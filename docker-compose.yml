@@ -1,0 +1,172 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (共通DB)
+  postgres:
+    image: postgres:16-alpine
+    container_name: openclaw-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-openclaw}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-openclaw}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - openclaw-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openclaw"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # OpenClaw AI Agent
+  openclaw:
+    build:
+      context: ./docker/openclaw
+      dockerfile: Dockerfile
+    container_name: openclaw-agent
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"  # ローカルホストのみアクセス可
+    environment:
+      # LLM Provider
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ZHIPUAI_API_KEY: ${ZHIPUAI_API_KEY}
+      MODEL_PROVIDER: ${MODEL_PROVIDER:-anthropic}
+      MODEL_NAME: ${MODEL_NAME:-claude-sonnet-4}
+      
+      # Telegram Bot
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
+      
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openclaw}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-openclaw}
+      
+      # Internal Services
+      N8N_BASE_URL: http://n8n:5678
+      OPENNOTEBOOK_URL: http://opennotebook:8080
+      OPENNOTEBOOK_API_KEY: ${OPENNOTEBOOK_API_KEY}
+      
+      # Security
+      ALLOWED_HOSTS: localhost,127.0.0.1
+      PORT: 3000
+      NODE_ENV: production
+    volumes:
+      - openclaw_data:/app/data
+      - ./skills:/app/skills  # カスタムスキルをマウント
+    depends_on:
+      postgres:
+        condition: service_healthy
+      n8n:
+        condition: service_started
+      opennotebook:
+        condition: service_started
+    networks:
+      - openclaw-network
+    mem_limit: 2g
+    cpus: 1.5
+
+  # N8N Workflow Automation
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: openclaw-n8n
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5678:5678"  # ローカルホストのみアクセス可
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: ${POSTGRES_DB:-openclaw}
+      DB_POSTGRESDB_USER: ${POSTGRES_USER:-openclaw}
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      N8N_BASIC_AUTH_ACTIVE: true
+      N8N_BASIC_AUTH_USER: ${N8N_USER:-admin}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_PASSWORD:-changeme}
+      N8N_HOST: localhost
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      WEBHOOK_URL: http://n8n:5678/
+      EXECUTIONS_DATA_SAVE_ON_SUCCESS: all
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./docker/n8n/workflows:/home/node/.n8n/workflows
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - openclaw-network
+    mem_limit: 1g
+    cpus: 1.0
+
+  # OpenNotebook (NotebookLM Alternative)
+  opennotebook:
+    build:
+      context: ./docker/opennotebook
+      dockerfile: Dockerfile
+    container_name: openclaw-opennotebook
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"  # ローカルホストのみアクセス可
+    environment:
+      # LLM Providers (複数対応)
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ZHIPUAI_API_KEY: ${ZHIPUAI_API_KEY}
+      
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openclaw}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-openclaw}
+      
+      # API Settings
+      OPENNOTEBOOK_API_KEY: ${OPENNOTEBOOK_API_KEY}
+      PORT: 8080
+      NODE_ENV: production
+    volumes:
+      - opennotebook_data:/app/data
+      - opennotebook_uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - openclaw-network
+    mem_limit: 1g
+    cpus: 1.0
+
+  # Nginx Reverse Proxy (Optional - 統合UI用)
+  nginx:
+    image: nginx:alpine
+    container_name: openclaw-nginx
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:80:80"  # ローカルホストのみアクセス可
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/html:/usr/share/nginx/html:ro
+    depends_on:
+      - openclaw
+      - n8n
+      - opennotebook
+    networks:
+      - openclaw-network
+    mem_limit: 256m
+
+volumes:
+  postgres_data:
+    driver: local
+  openclaw_data:
+    driver: local
+  n8n_data:
+    driver: local
+  opennotebook_data:
+    driver: local
+  opennotebook_uploads:
+    driver: local
+
+networks:
+  openclaw-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
