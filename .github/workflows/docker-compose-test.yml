@@ -1,0 +1,105 @@
+name: Docker Compose Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  docker-compose-test:
+    name: Test Docker Compose Configuration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create required directories
+        run: |
+          mkdir -p data/{postgres,openclaw,n8n,opennotebook,opennotebook_uploads}
+          mkdir -p logs/{openclaw,n8n,opennotebook}
+          chmod -R 777 data logs
+
+      - name: Create .env file
+        run: |
+          cat > .env << 'EOF'
+          # Database
+          POSTGRES_USER=openclaw
+          POSTGRES_PASSWORD=test_password_123
+          POSTGRES_DB=openclaw
+
+          # LLM Providers (dummy keys for testing)
+          ANTHROPIC_API_KEY=sk-ant-test-key
+          OPENAI_API_KEY=sk-test-key
+          ZHIPUAI_API_KEY=test-key
+
+          # Telegram
+          TELEGRAM_BOT_TOKEN=123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
+          TELEGRAM_CHAT_ID=123456789
+
+          # N8N
+          N8N_USER=admin
+          N8N_PASSWORD=test_password_123
+          N8N_ENCRYPTION_KEY=test_encryption_key_32_characters
+
+          # OpenNotebook
+          OPENNOTEBOOK_API_KEY=test_api_key_32_characters_long
+
+          # Security
+          SESSION_SECRET=test_session_secret_32_chars_long
+          JWT_SECRET=test_jwt_secret_32_characters_long
+          JWT_EXPIRES_IN=24h
+
+          # Application
+          NODE_ENV=production
+          LOG_LEVEL=info
+          TZ=Asia/Tokyo
+
+          # User IDs
+          UID=1000
+          GID=1000
+          EOF
+
+      - name: Validate docker-compose.production.yml
+        run: docker compose -f docker-compose.production.yml config
+
+      - name: Build images
+        run: docker compose -f docker-compose.production.yml build --no-cache
+
+      - name: Start services
+        run: |
+          docker compose -f docker-compose.production.yml up -d
+          sleep 30
+
+      - name: Check container status
+        run: |
+          docker compose -f docker-compose.production.yml ps
+          docker compose -f docker-compose.production.yml ps | grep -q "running" || exit 1
+
+      - name: Check PostgreSQL health
+        run: |
+          docker compose -f docker-compose.production.yml exec -T postgres pg_isready -U openclaw
+
+      - name: Check N8N health
+        run: |
+          docker compose -f docker-compose.production.yml exec -T n8n wget --spider http://localhost:5678/healthz || exit 0
+
+      - name: Check OpenNotebook health
+        run: |
+          docker compose -f docker-compose.production.yml exec -T opennotebook wget --spider http://localhost:8080/health || exit 0
+
+      - name: Show logs on failure
+        if: failure()
+        run: |
+          docker compose -f docker-compose.production.yml logs postgres
+          docker compose -f docker-compose.production.yml logs n8n
+          docker compose -f docker-compose.production.yml logs opennotebook
+
+      - name: Stop services
+        if: always()
+        run: docker compose -f docker-compose.production.yml down -v

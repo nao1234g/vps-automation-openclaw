@@ -1,0 +1,242 @@
+# OpenClaw VPS - Development Docker Compose
+# 開発環境用の設定（本番環境よりセキュリティ制約が緩い）
+#
+# 使用方法:
+#   docker compose -f docker-compose.dev.yml up
+
+version: '3.8'
+
+services:
+  # ============================================
+  # PostgreSQL Database
+  # ============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: openclaw-postgres-dev
+    restart: unless-stopped
+
+    ports:
+      - "5432:5432"  # 開発環境ではポート公開
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-openclaw}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-openclaw}
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+
+    networks:
+      - backend
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-openclaw}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ============================================
+  # OpenClaw AI Agent (開発モード)
+  # ============================================
+  openclaw:
+    build:
+      context: ./docker/openclaw
+      dockerfile: Dockerfile
+      target: builder  # ビルドステージのみ使用
+    container_name: openclaw-agent-dev
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"  # 直接アクセス可能
+
+    environment:
+      # LLM Provider
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ZHIPUAI_API_KEY: ${ZHIPUAI_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+
+      # Telegram
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
+
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openclaw}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-openclaw}
+
+      # Internal Services
+      N8N_BASE_URL: http://n8n:5678
+      OPENNOTEBOOK_URL: http://opennotebook:8080
+
+      # Application
+      PORT: 3000
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+    volumes:
+      - ./skills:/app/skills:rw  # スキルをホットリロード
+      - ./logs/openclaw:/app/logs:rw
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      n8n:
+        condition: service_started
+
+    networks:
+      - frontend
+      - backend
+
+    # 開発環境ではコマンド上書き可能
+    command: ["npm", "run", "dev"]
+
+  # ============================================
+  # N8N Workflow Automation
+  # ============================================
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: openclaw-n8n-dev
+    restart: unless-stopped
+
+    ports:
+      - "5678:5678"  # 直接アクセス可能
+
+    environment:
+      # Database
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: ${POSTGRES_DB:-openclaw}
+      DB_POSTGRESDB_USER: ${POSTGRES_USER:-openclaw}
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      DB_POSTGRESDB_SCHEMA: n8n
+
+      # Authentication (開発環境では無効化可能)
+      N8N_BASIC_AUTH_ACTIVE: ${N8N_BASIC_AUTH_ACTIVE:-false}
+      N8N_BASIC_AUTH_USER: ${N8N_USER:-admin}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_PASSWORD:-password}
+
+      # Encryption
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:-dev_encryption_key}
+
+      # Network
+      N8N_HOST: 0.0.0.0
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      WEBHOOK_URL: http://localhost:5678/
+
+      # Execution
+      EXECUTIONS_DATA_SAVE_ON_SUCCESS: all
+      EXECUTIONS_DATA_SAVE_ON_ERROR: all
+
+      # Timezone
+      TZ: ${TZ:-Asia/Tokyo}
+
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./docker/n8n/workflows:/home/node/.n8n/workflows:ro
+      - ./logs/n8n:/home/node/.n8n/logs:rw
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    networks:
+      - frontend
+      - backend
+
+  # ============================================
+  # OpenNotebook
+  # ============================================
+  opennotebook:
+    build:
+      context: ./docker/opennotebook
+      dockerfile: Dockerfile
+    container_name: openclaw-opennotebook-dev
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"  # 直接アクセス可能
+
+    environment:
+      # LLM Providers
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ZHIPUAI_API_KEY: ${ZHIPUAI_API_KEY}
+
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openclaw}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-openclaw}
+
+      # API
+      OPENNOTEBOOK_API_KEY: ${OPENNOTEBOOK_API_KEY:-dev_api_key}
+      PORT: 8080
+      NODE_ENV: development
+      LOG_LEVEL: debug
+
+      # Timezone
+      TZ: ${TZ:-Asia/Tokyo}
+
+    volumes:
+      - opennotebook_data:/app/data
+      - opennotebook_uploads:/app/uploads
+      - ./docker/opennotebook/app:/app:rw  # ホットリロード
+      - ./logs/opennotebook:/app/logs:rw
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    networks:
+      - frontend
+      - backend
+
+    # 開発環境ではnodemonでホットリロード
+    command: ["npm", "run", "dev"]
+
+  # ============================================
+  # Adminer (データベース管理ツール)
+  # ============================================
+  adminer:
+    image: adminer:latest
+    container_name: openclaw-adminer-dev
+    restart: unless-stopped
+
+    ports:
+      - "8081:8080"
+
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+
+    networks:
+      - backend
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  postgres_data:
+    driver: local
+  n8n_data:
+    driver: local
+  opennotebook_data:
+    driver: local
+  opennotebook_uploads:
+    driver: local
+
+# ============================================
+# 開発環境の特徴:
+# ✓ すべてのポートを公開（直接アクセス可能）
+# ✓ ホットリロード対応
+# ✓ デバッグログレベル
+# ✓ セキュリティ制約が緩い
+# ✓ Adminerでデータベース管理
+# ✗ 本番環境では使用しないこと
+# ============================================
