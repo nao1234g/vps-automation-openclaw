@@ -1,32 +1,78 @@
-FROM node:20-alpine
+# OpenNotebook - Secure Production Build
+# Multi-stage build for security
 
-WORKDIR /app
+# ============================================
+# Build Stage
+# ============================================
+FROM node:20-alpine AS builder
 
-# システム依存関係
-RUN apk add --no-cache \
+# セキュリティアップデート
+RUN apk update && \
+    apk upgrade && \
+    apk add --no-cache \
     git \
     python3 \
     make \
-    g++
+    g++ && \
+    rm -rf /var/cache/apk/*
 
-# OpenNotebookのクローン（仮のリポジトリURL - 実際のものに置き換え）
-# NOTE: 実際のOpenNotebookリポジトリが存在する場合はそちらを使用
-RUN git clone https://github.com/open-notebook/open-notebook.git . || \
-    echo "OpenNotebook placeholder" > README.md
+WORKDIR /build
 
-# 依存関係のインストール（リポジトリが存在する場合）
-RUN if [ -f package.json ]; then npm install && npm run build; fi
+# プレースホルダーアプリをコピー（実際のアプリがある場合は置き換え）
+COPY app/ ./
 
-# データディレクトリ
-RUN mkdir -p /app/data /app/uploads
+# 依存関係のインストール
+RUN if [ -f package.json ]; then \
+    npm ci && \
+    npm run build 2>/dev/null || true && \
+    npm cache clean --force; \
+    fi
 
-# ヘルスチェック
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:8080/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" || exit 0
+# ============================================
+# Production Stage
+# ============================================
+FROM node:20-alpine
+
+LABEL maintainer="OpenClaw VPS Project"
+LABEL description="OpenNotebook - Secure Production"
+LABEL version="1.0.0"
+
+# セキュリティアップデート
+RUN apk update && \
+    apk upgrade && \
+    apk add --no-cache \
+    dumb-init \
+    curl && \
+    rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
+
+# 非rootユーザー作成
+RUN addgroup -g 1000 -S appgroup && \
+    adduser -u 1000 -S appuser -G appgroup
+
+# 作業ディレクトリ
+WORKDIR /app
+RUN chown -R appuser:appgroup /app
+
+# ビルドステージからコピー
+COPY --from=builder --chown=appuser:appgroup /build ./
+
+# データ・ログディレクトリ
+RUN mkdir -p /app/data /app/uploads /app/logs /app/.cache && \
+    chown -R appuser:appgroup /app/data /app/uploads /app/logs /app/.cache
+
+# 非rootユーザーに切り替え
+USER appuser
 
 # ポート公開
 EXPOSE 8080
 
-# 起動コマンド
-CMD if [ -f package.json ]; then npm start; else echo "OpenNotebook not configured" && sleep infinity; fi
+# ヘルスチェック
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# dumb-init使用
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
+# アプリケーション起動
+CMD ["node", "server.js"]
 

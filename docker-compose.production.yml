@@ -1,0 +1,490 @@
+# OpenClaw VPS - Production Docker Compose
+# セキュリティ強化版: 本番環境対応
+#
+# 使用方法:
+#   docker compose -f docker-compose.production.yml up -d
+#
+# または docker-compose.yml を置き換えて:
+#   docker compose up -d
+
+version: '3.8'
+
+services:
+  # ============================================
+  # PostgreSQL Database (共通DB)
+  # ============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: openclaw-postgres
+    restart: unless-stopped
+
+    # セキュリティ設定
+    security_opt:
+      - no-new-privileges:true
+
+    # PostgreSQLは自動的に非rootユーザー(postgres)で実行される
+
+    # リソース制限
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-openclaw}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-openclaw}
+      # セキュリティ強化
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data:rw
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+
+    networks:
+      - backend
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-openclaw} -d ${POSTGRES_DB:-openclaw}"]
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================
+  # OpenClaw AI Agent
+  # ============================================
+  openclaw:
+    build:
+      context: ./docker/openclaw
+      dockerfile: Dockerfile
+    container_name: openclaw-agent
+    restart: unless-stopped
+
+    # セキュリティ設定
+    security_opt:
+      - no-new-privileges:true
+      - apparmor=docker-default
+
+    # Capabilities制限
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+
+    # 非rootユーザーで実行
+    user: "${UID:-1000}:${GID:-1000}"
+
+    # リソース制限
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+
+    # ポート公開（内部ネットワークのみ）
+    expose:
+      - "3000"
+
+    environment:
+      # LLM Provider
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ZHIPUAI_API_KEY: ${ZHIPUAI_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      MODEL_PROVIDER: ${MODEL_PROVIDER:-anthropic}
+      MODEL_NAME: ${MODEL_NAME:-claude-sonnet-4}
+
+      # Telegram Bot
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
+
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openclaw}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-openclaw}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-openclaw}
+      DB_USER: ${POSTGRES_USER:-openclaw}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+
+      # Internal Services
+      N8N_BASE_URL: http://n8n:5678
+      OPENNOTEBOOK_URL: http://opennotebook:8080
+      OPENNOTEBOOK_API_KEY: ${OPENNOTEBOOK_API_KEY}
+
+      # Security
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost,http://127.0.0.1}
+      SESSION_SECRET: ${SESSION_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
+
+      # Application
+      PORT: 3000
+      NODE_ENV: ${NODE_ENV:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      TZ: ${TZ:-Asia/Tokyo}
+
+    volumes:
+      - openclaw_data:/app/data:rw
+      - ./skills:/app/skills:ro
+      - ./logs/openclaw:/app/logs:rw
+
+    # 一時ファイル用tmpfs
+    tmpfs:
+      - /tmp:size=100M,mode=1777
+      - /app/.cache:size=50M,mode=0755
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      n8n:
+        condition: service_healthy
+
+    networks:
+      - frontend
+      - backend
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================
+  # N8N Workflow Automation
+  # ============================================
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: openclaw-n8n
+    restart: unless-stopped
+
+    # セキュリティ設定
+    security_opt:
+      - no-new-privileges:true
+
+    # N8Nは自動的に非rootユーザー(node)で実行される
+
+    # リソース制限
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    # ポート公開（内部ネットワークのみ）
+    expose:
+      - "5678"
+
+    environment:
+      # Database
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: ${POSTGRES_DB:-openclaw}
+      DB_POSTGRESDB_USER: ${POSTGRES_USER:-openclaw}
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_POSTGRESDB_SCHEMA: n8n
+
+      # Authentication
+      N8N_BASIC_AUTH_ACTIVE: ${N8N_BASIC_AUTH_ACTIVE:-true}
+      N8N_BASIC_AUTH_USER: ${N8N_USER:-admin}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_PASSWORD}
+
+      # Encryption
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+
+      # Network
+      N8N_HOST: 0.0.0.0
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      WEBHOOK_URL: ${DOMAIN_NAME:+https://${DOMAIN_NAME}}${DOMAIN_NAME:-http://n8n:5678}/
+
+      # Execution
+      EXECUTIONS_DATA_SAVE_ON_SUCCESS: all
+      EXECUTIONS_DATA_SAVE_ON_ERROR: all
+      EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS: true
+
+      # Timezone
+      GENERIC_TIMEZONE: ${TZ:-Asia/Tokyo}
+      TZ: ${TZ:-Asia/Tokyo}
+
+    volumes:
+      - n8n_data:/home/node/.n8n:rw
+      - ./docker/n8n/workflows:/home/node/.n8n/workflows:ro
+      - ./logs/n8n:/home/node/.n8n/logs:rw
+
+    tmpfs:
+      - /tmp:size=100M,mode=1777
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    networks:
+      - frontend
+      - backend
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================
+  # OpenNotebook (NotebookLM Alternative)
+  # ============================================
+  opennotebook:
+    build:
+      context: ./docker/opennotebook
+      dockerfile: Dockerfile
+    container_name: openclaw-opennotebook
+    restart: unless-stopped
+
+    # セキュリティ設定
+    security_opt:
+      - no-new-privileges:true
+
+    # 非rootユーザーで実行
+    user: "${UID:-1000}:${GID:-1000}"
+
+    # Capabilities制限
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+
+    # リソース制限
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    # ポート公開（内部ネットワークのみ）
+    expose:
+      - "8080"
+
+    environment:
+      # LLM Providers
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ZHIPUAI_API_KEY: ${ZHIPUAI_API_KEY}
+
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openclaw}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-openclaw}
+
+      # API Settings
+      OPENNOTEBOOK_API_KEY: ${OPENNOTEBOOK_API_KEY}
+      PORT: 8080
+      NODE_ENV: ${NODE_ENV:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+
+      # Timezone
+      TZ: ${TZ:-Asia/Tokyo}
+
+    volumes:
+      - opennotebook_data:/app/data:rw
+      - opennotebook_uploads:/app/uploads:rw
+      - ./logs/opennotebook:/app/logs:rw
+
+    tmpfs:
+      - /tmp:size=100M,mode=1777
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    networks:
+      - frontend
+      - backend
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================
+  # Nginx Reverse Proxy
+  # ============================================
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: openclaw-nginx
+    restart: unless-stopped
+
+    # セキュリティ設定
+    security_opt:
+      - no-new-privileges:true
+
+    # 読み取り専用
+    read_only: true
+
+    # Capabilities制限
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - CHOWN
+      - SETGID
+      - SETUID
+
+    # リソース制限
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+      - ./docker/nginx/html:/usr/share/nginx/html:ro
+
+    # 一時ファイル用tmpfs（read_only使用時に必要）
+    tmpfs:
+      - /tmp:size=10M,mode=1777
+      - /var/run:size=10M,mode=0755
+      - /var/cache/nginx:size=50M,mode=0755
+      - /var/log/nginx:size=50M,mode=0755
+
+    depends_on:
+      - openclaw
+      - n8n
+      - opennotebook
+
+    networks:
+      - frontend
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  # フロントエンド（Nginx <-> アプリ）
+  frontend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.1.0/24
+
+  # バックエンド（アプリ <-> DB）
+  backend:
+    driver: bridge
+    internal: true  # 外部アクセス不可
+    ipam:
+      config:
+        - subnet: 172.28.2.0/24
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/data/postgres
+
+  openclaw_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/data/openclaw
+
+  n8n_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/data/n8n
+
+  opennotebook_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/data/opennotebook
+
+  opennotebook_uploads:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/data/opennotebook_uploads
+
+# ============================================
+# セキュリティチェックリスト:
+# ✓ no-new-privileges 全コンテナに設定
+# ✓ 非rootユーザーで実行（可能な限り）
+# ✓ 読み取り専用ファイルシステム（Nginx）
+# ✓ Capabilities最小化
+# ✓ リソース制限設定
+# ✓ ネットワーク分離（frontend/backend）
+# ✓ ヘルスチェック全サービス
+# ✓ ログローテーション設定
+# ✓ 内部ポートのみ公開（Nginx経由）
+# ✓ tmpfs使用（一時ファイル）
+# ============================================

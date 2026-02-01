@@ -1,0 +1,62 @@
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Data directories
+data/
+logs/
+
+# Backup files
+backups/
+*.tar.gz
+*.sql.gz
+
+# Security reports
+security-reports/
+
+# SSL certificates (managed by Certbot)
+docker/nginx/ssl/*.pem
+docker/nginx/ssl/*.key
+
+# Docker volumes
+volumes/
+
+# Temporary files
+tmp/
+*.tmp
+*.swp
+*.swo
+*~
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.claude/projects/
+
+# Logs
+*.log
