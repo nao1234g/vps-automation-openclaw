@@ -1,0 +1,103 @@
+{
+  "name": "Research Paper Automation",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "research-automation"
+    },
+    {
+      "parameters": {
+        "url": "https://api.semanticscholar.org/graph/v1/paper/search",
+        "authentication": "none",
+        "method": "GET",
+        "qs": {
+          "query": "={{ $json.query }}",
+          "limit": "10",
+          "fields": "title,abstract,year,authors,url,citationCount"
+        }
+      },
+      "id": "search-papers",
+      "name": "Search Papers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const papers = items[0].json.data;\nconst formatted = papers.map(paper => ({\n  title: paper.title,\n  abstract: paper.abstract || 'No abstract available',\n  year: paper.year,\n  authors: paper.authors?.map(a => a.name).join(', ') || 'Unknown',\n  url: paper.url,\n  citations: paper.citationCount\n}));\n\nreturn formatted.map(paper => ({ json: paper }));"
+      },
+      "id": "format-papers",
+      "name": "Format Papers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://opennotebook:8080/api/v1/notebooks",
+        "authentication": "none",
+        "method": "POST",
+        "bodyParameters": {
+          "title": "={{ $json.title }}",
+          "content": "# {{ $json.title }}\\n\\n**Authors:** {{ $json.authors }}\\n**Year:** {{ $json.year }}\\n**Citations:** {{ $json.citations }}\\n\\n## Abstract\\n{{ $json.abstract }}\\n\\n**URL:** {{ $json.url }}"
+        },
+        "options": {}
+      },
+      "id": "create-notebook",
+      "name": "Create Notebook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const summary = `研究論文の調査が完了しました。\\n\\n検索クエリ: ${items[0].json.query}\\n取得論文数: ${items.length}\\n\\nOpenNotebookに保存しました。`;\n\nreturn [{ json: { message: summary } }];"
+      },
+      "id": "create-summary",
+      "name": "Create Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://openclaw:3000/api/telegram/notify",
+        "authentication": "none",
+        "bodyParameters": {
+          "message": "={{ $json.message }}"
+        }
+      },
+      "id": "send-notification",
+      "name": "Send Telegram Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{ "node": "Search Papers", "type": "main", "index": 0 }]]
+    },
+    "Search Papers": {
+      "main": [[{ "node": "Format Papers", "type": "main", "index": 0 }]]
+    },
+    "Format Papers": {
+      "main": [[{ "node": "Create Notebook", "type": "main", "index": 0 }]]
+    },
+    "Create Notebook": {
+      "main": [[{ "node": "Create Summary", "type": "main", "index": 0 }]]
+    },
+    "Create Summary": {
+      "main": [[{ "node": "Send Telegram Notification", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1"
+}

@@ -1,0 +1,173 @@
+# Prometheus Alert Rules
+groups:
+  # ============================================
+  # システムアラート
+  # ============================================
+  - name: system_alerts
+    interval: 30s
+    rules:
+      # ディスク使用率
+      - alert: HighDiskUsage
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 15
+        for: 5m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "ディスク使用率が高い ({{ $value | humanize }}%)"
+          description: "ディスク空き容量が15%未満です。クリーンアップが必要です。"
+
+      - alert: CriticalDiskUsage
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 5
+        for: 2m
+        labels:
+          severity: critical
+          category: system
+        annotations:
+          summary: "ディスク使用率が危険レベル ({{ $value | humanize }}%)"
+          description: "ディスク空き容量が5%未満です。緊急対応が必要です。"
+
+      # メモリ使用率
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "メモリ使用率が高い ({{ $value | humanize }}%)"
+          description: "メモリ使用率が90%を超えています。"
+
+      # CPU使用率
+      - alert: HighCpuUsage
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "CPU使用率が高い ({{ $value | humanize }}%)"
+          description: "CPU使用率が80%を超えています。"
+
+  # ============================================
+  # コンテナアラート
+  # ============================================
+  - name: container_alerts
+    interval: 30s
+    rules:
+      # コンテナダウン
+      - alert: ContainerDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: container
+        annotations:
+          summary: "コンテナが停止 ({{ $labels.job }})"
+          description: "{{ $labels.job }} コンテナが2分間応答していません。"
+
+      # コンテナメモリ使用率
+      - alert: ContainerHighMemory
+        expr: (container_memory_usage_bytes / container_spec_memory_limit_bytes) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          category: container
+        annotations:
+          summary: "コンテナメモリ使用率が高い ({{ $value | humanize }}%)"
+          description: "{{ $labels.name }} のメモリ使用率が90%を超えています。"
+
+      # コンテナCPU使用率
+      - alert: ContainerHighCpu
+        expr: (rate(container_cpu_usage_seconds_total[5m])) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          category: container
+        annotations:
+          summary: "コンテナCPU使用率が高い ({{ $value | humanize }}%)"
+          description: "{{ $labels.name }} のCPU使用率が80%を超えています。"
+
+      # コンテナ再起動
+      - alert: ContainerRestarting
+        expr: rate(container_last_seen[5m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          category: container
+        annotations:
+          summary: "コンテナが頻繁に再起動"
+          description: "{{ $labels.name }} が5分間で複数回再起動しています。"
+
+  # ============================================
+  # PostgreSQLアラート
+  # ============================================
+  - name: postgres_alerts
+    interval: 30s
+    rules:
+      # 接続数
+      - alert: PostgresHighConnections
+        expr: pg_stat_database_numbackends > 80
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "PostgreSQL接続数が多い ({{ $value }})"
+          description: "PostgreSQLの接続数が80を超えています。"
+
+      # デッドロック
+      - alert: PostgresDeadlocks
+        expr: rate(pg_stat_database_deadlocks[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "PostgreSQLでデッドロック発生"
+          description: "PostgreSQLでデッドロックが検出されました。"
+
+  # ============================================
+  # Nginxアラート
+  # ============================================
+  - name: nginx_alerts
+    interval: 30s
+    rules:
+      # 高いエラー率
+      - alert: NginxHighErrorRate
+        expr: rate(nginx_http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          category: nginx
+        annotations:
+          summary: "Nginx 5xxエラー率が高い"
+          description: "Nginxの5xxエラー率が5%を超えています。"
+
+  # ============================================
+  # カスタムアラート
+  # ============================================
+  - name: custom_alerts
+    interval: 60s
+    rules:
+      # バックアップ失敗（カスタムメトリクス）
+      - alert: BackupFailed
+        expr: openclaw_backup_status == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: backup
+        annotations:
+          summary: "バックアップ失敗"
+          description: "最後のバックアップが失敗しました。確認してください。"
+
+      # セキュリティスキャン検出（カスタムメトリクス）
+      - alert: SecurityVulnerabilityDetected
+        expr: openclaw_security_vulnerabilities > 0
+        for: 1m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "セキュリティ脆弱性検出 ({{ $value }}件)"
+          description: "セキュリティスキャンで{{ $value }}件の脆弱性が検出されました。"

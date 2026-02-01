@@ -1,0 +1,74 @@
+# Prometheus Configuration
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'openclaw-vps'
+    environment: 'production'
+
+# Alertmanager設定
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+# アラートルール
+rule_files:
+  - '/etc/prometheus/alerts.yml'
+
+# スクレイプ設定
+scrape_configs:
+  # Prometheus自身
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # Node Exporter (サーバーメトリクス)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          service: 'node-exporter'
+          instance: 'openclaw-vps'
+
+  # cAdvisor (コンテナメトリクス)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+        labels:
+          service: 'cadvisor'
+
+  # PostgreSQL Exporter (追加可能)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+        labels:
+          service: 'postgres'
+    # この設定を有効にする場合は、postgres-exporterコンテナを追加
+
+  # Nginx (nginxのstatus moduleを有効にする必要あり)
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:9113']
+        labels:
+          service: 'nginx'
+    # この設定を有効にする場合は、nginx-prometheus-exporterを追加
+
+  # OpenClaw (カスタムメトリクスエンドポイント /metrics を実装する場合)
+  # - job_name: 'openclaw'
+  #   static_configs:
+  #     - targets: ['openclaw:3000']
+  #       labels:
+  #         service: 'openclaw'
+  #   metrics_path: '/metrics'
+
+  # N8N (カスタムメトリクスエンドポイントを実装する場合)
+  # - job_name: 'n8n'
+  #   static_configs:
+  #     - targets: ['n8n:5678']
+  #       labels:
+  #         service: 'n8n'
+  #   metrics_path: '/metrics'

@@ -1,0 +1,93 @@
+# Alertmanager Configuration
+global:
+  resolve_timeout: 5m
+
+# アラート通知先の設定
+route:
+  group_by: ['alertname', 'severity', 'category']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: 'default'
+
+  # セキュリティ別のルーティング
+  routes:
+    # Critical: 即座に通知
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 0s
+
+    # Warning: まとめて通知
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+      group_wait: 30s
+
+    # System: システムアラート
+    - match:
+        category: system
+      receiver: 'system-alerts'
+
+    # Database: データベースアラート
+    - match:
+        category: database
+      receiver: 'database-alerts'
+
+# 通知先（Receiver）の定義
+receivers:
+  # デフォルト通知先
+  - name: 'default'
+    webhook_configs:
+      - url: 'http://openclaw:3000/api/alerts/webhook'
+        send_resolved: true
+
+  # Critical: Telegram通知
+  - name: 'critical-alerts'
+    webhook_configs:
+      - url: 'http://openclaw:3000/api/alerts/critical'
+        send_resolved: true
+    # Telegramが設定されている場合
+    # telegram_configs:
+    #   - bot_token: '${TELEGRAM_BOT_TOKEN}'
+    #     chat_id: ${TELEGRAM_CHAT_ID}
+    #     parse_mode: 'HTML'
+    #     message: |
+    #       🚨 <b>CRITICAL ALERT</b>
+    #       {{ range .Alerts }}
+    #       Alert: {{ .Labels.alertname }}
+    #       Summary: {{ .Annotations.summary }}
+    #       Description: {{ .Annotations.description }}
+    #       {{ end }}
+
+  # Warning: 通常アラート
+  - name: 'warning-alerts'
+    webhook_configs:
+      - url: 'http://openclaw:3000/api/alerts/warning'
+        send_resolved: true
+
+  # System: システムアラート
+  - name: 'system-alerts'
+    webhook_configs:
+      - url: 'http://openclaw:3000/api/alerts/system'
+        send_resolved: true
+
+  # Database: データベースアラート
+  - name: 'database-alerts'
+    webhook_configs:
+      - url: 'http://openclaw:3000/api/alerts/database'
+        send_resolved: true
+
+# 抑制ルール（同じアラートが繰り返し通知されないように）
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']
+
+  - source_match:
+      alertname: 'CriticalDiskUsage'
+    target_match:
+      alertname: 'HighDiskUsage'
+    equal: ['instance']

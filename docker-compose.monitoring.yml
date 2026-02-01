@@ -1,0 +1,202 @@
+# OpenClaw VPS - Monitoring Stack (Prometheus + Grafana)
+# 監視・アラート用のDocker Compose拡張
+#
+# 使用方法:
+#   docker compose -f docker-compose.production.yml -f docker-compose.monitoring.yml up -d
+
+version: '3.8'
+
+services:
+  # ============================================
+  # Prometheus (メトリクス収集)
+  # ============================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: openclaw-prometheus
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    user: "nobody"
+
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+
+    ports:
+      - "9090:9090"
+
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./docker/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data:/prometheus
+
+    networks:
+      - monitoring
+      - frontend
+      - backend
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # Grafana (可視化ダッシュボード)
+  # ============================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: openclaw-grafana
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    user: "472"  # Grafanaのデフォルトユーザー
+
+    ports:
+      - "3001:3000"
+
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_INSTALL_PLUGINS: ${GRAFANA_PLUGINS:-}
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:3001}
+      GF_USERS_ALLOW_SIGN_UP: false
+
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+    depends_on:
+      - prometheus
+
+    networks:
+      - monitoring
+      - frontend
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # Node Exporter (サーバーメトリクス)
+  # ============================================
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: openclaw-node-exporter
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+
+    networks:
+      - monitoring
+
+  # ============================================
+  # cAdvisor (コンテナメトリクス)
+  # ============================================
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: openclaw-cadvisor
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    privileged: true
+
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+
+    networks:
+      - monitoring
+
+  # ============================================
+  # Alertmanager (アラート管理)
+  # ============================================
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: openclaw-alertmanager
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    user: "nobody"
+
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+
+    ports:
+      - "9093:9093"
+
+    volumes:
+      - ./docker/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+
+    networks:
+      - monitoring
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9093/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  monitoring:
+    driver: bridge
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  alertmanager_data:
+    driver: local
+
+# ============================================
+# 使用例:
+#
+# 1. 監視スタックを含めて起動
+#    docker compose -f docker-compose.production.yml -f docker-compose.monitoring.yml up -d
+#
+# 2. アクセス先
+#    - Prometheus: http://localhost:9090
+#    - Grafana: http://localhost:3001 (admin/パスワード)
+#    - Alertmanager: http://localhost:9093
+#
+# 3. 停止
+#    docker compose -f docker-compose.production.yml -f docker-compose.monitoring.yml down
+# ============================================

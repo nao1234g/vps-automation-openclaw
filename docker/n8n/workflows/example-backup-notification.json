@@ -1,0 +1,112 @@
+{
+  "name": "Backup Success Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "backup-notify"
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "backup-notify"
+    },
+    {
+      "parameters": {
+        "functionCode": "const data = items[0].json;\n\nconst status = data.success ? '✅ 成功' : '❌ 失敗';\nconst emoji = data.success ? '💾' : '🚨';\n\nconst message = `${emoji} **バックアップ通知**\\n\\n` +\n  `ステータス: ${status}\\n` +\n  `タイプ: ${data.type || 'full'}\\n` +\n  `タイムスタンプ: ${data.timestamp}\\n` +\n  `サイズ: ${data.size || 'N/A'}\\n\\n` +\n  (data.error ? `エラー: ${data.error}` : '正常に完了しました。');\n\nreturn [{ json: { message, success: data.success } }];"
+      },
+      "id": "format-message",
+      "name": "Format Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.success }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "check-success",
+      "name": "Check Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "title": "Backup Success",
+        "content": "={{ $json.message }}",
+        "options": {
+          "color": "green"
+        }
+      },
+      "id": "success-notification",
+      "name": "Success Notification",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "title": "Backup Failed",
+        "content": "={{ $json.message }}",
+        "options": {
+          "color": "red",
+          "priority": "high"
+        }
+      },
+      "id": "failure-notification",
+      "name": "Failure Notification",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [850, 400]
+    },
+    {
+      "parameters": {
+        "url": "http://opennotebook:8080/api/v1/notebooks",
+        "method": "POST",
+        "bodyParameters": {
+          "title": "Backup Report - {{ $now }}",
+          "content": "={{ $json.message }}",
+          "tags": ["backup", "system"]
+        }
+      },
+      "id": "log-to-notebook",
+      "name": "Log to OpenNotebook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Format Message", "type": "main", "index": 0 }]]
+    },
+    "Format Message": {
+      "main": [[{ "node": "Check Success", "type": "main", "index": 0 }]]
+    },
+    "Check Success": {
+      "main": [
+        [{ "node": "Success Notification", "type": "main", "index": 0 }],
+        [{ "node": "Failure Notification", "type": "main", "index": 0 }]
+      ]
+    },
+    "Success Notification": {
+      "main": [[{ "node": "Log to OpenNotebook", "type": "main", "index": 0 }]]
+    },
+    "Failure Notification": {
+      "main": [[{ "node": "Log to OpenNotebook", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1"
+}
