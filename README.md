@@ -61,37 +61,127 @@
 
                                             ### Phase 2: SSH認証の設定
 
-                                            #### ステップ 2.1: SSHキーペアの生成
 
-                                            ローカルPCで実行：
-                                            ```bash
-                                            ssh-keygen -t ed25519 -C "openclaw-vps"
-                                            # 保存場所: ~/.ssh/openclaw_vps
-                                            ```
+ConoHa VPSでは、コントロールパネルから簡単にSSH接続の設定ができます。
 
-                                            #### ステップ 2.2: 公開鍵をVPSに登録
+#### ステップ 2.1: ConoHaコントロールパネルでIPアドレスを確認
 
-                                            ```bash
-                                            # ローカルPCから公開鍵をコピー
-                                            cat ~/.ssh/openclaw_vps.pub
+[1] [ConoHaコントロールパネル](https://cp.conoha.jp/)にログイン
 
-                                            # VPSにSSHでログイン（初回はパスワード認証）
-                                            ssh root@YOUR_VPS_IP
+[2] 左側のメニューから「**サーバー**」を選択
 
-                                            # VPS側で公開鍵を登録
-                                            mkdir -p ~/.ssh
-                                            echo "YOUR_PUBLIC_KEY" >> ~/.ssh/authorized_keys
-                                            chmod 700 ~/.ssh
-                                            chmod 600 ~/.ssh/authorized_keys
-                                            ```
+[3] サーバーリストが表示されます。対象のサーバーの**ネームタグ**をクリック
 
-                                            #### ステップ 2.3: SSH接続テスト
+[4] 「**ネットワーク情報**」の「**IPアドレス**」の項目で確認
 
-                                            ```bash
-                                            ssh -i ~/.ssh/openclaw_vps root@YOUR_VPS_IP
-                                            ```
+> 💡 このIPアドレスを後の手順で使用します
 
-                                            **✅ ゴール:** パスワードなしでVPSにSSH接続できる状態
+---
+
+#### ステップ 2.2: SSHクライアントソフトの準備
+
+**Windowsの場合**、以下のSSHクライアントを推奨：
+- **TeraTerm**（無料、日本語対応）
+  - 公式サイト: https://ttssh2.osdn.jp/
+- **PuTTY**（無料、多機能）
+  - 公式サイト: https://www.putty.org/
+
+**macOS / Linuxの場合**：
+- 標準搭載の`ssh`コマンドを使用（ターミナルから）
+
+---
+
+#### ステップ 2.3: パスワード認証でSSH接続（初回）
+
+**■ macOS / Linuxの場合**
+
+ターミナルを開いて以下を実行：
+\`\`\`bash
+ssh root@YOUR_VPS_IP
+# 例: ssh root@123.456.789.012
+\`\`\`
+
+初回接続時に以下のメッセージが表示されます：
+\`\`\`
+The authenticity of host '123.456.789.012' can't be established.
+Are you sure you want to continue connecting (yes/no)?
+\`\`\`
+→ **yes** と入力してEnter
+
+VPS作成時に設定した**rootパスワード**を入力してログイン
+
+**■ Windows（TeraTerm）の場合**
+
+1. TeraTermを起動
+2. 「ホスト」にVPSの**IPアドレス**を入力
+3. 「TCPポート」は **22** のまま
+4. 「サービス」は **SSH** を選択
+5. 「OK」をクリック
+6. ユーザ名：**root**
+7. パスワード：VPS作成時に設定した**rootパスワード**
+8. 「OK」をクリックしてログイン
+
+> 📚 **詳細な手順は公式ドキュメント参照：**
+> - [SSH接続でVPSにログインする](https://support.conoha.jp/v/vps_ssh/)
+> - [TeraTermでのSSH接続設定](https://support.conoha.jp/v/vpstera/)
+> - [PuTTYでのSSH接続設定](https://support.conoha.jp/v/vpsputty/)
+
+---
+
+#### ステップ 2.4: 公開鍵認証の設定（推奨・セキュリティ強化）
+
+パスワード認証よりも安全な**公開鍵認証**の設定を強く推奨します。
+
+**■ ローカルPCで鍵ペアを生成**
+
+macOS / Linuxの場合：
+\`\`\`bash
+# ED25519鍵の生成（推奨）
+ssh-keygen -t ed25519 -C "openclaw-conoha-vps"
+
+# 保存場所を聞かれたらEnter（デフォルト: ~/.ssh/id_ed25519）
+# パスフレーズは設定を推奨（空欄でも可）
+\`\`\`
+
+Windowsの場合（Git Bash）：
+\`\`\`bash
+ssh-keygen -t ed25519 -C "openclaw-conoha-vps"
+# 保存場所: C:\\Users\\YourName\\.ssh\\id_ed25519
+\`\`\`
+
+**■ 公開鍵をVPSに配置**
+
+方法1：\`ssh-copy-id\`コマンド（macOS/Linux/Git Bash）
+\`\`\`bash
+ssh-copy-id -i ~/.ssh/id_ed25519.pub root@YOUR_VPS_IP
+\`\`\`
+
+方法2：手動で配置
+\`\`\`bash
+# ローカルPCで公開鍵の内容をコピー
+cat ~/.ssh/id_ed25519.pub
+
+# VPSにSSHログイン後
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+nano ~/.ssh/authorized_keys
+# コピーした公開鍵を貼り付けて保存（Ctrl+O → Enter → Ctrl+X）
+chmod 600 ~/.ssh/authorized_keys
+\`\`\`
+
+**■ 鍵認証でのSSH接続テスト**
+
+\`\`\`bash
+ssh -i ~/.ssh/id_ed25519 root@YOUR_VPS_IP
+# パスワードなしでログインできれば成功！
+\`\`\`
+
+> 🔐 **セキュリティTips：**
+> - 公開鍵認証設定後は、パスワード認証を無効化することを推奨
+> - 一般ユーザーでの公開鍵認証手順：[ConoHa公式ガイド](https://support.conoha.jp/v/vpssshuser/)
+> - ConoHaコントロールパネルでもSSH Key登録が可能：[SSH Key登録方法](https://support.conoha.jp/v/sshkey/)
+
+**✅ ゴール:** VPSにSSH接続できる状態（パスワード認証または公開鍵認証）
 
                                             ---
 
