@@ -1,0 +1,155 @@
+# セキュアなDockerfileテンプレート
+# このファイルはセキュリティベストプラクティスに従った設定例です
+#
+# セキュリティ原則:
+# 1. 最小限のベースイメージを使用
+# 2. 非rootユーザーで実行
+# 3. 最新の安定バージョンを使用
+# 4. 脆弱性スキャンを実施
+# 5. マルチステージビルドでイメージサイズを最小化
+
+# ============================================
+# ビルドステージ
+# ============================================
+FROM node:20-alpine AS builder
+
+# セキュリティ: 非rootユーザーの作成（ビルド用）
+RUN addgroup -g 1001 -S buildgroup && \
+    adduser -u 1001 -S builduser -G buildgroup
+
+# 作業ディレクトリの設定
+WORKDIR /build
+
+# 依存関係ファイルのコピー（キャッシュ最適化）
+COPY --chown=builduser:buildgroup package*.json ./
+
+# セキュリティアップデート適用
+RUN apk update && \
+    apk upgrade && \
+    apk add --no-cache \
+    dumb-init=~1.2 && \
+    rm -rf /var/cache/apk/*
+
+# ユーザー切り替え（ビルドも非rootで実行）
+USER builduser
+
+# 依存関係のインストール（本番用のみ）
+RUN npm ci --only=production && \
+    npm cache clean --force
+
+# アプリケーションコードのコピー
+COPY --chown=builduser:buildgroup . .
+
+# ビルド実行（必要な場合）
+# RUN npm run build
+
+# ============================================
+# 本番ステージ（最小化）
+# ============================================
+FROM node:20-alpine
+
+# メタデータ
+LABEL maintainer="your-email@example.com"
+LABEL description="Secure Node.js application"
+LABEL version="1.0.0"
+
+# セキュリティアップデート
+RUN apk update && \
+    apk upgrade && \
+    apk add --no-cache \
+    dumb-init=~1.2 \
+    curl=~8 && \
+    rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
+
+# 非rootユーザーの作成
+RUN addgroup -g 1000 -S appgroup && \
+    adduser -u 1000 -S appuser -G appgroup
+
+# 作業ディレクトリの作成と権限設定
+WORKDIR /app
+RUN chown -R appuser:appgroup /app
+
+# ビルドステージから必要なファイルのみコピー
+COPY --from=builder --chown=appuser:appgroup /build/node_modules ./node_modules
+COPY --from=builder --chown=appuser:appgroup /build/package*.json ./
+COPY --from=builder --chown=appuser:appgroup /build/*.js ./
+# COPY --from=builder --chown=appuser:appgroup /build/dist ./dist  # ビルド成果物がある場合
+
+# 非rootユーザーに切り替え
+USER appuser
+
+# ポート公開（ドキュメント用）
+EXPOSE 3000
+
+# ヘルスチェック
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD node healthcheck.js || exit 1
+
+# dumb-initを使用してPID 1問題を回避
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
+# アプリケーション起動
+CMD ["node", "server.js"]
+
+# ============================================
+# セキュリティチェックリスト:
+# ✓ Alpine Linuxで最小化
+# ✓ 非rootユーザーで実行
+# ✓ マルチステージビルド
+# ✓ 最新パッケージにアップデート
+# ✓ 不要なファイルを削除
+# ✓ dumb-init使用
+# ✓ ヘルスチェック設定
+# ✓ 適切なファイル権限
+# ============================================
+
+# ============================================
+# Python版の例
+# ============================================
+# FROM python:3.12-alpine AS builder
+#
+# RUN addgroup -g 1001 -S buildgroup && \
+#     adduser -u 1001 -S builduser -G buildgroup
+#
+# WORKDIR /build
+#
+# RUN apk update && \
+#     apk upgrade && \
+#     apk add --no-cache \
+#     gcc \
+#     musl-dev \
+#     libffi-dev && \
+#     rm -rf /var/cache/apk/*
+#
+# COPY --chown=builduser:buildgroup requirements.txt .
+#
+# USER builduser
+#
+# RUN pip install --user --no-cache-dir -r requirements.txt
+#
+# FROM python:3.12-alpine
+#
+# RUN apk update && \
+#     apk upgrade && \
+#     apk add --no-cache dumb-init && \
+#     rm -rf /var/cache/apk/*
+#
+# RUN addgroup -g 1000 -S appgroup && \
+#     adduser -u 1000 -S appuser -G appgroup
+#
+# WORKDIR /app
+#
+# COPY --from=builder --chown=appuser:appgroup /home/builduser/.local /home/appuser/.local
+# COPY --chown=appuser:appgroup . .
+#
+# ENV PATH=/home/appuser/.local/bin:$PATH
+#
+# USER appuser
+#
+# EXPOSE 8000
+#
+# HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+#     CMD python healthcheck.py || exit 1
+#
+# ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+# CMD ["python", "app.py"]
