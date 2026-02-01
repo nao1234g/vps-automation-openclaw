@@ -1,0 +1,2 @@
+# vps-automation-openclaw
+VPS自動化ガイド：OpenClaw(旧Clawdbot/Moltbot)のセルフホスト導入とN8N・OpenNotebook連携のためのオートパイロットワークフロー
