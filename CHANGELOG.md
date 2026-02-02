@@ -8,7 +8,74 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial project setup
+- None
+
+## [1.1.0] - 2024-02-02
+
+### Added
+
+#### N8N Automation Workflows (6 workflows)
+- VPS Health Check with Telegram alerts (every 6 hours)
+- Backup Status Notification workflow
+- Cost Alert Notification workflow
+- Security Scan Notification workflow
+- Research Paper Automation workflow (ArXiv → OpenNotebook → Telegram)
+- System Maintenance Reminder workflow
+
+#### Grafana Monitoring Dashboards (3 dashboards)
+- System Overview Dashboard (CPU, Memory, Disk, Network)
+- Container Monitoring Dashboard (per-container metrics)
+- Cost Tracking Dashboard (API usage, VPS costs, forecasts)
+
+#### Cost Tracking System
+- PostgreSQL schema for cost tracking (003_cost_tracking.sql)
+- API usage tracking table with automatic cost calculation
+- Daily costs aggregation view
+- Monthly budgets management
+- Cost alerts system with configurable thresholds
+- Resource usage tracking (CPU, Memory, Disk, Network)
+- Automated cost calculation functions and triggers
+- Cost tracker script (daily/monthly reports, forecasting, budget alerts)
+
+#### Operational Tools
+- System Status Dashboard (status_dashboard.sh) - Unified monitoring dashboard with watch mode
+- Backup Verification Tool (verify_backup.sh) - Validates backup integrity and restorability
+- Cost tracking script with CSV export
+
+#### Documentation Enhancements (6 new docs)
+- Comprehensive FAQ (45 questions and answers)
+- Migration Guide (v0.x to v1.x, environment migration, database migration)
+- Disaster Recovery Guide (5 failure scenarios, RTO: 2 hours, RPO: 24 hours)
+- Cost Optimization Guide (60% cost reduction strategies, case studies)
+- API Endpoints Documentation (complete API reference for all services)
+- Release Checklist (pre-release, release, post-release procedures)
+
+#### Development Tools
+- Performance benchmarking script (API, database, storage, network benchmarks)
+- Database seeding tool (sample users, workflows, notebooks)
+- Docker Compose override for development (docker-compose.override.yml)
+
+#### Environment Configuration
+- Production environment example (.env.production.example)
+- Development environment example (.env.development.example)
+- Staging environment example (.env.staging.example)
+- Complete configuration templates with security settings
+
+#### Project Infrastructure
+- Project badges (License, Version, Docker, Security, CI/CD, Tech Stack)
+- MIT License file
+- CODEOWNERS file (ownership definitions)
+- Enhanced README with comprehensive documentation links
+
+### Changed
+- Updated CHANGELOG.md to reflect all enhancements
+- Enhanced README.md with badges and better organization
+- Improved documentation structure and cross-references
+
+### Security
+- Added security vulnerability scanning in CI/CD
+- Enhanced cost tracking for API usage monitoring
+- Improved backup verification procedures
 
 ## [1.0.0] - 2024-02-02
 
