@@ -195,6 +195,7 @@ docker compose -f docker-compose.production.yml up -d
 ### 📚 その他
 | ドキュメント | 内容 |
 |------------|------|
+| **[docs/FAQ.md](docs/FAQ.md)** | ❓ よくある質問（45項目） |
 | **[docs/SSH_KEY_SETUP.md](docs/SSH_KEY_SETUP.md)** | 🔑 SSH設定ガイド |
 | **[skills/README.md](skills/README.md)** | 🤖 スキル開発ガイド |
 | **[docker/nginx/ssl/README.md](docker/nginx/ssl/README.md)** | 🔐 SSL証明書ガイド |
