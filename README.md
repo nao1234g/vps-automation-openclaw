@@ -5,16 +5,8 @@
 **🚀 VPSへOpenClaw AIエージェントをセキュアにデプロイ 🔒**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](CHANGELOG.md)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)](https://www.docker.com/)
 [![Security](https://img.shields.io/badge/Security-Hardened-success)](SECURITY_CHECKLIST.md)
-
-[![Security Scan](https://github.com/nao1234g/vps-automation-openclaw/actions/workflows/security-scan.yml/badge.svg)](https://github.com/nao1234g/vps-automation-openclaw/actions/workflows/security-scan.yml)
-[![Docker Compose Test](https://github.com/nao1234g/vps-automation-openclaw/actions/workflows/docker-compose-test.yml/badge.svg)](https://github.com/nao1234g/vps-automation-openclaw/actions/workflows/docker-compose-test.yml)
-
-[![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=node.js)](https://nodejs.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql)](https://www.postgresql.org/)
-[![Contributions](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 </div>
 
@@ -169,36 +161,15 @@ docker compose -f docker-compose.production.yml up -d
 
 ## 📚 ドキュメント
 
-### 📖 スタートガイド
 | ドキュメント | 内容 |
 |------------|------|
 | **[DEPLOYMENT.md](DEPLOYMENT.md)** | 📖 完全デプロイメントガイド |
 | **[QUICKSTART_SECURITY.md](QUICKSTART_SECURITY.md)** | ⚡ 5分セキュリティセットアップ |
-| **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** | 📋 コマンド早見表 |
-| **[docs/MIGRATION.md](docs/MIGRATION.md)** | 🔄 他環境からの移行ガイド |
-
-### 🔧 運用ガイド
-| ドキュメント | 内容 |
-|------------|------|
-| **[OPERATIONS_GUIDE.md](OPERATIONS_GUIDE.md)** | 🛠️ 運用マニュアル |
-| **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** | 🚨 トラブルシューティング（16カテゴリ） |
-| **[PERFORMANCE.md](PERFORMANCE.md)** | ⚡ パフォーマンス最適化ガイド |
-
-### 🏗️ 技術ドキュメント
-| ドキュメント | 内容 |
-|------------|------|
-| **[ARCHITECTURE.md](ARCHITECTURE.md)** | 🏗️ システムアーキテクチャ |
-| **[DEVELOPMENT.md](DEVELOPMENT.md)** | 💻 開発者ガイド |
-| **[IMPLEMENTATION.md](IMPLEMENTATION.md)** | 📝 実装詳細・ADR |
 | **[SECURITY_CHECKLIST.md](SECURITY_CHECKLIST.md)** | 🔒 セキュリティチェックリスト |
-
-### 📚 その他
-| ドキュメント | 内容 |
-|------------|------|
-| **[docs/FAQ.md](docs/FAQ.md)** | ❓ よくある質問（45項目） |
+| **[OPERATIONS_GUIDE.md](OPERATIONS_GUIDE.md)** | 🛠️ 運用マニュアル |
+| **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** | 📋 コマンド早見表 |
+| **[ARCHITECTURE.md](ARCHITECTURE.md)** | 🏗️ システムアーキテクチャ |
 | **[docs/SSH_KEY_SETUP.md](docs/SSH_KEY_SETUP.md)** | 🔑 SSH設定ガイド |
-| **[skills/README.md](skills/README.md)** | 🤖 スキル開発ガイド |
-| **[docker/nginx/ssl/README.md](docker/nginx/ssl/README.md)** | 🔐 SSL証明書ガイド |
 
 ---
 
@@ -376,43 +347,6 @@ docker system prune -a --volumes
 
 ---
 
-## 📊 監視・アラート
-
-### Prometheus + Grafana 監視スタック
-
-リアルタイム監視とアラート機能を提供:
-
-```bash
-# 監視スタック起動
-docker compose -f docker-compose.production.yml \
-               -f docker-compose.monitoring.yml up -d
-
-# アクセス先
-# - Prometheus: http://localhost:9090
-# - Grafana: http://localhost:3001 (admin/パスワード)
-# - Alertmanager: http://localhost:9093
-```
-
-### 主な監視項目
-
-- **システムメトリクス**: CPU、メモリ、ディスク、ネットワーク
-- **コンテナメトリクス**: リソース使用率、再起動回数
-- **データベースメトリクス**: 接続数、クエリパフォーマンス
-- **アプリケーションメトリクス**: API応答時間、エラー率
-
-### アラート通知
-
-16種類のアラートルールを設定済み:
-- ディスク使用率85%以上
-- メモリ使用率90%以上
-- コンテナダウン
-- PostgreSQL接続数異常
-- バックアップ失敗
-
-詳細は [PERFORMANCE.md](PERFORMANCE.md) を参照してください。
-
----
-
 ## 📊 システム要件
 
 ### 最低スペック
@@ -468,23 +402,11 @@ docker image prune -a
 
 ## 🎨 今後の拡張予定
 
-### 短期（1-3ヶ月）
-- 🗃️ Redis キャッシュ導入
-- 📜 ログ集約（Loki）
-- 🧪 E2Eテスト自動化（Playwright）
-
-### 中期（3-6ヶ月）
 - 🎤 Ibyスピーチ連携（高品質日本語TTS）
 - 🎬 RemoTion統合（動画自動生成）
-- 🔄 Docker Swarm クラスタリング
-
-### 長期（6ヶ月以上）
-- ☸️ Kubernetesへの移行
-- 🌐 サービスメッシュ（Istio）
+- 🤖 サブエージェント機能（複数LLM並列実行）
+- 📊 ダッシュボード機能（進捗可視化）
 - 🔍 分散トレーシング（OpenTelemetry統合）
-- 🌍 マルチリージョン展開
-
-詳細は [IMPLEMENTATION.md](IMPLEMENTATION.md) を参照してください。
 
 ---
 
