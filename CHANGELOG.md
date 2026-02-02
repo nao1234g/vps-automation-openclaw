@@ -10,6 +10,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - None
 
+## [1.2.0] - 2024-02-02
+
+### Added
+
+#### E2E Testing Framework (Playwright)
+- Playwright configuration with multi-browser support (Chromium, Firefox, Mobile Chrome)
+- Health check test suite (services, database, security headers, rate limiting)
+- API endpoints test suite (cost tracking, system metrics, error handling, response times)
+- Monitoring test suite (Prometheus, Alertmanager, Grafana, alert rules)
+- GitHub Actions E2E testing workflow (automated testing on PRs and daily)
+- Comprehensive testing guide documentation
+
+#### Infrastructure as Code (Terraform)
+- Complete Terraform configuration for AWS EC2 deployment
+- VPC, subnets, security groups, and networking setup
+- EC2 instance with Ubuntu 22.04 LTS
+- Elastic IP for static public IP address
+- CloudWatch alarms (CPU usage, status checks)
+- AWS Backup with daily (30d) and weekly (90d) retention
+- Route53 DNS records management (optional)
+- User data script for automated initial setup
+- Multi-environment support (development, staging, production)
+- Comprehensive variable validation and security best practices
+- Cost estimates and optimization recommendations
+
+#### Kubernetes Deployment (Helm Charts)
+- Complete Helm Chart with 19 Kubernetes resource templates
+- Deployment with liveness/readiness probes and security contexts
+- Service, Ingress, ConfigMap, Secret, PVC
+- HorizontalPodAutoscaler for auto-scaling (2-10 replicas)
+- PodDisruptionBudget for high availability
+- NetworkPolicy for Pod-level security
+- ServiceMonitor for Prometheus integration
+- Dependencies: PostgreSQL, Redis, Prometheus, Grafana (as subcharts)
+- Multi-environment values (production, development)
+- Comprehensive Helm Chart documentation
+
+### Changed
+- Enhanced project documentation structure
+- Improved deployment flexibility (Docker Compose, Terraform, Kubernetes)
+- Updated CHANGELOG to reflect all enhancements
+
+### Security
+- Network policies for Kubernetes Pod isolation
+- Pod Security Standards (runAsNonRoot, readOnlyRootFilesystem)
+- AWS EC2 IMDSv2 enforcement
+- EBS encryption enabled by default
+
+### Performance
+- Auto-scaling for Kubernetes deployments
+- Resource optimization for different environments
+- Multi-replica deployments for high availability
+
 ## [1.1.0] - 2024-02-02
 
 ### Added
