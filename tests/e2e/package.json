@@ -1,0 +1,34 @@
+{
+  "name": "openclaw-e2e-tests",
+  "version": "1.0.0",
+  "description": "End-to-End tests for OpenClaw VPS deployment",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:mobile": "playwright test --project=mobile-chrome",
+    "test:health": "playwright test specs/health-checks.spec.ts",
+    "test:api": "playwright test specs/api-endpoints.spec.ts",
+    "test:monitoring": "playwright test specs/monitoring.spec.ts",
+    "report": "playwright show-report",
+    "codegen": "playwright codegen",
+    "install-deps": "npx playwright install --with-deps"
+  },
+  "keywords": [
+    "e2e",
+    "playwright",
+    "testing",
+    "openclaw"
+  ],
+  "author": "OpenClaw Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  }
+}
