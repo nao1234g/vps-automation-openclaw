@@ -1,0 +1,530 @@
+openapi: 3.0.3
+info:
+  title: OpenClaw VPS API
+  description: |
+    OpenClaw VPS の RESTful API 仕様書
+
+    このAPIは、以下の機能を提供します:
+    - システムヘルスチェック
+    - コスト追跡と予測
+    - システムメトリクス
+    - N8Nワークフロー管理
+
+    ## 認証
+
+    多くのエンドポイントは認証が必要です。JWTトークンをAuthorizationヘッダーに含めてください:
+
+    ```
+    Authorization: Bearer <token>
+    ```
+
+    ## レート制限
+
+    APIリクエストは以下の制限があります:
+    - 一般エンドポイント: 100 req/15分
+    - 管理者エンドポイント: 1000 req/15分
+
+    レート制限に達すると、`429 Too Many Requests` が返されます。
+
+  version: 1.2.0
+  contact:
+    name: OpenClaw Team
+    url: https://github.com/nao1234g/vps-automation-openclaw
+    email: admin@openclaw.io
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost
+    description: ローカル開発環境
+  - url: https://staging.your-domain.com
+    description: ステージング環境
+  - url: https://your-domain.com
+    description: 本番環境
+
+tags:
+  - name: Health
+    description: ヘルスチェックエンドポイント
+  - name: Costs
+    description: コスト追跡と予測
+  - name: Metrics
+    description: システムメトリクス
+  - name: Workflows
+    description: N8Nワークフロー管理
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: ヘルスチェック
+      description: システムの稼働状態を確認します
+      operationId: getHealth
+      responses:
+        '200':
+          description: システムは正常に稼働中
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+                uptime: 86400
+                timestamp: "2024-02-02T12:00:00Z"
+                checks:
+                  database: healthy
+                  redis: healthy
+                  disk: healthy
+        '503':
+          description: システムが利用不可
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/costs/daily:
+    get:
+      tags:
+        - Costs
+      summary: 日次コスト取得
+      description: 指定された日付のコスト情報を取得します
+      operationId: getDailyCosts
+      parameters:
+        - name: date
+          in: query
+          description: 日付 (YYYY-MM-DD形式)
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2024-02-02"
+      responses:
+        '200':
+          description: 日次コスト情報
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyCostResponse'
+        '400':
+          description: 不正なリクエスト
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/costs/monthly:
+    get:
+      tags:
+        - Costs
+      summary: 月次コスト取得
+      description: 当月のコスト合計を取得します
+      operationId: getMonthlyCosts
+      responses:
+        '200':
+          description: 月次コスト情報
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonthlyCostResponse'
+
+  /api/costs/forecast:
+    get:
+      tags:
+        - Costs
+      summary: コスト予測
+      description: 月末までのコストを予測します
+      operationId: getCostForecast
+      responses:
+        '200':
+          description: コスト予測情報
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CostForecastResponse'
+
+  /api/costs/alerts:
+    get:
+      tags:
+        - Costs
+      summary: コストアラート取得
+      description: アクティブなコストアラートを取得します
+      operationId: getCostAlerts
+      responses:
+        '200':
+          description: コストアラート一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CostAlertsResponse'
+
+  /api/metrics/system:
+    get:
+      tags:
+        - Metrics
+      summary: システムリソース取得
+      description: CPU、メモリ、ディスクの使用状況を取得します
+      operationId: getSystemMetrics
+      responses:
+        '200':
+          description: システムメトリクス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemMetricsResponse'
+
+  /api/metrics/containers:
+    get:
+      tags:
+        - Metrics
+      summary: コンテナメトリクス取得
+      description: 各Dockerコンテナのリソース使用状況を取得します
+      operationId: getContainerMetrics
+      responses:
+        '200':
+          description: コンテナメトリクス
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContainerMetricsResponse'
+
+  /api/workflows:
+    get:
+      tags:
+        - Workflows
+      summary: ワークフロー一覧取得
+      description: N8Nワークフローの一覧を取得します
+      operationId: getWorkflows
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: ワークフロー一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowsResponse'
+        '401':
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/workflows/{id}:
+    get:
+      tags:
+        - Workflows
+      summary: ワークフロー詳細取得
+      description: 指定されたワークフローの詳細を取得します
+      operationId: getWorkflow
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ワークフローID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ワークフロー詳細
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowResponse'
+        '404':
+          description: ワークフローが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/workflows/{id}/execute:
+    post:
+      tags:
+        - Workflows
+      summary: ワークフロー実行
+      description: 指定されたワークフローを実行します
+      operationId: executeWorkflow
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ワークフローID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 実行パラメータ
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowExecuteRequest'
+      responses:
+        '200':
+          description: ワークフロー実行開始
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowExecuteResponse'
+        '400':
+          description: 不正なリクエスト
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded, down]
+          description: システムの状態
+        uptime:
+          type: integer
+          description: 稼働時間（秒）
+        timestamp:
+          type: string
+          format: date-time
+          description: チェック実行時刻
+        checks:
+          type: object
+          properties:
+            database:
+              type: string
+              enum: [healthy, unhealthy]
+            redis:
+              type: string
+              enum: [healthy, unhealthy]
+            disk:
+              type: string
+              enum: [healthy, warning, critical]
+
+    DailyCostResponse:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          description: 日付
+        api_calls:
+          type: integer
+          description: API呼び出し回数
+        tokens:
+          type: object
+          properties:
+            input:
+              type: integer
+            output:
+              type: integer
+        cost:
+          type: object
+          properties:
+            api_usd:
+              type: number
+              format: double
+            vps_jpy:
+              type: integer
+            total_jpy:
+              type: integer
+
+    MonthlyCostResponse:
+      type: object
+      properties:
+        month:
+          type: string
+          example: "2024-02"
+        total_api_calls:
+          type: integer
+        total_tokens:
+          type: object
+          properties:
+            input:
+              type: integer
+            output:
+              type: integer
+        total_cost:
+          type: object
+          properties:
+            api_usd:
+              type: number
+            vps_jpy:
+              type: integer
+            storage_jpy:
+              type: integer
+            total_jpy:
+              type: integer
+        budget:
+          type: object
+          properties:
+            monthly_jpy:
+              type: integer
+            remaining_jpy:
+              type: integer
+            usage_percent:
+              type: number
+
+    CostForecastResponse:
+      type: object
+      properties:
+        current_month_cost:
+          type: integer
+        forecast_month_end:
+          type: integer
+        days_remaining:
+          type: integer
+        daily_average:
+          type: integer
+        recommendation:
+          type: string
+
+    CostAlertsResponse:
+      type: object
+      properties:
+        alerts:
+          type: array
+          items:
+            type: object
+            properties:
+              severity:
+                type: string
+                enum: [info, warning, critical]
+              message:
+                type: string
+              timestamp:
+                type: string
+                format: date-time
+
+    SystemMetricsResponse:
+      type: object
+      properties:
+        cpu:
+          type: object
+          properties:
+            usage_percent:
+              type: number
+            cores:
+              type: integer
+        memory:
+          type: object
+          properties:
+            total_bytes:
+              type: integer
+            used_bytes:
+              type: integer
+            used_percent:
+              type: number
+        disk:
+          type: object
+          properties:
+            total_bytes:
+              type: integer
+            used_bytes:
+              type: integer
+            used_percent:
+              type: number
+
+    ContainerMetricsResponse:
+      type: object
+      properties:
+        containers:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              status:
+                type: string
+              cpu_percent:
+                type: number
+              memory_usage:
+                type: integer
+              memory_limit:
+                type: integer
+              network_rx:
+                type: integer
+              network_tx:
+                type: integer
+
+    WorkflowsResponse:
+      type: object
+      properties:
+        workflows:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              active:
+                type: boolean
+              tags:
+                type: array
+                items:
+                  type: string
+
+    WorkflowResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        active:
+          type: boolean
+        tags:
+          type: array
+          items:
+            type: string
+        nodes:
+          type: array
+          items:
+            type: object
+        connections:
+          type: object
+
+    WorkflowExecuteRequest:
+      type: object
+      properties:
+        data:
+          type: object
+          description: ワークフローに渡すデータ
+
+    WorkflowExecuteResponse:
+      type: object
+      properties:
+        execution_id:
+          type: string
+        status:
+          type: string
+          enum: [running, completed, failed]
+        message:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: エラーメッセージ
+        code:
+          type: string
+          description: エラーコード
+        details:
+          type: object
+          description: 追加の詳細情報

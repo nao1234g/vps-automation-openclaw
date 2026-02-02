@@ -1,0 +1,9 @@
+# Ignore all load test results
+*.json
+*.html
+*.xml
+*.csv
+
+# Except README
+!README.md
+!.gitignore
