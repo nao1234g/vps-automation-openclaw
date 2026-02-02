@@ -1,0 +1,354 @@
+# ============================================================================
+# Alertmanager Configuration Example
+# ============================================================================
+#
+# このファイルをコピーして使用:
+# cp docker/alertmanager/alertmanager.yml.example docker/alertmanager/alertmanager.yml
+#
+# Alertmanager は Prometheus から受け取ったアラートを適切な通知先に送信します
+#
+# 対応通知先:
+# - Slack
+# - Email
+# - Telegram
+# - Webhook (PagerDuty, Opsgenie等)
+#
+# ============================================================================
+
+global:
+  # デフォルト設定
+  resolve_timeout: 5m
+
+  # SMTP設定（Email通知用）
+  smtp_from: 'alertmanager@your-domain.com'
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_auth_username: 'your-email@gmail.com'
+  smtp_auth_password: 'your-app-password'
+  smtp_require_tls: true
+
+# ============================================================================
+# テンプレート定義
+# ============================================================================
+
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# ============================================================================
+# ルート設定（アラートのルーティング）
+# ============================================================================
+
+route:
+  # デフォルトのグルーピング
+  group_by: ['alertname', 'cluster', 'service']
+
+  # 同じグループのアラートを待つ時間
+  group_wait: 10s
+
+  # 同じグループに新しいアラートが来た場合の待機時間
+  group_interval: 10s
+
+  # 同じアラートを再送信する間隔
+  repeat_interval: 12h
+
+  # デフォルトの通知先
+  receiver: 'default'
+
+  # ============================================================================
+  # 重要度別ルーティング
+  # ============================================================================
+
+  routes:
+    # Critical: 即座に全通知先へ
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 0s
+      group_interval: 5m
+      repeat_interval: 1h
+
+    # High: Slack + Emailへ
+    - match:
+        severity: high
+      receiver: 'high-alerts'
+      group_wait: 5s
+      group_interval: 10m
+      repeat_interval: 3h
+
+    # Medium: Slackのみ
+    - match:
+        severity: medium
+      receiver: 'medium-alerts'
+      group_wait: 30s
+      group_interval: 30m
+      repeat_interval: 6h
+
+    # Low: ログのみ（通知なし）
+    - match:
+        severity: low
+      receiver: 'low-alerts'
+      group_wait: 1m
+      repeat_interval: 24h
+
+    # ============================================================================
+    # サービス別ルーティング
+    # ============================================================================
+
+    # データベースアラート → DBチームへ
+    - match:
+        service: postgres
+      receiver: 'database-team'
+      continue: true  # 他のルートも評価
+
+    # セキュリティアラート → セキュリティチームへ
+    - match:
+        alertname: 'SecurityVulnerability'
+      receiver: 'security-team'
+      continue: true
+
+# ============================================================================
+# 通知先（Receivers）設定
+# ============================================================================
+
+receivers:
+  # ----------------------------------------------------------------------------
+  # デフォルト通知先（全アラート）
+  # ----------------------------------------------------------------------------
+  - name: 'default'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#openclaw-alerts'
+        title: '{{ .CommonAnnotations.summary }}'
+        text: >-
+          {{ range .Alerts }}
+            *Alert:* {{ .Annotations.summary }}
+            *Description:* {{ .Annotations.description }}
+            *Severity:* {{ .Labels.severity }}
+            *Details:*
+            {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+            {{ end }}
+          {{ end }}
+        send_resolved: true
+
+  # ----------------------------------------------------------------------------
+  # Critical アラート（複数通知先）
+  # ----------------------------------------------------------------------------
+  - name: 'critical-alerts'
+    # Slack通知
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#openclaw-critical'
+        title: '🚨 CRITICAL ALERT'
+        text: >-
+          *{{ .CommonAnnotations.summary }}*
+
+          {{ range .Alerts }}
+          *Description:* {{ .Annotations.description }}
+          *Started:* {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+          *Labels:*
+          {{ range .Labels.SortedPairs }}  • {{ .Name }}: {{ .Value }}
+          {{ end }}
+          {{ end }}
+        color: 'danger'
+        send_resolved: true
+
+    # Email通知
+    email_configs:
+      - to: 'admin@your-domain.com'
+        from: 'alertmanager@your-domain.com'
+        subject: '🚨 CRITICAL: {{ .CommonAnnotations.summary }}'
+        html: |
+          <h2>🚨 Critical Alert</h2>
+          <p><strong>{{ .CommonAnnotations.summary }}</strong></p>
+          <ul>
+          {{ range .Alerts }}
+            <li>
+              <strong>Description:</strong> {{ .Annotations.description }}<br>
+              <strong>Started:</strong> {{ .StartsAt.Format "2006-01-02 15:04:05" }}<br>
+              <strong>Labels:</strong>
+              <ul>
+              {{ range .Labels.SortedPairs }}
+                <li>{{ .Name }}: {{ .Value }}</li>
+              {{ end }}
+              </ul>
+            </li>
+          {{ end }}
+          </ul>
+        send_resolved: true
+
+    # Telegram通知
+    telegram_configs:
+      - bot_token: 'YOUR_TELEGRAM_BOT_TOKEN'
+        chat_id: YOUR_CHAT_ID
+        message: |
+          🚨 *CRITICAL ALERT*
+
+          *{{ .CommonAnnotations.summary }}*
+
+          {{ range .Alerts -}}
+          📝 {{ .Annotations.description }}
+          ⏰ Started: {{ .StartsAt.Format "15:04:05" }}
+          {{ range .Labels.SortedPairs -}}
+          • {{ .Name }}: `{{ .Value }}`
+          {{ end }}
+          {{ end }}
+        parse_mode: 'Markdown'
+        send_resolved: true
+
+  # ----------------------------------------------------------------------------
+  # High アラート（Slack + Email）
+  # ----------------------------------------------------------------------------
+  - name: 'high-alerts'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#openclaw-alerts'
+        title: '⚠️ High Priority Alert'
+        text: '{{ .CommonAnnotations.summary }}\n{{ .CommonAnnotations.description }}'
+        color: 'warning'
+        send_resolved: true
+
+    email_configs:
+      - to: 'team@your-domain.com'
+        subject: '⚠️ HIGH: {{ .CommonAnnotations.summary }}'
+
+  # ----------------------------------------------------------------------------
+  # Medium アラート（Slackのみ）
+  # ----------------------------------------------------------------------------
+  - name: 'medium-alerts'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#openclaw-monitoring'
+        title: '⚡ Medium Priority Alert'
+        text: '{{ .CommonAnnotations.summary }}'
+        color: '#FFA500'
+        send_resolved: true
+
+  # ----------------------------------------------------------------------------
+  # Low アラート（ログのみ）
+  # ----------------------------------------------------------------------------
+  - name: 'low-alerts'
+    # 通知なし（Alertmanager内部で記録のみ）
+
+  # ----------------------------------------------------------------------------
+  # データベースチーム
+  # ----------------------------------------------------------------------------
+  - name: 'database-team'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#database-alerts'
+        title: '💾 Database Alert'
+        text: |
+          *{{ .CommonAnnotations.summary }}*
+          {{ .CommonAnnotations.description }}
+        send_resolved: true
+
+    email_configs:
+      - to: 'db-team@your-domain.com'
+        subject: '💾 DB Alert: {{ .CommonAnnotations.summary }}'
+
+  # ----------------------------------------------------------------------------
+  # セキュリティチーム
+  # ----------------------------------------------------------------------------
+  - name: 'security-team'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#security-alerts'
+        title: '🔒 Security Alert'
+        text: |
+          *{{ .CommonAnnotations.summary }}*
+          {{ .CommonAnnotations.description }}
+        color: 'danger'
+        send_resolved: true
+
+    email_configs:
+      - to: 'security@your-domain.com'
+        subject: '🔒 Security Alert: {{ .CommonAnnotations.summary }}'
+
+# ============================================================================
+# 抑制ルール（Inhibition Rules）
+# ============================================================================
+# 特定のアラートが発火している時、他のアラートを抑制
+
+inhibit_rules:
+  # インスタンスダウン時は、そのインスタンスの他のアラートを抑制
+  - source_match:
+      severity: 'critical'
+      alertname: 'InstanceDown'
+    target_match:
+      severity: 'warning'
+    equal: ['instance']
+
+  # Criticalアラート発火時、同じサービスのMediumアラートを抑制
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'medium'
+    equal: ['service']
+
+  # データベースダウン時、接続エラーアラートを抑制
+  - source_match:
+      alertname: 'PostgreSQLDown'
+    target_match:
+      alertname: 'DatabaseConnectionError'
+    equal: ['instance']
+
+# ============================================================================
+# 設定例：PagerDuty統合
+# ============================================================================
+
+# receivers:
+#   - name: 'pagerduty'
+#     pagerduty_configs:
+#       - service_key: 'YOUR_PAGERDUTY_SERVICE_KEY'
+#         description: '{{ .CommonAnnotations.summary }}'
+#         details:
+#           firing: '{{ .Alerts.Firing | len }}'
+#           resolved: '{{ .Alerts.Resolved | len }}'
+#           severity: '{{ .CommonLabels.severity }}'
+
+# ============================================================================
+# 設定例：Opsgenie統合
+# ============================================================================
+
+# receivers:
+#   - name: 'opsgenie'
+#     opsgenie_configs:
+#       - api_key: 'YOUR_OPSGENIE_API_KEY'
+#         message: '{{ .CommonAnnotations.summary }}'
+#         description: '{{ .CommonAnnotations.description }}'
+#         priority: 'P{{ if eq .CommonLabels.severity "critical" }}1{{ else if eq .CommonLabels.severity "high" }}2{{ else }}3{{ end }}'
+
+# ============================================================================
+# 設定例：Webhook（カスタム通知）
+# ============================================================================
+
+# receivers:
+#   - name: 'custom-webhook'
+#     webhook_configs:
+#       - url: 'https://your-webhook-endpoint.com/alerts'
+#         send_resolved: true
+#         http_config:
+#           basic_auth:
+#             username: 'alert-user'
+#             password: 'secret-password'
+
+# ============================================================================
+# テスト
+# ============================================================================
+#
+# 設定ファイルの検証:
+# docker compose -f docker-compose.monitoring.yml exec alertmanager \
+#   amtool check-config /etc/alertmanager/alertmanager.yml
+#
+# テストアラート送信:
+# curl -H "Content-Type: application/json" -d '[{
+#   "labels": {
+#     "alertname": "TestAlert",
+#     "severity": "critical"
+#   },
+#   "annotations": {
+#     "summary": "Test alert from Alertmanager",
+#     "description": "This is a test"
+#   }
+# }]' http://localhost:9093/api/v1/alerts
+#
+# ============================================================================
