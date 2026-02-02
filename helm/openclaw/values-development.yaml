@@ -1,0 +1,100 @@
+# ==============================================================================
+# Development Values for OpenClaw Helm Chart
+# ==============================================================================
+
+replicaCount: 1
+
+image:
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+env:
+  NODE_ENV: development
+  LOG_LEVEL: debug
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+
+persistence:
+  enabled: true
+  size: 5Gi
+
+postgresql:
+  enabled: true
+  auth:
+    password: "devpassword"
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+    resources:
+      limits:
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: "devpassword"
+  master:
+    persistence:
+      enabled: false
+    resources:
+      limits:
+        cpu: 100m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+
+n8n:
+  enabled: true
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  persistence:
+    enabled: false
+
+prometheus:
+  enabled: false
+
+grafana:
+  enabled: false
+
+networkPolicy:
+  enabled: false
+
+podDisruptionBudget:
+  enabled: false
+
+backup:
+  enabled: false
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  hosts:
+    - host: openclaw.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []

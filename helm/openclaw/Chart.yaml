@@ -1,0 +1,70 @@
+apiVersion: v2
+name: openclaw
+description: OpenClaw VPS - AI Agent Platform with N8N, OpenNotebook, and Monitoring
+
+# Chart type: application or library
+type: application
+
+# This is the chart version. This version number should be incremented each time
+# you make changes to the chart and its templates.
+version: 1.1.0
+
+# This is the version number of the application being deployed.
+appVersion: "1.1.0"
+
+# Keywords for searching
+keywords:
+  - openclaw
+  - ai
+  - agent
+  - n8n
+  - automation
+  - monitoring
+  - prometheus
+  - grafana
+
+# Maintainers information
+maintainers:
+  - name: OpenClaw Team
+    email: admin@openclaw.io
+    url: https://github.com/nao1234g/vps-automation-openclaw
+
+# Chart sources
+sources:
+  - https://github.com/nao1234g/vps-automation-openclaw
+
+# Home page
+home: https://github.com/nao1234g/vps-automation-openclaw
+
+# Icon
+icon: https://raw.githubusercontent.com/nao1234g/vps-automation-openclaw/main/.github/assets/logo.png
+
+# Dependencies (if using subcharts)
+dependencies:
+  - name: postgresql
+    version: "^13.0.0"
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+
+  - name: redis
+    version: "^18.0.0"
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
+
+  - name: prometheus
+    version: "^25.0.0"
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: prometheus.enabled
+
+  - name: grafana
+    version: "^7.0.0"
+    repository: https://grafana.github.io/helm-charts
+    condition: grafana.enabled
+
+# Minimum Kubernetes version
+kubeVersion: ">=1.24.0-0"
+
+# Annotations
+annotations:
+  category: AI/Automation
+  licenses: MIT

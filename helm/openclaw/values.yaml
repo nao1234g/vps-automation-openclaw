@@ -1,0 +1,530 @@
+# ==============================================================================
+# OpenClaw Helm Chart Values
+# ==============================================================================
+#
+# Default values for openclaw.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+#
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Global Configuration
+# ------------------------------------------------------------------------------
+
+global:
+  # Global image registry
+  imageRegistry: ""
+
+  # Global image pull secrets
+  imagePullSecrets: []
+
+  # Global storage class
+  storageClass: ""
+
+# ------------------------------------------------------------------------------
+# Common Configuration
+# ------------------------------------------------------------------------------
+
+# Number of replicas
+replicaCount: 2
+
+# Image configuration
+image:
+  registry: docker.io
+  repository: openclaw/openclaw
+  tag: "1.1.0"
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+  automount: true
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod labels
+podLabels: {}
+
+# Pod security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# ------------------------------------------------------------------------------
+# Service Configuration
+# ------------------------------------------------------------------------------
+
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+  annotations: {}
+
+# ------------------------------------------------------------------------------
+# Ingress Configuration
+# ------------------------------------------------------------------------------
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/rate-limit: "10"
+  hosts:
+    - host: openclaw.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: openclaw-tls
+      hosts:
+        - openclaw.example.com
+
+# ------------------------------------------------------------------------------
+# Resource Limits
+# ------------------------------------------------------------------------------
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+# ------------------------------------------------------------------------------
+# Autoscaling
+# ------------------------------------------------------------------------------
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# ------------------------------------------------------------------------------
+# Liveness and Readiness Probes
+# ------------------------------------------------------------------------------
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# ------------------------------------------------------------------------------
+# Node Selector, Tolerations, and Affinity
+# ------------------------------------------------------------------------------
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - openclaw
+          topologyKey: kubernetes.io/hostname
+
+# ------------------------------------------------------------------------------
+# Persistence
+# ------------------------------------------------------------------------------
+
+persistence:
+  enabled: true
+  storageClass: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+  annotations: {}
+
+# ------------------------------------------------------------------------------
+# Environment Variables
+# ------------------------------------------------------------------------------
+
+env:
+  NODE_ENV: production
+  LOG_LEVEL: info
+  PORT: "3000"
+
+# Secrets (use external secret management in production)
+secrets:
+  anthropicApiKey: ""
+  telegramBotToken: ""
+  telegramChatId: ""
+  sessionSecret: ""
+  jwtSecret: ""
+
+# ------------------------------------------------------------------------------
+# PostgreSQL Configuration
+# ------------------------------------------------------------------------------
+
+postgresql:
+  enabled: true
+  auth:
+    username: openclaw
+    password: ""
+    database: openclaw
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+
+# External PostgreSQL (if not using subchart)
+externalDatabase:
+  enabled: false
+  host: ""
+  port: 5432
+  database: openclaw
+  user: openclaw
+  password: ""
+
+# ------------------------------------------------------------------------------
+# Redis Configuration
+# ------------------------------------------------------------------------------
+
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: ""
+  master:
+    persistence:
+      enabled: true
+      size: 5Gi
+    resources:
+      limits:
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+# External Redis (if not using subchart)
+externalRedis:
+  enabled: false
+  host: ""
+  port: 6379
+  password: ""
+
+# ------------------------------------------------------------------------------
+# N8N Configuration
+# ------------------------------------------------------------------------------
+
+n8n:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    registry: docker.io
+    repository: n8nio/n8n
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 5678
+
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    hosts:
+      - host: n8n.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: n8n-tls
+        hosts:
+          - n8n.example.com
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+  persistence:
+    enabled: true
+    size: 5Gi
+
+  env:
+    N8N_PROTOCOL: https
+    N8N_PORT: "5678"
+    EXECUTIONS_TIMEOUT: "300"
+    EXECUTIONS_TIMEOUT_MAX: "3600"
+
+# ------------------------------------------------------------------------------
+# OpenNotebook Configuration
+# ------------------------------------------------------------------------------
+
+opennotebook:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    registry: docker.io
+    repository: openclaw/opennotebook
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+  persistence:
+    enabled: true
+    size: 5Gi
+
+# ------------------------------------------------------------------------------
+# Prometheus Configuration
+# ------------------------------------------------------------------------------
+
+prometheus:
+  enabled: true
+
+  server:
+    persistentVolume:
+      enabled: true
+      size: 20Gi
+
+    resources:
+      limits:
+        cpu: 500m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 1Gi
+
+    retention: "30d"
+
+  alertmanager:
+    enabled: true
+    persistentVolume:
+      enabled: true
+      size: 5Gi
+
+  nodeExporter:
+    enabled: true
+
+  kubeStateMetrics:
+    enabled: true
+
+# ------------------------------------------------------------------------------
+# Grafana Configuration
+# ------------------------------------------------------------------------------
+
+grafana:
+  enabled: true
+
+  replicas: 1
+
+  adminUser: admin
+  adminPassword: ""
+
+  persistence:
+    enabled: true
+    size: 5Gi
+
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    hosts:
+      - grafana.example.com
+    tls:
+      - secretName: grafana-tls
+        hosts:
+          - grafana.example.com
+
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://prometheus-server
+          access: proxy
+          isDefault: true
+
+# ------------------------------------------------------------------------------
+# Nginx Ingress Controller
+# ------------------------------------------------------------------------------
+
+nginx-ingress:
+  enabled: true
+  controller:
+    replicaCount: 2
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+
+# ------------------------------------------------------------------------------
+# Cert-Manager
+# ------------------------------------------------------------------------------
+
+cert-manager:
+  enabled: true
+  installCRDs: true
+
+# ------------------------------------------------------------------------------
+# Network Policies
+# ------------------------------------------------------------------------------
+
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3000
+
+  egress:
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 5432  # PostgreSQL
+        - protocol: TCP
+          port: 6379  # Redis
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443   # HTTPS
+        - protocol: TCP
+          port: 53    # DNS
+          protocol: UDP
+          port: 53
+
+# ------------------------------------------------------------------------------
+# Pod Disruption Budget
+# ------------------------------------------------------------------------------
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# ------------------------------------------------------------------------------
+# Service Monitor (Prometheus Operator)
+# ------------------------------------------------------------------------------
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  scrapeTimeout: 10s
+
+# ------------------------------------------------------------------------------
+# Backup Configuration
+# ------------------------------------------------------------------------------
+
+backup:
+  enabled: true
+  schedule: "0 3 * * *"  # Daily at 3 AM
+  retention: 30  # Keep 30 backups
+
+  s3:
+    enabled: false
+    bucket: ""
+    region: ""
+    accessKey: ""
+    secretKey: ""
+
+# ------------------------------------------------------------------------------
+# Additional Volumes
+# ------------------------------------------------------------------------------
+
+extraVolumes: []
+extraVolumeMounts: []
+
+# ------------------------------------------------------------------------------
+# Init Containers
+# ------------------------------------------------------------------------------
+
+initContainers: []
+
+# ------------------------------------------------------------------------------
+# Sidecar Containers
+# ------------------------------------------------------------------------------
+
+sidecars: []
