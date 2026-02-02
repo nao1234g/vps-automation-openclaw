@@ -1,0 +1,168 @@
+{
+  "name": "VPS Health Check with Telegram Alert",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "name": "Schedule - Every 6 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "command": "docker ps --format '{{.Names}}: {{.Status}}'"
+      },
+      "name": "Check Docker Containers",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [450, 200]
+    },
+    {
+      "parameters": {
+        "command": "df -h / | awk 'NR==2 {print $5}'"
+      },
+      "name": "Check Disk Usage",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "command": "free | grep Mem | awk '{printf \"%.1f%%\", $3/$2 * 100}'"
+      },
+      "name": "Check Memory Usage",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [450, 400]
+    },
+    {
+      "parameters": {
+        "command": "uptime | awk '{print $(NF-2), $(NF-1), $NF}'"
+      },
+      "name": "Check System Load",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [450, 500]
+    },
+    {
+      "parameters": {
+        "functionCode": "const containers = $node['Check Docker Containers'].json.stdout;\nconst disk = $node['Check Disk Usage'].json.stdout.trim();\nconst memory = $node['Check Memory Usage'].json.stdout.trim();\nconst load = $node['Check System Load'].json.stdout.trim();\n\nconst diskUsage = parseInt(disk);\nconst memoryUsage = parseFloat(memory);\n\nlet status = '✅ 正常';\nlet alerts = [];\n\nif (diskUsage > 85) {\n  status = '⚠️ 警告';\n  alerts.push(`ディスク使用率が高い: ${disk}`);\n}\n\nif (memoryUsage > 90) {\n  status = '⚠️ 警告';\n  alerts.push(`メモリ使用率が高い: ${memory}`);\n}\n\nif (!containers.includes('Up')) {\n  status = '🚨 異常';\n  alerts.push('停止しているコンテナがあります');\n}\n\nconst message = `🖥️ VPSヘルスチェック\n\n【ステータス】 ${status}\n\n【システム情報】\n💾 ディスク: ${disk}\n🧠 メモリ: ${memory}\n📊 ロードアベレージ: ${load}\n\n【コンテナ状態】\n${containers}\n\n${alerts.length > 0 ? '⚠️ アラート:\\n' + alerts.join('\\n') : '✅ 全てのチェックに合格しました'}\n\n🕐 チェック時刻: ${new Date().toLocaleString('ja-JP', {timeZone: 'Asia/Tokyo'})}`;\n\nreturn {\n  json: {\n    message: message,\n    status: status,\n    alerts: alerts\n  }\n};"
+      },
+      "name": "Format Health Report",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "={{$json.message}}"
+      },
+      "name": "Send Telegram Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule - Every 6 Hours": {
+      "main": [
+        [
+          {
+            "node": "Check Docker Containers",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Disk Usage",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Memory Usage",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check System Load",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Docker Containers": {
+      "main": [
+        [
+          {
+            "node": "Format Health Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Disk Usage": {
+      "main": [
+        [
+          {
+            "node": "Format Health Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Memory Usage": {
+      "main": [
+        [
+          {
+            "node": "Format Health Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check System Load": {
+      "main": [
+        [
+          {
+            "node": "Format Health Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Health Report": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "vps-health-check"
+}

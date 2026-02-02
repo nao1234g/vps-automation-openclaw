@@ -1,0 +1,260 @@
+{
+  "name": "System Resource Monitoring Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "name": "Schedule - Every 15 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "command": "top -bn1 | grep 'Cpu(s)' | awk '{print $2}' | cut -d'%' -f1"
+      },
+      "name": "Get CPU Usage",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [450, 200]
+    },
+    {
+      "parameters": {
+        "command": "free | grep Mem | awk '{printf \"%.1f\", $3/$2 * 100}'"
+      },
+      "name": "Get Memory Usage",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "command": "df -h / | awk 'NR==2 {print $5}' | cut -d'%' -f1"
+      },
+      "name": "Get Disk Usage",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [450, 400]
+    },
+    {
+      "parameters": {
+        "command": "docker stats --no-stream --format '{{.Container}}: CPU={{.CPUPerc}}, MEM={{.MemPerc}}'"
+      },
+      "name": "Get Container Stats",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [450, 500]
+    },
+    {
+      "parameters": {
+        "functionCode": "const cpu = parseFloat($node['Get CPU Usage'].json.stdout.trim());\nconst memory = parseFloat($node['Get Memory Usage'].json.stdout.trim());\nconst disk = parseInt($node['Get Disk Usage'].json.stdout.trim());\nconst containerStats = $node['Get Container Stats'].json.stdout;\n\nconst timestamp = new Date().toISOString();\n\n// Determine alert level\nlet alertLevel = 'NORMAL';\nlet alerts = [];\n\nif (cpu > 80) {\n  alertLevel = 'WARNING';\n  alerts.push(`CPU使用率が高い: ${cpu.toFixed(1)}%`);\n}\n\nif (memory > 85) {\n  alertLevel = 'WARNING';\n  alerts.push(`メモリ使用率が高い: ${memory.toFixed(1)}%`);\n}\n\nif (disk > 85) {\n  alertLevel = 'CRITICAL';\n  alerts.push(`ディスク使用率が高い: ${disk}%`);\n}\n\nif (cpu > 90 || memory > 95 || disk > 95) {\n  alertLevel = 'CRITICAL';\n}\n\n// Format container stats\nconst containerLines = containerStats.split('\\n').filter(line => line.trim());\nconst containerSummary = containerLines.map(line => `  ${line}`).join('\\n');\n\nreturn {\n  json: {\n    timestamp: timestamp,\n    cpu: cpu,\n    memory: memory,\n    disk: disk,\n    containerStats: containerStats,\n    alertLevel: alertLevel,\n    alerts: alerts,\n    metrics: {\n      cpu_percent: cpu,\n      memory_percent: memory,\n      disk_percent: disk\n    }\n  }\n};"
+      },
+      "name": "Process Metrics",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO system_metrics (timestamp, cpu_percent, memory_percent, disk_percent, alert_level) VALUES ('{{$json.timestamp}}', {{$json.cpu}}, {{$json.memory}}, {{$json.disk}}, '{{$json.alertLevel}}')",
+        "options": {}
+      },
+      "name": "Store Metrics in Database",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [850, 200],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "PostgreSQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.alertLevel}}",
+              "operation": "notEqual",
+              "value2": "NORMAL"
+            }
+          ]
+        }
+      },
+      "name": "Check Alert Level",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [850, 350]
+    },
+    {
+      "parameters": {
+        "functionCode": "const alertLevel = $json.alertLevel;\nconst cpu = $json.cpu.toFixed(1);\nconst memory = $json.memory.toFixed(1);\nconst disk = $json.disk;\nconst alerts = $json.alerts;\n\nconst icon = alertLevel === 'CRITICAL' ? '🚨' : '⚠️';\n\nconst message = `${icon} リソース${alertLevel === 'CRITICAL' ? '緊急' : '警告'}アラート\n\n【アラートレベル】 ${alertLevel}\n\n【現在の使用率】\n🖥️ CPU: ${cpu}%\n🧠 メモリ: ${memory}%\n💾 ディスク: ${disk}%\n\n【検出された問題】\n${alerts.map(a => `• ${a}`).join('\\n')}\n\n🕐 検出時刻: ${new Date().toLocaleString('ja-JP', {timeZone: 'Asia/Tokyo'})}\n\n${alertLevel === 'CRITICAL' ? '⚠️ 緊急対応が必要です！' : '💡 リソースの最適化を検討してください'}`;\n\nreturn {\n  json: {\n    message: message,\n    alertLevel: alertLevel\n  }\n};"
+      },
+      "name": "Format Alert Message",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "={{$json.message}}"
+      },
+      "name": "Send Telegram Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1250, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT timestamp, cpu_percent, memory_percent, disk_percent FROM system_metrics WHERE timestamp > NOW() - INTERVAL '24 hours' ORDER BY timestamp DESC LIMIT 96",
+        "options": {}
+      },
+      "name": "Get 24h Trend Data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [850, 500],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "PostgreSQL account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule - Every 15 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Get CPU Usage",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Memory Usage",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Disk Usage",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Container Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get CPU Usage": {
+      "main": [
+        [
+          {
+            "node": "Process Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Memory Usage": {
+      "main": [
+        [
+          {
+            "node": "Process Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Disk Usage": {
+      "main": [
+        [
+          {
+            "node": "Process Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Container Stats": {
+      "main": [
+        [
+          {
+            "node": "Process Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Metrics": {
+      "main": [
+        [
+          {
+            "node": "Store Metrics in Database",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Alert Level",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get 24h Trend Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Alert Level": {
+      "main": [
+        [
+          {
+            "node": "Format Alert Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Alert Message": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "resource-monitoring"
+}

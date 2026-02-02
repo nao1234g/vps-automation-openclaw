@@ -1,0 +1,177 @@
+{
+  "name": "Security Scan Alert Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1,
+              "triggerAtHour": 2,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "name": "Schedule - Daily at 2 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "command": "cd /opt/vps-automation-openclaw && ./scripts/security_scan.sh --all"
+      },
+      "name": "Run Security Scan",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "command": "ls -t /opt/vps-automation-openclaw/security-reports/*.txt | head -1 | xargs cat"
+      },
+      "name": "Get Latest Report",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const report = $node['Get Latest Report'].json.stdout;\nconst exitCode = $node['Run Security Scan'].json.exitCode;\n\nlet status = '✅ セキュア';\nlet severity = 'LOW';\n\nif (exitCode !== 0) {\n  status = '🚨 脆弱性検出';\n  severity = 'HIGH';\n}\n\nif (report.includes('HIGH') || report.includes('CRITICAL')) {\n  status = '🚨 緊急対応必要';\n  severity = 'CRITICAL';\n} else if (report.includes('MEDIUM')) {\n  status = '⚠️ 警告';\n  severity = 'MEDIUM';\n}\n\nconst summaryLines = report.split('\\n').slice(0, 30);\nconst summary = summaryLines.join('\\n');\n\nconst message = `🔒 セキュリティスキャン結果\n\n【ステータス】 ${status}\n【重要度】 ${severity}\n\n【サマリー】\n${summary}\n\n📊 詳細レポート: /opt/vps-automation-openclaw/security-reports/\n🕐 スキャン時刻: ${new Date().toLocaleString('ja-JP', {timeZone: 'Asia/Tokyo'})}\n\n${severity === 'CRITICAL' || severity === 'HIGH' ? '⚠️ 早急な対応を推奨します' : '✅ 継続的な監視を実施中'}`;\n\nreturn {\n  json: {\n    message: message,\n    status: status,\n    severity: severity,\n    exitCode: exitCode\n  }\n};"
+      },
+      "name": "Analyze Scan Results",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.severity}}",
+              "operation": "notEqual",
+              "value2": "LOW"
+            }
+          ]
+        }
+      },
+      "name": "Alert if Issues Found",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "={{$json.message}}"
+      },
+      "name": "Send Telegram Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1250, 200],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "YOUR_SLACK_WEBHOOK_URL",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"text\": \"{{$json.message}}\",\n  \"username\": \"Security Bot\",\n  \"icon_emoji\": \":lock:\"\n}"
+      },
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Log to N8N for record keeping\nreturn {\n  json: {\n    timestamp: new Date().toISOString(),\n    severity: $json.severity,\n    status: $json.status,\n    logged: true\n  }\n};"
+      },
+      "name": "Log Results",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1250, 400]
+    }
+  ],
+  "connections": {
+    "Schedule - Daily at 2 AM": {
+      "main": [
+        [
+          {
+            "node": "Run Security Scan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Security Scan": {
+      "main": [
+        [
+          {
+            "node": "Get Latest Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Latest Report": {
+      "main": [
+        [
+          {
+            "node": "Analyze Scan Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Scan Results": {
+      "main": [
+        [
+          {
+            "node": "Alert if Issues Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert if Issues Found": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "security-scan-alert"
+}

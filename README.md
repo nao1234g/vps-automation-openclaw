@@ -5,8 +5,16 @@
 **🚀 VPSへOpenClaw AIエージェントをセキュアにデプロイ 🔒**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](CHANGELOG.md)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)](https://www.docker.com/)
 [![Security](https://img.shields.io/badge/Security-Hardened-success)](SECURITY_CHECKLIST.md)
+
+[![Security Scan](https://github.com/nao1234g/vps-automation-openclaw/actions/workflows/security-scan.yml/badge.svg)](https://github.com/nao1234g/vps-automation-openclaw/actions/workflows/security-scan.yml)
+[![Docker Compose Test](https://github.com/nao1234g/vps-automation-openclaw/actions/workflows/docker-compose-test.yml/badge.svg)](https://github.com/nao1234g/vps-automation-openclaw/actions/workflows/docker-compose-test.yml)
+
+[![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=node.js)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql)](https://www.postgresql.org/)
+[![Contributions](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 </div>
 

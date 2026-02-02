@@ -1,0 +1,38 @@
+# Code Owners for OpenClaw VPS Project
+# These owners will be automatically requested for review when someone opens a pull request.
+# Learn more: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+# Will be requested for review when someone opens a pull request
+*       @nao1234g
+
+# Docker configurations
+docker/**                           @nao1234g
+docker-compose*.yml                 @nao1234g
+Dockerfile                          @nao1234g
+
+# Security-related files
+SECURITY_CHECKLIST.md               @nao1234g
+scripts/security_*.sh               @nao1234g
+docker/*/security/**                @nao1234g
+
+# Infrastructure and deployment
+scripts/setup.sh                    @nao1234g
+scripts/backup.sh                   @nao1234g
+scripts/restore.sh                  @nao1234g
+Makefile                            @nao1234g
+
+# CI/CD workflows
+.github/workflows/**                @nao1234g
+
+# Documentation (can be reviewed by documentation team in the future)
+*.md                                @nao1234g
+docs/**                             @nao1234g
+
+# Monitoring and observability
+docker/prometheus/**                @nao1234g
+docker/grafana/**                   @nao1234g
+docker-compose.monitoring.yml       @nao1234g
+
+# Skills
+skills/**                           @nao1234g

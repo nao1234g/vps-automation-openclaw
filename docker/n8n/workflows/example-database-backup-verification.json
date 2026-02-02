@@ -1,0 +1,236 @@
+{
+  "name": "Database Backup Verification Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1,
+              "triggerAtHour": 3,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "name": "Schedule - Daily at 3 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "command": "cd /opt/vps-automation-openclaw && sudo ./scripts/backup.sh"
+      },
+      "name": "Run Backup",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "command": "ls -lh /opt/backups/openclaw/ | tail -1"
+      },
+      "name": "Get Latest Backup Info",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "command": "du -sh /opt/backups/openclaw/ | awk '{print $1}'"
+      },
+      "name": "Get Total Backup Size",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [650, 400]
+    },
+    {
+      "parameters": {
+        "command": "find /opt/backups/openclaw/ -name 'backup_*' | wc -l"
+      },
+      "name": "Count Backups",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [650, 500]
+    },
+    {
+      "parameters": {
+        "functionCode": "const backupInfo = $node['Get Latest Backup Info'].json.stdout;\nconst totalSize = $node['Get Total Backup Size'].json.stdout.trim();\nconst backupCount = parseInt($node['Count Backups'].json.stdout.trim());\nconst exitCode = $node['Run Backup'].json.exitCode;\n\nlet status = '✅ 成功';\nlet alerts = [];\n\nif (exitCode !== 0) {\n  status = '🚨 失敗';\n  alerts.push('バックアップの作成に失敗しました');\n}\n\nif (backupCount < 1) {\n  status = '⚠️ 警告';\n  alerts.push('バックアップが見つかりません');\n}\n\nif (backupCount > 30) {\n  alerts.push(`古いバックアップの削除を推奨 (現在: ${backupCount}個)`);\n}\n\nconst message = `💾 データベースバックアップ\n\n【ステータス】 ${status}\n【終了コード】 ${exitCode}\n\n【バックアップ情報】\n📦 総サイズ: ${totalSize}\n📊 バックアップ数: ${backupCount}個\n📄 最新バックアップ:\n${backupInfo}\n\n${alerts.length > 0 ? '⚠️ 通知:\\n' + alerts.join('\\n') : '✅ バックアップは正常に完了しました'}\n\n🕐 実行時刻: ${new Date().toLocaleString('ja-JP', {timeZone: 'Asia/Tokyo'})}\n\n💡 バックアップの保持期間: 30日\n💡 推奨: 定期的にオフサイトバックアップを実施`;\n\nreturn {\n  json: {\n    message: message,\n    status: status,\n    exitCode: exitCode,\n    backupCount: backupCount,\n    alerts: alerts\n  }\n};"
+      },
+      "name": "Verify Backup Status",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.exitCode}}",
+              "operation": "equal",
+              "value2": 0
+            }
+          ]
+        }
+      },
+      "name": "Check Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "={{$json.message}}"
+      },
+      "name": "Send Success Notification",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1250, 200],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "🚨 バックアップ失敗アラート\\n\\n={{$json.message}}"
+      },
+      "name": "Send Failure Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1250, 400],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "find /opt/backups/openclaw/ -name 'backup_*' -type d -mtime +30 -exec rm -rf {} \\;"
+      },
+      "name": "Cleanup Old Backups",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1450, 200]
+    }
+  ],
+  "connections": {
+    "Schedule - Daily at 3 AM": {
+      "main": [
+        [
+          {
+            "node": "Run Backup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Backup": {
+      "main": [
+        [
+          {
+            "node": "Get Latest Backup Info",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Total Backup Size",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Count Backups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Latest Backup Info": {
+      "main": [
+        [
+          {
+            "node": "Verify Backup Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Total Backup Size": {
+      "main": [
+        [
+          {
+            "node": "Verify Backup Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count Backups": {
+      "main": [
+        [
+          {
+            "node": "Verify Backup Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Backup Status": {
+      "main": [
+        [
+          {
+            "node": "Check Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Success": {
+      "main": [
+        [
+          {
+            "node": "Send Success Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Failure Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Success Notification": {
+      "main": [
+        [
+          {
+            "node": "Cleanup Old Backups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "database-backup-verification"
+}
