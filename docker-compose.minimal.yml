@@ -1,0 +1,131 @@
+# OpenClaw VPS - Minimal Test Environment
+# PostgreSQL + OpenNotebook + N8N の最小構成
+#
+# 使用方法:
+#   make minimal
+#   または: docker compose -f docker-compose.minimal.yml up
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: openclaw-postgres-minimal
+    restart: unless-stopped
+    
+    ports:
+      - "5432:5432"
+    
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-openclaw}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-openclaw}
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
+    
+    volumes:
+      - postgres_data_minimal:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    
+    networks:
+      - minimal-network
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openclaw"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    
+    mem_limit: 512m
+
+  # OpenNotebook
+  opennotebook:
+    build:
+      context: ./docker/opennotebook
+      dockerfile: Dockerfile
+    container_name: openclaw-opennotebook-minimal
+    restart: unless-stopped
+    
+    ports:
+      - "8080:8080"
+    
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openclaw}:${POSTGRES_PASSWORD:-dev_password}@postgres:5432/${POSTGRES_DB:-openclaw}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-sk-test}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-sk-ant-test}
+      PORT: 8080
+      NODE_ENV: development
+      LOG_LEVEL: debug
+    
+    volumes:
+      - opennotebook_data_minimal:/app/data
+      - ./logs/opennotebook:/app/logs:rw
+    
+    depends_on:
+      postgres:
+        condition: service_healthy
+    
+    networks:
+      - minimal-network
+    
+    mem_limit: 512m
+    
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # N8N Workflow Automation
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: openclaw-n8n-minimal
+    restart: unless-stopped
+    
+    ports:
+      - "5678:5678"
+    
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: ${POSTGRES_DB:-openclaw}
+      DB_POSTGRESDB_USER: ${POSTGRES_USER:-openclaw}
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD:-dev_password}
+      N8N_BASIC_AUTH_ACTIVE: true
+      N8N_BASIC_AUTH_USER: ${N8N_USER:-admin}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_PASSWORD:-dev_admin_password_change_in_prod}
+      N8N_HOST: localhost
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      WEBHOOK_URL: http://n8n:5678/
+      EXECUTIONS_DATA_SAVE_ON_SUCCESS: all
+    
+    volumes:
+      - n8n_data_minimal:/home/node/.n8n
+      - ./docker/n8n/workflows:/home/node/.n8n/workflows:ro
+    
+    depends_on:
+      postgres:
+        condition: service_healthy
+    
+    networks:
+      - minimal-network
+    
+    mem_limit: 512m
+    
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data_minimal:
+    driver: local
+  opennotebook_data_minimal:
+    driver: local
+  n8n_data_minimal:
+    driver: local
+
+networks:
+  minimal-network:
+    driver: bridge

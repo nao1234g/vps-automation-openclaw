@@ -23,8 +23,7 @@ COPY app/ ./
 
 # 依存関係のインストール
 RUN if [ -f package.json ]; then \
-    npm ci && \
-    npm run build 2>/dev/null || true && \
+    npm ci --only=production && \
     npm cache clean --force; \
     fi
 
@@ -45,9 +44,13 @@ RUN apk update && \
     curl && \
     rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 
-# 非rootユーザー作成
-RUN addgroup -g 1000 -S appgroup && \
-    adduser -u 1000 -S appuser -G appgroup
+# 非rootユーザー作成（既存のグループがあれば使用）
+RUN if ! getent group appgroup >/dev/null 2>&1; then \
+      addgroup -g 1001 -S appgroup; \
+    fi && \
+    if ! id -u appuser >/dev/null 2>&1; then \
+      adduser -u 1001 -S appuser -G appgroup; \
+    fi
 
 # 作業ディレクトリ
 WORKDIR /app

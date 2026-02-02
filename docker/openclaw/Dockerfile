@@ -47,9 +47,13 @@ RUN apk update && \
     curl && \
     rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 
-# 非rootユーザー作成
-RUN addgroup -g 1000 -S appgroup && \
-    adduser -u 1000 -S appuser -G appgroup
+# 非rootユーザー作成（既存のグループがあれば使用）
+RUN if ! getent group appgroup >/dev/null 2>&1; then \
+      addgroup -g 1001 -S appgroup; \
+    fi && \
+    if ! id -u appuser >/dev/null 2>&1; then \
+      adduser -u 1001 -S appuser -G appgroup; \
+    fi
 
 # Chromiumのパス設定（Puppeteer用）
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \

@@ -51,6 +51,28 @@ validate-env: ## 環境変数をバリデーション
 	@./scripts/validate_env.sh
 
 # ============================================
+# 最小構成（開発用）
+# ============================================
+minimal: setup-dirs ## 最小構成（PostgreSQL + OpenNotebook + N8N）を起動
+	@echo "🚀 最小構成を起動..."
+	docker compose -f docker-compose.minimal.yml up -d
+	@echo "✓ 起動完了"
+	@echo ""
+	@echo "アクセス先:"
+	@echo "  - OpenNotebook: http://localhost:8080/health"
+	@echo "  - N8N:          http://localhost:5678 (admin / dev_admin_password_change_in_prod)"
+	@echo "  - PostgreSQL:   localhost:5432"
+
+minimal-logs: ## 最小構成のログを表示
+	docker compose -f docker-compose.minimal.yml logs -f
+
+minimal-down: ## 最小構成を停止
+	docker compose -f docker-compose.minimal.yml down
+
+minimal-clean: ## 最小構成を完全削除（ボリュームも削除）
+	docker compose -f docker-compose.minimal.yml down -v
+
+# ============================================
 # 開発環境
 # ============================================
 dev: setup-dirs ## 開発環境を起動
