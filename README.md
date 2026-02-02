@@ -175,6 +175,7 @@ docker compose -f docker-compose.production.yml up -d
 | **[DEPLOYMENT.md](DEPLOYMENT.md)** | 📖 完全デプロイメントガイド |
 | **[QUICKSTART_SECURITY.md](QUICKSTART_SECURITY.md)** | ⚡ 5分セキュリティセットアップ |
 | **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** | 📋 コマンド早見表 |
+| **[docs/MIGRATION.md](docs/MIGRATION.md)** | 🔄 他環境からの移行ガイド |
 
 ### 🔧 運用ガイド
 | ドキュメント | 内容 |
