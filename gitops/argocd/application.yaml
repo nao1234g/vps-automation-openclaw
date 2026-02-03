@@ -1,0 +1,71 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openclaw
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: openclaw
+    app.kubernetes.io/part-of: openclaw-vps
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  # プロジェクト名
+  project: openclaw
+
+  # ソースリポジトリ
+  source:
+    repoURL: https://github.com/nao1234g/vps-automation-openclaw.git
+    targetRevision: HEAD
+    path: helm/openclaw
+
+    # Helm パラメータ
+    helm:
+      releaseName: openclaw
+      valueFiles:
+        - values.yaml
+        - values-production.yaml
+
+      # 動的なパラメータ（CI/CDから上書き可能）
+      parameters:
+        - name: image.tag
+          value: "1.2.0"
+        - name: replicaCount
+          value: "3"
+
+  # デプロイ先
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openclaw
+
+  # 同期ポリシー
+  syncPolicy:
+    automated:
+      prune: true           # 削除されたリソースを自動削除
+      selfHeal: true        # ドリフトを自動修復
+      allowEmpty: false     # 空のリソースを許可しない
+
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - Validate=true
+
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # ヘルスチェック設定
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas  # HPAでスケールした場合を無視
+
+  # リビジョン履歴制限
+  revisionHistoryLimit: 10

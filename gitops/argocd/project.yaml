@@ -1,0 +1,112 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: openclaw
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: openclaw
+    app.kubernetes.io/part-of: openclaw-vps
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  # プロジェクトの説明
+  description: OpenClaw VPS - AI Agent Platform
+
+  # 許可されるソースリポジトリ
+  sourceRepos:
+    - https://github.com/nao1234g/vps-automation-openclaw.git
+    - https://charts.bitnami.com/bitnami
+    - https://prometheus-community.github.io/helm-charts
+    - https://grafana.github.io/helm-charts
+
+  # 許可されるデプロイ先
+  destinations:
+    - namespace: openclaw
+      server: https://kubernetes.default.svc
+    - namespace: openclaw-staging
+      server: https://kubernetes.default.svc
+    - namespace: openclaw-dev
+      server: https://kubernetes.default.svc
+    - namespace: monitoring
+      server: https://kubernetes.default.svc
+
+  # クラスターリソースのホワイトリスト
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+    - group: networking.k8s.io
+      kind: IngressClass
+    - group: cert-manager.io
+      kind: ClusterIssuer
+
+  # 名前空間リソースの拒否リスト
+  namespaceResourceBlacklist:
+    - group: ''
+      kind: ResourceQuota
+    - group: ''
+      kind: LimitRange
+
+  # 許可される名前空間リソース
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+  # ロールの定義
+  roles:
+    # 管理者ロール
+    - name: admin
+      description: Admin role for OpenClaw project
+      policies:
+        - p, proj:openclaw:admin, applications, *, openclaw/*, allow
+        - p, proj:openclaw:admin, repositories, *, *, allow
+        - p, proj:openclaw:admin, clusters, *, *, allow
+      groups:
+        - openclaw-admins
+
+    # 開発者ロール
+    - name: developer
+      description: Developer role for OpenClaw project
+      policies:
+        - p, proj:openclaw:developer, applications, get, openclaw/*, allow
+        - p, proj:openclaw:developer, applications, sync, openclaw/*, allow
+        - p, proj:openclaw:developer, applications, action/*, openclaw/*, allow
+      groups:
+        - openclaw-developers
+
+    # 閲覧者ロール
+    - name: viewer
+      description: Viewer role for OpenClaw project
+      policies:
+        - p, proj:openclaw:viewer, applications, get, openclaw/*, allow
+      groups:
+        - openclaw-viewers
+
+  # 同期ウィンドウ（メンテナンス時間）
+  syncWindows:
+    # 平日の営業時間外のみ自動同期を許可
+    - kind: allow
+      schedule: '0 22 * * 1-5'  # 平日22:00-08:00
+      duration: 10h
+      applications:
+        - '*'
+      manualSync: true
+
+    # 週末は常に許可
+    - kind: allow
+      schedule: '0 0 * * 0,6'  # 土日
+      duration: 48h
+      applications:
+        - '*'
+      manualSync: true
+
+  # シグネチャキー（GPG署名の検証）
+  signatureKeys: []
+
+  # 孤立したリソースの監視
+  orphanedResources:
+    warn: true
+    ignore: []

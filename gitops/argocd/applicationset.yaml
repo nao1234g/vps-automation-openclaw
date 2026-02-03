@@ -1,0 +1,87 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: openclaw-environments
+  namespace: argocd
+spec:
+  generators:
+    # 環境ごとにアプリケーションを生成
+    - list:
+        elements:
+          - environment: production
+            namespace: openclaw
+            replicaCount: "3"
+            valuesFile: values-production.yaml
+            targetRevision: main
+            autoSync: true
+
+          - environment: staging
+            namespace: openclaw-staging
+            replicaCount: "2"
+            valuesFile: values-production.yaml
+            targetRevision: develop
+            autoSync: true
+
+          - environment: development
+            namespace: openclaw-dev
+            replicaCount: "1"
+            valuesFile: values-development.yaml
+            targetRevision: develop
+            autoSync: false
+
+  template:
+    metadata:
+      name: 'openclaw-{{environment}}'
+      namespace: argocd
+      labels:
+        app.kubernetes.io/name: openclaw
+        app.kubernetes.io/instance: '{{environment}}'
+        environment: '{{environment}}'
+      annotations:
+        notifications.argoproj.io/subscribe.on-sync-succeeded.slack: openclaw-deployments
+        notifications.argoproj.io/subscribe.on-sync-failed.slack: openclaw-alerts
+
+    spec:
+      project: openclaw
+
+      source:
+        repoURL: https://github.com/nao1234g/vps-automation-openclaw.git
+        targetRevision: '{{targetRevision}}'
+        path: helm/openclaw
+
+        helm:
+          releaseName: 'openclaw-{{environment}}'
+          valueFiles:
+            - values.yaml
+            - '{{valuesFile}}'
+
+          parameters:
+            - name: replicaCount
+              value: '{{replicaCount}}'
+            - name: global.environment
+              value: '{{environment}}'
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+
+      syncPolicy:
+        automated:
+          prune: '{{autoSync}}'
+          selfHeal: '{{autoSync}}'
+        syncOptions:
+          - CreateNamespace=true
+          - ApplyOutOfSyncOnly=true
+        retry:
+          limit: 3
+          backoff:
+            duration: 10s
+            factor: 2
+            maxDuration: 3m
+
+      # 環境別のヘルスチェック
+      info:
+        - name: Environment
+          value: '{{environment}}'
+        - name: Namespace
+          value: '{{namespace}}'

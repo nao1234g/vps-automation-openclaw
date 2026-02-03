@@ -268,8 +268,207 @@ info: ## システム情報を表示
 	@free -h | grep Mem
 
 # ============================================
+# E2Eテスト
+# ============================================
+e2e-install: ## E2Eテストの依存関係をインストール
+	@echo "📦 E2Eテストの依存関係をインストール..."
+	cd tests/e2e && npm install
+	cd tests/e2e && npx playwright install --with-deps
+	@echo "✓ インストール完了"
+
+e2e-test: ## E2Eテストを実行
+	@echo "🧪 E2Eテストを実行..."
+	cd tests/e2e && npm test
+	@echo "✓ テスト完了"
+
+e2e-test-ui: ## E2EテストをUIモードで実行
+	cd tests/e2e && npm run test:ui
+
+e2e-test-headed: ## E2Eテストをブラウザ表示で実行
+	cd tests/e2e && npm run test:headed
+
+e2e-report: ## E2Eテストレポートを表示
+	cd tests/e2e && npm run report
+
+# ============================================
+# 負荷テスト
+# ============================================
+load-test: ## 標準負荷テストを実行
+	@echo "🔥 負荷テストを実行..."
+	k6 run tests/load/k6-config.js
+	@echo "✓ テスト完了"
+
+load-test-spike: ## スパイクテストを実行
+	@echo "🔥 スパイクテストを実行..."
+	k6 run tests/load/spike-test.js
+
+load-test-stress: ## ストレステストを実行
+	@echo "🔥 ストレステストを実行..."
+	k6 run tests/load/stress-test.js
+
+load-test-soak: ## ソークテスト（長時間）を実行
+	@echo "🔥 ソークテストを実行（約2時間）..."
+	k6 run tests/load/soak-test.js
+
+load-test-quick: ## クイック負荷テスト（5 VUs, 30秒）
+	@echo "🔥 クイック負荷テストを実行..."
+	k6 run --vus 5 --duration 30s tests/load/k6-config.js
+
+# ============================================
+# Terraform (IaC)
+# ============================================
+tf-init: ## Terraformを初期化
+	@echo "🏗️  Terraformを初期化..."
+	cd terraform && terraform init
+	@echo "✓ 初期化完了"
+
+tf-plan: ## Terraformプランを表示
+	@echo "📋 Terraformプランを表示..."
+	cd terraform && terraform plan
+
+tf-apply: ## Terraformを適用（インフラ作成）
+	@echo "🚀 Terraformを適用..."
+	cd terraform && terraform apply
+
+tf-destroy: ## Terraformリソースを削除（危険）
+	@echo "⚠️  警告: 全インフラリソースを削除します"
+	@read -p "続行しますか？ (y/N): " confirm && [ "$$confirm" = "y" ] || exit 1
+	cd terraform && terraform destroy
+
+tf-output: ## Terraform出力を表示
+	cd terraform && terraform output
+
+tf-validate: ## Terraform設定を検証
+	cd terraform && terraform validate
+
+# ============================================
+# Helm (Kubernetes)
+# ============================================
+helm-deps: ## Helm依存関係を更新
+	@echo "📦 Helm依存関係を更新..."
+	cd helm/openclaw && helm dependency update
+	@echo "✓ 更新完了"
+
+helm-install: ## Helm Chartをインストール
+	@echo "🚀 Helm Chartをインストール..."
+	helm install openclaw helm/openclaw -n openclaw --create-namespace
+	@echo "✓ インストール完了"
+
+helm-upgrade: ## Helm Chartをアップグレード
+	@echo "⬆️  Helm Chartをアップグレード..."
+	helm upgrade openclaw helm/openclaw -n openclaw
+	@echo "✓ アップグレード完了"
+
+helm-uninstall: ## Helm Chartをアンインストール
+	@echo "🗑️  Helm Chartをアンインストール..."
+	helm uninstall openclaw -n openclaw
+	@echo "✓ アンインストール完了"
+
+helm-template: ## Helmテンプレートをレンダリング
+	helm template openclaw helm/openclaw -n openclaw
+
+helm-lint: ## Helm Chartをリント
+	helm lint helm/openclaw
+
+helm-dev: ## 開発環境用にインストール
+	helm install openclaw-dev helm/openclaw \
+		-n openclaw-dev --create-namespace \
+		-f helm/openclaw/values-development.yaml
+
+helm-prod: ## 本番環境用にインストール
+	helm install openclaw-prod helm/openclaw \
+		-n openclaw-prod --create-namespace \
+		-f helm/openclaw/values-production.yaml
+
+# ============================================
+# GitOps (ArgoCD)
+# ============================================
+argocd-install: ## ArgoCDをインストール
+	@echo "🔄 ArgoCDをインストール..."
+	kubectl create namespace argocd || true
+	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+	@echo "✓ インストール完了"
+	@echo "初期パスワード取得: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d"
+
+argocd-project: ## ArgoCDプロジェクトを作成
+	@echo "📁 ArgoCDプロジェクトを作成..."
+	kubectl apply -f gitops/argocd/project.yaml
+	@echo "✓ プロジェクト作成完了"
+
+argocd-app: ## ArgoCDアプリケーションを作成
+	@echo "📱 ArgoCDアプリケーションを作成..."
+	kubectl apply -f gitops/argocd/application.yaml
+	@echo "✓ アプリケーション作成完了"
+
+argocd-appset: ## ArgoCDアプリケーションセットを作成（複数環境）
+	@echo "📱 ArgoCDアプリケーションセットを作成..."
+	kubectl apply -f gitops/argocd/applicationset.yaml
+	@echo "✓ アプリケーションセット作成完了"
+
+argocd-notifications: ## ArgoCD通知を設定
+	kubectl apply -f gitops/argocd/notifications.yaml
+
+argocd-port-forward: ## ArgoCDダッシュボードにアクセス
+	@echo "🌐 ArgoCD: https://localhost:8080"
+	kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+# ============================================
+# 監視・コスト
+# ============================================
+status: ## システムステータスダッシュボードを表示
+	@./scripts/status_dashboard.sh
+
+status-watch: ## システムステータスを監視（自動更新）
+	@./scripts/status_dashboard.sh --watch
+
+cost: ## 日次コストレポートを表示
+	@./scripts/cost_tracker.sh --daily
+
+cost-monthly: ## 月次コストレポートを表示
+	@./scripts/cost_tracker.sh --monthly
+
+cost-forecast: ## コスト予測を表示
+	@./scripts/cost_tracker.sh --forecast
+
+cost-alert: ## 予算アラートをチェック
+	@./scripts/cost_tracker.sh --alert
+
+verify-backup: ## バックアップを検証
+	@echo "🔍 バックアップを検証..."
+	@sudo ./scripts/verify_backup.sh --quick
+
+verify-backup-full: ## バックアップをフル検証（テスト復元含む）
+	@echo "🔍 バックアップをフル検証..."
+	@sudo ./scripts/verify_backup.sh --full
+
+benchmark: ## パフォーマンスベンチマークを実行
+	@echo "📊 ベンチマークを実行..."
+	@./scripts/benchmark.sh
+
+seed-data: ## サンプルデータを生成
+	@echo "🌱 サンプルデータを生成..."
+	@./scripts/seed_data.sh
+
+# ============================================
+# ドキュメント
+# ============================================
+docs-serve: ## ドキュメントサーバーを起動（Pythonの簡易サーバー）
+	@echo "📚 ドキュメントサーバーを起動: http://localhost:8000"
+	python3 -m http.server 8000 --directory docs
+
+docs-api: ## OpenAPI仕様書を表示
+	@echo "📖 API仕様書: docs/openapi.yaml"
+	@cat docs/openapi.yaml
+
+# ============================================
 # ワンライナー
 # ============================================
 quick-deploy: setup-env setup-dirs prod health ## クイックデプロイ（全自動）
 
 quick-update: git-pull prod-down prod health ## クイック更新（全自動）
+
+test-all: validate e2e-test load-test-quick ## 全テストを実行
+
+deploy-k8s: helm-deps helm-install ## Kubernetesにデプロイ
+
+deploy-gitops: argocd-project argocd-appset ## GitOpsでデプロイ

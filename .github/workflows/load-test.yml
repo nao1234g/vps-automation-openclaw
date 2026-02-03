@@ -1,0 +1,202 @@
+name: Load Testing
+
+on:
+  # 週次実行（日曜日 3:00 AM UTC）
+  schedule:
+    - cron: '0 3 * * 0'
+
+  # 手動実行
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Test type to run'
+        required: true
+        default: 'standard'
+        type: choice
+        options:
+          - standard
+          - spike
+          - stress
+          - soak
+
+      vus:
+        description: 'Number of virtual users (for standard test)'
+        required: false
+        default: '50'
+        type: string
+
+      duration:
+        description: 'Test duration (e.g., 5m, 30s)'
+        required: false
+        default: '5m'
+        type: string
+
+      base_url:
+        description: 'Base URL for testing'
+        required: false
+        default: 'http://localhost'
+        type: string
+
+jobs:
+  load-test:
+    name: Run Load Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 180  # ソークテスト用に長めに設定
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Create environment file
+        run: |
+          cp .env.example .env
+          echo "NODE_ENV=test" >> .env
+
+      - name: Start services
+        run: |
+          docker compose -f docker-compose.minimal.yml up -d
+
+          echo "Waiting for services to be ready..."
+          timeout 120 bash -c 'until curl -f http://localhost/health 2>/dev/null; do sleep 2; done' || true
+          sleep 10
+
+      - name: Verify services are running
+        run: |
+          docker compose -f docker-compose.minimal.yml ps
+          curl -f http://localhost/health || echo "Health check endpoint not ready"
+
+      - name: Create results directory
+        run: mkdir -p tests/load/results
+
+      - name: Run Load Test (Standard)
+        if: github.event.inputs.test_type == 'standard' || github.event_name == 'schedule'
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url || 'http://localhost' }}
+        run: |
+          k6 run \
+            --out json=tests/load/results/standard-results.json \
+            tests/load/k6-config.js
+
+      - name: Run Load Test (Spike)
+        if: github.event.inputs.test_type == 'spike'
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url || 'http://localhost' }}
+        run: |
+          k6 run \
+            --out json=tests/load/results/spike-results.json \
+            tests/load/spike-test.js
+
+      - name: Run Load Test (Stress)
+        if: github.event.inputs.test_type == 'stress'
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url || 'http://localhost' }}
+        run: |
+          k6 run \
+            --out json=tests/load/results/stress-results.json \
+            tests/load/stress-test.js
+
+      - name: Run Load Test (Soak)
+        if: github.event.inputs.test_type == 'soak'
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url || 'http://localhost' }}
+        run: |
+          k6 run \
+            --out json=tests/load/results/soak-results.json \
+            tests/load/soak-test.js
+
+      - name: Generate HTML Report
+        if: always()
+        run: |
+          # 簡易HTMLレポート生成
+          cat > tests/load/results/report.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Load Test Report - ${{ github.run_id }}</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+              .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+              h1 { color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 10px; }
+              .metric { margin: 20px 0; padding: 15px; background: #f9f9f9; border-left: 4px solid #4CAF50; }
+              .info { color: #666; }
+              pre { background: #f0f0f0; padding: 15px; overflow-x: auto; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>Load Test Report</h1>
+              <p class="info">
+                <strong>Run ID:</strong> ${{ github.run_id }}<br>
+                <strong>Test Type:</strong> ${{ github.event.inputs.test_type || 'standard' }}<br>
+                <strong>Date:</strong> $(date)<br>
+                <strong>Commit:</strong> ${{ github.sha }}
+              </p>
+              <div class="metric">
+                <h3>Test Results</h3>
+                <p>See JSON files for detailed metrics.</p>
+              </div>
+            </div>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-results-${{ github.event.inputs.test_type || 'standard' }}
+          path: tests/load/results/
+          retention-days: 30
+
+      - name: Show Docker logs on failure
+        if: failure()
+        run: |
+          echo "=== Docker Compose Logs ==="
+          docker compose -f docker-compose.minimal.yml logs --tail=100
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker compose -f docker-compose.minimal.yml down -v
+          docker system prune -af --volumes
+
+      - name: Generate Summary
+        if: always()
+        run: |
+          echo "# Load Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Test Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Test Type**: ${{ github.event.inputs.test_type || 'standard' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Base URL**: ${{ github.event.inputs.base_url || 'http://localhost' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run ID**: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Results" >> $GITHUB_STEP_SUMMARY
+          echo "See uploaded artifacts for detailed results." >> $GITHUB_STEP_SUMMARY
+
+  notify:
+    name: Notify Results
+    runs-on: ubuntu-latest
+    needs: load-test
+    if: always()
+
+    steps:
+      - name: Send notification (success)
+        if: needs.load-test.result == 'success'
+        run: |
+          echo "Load test completed successfully"
+          # Telegram/Slack notification can be added here
+
+      - name: Send notification (failure)
+        if: needs.load-test.result == 'failure'
+        run: |
+          echo "Load test failed"
+          # Telegram/Slack notification can be added here

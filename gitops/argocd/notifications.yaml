@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+  namespace: argocd
+data:
+  # Slack通知テンプレート
+  template.app-deployed: |
+    message: |
+      ✅ *{{.app.metadata.name}}* がデプロイされました
+
+      *環境:* {{.app.spec.destination.namespace}}
+      *リビジョン:* {{.app.status.sync.revision}}
+      *ステータス:* {{.app.status.sync.status}}
+
+      <{{.context.argocdUrl}}/applications/{{.app.metadata.name}}|ArgoCD で確認>
+
+  template.app-sync-failed: |
+    message: |
+      ❌ *{{.app.metadata.name}}* の同期に失敗しました
+
+      *環境:* {{.app.spec.destination.namespace}}
+      *エラー:* {{.app.status.operationState.message}}
+
+      <{{.context.argocdUrl}}/applications/{{.app.metadata.name}}|ArgoCD で確認>
+
+  template.app-health-degraded: |
+    message: |
+      ⚠️ *{{.app.metadata.name}}* のヘルスが低下しています
+
+      *環境:* {{.app.spec.destination.namespace}}
+      *ヘルスステータス:* {{.app.status.health.status}}
+
+      <{{.context.argocdUrl}}/applications/{{.app.metadata.name}}|ArgoCD で確認>
+
+  template.app-sync-running: |
+    message: |
+      🔄 *{{.app.metadata.name}}* を同期中...
+
+      *環境:* {{.app.spec.destination.namespace}}
+      *ターゲットリビジョン:* {{.app.spec.source.targetRevision}}
+
+  # Telegram通知テンプレート
+  template.app-deployed-telegram: |
+    message: |
+      ✅ {{.app.metadata.name}} がデプロイされました
+      環境: {{.app.spec.destination.namespace}}
+      リビジョン: {{.app.status.sync.revision}}
+
+  template.app-sync-failed-telegram: |
+    message: |
+      ❌ {{.app.metadata.name}} の同期に失敗しました
+      環境: {{.app.spec.destination.namespace}}
+      エラー: {{.app.status.operationState.message}}
+
+  # トリガー定義
+  trigger.on-deployed: |
+    - when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
+      send: [app-deployed]
+
+  trigger.on-sync-failed: |
+    - when: app.status.operationState.phase in ['Failed', 'Error']
+      send: [app-sync-failed]
+
+  trigger.on-health-degraded: |
+    - when: app.status.health.status == 'Degraded'
+      send: [app-health-degraded]
+
+  trigger.on-sync-running: |
+    - when: app.status.operationState.phase in ['Running']
+      send: [app-sync-running]
+
+  # サービス設定
+  service.slack: |
+    token: $slack-token
+    username: ArgoCD
+    icon: https://argoproj.github.io/argo-cd/assets/logo.png
+
+  service.telegram: |
+    token: $telegram-token
+
+  # デフォルト購読
+  subscriptions: |
+    - recipients:
+        - slack:openclaw-deployments
+      triggers:
+        - on-deployed
+        - on-sync-running
+    - recipients:
+        - slack:openclaw-alerts
+      triggers:
+        - on-sync-failed
+        - on-health-degraded
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: argocd-notifications-secret
+  namespace: argocd
+type: Opaque
+stringData:
+  slack-token: "xoxb-your-slack-token"
+  telegram-token: "your-telegram-bot-token"
