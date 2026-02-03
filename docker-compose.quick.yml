@@ -73,6 +73,7 @@ services:
 
       # OpenClaw Gateway
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-openclaw-dev-token}
+      OPENCLAW_PASSWORD: ${OPENCLAW_PASSWORD:-openclaw}
       OPENCLAW_PORT: 3000
 
       # Browser (Puppeteer)

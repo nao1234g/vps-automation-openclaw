@@ -13,7 +13,7 @@ echo "================================"
 # 設定ディレクトリ作成
 mkdir -p "${OPENCLAW_HOME}"
 
-# 設定ファイルが存在しない場合は作成（最小限の設定）
+# 設定ファイルが存在しない場合は作成
 if [ ! -f "${OPENCLAW_CONFIG}" ]; then
     echo "📝 Creating OpenClaw configuration..."
 
@@ -22,7 +22,12 @@ if [ ! -f "${OPENCLAW_CONFIG}" ]; then
   "gateway": {
     "mode": "local",
     "port": 3000,
-    "bind": "lan"
+    "bind": "lan",
+    "auth": {
+      "mode": "password",
+      "password": "${OPENCLAW_PASSWORD:-openclaw}"
+    },
+    "trustedProxies": ["172.16.0.0/12", "10.0.0.0/8", "192.168.0.0/16", "127.0.0.1"]
   }
 }
 EOF
@@ -41,10 +46,11 @@ echo "   Port: ${OPENCLAW_PORT:-3000}"
 echo "   Bind: lan"
 echo ""
 
-# Gateway を起動
+# Gateway を起動（パスワード認証モード）
 exec openclaw gateway run \
     --port "${OPENCLAW_PORT:-3000}" \
     --bind lan \
-    --token "${OPENCLAW_GATEWAY_TOKEN:-openclaw-dev-token}" \
+    --auth password \
+    --password "${OPENCLAW_PASSWORD:-openclaw}" \
     --allow-unconfigured \
     --verbose
