@@ -71,9 +71,8 @@ services:
       PORT: 3000
       LOG_LEVEL: ${LOG_LEVEL:-info}
 
-      # OpenClaw Gateway
-      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-openclaw-dev-token}
-      OPENCLAW_PASSWORD: ${OPENCLAW_PASSWORD:-openclaw}
+      # OpenClaw Gateway (本番用トークン認証)
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:?OPENCLAW_GATEWAY_TOKEN is required}
       OPENCLAW_PORT: 3000
 
       # Browser (Puppeteer)

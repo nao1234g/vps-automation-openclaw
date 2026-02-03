@@ -23,11 +23,7 @@ if [ ! -f "${OPENCLAW_CONFIG}" ]; then
     "mode": "local",
     "port": 3000,
     "bind": "lan",
-    "auth": {
-      "mode": "password",
-      "password": "${OPENCLAW_PASSWORD:-openclaw}"
-    },
-    "trustedProxies": ["172.16.0.0/12", "10.0.0.0/8", "192.168.0.0/16", "127.0.0.1"]
+    "trustedProxies": ["0.0.0.0/0"]
   }
 }
 EOF
@@ -46,11 +42,11 @@ echo "   Port: ${OPENCLAW_PORT:-3000}"
 echo "   Bind: lan"
 echo ""
 
-# Gateway を起動（パスワード認証モード）
+# Gateway を起動（本番トークン認証モード）
+# ダッシュボードURL: http://localhost:3000/?token=YOUR_TOKEN
 exec openclaw gateway run \
     --port "${OPENCLAW_PORT:-3000}" \
     --bind lan \
-    --auth password \
-    --password "${OPENCLAW_PASSWORD:-openclaw}" \
+    --token "${OPENCLAW_GATEWAY_TOKEN}" \
     --allow-unconfigured \
     --verbose
