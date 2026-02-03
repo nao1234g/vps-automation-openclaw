@@ -1,0 +1,153 @@
+# OpenClaw VPS - Quick Start Environment
+# ワンコマンドでOpenClawを起動するための最小構成
+#
+# 使用方法:
+#   make quick-deploy
+#   または: docker compose -f docker-compose.quick.yml up -d
+#
+# アクセス先:
+#   - OpenClaw API: http://localhost:3000
+#   - N8N: http://localhost:5678
+#   - PostgreSQL: localhost:5432
+
+services:
+  # ============================================
+  # PostgreSQL Database
+  # ============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: openclaw-postgres
+    restart: unless-stopped
+
+    ports:
+      - "5432:5432"
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-openclaw}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_production}
+      POSTGRES_DB: ${POSTGRES_DB:-openclaw}
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+
+    networks:
+      - openclaw-network
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-openclaw}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ============================================
+  # OpenClaw AI Agent
+  # ============================================
+  openclaw:
+    build:
+      context: ./docker/openclaw
+      dockerfile: Dockerfile
+    container_name: openclaw-agent
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openclaw}:${POSTGRES_PASSWORD:-change_me_in_production}@postgres:5432/${POSTGRES_DB:-openclaw}
+
+      # AI Providers
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+
+      # Telegram (optional)
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+
+      # Application
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3000
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+
+      # OpenClaw Gateway
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-openclaw-dev-token}
+      OPENCLAW_PORT: 3000
+
+      # Browser (Puppeteer)
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium-browser
+
+    volumes:
+      - openclaw_data:/app/data
+      - openclaw_logs:/app/logs
+      - ./skills:/app/skills:ro
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    networks:
+      - openclaw-network
+
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+
+  # ============================================
+  # N8N Workflow Automation
+  # ============================================
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: openclaw-n8n
+    restart: unless-stopped
+
+    ports:
+      - "5678:5678"
+
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: ${POSTGRES_DB:-openclaw}
+      DB_POSTGRESDB_USER: ${POSTGRES_USER:-openclaw}
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_production}
+      DB_POSTGRESDB_SCHEMA: n8n
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: ${N8N_USER:-admin}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_PASSWORD:-admin}
+      N8N_HOST: ${N8N_HOST:-localhost}
+      N8N_PORT: 5678
+      N8N_PROTOCOL: ${N8N_PROTOCOL:-http}
+      WEBHOOK_URL: ${WEBHOOK_URL:-http://localhost:5678/}
+      GENERIC_TIMEZONE: ${TZ:-Asia/Tokyo}
+
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    networks:
+      - openclaw-network
+
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+  openclaw_data:
+  openclaw_logs:
+  n8n_data:
+
+networks:
+  openclaw-network:
+    driver: bridge

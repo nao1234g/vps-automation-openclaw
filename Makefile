@@ -461,11 +461,37 @@ docs-api: ## OpenAPI仕様書を表示
 	@cat docs/openapi.yaml
 
 # ============================================
+# Quick Deploy（ワンコマンドデプロイ）
+# ============================================
+COMPOSE_QUICK := docker-compose.quick.yml
+
+quick-deploy: ## ワンコマンドでOpenClawを起動（推奨）
+	@./scripts/quick_deploy.sh
+
+quick-up: ## クイック構成を起動
+	docker compose -f $(COMPOSE_QUICK) up -d --build
+
+quick-down: ## クイック構成を停止
+	docker compose -f $(COMPOSE_QUICK) down
+
+quick-logs: ## クイック構成のログを表示
+	docker compose -f $(COMPOSE_QUICK) logs -f
+
+quick-restart: ## クイック構成を再起動
+	docker compose -f $(COMPOSE_QUICK) restart
+
+quick-ps: ## クイック構成のコンテナ状態を表示
+	docker compose -f $(COMPOSE_QUICK) ps
+
+quick-clean: ## クイック構成を完全削除（ボリュームも削除）
+	docker compose -f $(COMPOSE_QUICK) down -v
+
+# ============================================
 # ワンライナー
 # ============================================
-quick-deploy: setup-env setup-dirs prod health ## クイックデプロイ（全自動）
+full-deploy: setup-env setup-dirs prod health ## フルデプロイ（本番環境）
 
-quick-update: git-pull prod-down prod health ## クイック更新（全自動）
+quick-update: git-pull quick-down quick-up ## クイック更新（全自動）
 
 test-all: validate e2e-test load-test-quick ## 全テストを実行
 
