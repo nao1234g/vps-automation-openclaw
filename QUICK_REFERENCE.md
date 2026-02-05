@@ -52,6 +52,15 @@ sudo ./scripts/maintenance.sh
 sudo ./scripts/maintenance.sh --aggressive
 ```
 
+### OpenClaw ペアリング確認
+```bash
+# ペアリング状態確認
+./scripts/check_openclaw_pairing.sh
+
+# 詳細情報付き
+./scripts/check_openclaw_pairing.sh --verbose
+```
+
 ## 🐳 Docker操作
 
 ### コンテナ管理

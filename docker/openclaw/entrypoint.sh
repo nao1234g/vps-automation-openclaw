@@ -42,11 +42,11 @@ echo "   Port: ${OPENCLAW_PORT:-3000}"
 echo "   Bind: lan"
 echo ""
 
-# Gateway を起動（本番トークン認証モード）
-# ダッシュボードURL: http://localhost:3000/?token=YOUR_TOKEN
+# Gateway を起動（本番パスワード認証モード）
+# ダッシュボードURL: http://localhost:3000
+
 exec openclaw gateway run \
     --port "${OPENCLAW_PORT:-3000}" \
     --bind lan \
-    --token "${OPENCLAW_GATEWAY_TOKEN}" \
-    --allow-unconfigured \
+    --password "${OPENCLAW_GATEWAY_TOKEN}" \
     --verbose

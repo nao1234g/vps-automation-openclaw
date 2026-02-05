@@ -74,6 +74,8 @@ services:
       # OpenClaw Gateway (本番用トークン認証)
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:?OPENCLAW_GATEWAY_TOKEN is required}
       OPENCLAW_PORT: 3000
+      # ブラウザからの接続を許可（ペアリング無効化）
+      OPENCLAW_DISABLE_PAIRING: ${OPENCLAW_DISABLE_PAIRING:-true}
 
       # Browser (Puppeteer)
       PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
