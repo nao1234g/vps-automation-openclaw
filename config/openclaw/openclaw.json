@@ -1,0 +1,16 @@
+{
+  "gateway": {
+    "port": 3000,
+    "mode": "local",
+    "bind": "lan",
+    "trustedProxies": ["0.0.0.0/0"],
+    "controlUi": {
+      "allowInsecureAuth": true,
+      "dangerouslyDisableDeviceAuth": true
+    },
+    "auth": {
+      "mode": "token",
+      "token": "my-super-secret-openclaw-token-12345"
+    }
+  }
+}

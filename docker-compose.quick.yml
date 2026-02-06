@@ -76,6 +76,8 @@ services:
       OPENCLAW_PORT: 3000
       # ブラウザからの接続を許可（ペアリング無効化）
       OPENCLAW_DISABLE_PAIRING: ${OPENCLAW_DISABLE_PAIRING:-true}
+      # Control UI の非セキュア認証を許可（開発/テスト用）
+      OPENCLAW_GATEWAY_CONTROLUI_ALLOWINSECUREAUTH: "true"
 
       # Browser (Puppeteer)
       PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
@@ -85,6 +87,7 @@ services:
       - openclaw_data:/app/data
       - openclaw_logs:/app/logs
       - ./skills:/app/skills:ro
+      - ./config/openclaw/openclaw.json:/home/appuser/.openclaw/openclaw.json:ro
 
     depends_on:
       postgres:
