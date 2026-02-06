@@ -60,6 +60,8 @@ services:
 
       # AI Providers
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      GEMINI_API_KEY: ${GOOGLE_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
 
       # Telegram (optional)
@@ -87,7 +89,7 @@ services:
       - openclaw_data:/app/data
       - openclaw_logs:/app/logs
       - ./skills:/app/skills:ro
-      - ./config/openclaw/openclaw.json:/root/.openclaw/openclaw.json:ro
+      - ./config/openclaw/openclaw.json:/home/appuser/.openclaw/openclaw.json:ro
 
     depends_on:
       postgres:

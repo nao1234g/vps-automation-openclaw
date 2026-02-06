@@ -12,5 +12,26 @@
       "mode": "token",
       "token": "my-super-secret-openclaw-token-12345"
     }
+  },
+  "agents": {
+    "list": [
+      {
+        "id": "gemini-cheap",
+        "model": "google/gemini-2.0-flash",
+        "identity": {
+          "name": "Gemini Flash",
+          "emoji": "🔮"
+        },
+        "default": true
+      },
+      {
+        "id": "claude-premium",
+        "model": "anthropic/claude-sonnet-4-5",
+        "identity": {
+          "name": "Claude Sonnet",
+          "emoji": "💎"
+        }
+      }
+    ]
   }
 }

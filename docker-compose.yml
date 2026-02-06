@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL Database (共通DB)
   postgres:
@@ -32,6 +30,8 @@ services:
     environment:
       # LLM Provider
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      GEMINI_API_KEY: ${GOOGLE_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
       ZHIPUAI_API_KEY: ${ZHIPUAI_API_KEY}
       MODEL_PROVIDER: ${MODEL_PROVIDER:-anthropic}
       MODEL_NAME: ${MODEL_NAME:-claude-sonnet-4}
@@ -49,12 +49,15 @@ services:
       OPENNOTEBOOK_API_KEY: ${OPENNOTEBOOK_API_KEY}
       
       # Security
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+      OPENCLAW_PASSWORD: ${OPENCLAW_PASSWORD:-}
       ALLOWED_HOSTS: localhost,127.0.0.1
       PORT: 3000
       NODE_ENV: production
     volumes:
       - openclaw_data:/app/data
       - ./skills:/app/skills  # カスタムスキルをマウント
+      - ./config/openclaw/openclaw.json:/home/appuser/.openclaw/openclaw.json:ro
     depends_on:
       postgres:
         condition: service_healthy
@@ -169,4 +172,3 @@ networks:
     ipam:
       config:
         - subnet: 172.28.0.0/16
-
