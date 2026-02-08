@@ -1,0 +1,166 @@
+{
+    "name": "Feedly記事自動生成",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "days",
+                            "triggerAtHour": 8,
+                            "triggerAtMinute": 0
+                        }
+                    ]
+                }
+            },
+            "name": "毎日8時",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "GET",
+                "url": "https://cloud.feedly.com/v3/streams/contents",
+                "authentication": "genericCredentialType",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer {{ $env.FEEDLY_ACCESS_TOKEN }}"
+                        }
+                    ]
+                },
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "streamId",
+                            "value": "={{ $env.FEEDLY_STREAM_ID }}"
+                        },
+                        {
+                            "name": "count",
+                            "value": "10"
+                        },
+                        {
+                            "name": "ranked",
+                            "value": "newest"
+                        }
+                    ]
+                }
+            },
+            "name": "Feedly記事取得",
+            "type": "n8n-nodes-base.httpRequest",
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "raw",
+                "jsonOutput": "={\n  \"articles\": {{ JSON.stringify($json.items.slice(0, 5).map(item => ({\n    title: item.title,\n    summary: item.summary?.content?.substring(0, 500) || '',\n    source: item.origin?.title || 'Unknown',\n    url: item.originId\n  }))) }}\n}"
+            },
+            "name": "記事抽出",
+            "type": "n8n-nodes-base.set",
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "key",
+                            "value": "={{ $env.GEMINI_API_KEY }}"
+                        }
+                    ]
+                },
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"あなたはプロのテックブロガーです。以下の最新ニュースを参考に、読者に価値のあるオリジナル記事を作成してください。\\n\\n【参考ニュース】\\n{{ JSON.stringify($json.articles) }}\\n\\n【要件】\\n- タイトル: SEO最適化、32字以内\\n- 文字数: 2000〜3000字\\n- 構成: 導入 → ニュース解説 → 考察 → まとめ\\n- トーン: 専門的だが分かりやすく\\n- オリジナリティ: 参考記事のコピーではなく、独自の視点で\\n- 最後に参考記事のURLリストを追加\"\n        }\n      ]\n    }\n  ]\n}"
+            },
+            "name": "AI記事生成",
+            "type": "n8n-nodes-base.httpRequest",
+            "position": [
+                850,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "raw",
+                "jsonOutput": "={\n  \"article\": {{ JSON.stringify($json.candidates[0].content.parts[0].text) }},\n  \"date\": \"{{ $now.format('yyyy-MM-dd') }}\",\n  \"type\": \"feedly-based\",\n  \"sources\": {{ JSON.stringify($('記事抽出').item.json.articles) }}\n}"
+            },
+            "name": "出力整形",
+            "type": "n8n-nodes-base.set",
+            "position": [
+                1050,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "毎日8時": {
+            "main": [
+                [
+                    {
+                        "node": "Feedly記事取得",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Feedly記事取得": {
+            "main": [
+                [
+                    {
+                        "node": "記事抽出",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "記事抽出": {
+            "main": [
+                [
+                    {
+                        "node": "AI記事生成",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI記事生成": {
+            "main": [
+                [
+                    {
+                        "node": "出力整形",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
