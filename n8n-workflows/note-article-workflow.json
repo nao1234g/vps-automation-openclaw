@@ -1,0 +1,115 @@
+{
+    "name": "Note記事自動生成",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hoursInterval": 24
+                        }
+                    ]
+                }
+            },
+            "name": "毎日9時に実行",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "url": "http://localhost:18789/api/chat",
+                "method": "POST",
+                "headers": {
+                    "Authorization": "Bearer {{$env.OPENCLAW_TOKEN}}"
+                },
+                "body": {
+                    "agent": "gemini-cheap",
+                    "message": "今日のトレンドキーワードを3つ提案して。AIツール、投資、副業の分野から。"
+                }
+            },
+            "name": "OpenClaw: キーワードリサーチ",
+            "type": "n8n-nodes-base.httpRequest",
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "url": "http://localhost:18789/api/chat",
+                "method": "POST",
+                "headers": {
+                    "Authorization": "Bearer {{$env.OPENCLAW_TOKEN}}"
+                },
+                "body": {
+                    "agent": "claude-premium",
+                    "message": "以下のキーワードで2000〜3000字のNote記事を書いて。SEO最適化、見出し付き、読みやすい文体で。キーワード: {{$json.response}}"
+                }
+            },
+            "name": "OpenClaw: 記事生成",
+            "type": "n8n-nodes-base.httpRequest",
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "url": "https://api.note.com/v2/notes",
+                "method": "POST",
+                "headers": {
+                    "Authorization": "Bearer {{$env.NOTE_TOKEN}}"
+                },
+                "body": {
+                    "body": "={{$json.response}}",
+                    "status": "draft"
+                }
+            },
+            "name": "Note: 記事投稿（下書き）",
+            "type": "n8n-nodes-base.httpRequest",
+            "position": [
+                850,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "毎日9時に実行": {
+            "main": [
+                [
+                    {
+                        "node": "OpenClaw: キーワードリサーチ",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenClaw: キーワードリサーチ": {
+            "main": [
+                [
+                    {
+                        "node": "OpenClaw: 記事生成",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenClaw: 記事生成": {
+            "main": [
+                [
+                    {
+                        "node": "Note: 記事投稿（下書き）",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

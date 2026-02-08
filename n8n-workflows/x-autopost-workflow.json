@@ -1,0 +1,81 @@
+{
+    "name": "X自動投稿",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hoursInterval": 6
+                        }
+                    ]
+                }
+            },
+            "name": "6時間ごとに実行",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "url": "http://localhost:18789/api/chat",
+                "method": "POST",
+                "headers": {
+                    "Authorization": "Bearer {{$env.OPENCLAW_TOKEN}}"
+                },
+                "body": {
+                    "agent": "gemini-cheap",
+                    "message": "AIツールや副業に関する有益なツイートを1つ作成して。140字以内、ハッシュタグ2-3個含める。"
+                }
+            },
+            "name": "OpenClaw: ツイート生成",
+            "type": "n8n-nodes-base.httpRequest",
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "authentication": "oAuth1",
+                "text": "={{$json.response}}"
+            },
+            "name": "X: ツイート投稿",
+            "type": "n8n-nodes-base.twitter",
+            "position": [
+                650,
+                300
+            ],
+            "credentials": {
+                "twitterOAuth1Api": "X_API_CREDENTIALS"
+            }
+        }
+    ],
+    "connections": {
+        "6時間ごとに実行": {
+            "main": [
+                [
+                    {
+                        "node": "OpenClaw: ツイート生成",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenClaw: ツイート生成": {
+            "main": [
+                [
+                    {
+                        "node": "X: ツイート投稿",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
