@@ -1,0 +1,147 @@
+{
+    "name": "Notion自動整理",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "days",
+                            "triggerAtHour": 21,
+                            "triggerAtMinute": 0
+                        }
+                    ]
+                }
+            },
+            "name": "毎日21時",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "resource": "databasePage",
+                "operation": "getAll",
+                "databaseId": "={{ $env.NOTION_DATABASE_ID }}",
+                "returnAll": false,
+                "limit": 50,
+                "filterType": "pageFilter",
+                "filters": {
+                    "conditions": [
+                        {
+                            "key": "Status",
+                            "condition": "isEmpty"
+                        }
+                    ]
+                }
+            },
+            "name": "未整理ページ取得",
+            "type": "n8n-nodes-base.notion",
+            "position": [
+                450,
+                300
+            ],
+            "credentials": {
+                "notionApi": "Notion API"
+            }
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "key",
+                            "value": "={{ $env.GEMINI_API_KEY }}"
+                        }
+                    ]
+                },
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"以下のNotionページの内容を分析して、適切なカテゴリとタグを提案してください。\\n\\nタイトル: {{ $json.properties.Name.title[0].plain_text }}\\n\\n回答形式 (JSON):\\n{\\\"category\\\": \\\"カテゴリ名\\\", \\\"tags\\\": [\\\"タグ1\\\", \\\"タグ2\\\"], \\\"summary\\\": \\\"一行要約\\\"}\\n\\nカテゴリ選択肢: 仕事, アイデア, 学習, プロジェクト, メモ, その他\"\n        }\n      ]\n    }\n  ]\n}"
+            },
+            "name": "AI分類",
+            "type": "n8n-nodes-base.httpRequest",
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "resource": "databasePage",
+                "operation": "update",
+                "pageId": "={{ $('未整理ページ取得').item.json.id }}",
+                "propertiesUi": {
+                    "propertyValues": [
+                        {
+                            "key": "Category",
+                            "select": "={{ JSON.parse($json.candidates[0].content.parts[0].text).category }}"
+                        },
+                        {
+                            "key": "Tags",
+                            "multiSelect": "={{ JSON.parse($json.candidates[0].content.parts[0].text).tags }}"
+                        }
+                    ]
+                }
+            },
+            "name": "Notion更新",
+            "type": "n8n-nodes-base.notion",
+            "position": [
+                850,
+                300
+            ],
+            "credentials": {
+                "notionApi": "Notion API"
+            }
+        }
+    ],
+    "connections": {
+        "毎日21時": {
+            "main": [
+                [
+                    {
+                        "node": "未整理ページ取得",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "未整理ページ取得": {
+            "main": [
+                [
+                    {
+                        "node": "AI分類",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI分類": {
+            "main": [
+                [
+                    {
+                        "node": "Notion更新",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
