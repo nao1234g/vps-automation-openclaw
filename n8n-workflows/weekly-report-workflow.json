@@ -1,0 +1,95 @@
+{
+    "name": "週次レポート生成",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "weeks",
+                            "triggerAtHour": 9,
+                            "triggerAtMinute": 0,
+                            "weekday": 1
+                        }
+                    ]
+                }
+            },
+            "name": "毎週月曜9時",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+                "authentication": "genericCredentialType",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "key",
+                            "value": "={{$env.GEMINI_API_KEY}}"
+                        }
+                    ]
+                },
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"あなたは週次レポートを作成するアナリストです。\\n\\n今週のAI・テクノロジー業界のトレンドをまとめた週次レポートを作成してください。\\n\\n含める内容:\\n- 今週の重要ニュース（3-5件）\\n- 注目の新ツール・サービス\\n- 来週の予測\\n- アクションアイテム\\n\\nフォーマット: マークダウン形式で、読みやすく構成してください。\"\n        }\n      ]\n    }\n  ]\n}"
+            },
+            "name": "Gemini週次レポート生成",
+            "type": "n8n-nodes-base.httpRequest",
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "raw",
+                "jsonOutput": "={\n  \"report\": {{ JSON.stringify($json.candidates[0].content.parts[0].text) }},\n  \"date\": \"{{ $now.format('yyyy-MM-dd') }}\",\n  \"type\": \"weekly\"\n}"
+            },
+            "name": "レポート整形",
+            "type": "n8n-nodes-base.set",
+            "position": [
+                650,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "毎週月曜9時": {
+            "main": [
+                [
+                    {
+                        "node": "Gemini週次レポート生成",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Gemini週次レポート生成": {
+            "main": [
+                [
+                    {
+                        "node": "レポート整形",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

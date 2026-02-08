@@ -1,0 +1,116 @@
+{
+    "name": "マルチテーマ記事ローテーション",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "days",
+                            "triggerAtHour": 9,
+                            "triggerAtMinute": 0
+                        }
+                    ]
+                }
+            },
+            "name": "毎日9時",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "raw",
+                "jsonOutput": "={\n  \"themes\": [\n    \"AIツールを使った副業で月5万円稼ぐ方法\",\n    \"ChatGPT活用術：仕事効率を3倍にするプロンプト集\",\n    \"初心者向け投資入門：NISAで始める資産形成\",\n    \"フリーランスになるための完全ガイド2026\",\n    \"プログラミング独学のロードマップ\",\n    \"AI画像生成の始め方：MidjourneyとStable Diffusion比較\",\n    \"ノーコードツールでアプリを作る方法\"\n  ],\n  \"selectedTheme\": \"{{ $json.themes[Math.floor(Math.random() * 7)] }}\",\n  \"dayOfWeek\": {{ $now.weekday }}\n}"
+            },
+            "name": "テーマ選択",
+            "type": "n8n-nodes-base.set",
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "key",
+                            "value": "={{$env.GEMINI_API_KEY}}"
+                        }
+                    ]
+                },
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"あなたはプロのブログライターです。以下のテーマで2000〜3000字のブログ記事を書いてください。\\n\\nテーマ: {{ $json.selectedTheme }}\\n\\n要件:\\n- SEO最適化されたタイトル（32字以内）\\n- 見出し（##）を3〜5個使用\\n- 具体的な手順とコツ\\n- 読みやすい文体\\n- 最後にまとめと行動喚起\"\n        }\n      ]\n    }\n  ]\n}"
+            },
+            "name": "記事生成",
+            "type": "n8n-nodes-base.httpRequest",
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "raw",
+                "jsonOutput": "={\n  \"article\": {{ JSON.stringify($json.candidates[0].content.parts[0].text) }},\n  \"theme\": \"{{ $('テーマ選択').item.json.selectedTheme }}\",\n  \"date\": \"{{ $now.format('yyyy-MM-dd') }}\"\n}"
+            },
+            "name": "記事整形",
+            "type": "n8n-nodes-base.set",
+            "position": [
+                850,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "毎日9時": {
+            "main": [
+                [
+                    {
+                        "node": "テーマ選択",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "テーマ選択": {
+            "main": [
+                [
+                    {
+                        "node": "記事生成",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "記事生成": {
+            "main": [
+                [
+                    {
+                        "node": "記事整形",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
