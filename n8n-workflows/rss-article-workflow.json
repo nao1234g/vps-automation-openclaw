@@ -1,0 +1,216 @@
+{
+    "name": "RSS記事自動生成（無料版）",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "days",
+                            "triggerAtHour": 8,
+                            "triggerAtMinute": 0
+                        }
+                    ]
+                }
+            },
+            "name": "毎日8時",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "url": "https://jp.techcrunch.com/feed/"
+            },
+            "name": "TechCrunch",
+            "type": "n8n-nodes-base.rssFeedRead",
+            "position": [
+                450,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "url": "https://gigazine.net/news/rss_2.0/"
+            },
+            "name": "GIGAZINE",
+            "type": "n8n-nodes-base.rssFeedRead",
+            "position": [
+                450,
+                350
+            ]
+        },
+        {
+            "parameters": {
+                "url": "https://www.publickey1.jp/atom.xml"
+            },
+            "name": "Publickey",
+            "type": "n8n-nodes-base.rssFeedRead",
+            "position": [
+                450,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "combine",
+                "combinationMode": "mergeByPosition",
+                "options": {}
+            },
+            "name": "記事統合",
+            "type": "n8n-nodes-base.merge",
+            "position": [
+                650,
+                350
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "raw",
+                "jsonOutput": "={\n  \"articles\": {{ JSON.stringify($input.all().slice(0, 5).map(item => ({\n    title: item.json.title,\n    summary: item.json.contentSnippet?.substring(0, 300) || item.json.content?.substring(0, 300) || '',\n    source: item.json.creator || 'Tech News',\n    link: item.json.link,\n    pubDate: item.json.pubDate\n  }))) }}\n}"
+            },
+            "name": "上位5記事抽出",
+            "type": "n8n-nodes-base.set",
+            "position": [
+                850,
+                350
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "key",
+                            "value": "={{ $env.GEMINI_API_KEY }}"
+                        }
+                    ]
+                },
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"あなたはプロのテックブロガーです。以下の最新ニュースを参考に、読者に価値のあるオリジナル記事を作成してください。\\n\\n【本日のニュース】\\n{{ JSON.stringify($json.articles) }}\\n\\n【要件】\\n- タイトル: SEO最適化、32字以内、興味を引く\\n- 文字数: 2000〜3000字\\n- 構成: 導入(なぜ今これが重要か) → ニュース解説 → 独自の考察 → 読者へのアクション\\n- トーン: 専門的だが親しみやすく\\n- 重要: 参考記事のコピーではなく、あなた独自の視点で書く\\n- 最後に「参考ソース」として元記事のURLリストを追加\"\n        }\n      ]\n    }\n  ]\n}"
+            },
+            "name": "AI記事生成",
+            "type": "n8n-nodes-base.httpRequest",
+            "position": [
+                1050,
+                350
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "raw",
+                "jsonOutput": "={\n  \"article\": {{ JSON.stringify($json.candidates[0].content.parts[0].text) }},\n  \"generatedAt\": \"{{ $now.format('yyyy-MM-dd HH:mm') }}\",\n  \"type\": \"rss-based\",\n  \"sourceCount\": {{ $('上位5記事抽出').item.json.articles.length }}\n}"
+            },
+            "name": "出力整形",
+            "type": "n8n-nodes-base.set",
+            "position": [
+                1250,
+                350
+            ]
+        }
+    ],
+    "connections": {
+        "毎日8時": {
+            "main": [
+                [
+                    {
+                        "node": "TechCrunch",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "GIGAZINE",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Publickey",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "TechCrunch": {
+            "main": [
+                [
+                    {
+                        "node": "記事統合",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "GIGAZINE": {
+            "main": [
+                [
+                    {
+                        "node": "記事統合",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Publickey": {
+            "main": [
+                [
+                    {
+                        "node": "記事統合",
+                        "type": "main",
+                        "index": 2
+                    }
+                ]
+            ]
+        },
+        "記事統合": {
+            "main": [
+                [
+                    {
+                        "node": "上位5記事抽出",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "上位5記事抽出": {
+            "main": [
+                [
+                    {
+                        "node": "AI記事生成",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI記事生成": {
+            "main": [
+                [
+                    {
+                        "node": "出力整形",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
