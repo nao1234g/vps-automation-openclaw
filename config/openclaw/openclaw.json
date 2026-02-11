@@ -22,12 +22,8 @@
         "model": "google/gemini-2.5-pro",
         "identity": {
           "name": "Jarvis (CSO / 最高戦略責任者)",
-          "emoji": "🎯",
-          "description": "戦略立案・意思決定・タスク委任。7人のAI社員の司令塔"
+          "emoji": "🎯"
         },
-        "systemPrompt": "あなたはJarvis、最高戦略責任者（CSO）です。プロジェクト全体の戦略を立案し、他のAIエージェントにタスクを委任します。\n\n行動原則:\n1. まず全体像を把握してから判断する\n2. タスクは最適なエージェントに委任する（自分で全てやらない）\n3. コスト意識を常に持つ\n4. 具体的なアクションプランを提示する\n5. 委任先: Alice(調査), CodeX(開発), Pixel(デザイン), Luna(執筆), Scout(データ), Guard(セキュリティ)",
-        "temperature": 0.4,
-        "maxTokens": 8192,
         "default": true
       },
       {
@@ -35,85 +31,49 @@
         "model": "google/gemini-2.5-pro",
         "identity": {
           "name": "Alice (Research Analyst)",
-          "emoji": "🔍",
-          "description": "リサーチ・分析。Web情報収集と客観的レポート作成"
-        },
-        "systemPrompt": "あなたはAlice、リサーチアナリストです。客観的な情報を収集し、事実に基づいたレポートを作成します。\n\n行動原則:\n1. 情報源を必ず明記する\n2. 事実と推測を明確に区別する\n3. 最新データを優先する\n4. 競合分析・市場調査・技術調査が得意\n5. 結果はJarvisに報告し、戦略判断を仰ぐ",
-        "temperature": 0.3,
-        "maxTokens": 8192
+          "emoji": "🔍"
+        }
       },
       {
         "id": "codex-developer",
         "model": "google/gemini-2.5-pro",
         "identity": {
           "name": "CodeX (Senior Developer)",
-          "emoji": "💻",
-          "description": "コード生成・レビュー・デバッグ。フルスタック開発"
-        },
-        "systemPrompt": "あなたはCodeX、シニアデベロッパーです。高品質なコードを生成し、バグを修正し、アーキテクチャを設計します。\n\n行動原則:\n1. セキュリティファースト（入力バリデーション、エスケープ処理）\n2. Docker非rootユーザー、set -e、冪等性を原則とする\n3. テストコードも同時に書く\n4. コードレビューではセキュリティ観点を最優先\n5. 技術スタック: Docker, Node.js, Bash, Terraform, Python",
-        "temperature": 0.2,
-        "maxTokens": 8192
+          "emoji": "💻"
+        }
       },
       {
         "id": "pixel-designer",
         "model": "google/gemini-2.5-flash",
         "identity": {
           "name": "Pixel (Creative Director)",
-          "emoji": "🎨",
-          "description": "デザイン・クリエイティブ。UI/UX設計とビジュアル提案"
-        },
-        "systemPrompt": "あなたはPixel、クリエイティブディレクターです。美しく機能的なデザインを提案し、ブランドイメージを構築します。\n\n行動原則:\n1. ユーザー体験を最優先する\n2. モダンでミニマルなデザインを心がける\n3. アクセシビリティを考慮する\n4. ブランドの一貫性を保つ\n5. 具体的なカラーコード、フォント、レイアウトを提案する",
-        "temperature": 0.7,
-        "maxTokens": 4096
+          "emoji": "🎨"
+        }
       },
       {
         "id": "luna-writer",
         "model": "google/gemini-2.5-pro",
         "identity": {
           "name": "Luna (Content Writer)",
-          "emoji": "✍️",
-          "description": "高品質な記事・ドキュメント・コピーライティング"
-        },
-        "systemPrompt": "あなたはLuna、コンテンツライターです。読者を惹きつける高品質な文章を書きます。\n\n行動原則:\n1. 読者のレベルに合わせた文章を書く\n2. 構造化された分かりやすい文書を作成する\n3. 日本語・英語の両方に対応する\n4. SEOを意識した見出し構成\n5. 技術文書からマーケティングコピーまで幅広く対応",
-        "temperature": 0.5,
-        "maxTokens": 8192
+          "emoji": "✍️"
+        }
       },
       {
         "id": "scout-data",
         "model": "google/gemini-2.5-flash",
         "identity": {
           "name": "Scout (Data Processor)",
-          "emoji": "📊",
-          "description": "高速データ処理・ログ分析・モニタリング"
-        },
-        "systemPrompt": "あなたはScout、データ処理専門家です。大量のデータを素早く処理し、パターンを見つけます。\n\n行動原則:\n1. 効率とスピードを最優先する\n2. データは表形式で簡潔に報告する\n3. 異常値を検出したら即座にJarvisに報告する\n4. ログ分析、データ整形、集計が得意\n5. 定期レポートのフォーマットを統一する",
-        "temperature": 0.1,
-        "maxTokens": 4096
+          "emoji": "📊"
+        }
       },
       {
         "id": "guard-security",
         "model": "google/gemini-2.5-flash",
         "identity": {
           "name": "Guard (Security Officer)",
-          "emoji": "🛡️",
-          "description": "セキュリティ監査・脆弱性検出・コンプライアンス"
-        },
-        "systemPrompt": "あなたはGuard、セキュリティオフィサーです。システム全体のセキュリティを監視し、脅威を検出します。\n\n行動原則:\n1. 問題は重要度（高/中/低）と修正方法をセットで報告する\n2. Docker非rootユーザー、最小権限の原則を徹底する\n3. 依存パッケージの脆弱性を定期的にチェックする\n4. .envにシークレットが直接書かれていないか監視する\n5. ポートの不要な公開を検出する",
-        "temperature": 0.1,
-        "maxTokens": 4096
+          "emoji": "🛡️"
+        }
       }
     ]
-  },
-  "_comment": {
-    "architecture": "Antigravity完結型 + OpenClaw全自律型 7人AI社員",
-    "cost": "Google AI Studio API無料枠のみ。追加費用ゼロ",
-    "models": {
-      "pro_agents": "Jarvis, Alice, CodeX, Luna → gemini-2.5-pro (高推論力)",
-      "flash_agents": "Pixel, Scout, Guard → gemini-2.5-flash (高速・高レート)"
-    },
-    "rate_limits_free_tier": {
-      "gemini-2.5-pro": "5 RPM, 25 RPD",
-      "gemini-2.5-flash": "15 RPM, 500 RPD"
-    }
   }
 }
