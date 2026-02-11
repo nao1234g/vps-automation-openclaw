@@ -63,6 +63,7 @@ services:
       GEMINI_API_KEY: ${GOOGLE_API_KEY:-}
       GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      XAI_API_KEY: ${XAI_API_KEY:-}
 
       # Telegram (optional)
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
@@ -89,8 +90,7 @@ services:
       - openclaw_data:/app/data
       - openclaw_logs:/app/logs
       - ./skills:/app/skills:ro
-      - ./config/openclaw/openclaw.json:/home/appuser/.openclaw/openclaw.json:ro
-      - ./config/openclaw/personas:/home/appuser/.openclaw/personas:ro
+      - ./config/openclaw:/home/appuser/.openclaw
 
     depends_on:
       postgres:

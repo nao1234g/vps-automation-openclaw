@@ -19,7 +19,7 @@
     "list": [
       {
         "id": "jarvis-cso",
-        "model": "google/gemini-2.0-flash-001",
+        "model": "google/gemini-2.5-pro",
         "identity": {
           "name": "Jarvis (CSO / 最高戦略責任者)",
           "emoji": "🎯"
@@ -28,7 +28,7 @@
       },
       {
         "id": "alice-research",
-        "model": "google/gemini-2.0-flash-001",
+        "model": "google/gemini-2.5-pro",
         "identity": {
           "name": "Alice (Research Analyst)",
           "emoji": "🔍"
@@ -36,7 +36,7 @@
       },
       {
         "id": "codex-developer",
-        "model": "google/gemini-2.0-flash-001",
+        "model": "google/gemini-2.5-pro",
         "identity": {
           "name": "CodeX (Senior Developer)",
           "emoji": "💻"
@@ -44,7 +44,7 @@
       },
       {
         "id": "pixel-designer",
-        "model": "google/gemini-2.0-flash-001",
+        "model": "google/gemini-2.5-flash",
         "identity": {
           "name": "Pixel (Creative Director)",
           "emoji": "🎨"
@@ -52,7 +52,7 @@
       },
       {
         "id": "luna-writer",
-        "model": "google/gemini-2.0-flash-001",
+        "model": "google/gemini-2.5-pro",
         "identity": {
           "name": "Luna (Content Writer)",
           "emoji": "✍️"
@@ -60,7 +60,7 @@
       },
       {
         "id": "scout-data",
-        "model": "google/gemini-2.0-flash-001",
+        "model": "google/gemini-2.5-flash",
         "identity": {
           "name": "Scout (Data Processor)",
           "emoji": "📊"
@@ -68,10 +68,18 @@
       },
       {
         "id": "guard-security",
-        "model": "google/gemini-2.0-flash-001",
+        "model": "google/gemini-2.5-flash",
         "identity": {
           "name": "Guard (Security Officer)",
           "emoji": "🛡️"
+        }
+      },
+      {
+        "id": "hawk-xresearch",
+        "model": "xai/grok-4.1",
+        "identity": {
+          "name": "Hawk (X/SNS Researcher)",
+          "emoji": "🦅"
         }
       }
     ]

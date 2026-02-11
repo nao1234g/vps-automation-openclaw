@@ -93,6 +93,35 @@
 - **影響**: Gateway自体は正常に動作するが、プラグインの自動設定変更が永続化されない
 - **対策**: 機能上問題なければ `:ro` のまま許容。プラグイン管理が必要なら `:ro` を外す
 
+### 2026-02-12: Telegram接続 & EBUSY完全解決
+- **症状**: Telegram Bot Token を設定しても「Telegram configured, not enabled yet.」のまま有効化されない
+- **根本原因**: `openclaw.json` が単一ファイルでバインドマウント（`:ro`）されており、`openclaw doctor --fix` が設定を書き込めない
+- **解決までの道のり**:
+  1. `:ro` を削除 → まだ EBUSY（単一ファイルマウントでは rename 操作が不可）
+  2. ディレクトリマウントに変更 (`./config/openclaw:/home/appuser/.openclaw`) → EACCES（権限不足）
+  3. `chown 1000:1000` + `chmod 777` → `openclaw doctor --fix` 成功
+  4. doctor が `plugins.entries.telegram.enabled: false` で追加 → 手動で `true` に変更
+  5. Telegram 接続後、ペアリング承認が必要 → `openclaw pairing approve telegram <code>`
+- **正しいマウント方式**:
+  ```yaml
+  volumes:
+    - ./config/openclaw:/home/appuser/.openclaw  # ディレクトリ単位、:ro なし
+  ```
+- **教訓**:
+  1. OpenClaw はプラグイン管理のため設定ディレクトリに**書き込み権限が必要**
+  2. 単一ファイルのバインドマウントでは rename（アトミック書き込み）が失敗する → **ディレクトリ単位でマウント**すること
+  3. `openclaw doctor --fix` はプラグイン有効化の正規手段。ただし `enabled: false` で追加されることがあるので確認が必要
+  4. Telegram 接続には Bot Token 設定 → doctor --fix → ペアリング承認 の3ステップが必要
+
+### 2026-02-12: Gemini モデル名の不一致
+- **症状**: `Error: No API key found for provider "google"` → 解決後も Telegram で「gemini-cheap」しか使えない
+- **根本原因**: 2つの問題が重なっていた
+  1. VPS の `.env` に `GOOGLE_API_KEY` が未設定（追加で解決）
+  2. `openclaw.json` のモデル名 `google/gemini-2.5-pro-preview-05-06` が存在しないモデル名
+- **正しいモデル名**: `google/gemini-2.5-pro`、`google/gemini-2.5-flash`（preview 接尾辞なし）
+- **確認方法**: `curl -s "https://generativelanguage.googleapis.com/v1beta/models?key=${GOOGLE_KEY}"` で利用可能モデル一覧を取得
+- **教訓**: Google は preview モデルの名称を頻繁に変更・廃止する。設定前に API で利用可能なモデル名を確認すること
+
 ### 一般的な落とし穴
 - **PostgreSQL init スクリプト**: 初回起動時のみ実行。再実行するにはボリューム削除が必要
 - **Docker Compose ファイルの選択ミス**: 変更を加えた yml と実際に起動している yml が異なるケースが頻発。`docker compose ps` で確認すること
@@ -118,7 +147,8 @@
 - Node.js: 22-slim（OpenClaw要件）
 
 ### コスト制約
-- LLM API: Anthropic Claude（メイン）、Gemini Flash（コスパ重視）
+- LLM API: Google Gemini 2.5 Pro/Flash（無料枠で運用）、xAI Grok 4.1（$5購入済み）
+- サブスク別: Google AI Pro（¥2,900/月）はAntigravity用、Claude Max（$200/月）はClaude Code用。**いずれもAPI料金とは別**
 - バックアップ: ローカル保持30日（リモートはオプション）
 - 監視: Prometheus + Grafana（セルフホスト、追加コストなし）
 
@@ -131,19 +161,38 @@
 
 ## 4. Current State（現在の状態）
 
-### 動作中の構成（2026-02-11時点）
+### 動作中の構成（2026-02-12時点）
 - **使用中Compose**: `docker-compose.quick.yml`
-- **コンテナ**: 5サービス全て healthy（openclaw-agent, postgres, nginx, n8n, opennotebook）
-- **OpenClaw版**: v2026.2.2-3（最新 v2026.2.9 が利用可能）
+- **VPS**: ConoHa 163.44.124.123（Caddy リバースプロキシ）
+- **コンテナ**: 3サービス healthy（openclaw-agent, postgres, n8n）
 - **Gateway**: ws://0.0.0.0:3000 でリッスン中
-- **Control UI**: 接続成功（webchat connected）
-- **既知の警告**: trusted proxy 設定で `172.28.0.1`（Dockerブリッジ）が未信頼扱い
+- **Telegram**: `@openclaw_nn2026_bot` 接続済み・ペアリング承認済み
+- **エージェント**: 8人体制（Gemini 2.5 Pro/Flash + xAI Grok 4.1）
+
+### AIエージェント構成（8人）
+| # | 名前 | 役割 | モデル |
+|---|------|------|--------|
+| 1 | 🎯 Jarvis | 戦略・指揮（DEFAULT） | google/gemini-2.5-pro |
+| 2 | 🔍 Alice | リサーチ | google/gemini-2.5-pro |
+| 3 | 💻 CodeX | 開発 | google/gemini-2.5-pro |
+| 4 | 🎨 Pixel | デザイン | google/gemini-2.5-flash |
+| 5 | ✍️ Luna | 執筆 | google/gemini-2.5-pro |
+| 6 | 📊 Scout | データ処理 | google/gemini-2.5-flash |
+| 7 | 🛡️ Guard | セキュリティ | google/gemini-2.5-flash |
+| 8 | 🦅 Hawk | X/SNSリサーチ | xai/grok-4.1 |
+
+### コスト状況
+- Gemini API: **無料枠**で運用中（追加コストなし）
+- xAI API: **$5 購入済み**（約50〜70回のフルリサーチ分）
+- Google AI Pro サブスク: ¥2,900/月（Antigravity用、API とは別）
+- Claude Max: $200/月（Claude Code用、API とは別）
 
 ### 未解決の課題
-- [ ] OpenClaw を v2026.2.9 にアップデート
-- [ ] trusted proxy 警告の解消（`gateway.trustedProxies` に Docker ブリッジ追加）
-- [ ] EBUSY エラーの対応方針決定（`:ro` を外すか許容するか）
-- [ ] `entrypoint.sh` 内の不要なペアリング関連コードのクリーンアップ
+- [ ] OpenClaw を最新版にアップデート
+- [ ] xAI APIキーをローテーション（チャットに表示されたため）
+- [ ] VPSのSSHアクセス復旧（sshdが停止中、シリアルコンソールのみ）
+- [ ] VPSの `chmod 777` を適切な権限に修正（セキュリティ）
+- [ ] N8N自動化ワークフロー構築（毎朝ニュース収集等）
 
 ---
 
@@ -200,4 +249,4 @@
 
 ---
 
-*最終更新: 2026-02-11 — ペアリング問題の教訓を記録、プロジェクト全体のコンテキストを構造化*
+*最終更新: 2026-02-12 — Telegram接続完了、8人AI社員体制（Hawk追加）、EBUSY/モデル名問題の教訓を記録*
