@@ -175,11 +175,16 @@ make scan                # Security vulnerability scan
 
 ---
 
+**AI Context Files:** This project uses persistent context files for AI agents:
+- `.claude/CLAUDE.md` - **Primary AI context** (Architecture Rules, Known Mistakes, Constraints, Agent Instructions). Always check "Known Mistakes" before attempting fixes to avoid repeating past errors.
+- `.github/copilot-instructions.md` - This file. Focused on workflows, commands, and conventions.
+
 **Documentation Priority:** When unclear, reference in order:
-1. `QUICK_REFERENCE.md` - Command cheat sheet
-2. `DEVELOPMENT.md` - Dev workflows
-3. `ARCHITECTURE.md` - System design
-4. `OPERATIONS_GUIDE.md` - Production operations
-5. `TROUBLESHOOTING.md` - Common issues
+1. `.claude/CLAUDE.md` - AI-specific context and known mistakes
+2. `QUICK_REFERENCE.md` - Command cheat sheet
+3. `DEVELOPMENT.md` - Dev workflows
+4. `ARCHITECTURE.md` - System design
+5. `OPERATIONS_GUIDE.md` - Production operations
+6. `TROUBLESHOOTING.md` - Common issues
 
 **Code Style:** Follow existing patterns in scripts (defensive bash, color logging) and Dockerfiles (multi-stage, non-root). Security and idempotency trump brevity.
