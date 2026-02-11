@@ -1,0 +1,302 @@
+{
+  "name": "Multi-Agent Orchestration - Daily AI News Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger (8:00 AM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://openclaw:3000/api/agents/alice-researcher/execute",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.OPENCLAW_GATEWAY_TOKEN}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "task",
+              "value": "search_web"
+            },
+            {
+              "name": "query",
+              "value": "AI news latest machine learning artificial intelligence"
+            },
+            {
+              "name": "limit",
+              "value": 5
+            },
+            {
+              "name": "date_filter",
+              "value": "today"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Alice: Research AI News",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [470, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "1",
+          "name": "OpenClaw API Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract research findings from Alice's response\nconst response = $input.item.json;\nconst findings = response.findings || [];\n\n// Format for Luna (writer agent)\nconst newsItems = findings.map((item, index) => ({\n  title: item.title,\n  summary: item.summary,\n  source: item.source,\n  date: item.date,\n  relevance: item.reliability\n}));\n\nreturn {\n  json: {\n    newsItems: newsItems,\n    totalFound: findings.length,\n    researchCost: response.estimatedCost || '$0.002',\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "name": "Process Research Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [690, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://openclaw:3000/api/agents/luna-writer/execute",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.OPENCLAW_GATEWAY_TOKEN}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "task",
+              "value": "write_article"
+            },
+            {
+              "name": "topic",
+              "value": "Daily AI News Digest"
+            },
+            {
+              "name": "source_data",
+              "value": "={{$json.newsItems}}"
+            },
+            {
+              "name": "format",
+              "value": "blog_post"
+            },
+            {
+              "name": "length",
+              "value": "medium"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Luna: Write Article",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [910, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://openclaw:3000/api/agents/jarvis-cso/execute",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.OPENCLAW_GATEWAY_TOKEN}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "task",
+              "value": "review_content"
+            },
+            {
+              "name": "content",
+              "value": "={{$json.article}}"
+            },
+            {
+              "name": "criteria",
+              "value": "quality,accuracy,readability,engagement"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Jarvis: Final Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1130, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "daily_reports",
+        "columns": "report_date,title,content,cost_total,agents_used",
+        "values": "={{$now}},={{$json.title}},={{$json.approvedArticle}},={{$json.totalCost}},Alice,Luna,Jarvis"
+      },
+      "name": "Save to PostgreSQL",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [1350, 300],
+      "credentials": {
+        "postgres": {
+          "id": "2",
+          "name": "OpenClaw Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$env.TELEGRAM_CHAT_ID}}",
+        "text": "🎯 **Daily AI News Report Ready!**\\n\\n📊 Statistics:\\n• News Items: {{$json.newsCount}}\\n• Total Cost: {{$json.totalCost}}\\n• Time: {{$json.processingTime}}\\n\\n✅ Agents Used:\\n• Alice (Research): $0.002\\n• Luna (Writing): $0.05\\n• Jarvis (Review): $0.02\\n\\n📄 Report saved to database.\\n\\n[View Full Report](https://yourdomain.com/reports/latest)",
+        "additionalFields": {
+          "parseMode": "Markdown"
+        }
+      },
+      "name": "Notify via Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1570, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "3",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate total cost and metrics\nconst aliceCost = 0.002;\nconst lunaCost = 0.05;\nconst jarvisCost = 0.02;\nconst totalCost = (aliceCost + lunaCost + jarvisCost).toFixed(3);\n\nconst processingTime = Math.round((Date.now() - new Date($('Schedule Trigger (8:00 AM)').first().json.timestamp).getTime()) / 1000);\n\nreturn {\n  json: {\n    ...($input.item.json),\n    totalCost: `$${totalCost}`,\n    newsCount: $('Process Research Data').first().json.totalFound,\n    processingTime: `${processingTime}s`,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "name": "Calculate Metrics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1350, 500]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger (8:00 AM)": {
+      "main": [
+        [
+          {
+            "node": "Alice: Research AI News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alice: Research AI News": {
+      "main": [
+        [
+          {
+            "node": "Process Research Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Research Data": {
+      "main": [
+        [
+          {
+            "node": "Luna: Write Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Luna: Write Article": {
+      "main": [
+        [
+          {
+            "node": "Jarvis: Final Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jarvis: Final Review": {
+      "main": [
+        [
+          {
+            "node": "Save to PostgreSQL",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Calculate Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to PostgreSQL": {
+      "main": [
+        [
+          {
+            "node": "Notify via Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "multi-agent",
+      "id": "1"
+    },
+    {
+      "name": "automation",
+      "id": "2"
+    },
+    {
+      "name": "cost-optimized",
+      "id": "3"
+    }
+  ],
+  "meta": {
+    "instanceId": "openclaw-vps-multiagent"
+  }
+}

@@ -16,22 +16,57 @@
   "agents": {
     "list": [
       {
-        "id": "gemini-cheap",
-        "model": "google/gemini-2.0-flash",
+        "id": "scout-flash",
+        "model": "google/gemini-2.5-flash",
         "identity": {
-          "name": "Gemini Flash",
-          "emoji": "🔮"
+          "name": "Scout (Data Processor)",
+          "emoji": "📊",
+          "description": "高速データ処理。Google AI Studio API無料枠で自動化用"
         },
+        "systemPrompt": "あなたはScout、データ処理専門家です。大量のデータを素早く処理し、パターンを見つけます。効率とスピードを最優先。ログ分析、データ整形、簡単な集計を得意とします。",
+        "temperature": 0.1,
+        "maxTokens": 2048,
         "default": true
       },
       {
-        "id": "claude-premium",
-        "model": "anthropic/claude-sonnet-4-5",
+        "id": "alice-research",
+        "model": "google/gemini-2.5-pro",
         "identity": {
-          "name": "Claude Sonnet",
-          "emoji": "💎"
-        }
+          "name": "Alice (Researcher)",
+          "emoji": "🔍",
+          "description": "リサーチ・分析。Google AI Studio API無料枠で利用"
+        },
+        "systemPrompt": "あなたはAlice、リサーチ専門家です。客観的な情報を素早く収集し、事実のみを報告します。情報源を明記し、最新データを優先します。",
+        "temperature": 0.3,
+        "maxTokens": 4096
+      },
+      {
+        "id": "pixel-creative",
+        "model": "google/gemini-3-flash-preview",
+        "identity": {
+          "name": "Pixel (Creative)",
+          "emoji": "🎨",
+          "description": "クリエイティブ・デザイン。Gemini 3 Flashの高性能を活用"
+        },
+        "systemPrompt": "あなたはPixel、クリエイティブ担当です。UI/UX設計、コンテンツ構成、ビジュアル提案を行います。",
+        "temperature": 0.6,
+        "maxTokens": 4096
       }
     ]
+  },
+  "_comment": {
+    "architecture": "サブスクリプション最適化構成",
+    "cost": "Google AI Studio API無料枠を活用。Scout(Flash)がデフォルト、複雑な分析はAlice(Pro)、クリエイティブはPixel(3 Flash)",
+    "manual_agents": {
+      "jarvis": "Claude Code CLI (Opus 4) - ターミナルで直接使用",
+      "codex": "OpenAI Codex - VS Code内で自動補完",
+      "luna": "Google Antigravity - Claude Opus 4.5/4.6品質の執筆",
+      "guard": "Claude Code (Sonnet 4.5) - セキュリティレビュー"
+    },
+    "subscriptions": {
+      "claude_code": "$100/月 - Jarvis, Guard, CodeX(複雑)",
+      "chatgpt_plus": "$20/月 - CodeX(日常開発), GPT-4o",
+      "google_ai_pro": "¥2,900/月 - Scout, Alice, Pixel, Luna(Antigravity), Deep Research"
+    }
   }
 }
