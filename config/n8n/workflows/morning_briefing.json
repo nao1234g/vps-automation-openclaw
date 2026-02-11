@@ -1,0 +1,149 @@
+{
+    "name": "Morning Briefing (Alice & Jarvis)",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hours": 8
+                        }
+                    ]
+                }
+            },
+            "name": "Schedule",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://openclaw-agent:3000/api/v1/agents/alice-research/chat",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "message",
+                            "value": "昨日のAI業界の主要ニュースを3つピックアップして、それぞれ1行で要約してください。"
+                        },
+                        {
+                            "name": "stream",
+                            "value": "false"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "name": "Alice (Research)",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 3,
+            "position": [
+                450,
+                300
+            ],
+            "credentials": {
+                "httpHeaderAuth": {
+                    "id": "openclaw_token",
+                    "name": "OpenClaw Token"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://openclaw-agent:3000/api/v1/agents/jarvis-cso/chat",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "message",
+                            "value": "={{ \"以下のニュースに基づいて、今日我々が取るべき戦略的アクションを1つ提案してください。\\n\\n\" + $json.response }}"
+                        },
+                        {
+                            "name": "stream",
+                            "value": "false"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "name": "Jarvis (Thinking)",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 3,
+            "position": [
+                650,
+                300
+            ],
+            "credentials": {
+                "httpHeaderAuth": {
+                    "id": "openclaw_token",
+                    "name": "OpenClaw Token"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "chatId": "YOUR_CHAT_ID",
+                "text": "={{ $json.response }}",
+                "additionalFields": {}
+            },
+            "name": "Telegram",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1,
+            "position": [
+                850,
+                300
+            ],
+            "credentials": {
+                "telegramApi": {
+                    "id": "telegram_bot",
+                    "name": "Telegram Bot"
+                }
+            }
+        }
+    ],
+    "connections": {
+        "Schedule": {
+            "main": [
+                [
+                    {
+                        "node": "Alice (Research)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Alice (Research)": {
+            "main": [
+                [
+                    {
+                        "node": "Jarvis (Thinking)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Jarvis (Thinking)": {
+            "main": [
+                [
+                    {
+                        "node": "Telegram",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

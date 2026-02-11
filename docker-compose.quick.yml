@@ -36,7 +36,7 @@ services:
       - openclaw-network
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-openclaw}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-openclaw}" ]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -100,7 +100,7 @@ services:
       - openclaw-network
 
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost:3000/"]
+      test: [ "CMD", "curl", "-sf", "http://localhost:3000/" ]
       interval: 30s
       timeout: 10s
       start_period: 120s
@@ -133,6 +133,7 @@ services:
       N8N_PROTOCOL: ${N8N_PROTOCOL:-http}
       WEBHOOK_URL: ${WEBHOOK_URL:-http://localhost:5678/}
       GENERIC_TIMEZONE: ${TZ:-Asia/Tokyo}
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
 
     volumes:
       - n8n_data:/home/node/.n8n
@@ -145,7 +146,7 @@ services:
       - openclaw-network
 
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -155,6 +156,7 @@ volumes:
   openclaw_data:
   openclaw_logs:
   n8n_data:
+
 
 networks:
   openclaw-network:
