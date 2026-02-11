@@ -90,6 +90,7 @@ services:
       - openclaw_logs:/app/logs
       - ./skills:/app/skills:ro
       - ./config/openclaw/openclaw.json:/home/appuser/.openclaw/openclaw.json:ro
+      - ./config/openclaw/personas:/home/appuser/.openclaw/personas:ro
 
     depends_on:
       postgres:
