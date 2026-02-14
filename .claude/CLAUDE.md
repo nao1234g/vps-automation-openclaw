@@ -59,119 +59,41 @@
 
 ## 2. Known Mistakes（既知のミスと教訓）
 
-### 2026-02-11: OpenClaw Control UI ペアリング問題
-- **症状**: ブラウザからControl UI接続時に `disconnected (1008): pairing required` エラー
-- **根本原因**: OpenClaw GatewayはデフォルトでWebSocket接続にデバイスペアリングを要求する
-- **誤ったアプローチ**:
-  - `--no-pairing` CLIフラグ → OpenClaw CLIにこのオプションは**存在しない**
-  - `entrypoint.sh` で環境変数から `--no-pairing` を動的追加 → 動作しない
-  - Docker Compose に `OPENCLAW_DISABLE_PAIRING` 環境変数を追加 → Gateway が認識しない（OpenClaw独自の環境変数ではない）
-- **正しい解決策**: `openclaw.json` 設定ファイルで以下を設定:
-  ```json
-  {
-    "gateway": {
-      "controlUi": {
-        "allowInsecureAuth": true,
-        "dangerouslyDisableDeviceAuth": true
-      }
-    }
-  }
-  ```
-- **デプロイ方法**: `config/openclaw/openclaw.json` をDocker Composeでマウント:
-  ```yaml
-  volumes:
-    - ./config/openclaw/openclaw.json:/home/appuser/.openclaw/openclaw.json:ro
-  ```
-- **教訓**:
-  1. OpenClawの設定変更はCLIフラグや環境変数ではなく、**openclaw.json設定ファイル**で行う
-  2. Docker Compose環境変数を追加する前に、対象ソフトウェアがその環境変数を認識するか確認する
-  3. `:ro`（read-only）マウントすると Gateway がプラグイン設定を書き込めず `EBUSY` エラーが出る → 許容するか `:ro` を外す
+**詳細は [docs/KNOWN_MISTAKES.md](docs/KNOWN_MISTAKES.md) を参照**
 
-### 2026-02-11: read-only マウントによる EBUSY エラー
-- **症状**: `failed to persist plugin auto-enable changes: Error: EBUSY: resource busy or locked`
-- **原因**: `openclaw.json` を `:ro` でマウントしているため、Gateway が設定を更新できない
-- **影響**: Gateway自体は正常に動作するが、プラグインの自動設定変更が永続化されない
-- **対策**: 機能上問題なければ `:ro` のまま許容。プラグイン管理が必要なら `:ro` を外す
+過去のミス、無駄な試行錯誤、教訓を記録したデータベースです。
+新しい実装・設定変更を行う前に、**必ずこのファイルを確認**してください。
 
-### 2026-02-12: Telegram接続 & EBUSY完全解決
-- **症状**: Telegram Bot Token を設定しても「Telegram configured, not enabled yet.」のまま有効化されない
-- **根本原因**: `openclaw.json` が単一ファイルでバインドマウント（`:ro`）されており、`openclaw doctor --fix` が設定を書き込めない
-- **解決までの道のり**:
-  1. `:ro` を削除 → まだ EBUSY（単一ファイルマウントでは rename 操作が不可）
-  2. ディレクトリマウントに変更 (`./config/openclaw:/home/appuser/.openclaw`) → EACCES（権限不足）
-  3. `chown 1000:1000` + `chmod 777` → `openclaw doctor --fix` 成功
-  4. doctor が `plugins.entries.telegram.enabled: false` で追加 → 手動で `true` に変更
-  5. Telegram 接続後、ペアリング承認が必要 → `openclaw pairing approve telegram <code>`
-- **正しいマウント方式**:
-  ```yaml
-  volumes:
-    - ./config/openclaw:/home/appuser/.openclaw  # ディレクトリ単位、:ro なし
-  ```
-- **教訓**:
-  1. OpenClaw はプラグイン管理のため設定ディレクトリに**書き込み権限が必要**
-  2. 単一ファイルのバインドマウントでは rename（アトミック書き込み）が失敗する → **ディレクトリ単位でマウント**すること
-  3. `openclaw doctor --fix` はプラグイン有効化の正規手段。ただし `enabled: false` で追加されることがあるので確認が必要
-  4. Telegram 接続には Bot Token 設定 → doctor --fix → ペアリング承認 の3ステップが必要
+### 最重要の教訓（毎回思い出すこと）
 
-### 2026-02-12: Gemini モデル名の不一致
-- **症状**: `Error: No API key found for provider "google"` → 解決後も Telegram で「gemini-cheap」しか使えない
-- **根本原因**: 2つの問題が重なっていた
-  1. VPS の `.env` に `GOOGLE_API_KEY` が未設定（追加で解決）
-  2. `openclaw.json` のモデル名 `google/gemini-2.5-pro-preview-05-06` が存在しないモデル名
-- **正しいモデル名**: `google/gemini-2.5-pro`、`google/gemini-2.5-flash`（preview 接尾辞なし）
-- **確認方法**: `curl -s "https://generativelanguage.googleapis.com/v1beta/models?key=${GOOGLE_KEY}"` で利用可能モデル一覧を取得
-- **教訓**: Google は preview モデルの名称を頻繁に変更・廃止する。設定前に API で利用可能なモデル名を確認すること
+1. **実装前に必ず世界中から実装例を検索する**
+   - GitHub Issues/Gists、X（Twitter）、公式ドキュメント、ブログ記事
+   - 検索キーワード例: `ツール名 + やりたいこと + config/example/setup`
+   - 最低3回は異なるキーワードで検索してから「できない」と判断する
 
-### 2026-02-14: SSH復旧 & Control UI トークン認証
-- **SSH復旧**: cloud-initが `/etc/ssh/sshd_config.d/50-cloud-init.conf` で `PasswordAuthentication no` を上書きしていた → `yes` に変更して解決
-- **Control UI接続**: `dangerouslyDisableDeviceAuth: true` でもデバイス認証が要求される
-- **正しい解決策**: URLにトークンを付与 `http://host:port/?token={GATEWAY_TOKEN}`（GitHub issue #8529）
-- **entrypoint.sh**: `--password` フラグを削除（CLIフラグではなくJSON設定で認証制御）
-- **教訓**:
-  1. cloud-init の sshd_config.d 配下のファイルがメインの sshd_config を上書きする
-  2. OpenClaw Control UIのトークン認証はURLパラメータで渡す
-  3. SSHトンネル: `ssh -i key -f -N -L 8081:localhost:3000 root@VPS`
+2. **機能の存在を推測で語らない**
+   - 「〜のAPIがあるはず」「〜で設定できるはず」は禁止
+   - 公式ドキュメント、APIレスポンス、GitHub Issues で必ず裏付けを取る
 
-### 2026-02-14: N8N API アクセス & ワークフロー
-- **N8N API認証**: `X-N8N-API-KEY` ヘッダーが必須。Basic Auth では通らない
-- **APIキー生成**: N8N Web UIまたはREST APIの `/rest/api-keys` で生成（scopes + expiresAt 必須）
-- **N8Nオーナーセットアップ**: DB直接操作で可能（email, password をbcryptハッシュで設定）
-- **ワークフロー実行**: 公開API (`/api/v1/`) にはワークフロー実行エンドポイントがない → スケジュール実行で対応
-- **環境変数**: N8Nコンテナにも `GOOGLE_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` を渡す必要あり
-- **OpenClawにはREST APIがない**: エージェントチャットはWebSocket専用。N8NからOpenClawエージェントを直接呼び出す方法はない
-- **教訓**:
-  1. N8N → OpenClawエージェント呼び出しは不可。N8NからLLM APIを直接呼ぶ設計にする
-  2. Telegram `sendMessage` API はOpenClawの `getUpdates` と競合しない（送信と受信は別）
-  3. N8Nのワークフロー手動実行は公開APIからはできない
+3. **エラーが出てから調査するのではなく、実装前に調査する**
+   - Bot対策（CAPTCHA、レート制限）、認証方式、モデル名の変更等
+   - 「よくある問題」を事前にGitHub Issuesで確認する
 
-### 2026-02-14: ペルソナファイルの仕組み
-- **システムプロンプト**: `openclaw.json` のJSON設定ではなく `personas/{agent-id}.md` ファイルで定義
-- **ワークスペース**: `workspace/` ディレクトリに SOUL.md, USER.md, AGENTS.md 等が存在
-- **無効なキー**: `systemPrompt`, `instructions`, `identity.description` はすべて OpenClaw config で拒否される
-- **有効なキー**: `id`, `model`, `identity` (name, emoji のみ), `default`
+4. **OpenClawの設定変更は openclaw.json で行う（CLIフラグではない）**
+   - 存在しないCLIオプションを推測で追加しない
+   - 環境変数を追加する前に、対象ソフトウェアがその環境変数を認識するか確認する
 
-### 2026-02-14: sessions_spawn の pairing required エラー
-- **症状**: Jarvis が Telegram 経由で sessions_spawn を使って Alice に仕事を振ろうとすると「pairing required」エラー
-- **追加症状**: `openclaw doctor` も `openclaw devices list` も同じ pairing required で接続不可
-- **根本原因**: Docker コンテナ内の CLI デバイス (`~/.openclaw/identity/device.json`) が Gateway に未登録。`~/.openclaw/devices/paired.json` が空 `{}`
-- **鶏と卵の問題**: `openclaw pairing approve` も Gateway 接続が必要なので、CLI からは承認不可能
-- **正しい解決策**: `paired.json` に手動でデバイスを登録（Node.js スクリプトで）
-  1. `pending.json` からデバイス情報を取得
-  2. `paired.json` にデバイスID をキーとしてエントリを追加（approvedAt, label 付き）
-  3. `pending.json` を `{}` にクリア
-  4. Gateway を再起動（`docker restart openclaw-agent`）
-- **entrypoint.sh の変更**: Gateway 起動時に `--auth token --token "${OPENCLAW_GATEWAY_TOKEN}"` を明示的に指定
-- **教訓**:
-  1. OpenClaw Gateway はデバイス認証とトークン認証が**別レイヤー**で動く。トークンだけでは不十分
-  2. `controlUi.dangerouslyDisableDeviceAuth` は Control UI のみに効く。CLI やサブエージェントには効かない
-  3. `paired.json` はディレクトリマウント上にあるので、コンテナ再起動でも保持される
-  4. サブエージェントは親セッションの接続を継承する（公式ドキュメントより）ので、親の認証が通れば spawn は動く
+### よくあるミスのクイックリファレンス
 
-### 一般的な落とし穴
-- **PostgreSQL init スクリプト**: 初回起動時のみ実行。再実行するにはボリューム削除が必要
-- **Docker Compose ファイルの選択ミス**: 変更を加えた yml と実際に起動している yml が異なるケースが頻発。`docker compose ps` で確認すること
-- **entrypoint.sh の変更**: ファイル修正後は `docker compose up -d --build` が必要（`restart` では反映されない）
-- **環境変数のデフォルト値**: `${VAR}` と `${VAR:-default}` の違いに注意。前者は未設定時に空文字、後者はデフォルト値が入る
+| 問題 | 根本原因 | 解決策 |
+|------|----------|--------|
+| OpenClaw ペアリングエラー | `openclaw.json` の `controlUi.dangerouslyDisableDeviceAuth` 未設定 | `openclaw.json` で設定（CLIフラグではない） |
+| EBUSY エラー | 単一ファイルをバインドマウント（`:ro`） | ディレクトリ単位でマウント、`:ro` なし |
+| Gemini モデル名エラー | preview モデル名が廃止された | APIで利用可能モデル名を確認してから設定 |
+| N8N API 401 Unauthorized | Basic Auth で API アクセス | `X-N8N-API-KEY` ヘッダーで認証 |
+| Substack CAPTCHA | メール/パスワード認証 | Cookie認証（`connect.sid`）に切り替え |
+
+詳細な症状・解決手順・教訓・検索キーワードは [docs/KNOWN_MISTAKES.md](docs/KNOWN_MISTAKES.md) を参照してください。
 
 ---
 
@@ -316,12 +238,14 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
 ## 5. Documentation Priority（参照順序）
 
 問題が発生したら以下の順で参照:
-1. `QUICK_REFERENCE.md` — コマンドチートシート
-2. `DEVELOPMENT.md` — 開発ワークフロー
-3. `ARCHITECTURE.md` — システム設計
-4. `OPERATIONS_GUIDE.md` — 本番運用
-5. `TROUBLESHOOTING.md` — よくある問題
-6. `docs/OPENCLAW_PAIRING_SOLUTION.md` — ペアリング問題の解決
+1. **`docs/KNOWN_MISTAKES.md`** — 既知のミス・教訓データベース（**最優先**）
+2. `QUICK_REFERENCE.md` — コマンドチートシート
+3. `DEVELOPMENT.md` — 開発ワークフロー
+4. `ARCHITECTURE.md` — システム設計
+5. `OPERATIONS_GUIDE.md` — 本番運用
+6. `TROUBLESHOOTING.md` — よくある問題
+7. `docs/OPENCLAW_PAIRING_SOLUTION.md` — ペアリング問題の解決
+8. `docs/SUBSTACK_AUTO_PUBLISH_SETUP.md` — Substack自動投稿セットアップ
 
 ---
 
@@ -350,6 +274,80 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
 - 「できない」と判断する前に、最低3回は異なるキーワードで検索すること
 - この教訓: OpenClawの `sessions_spawn` は公式ドキュメントにも記載があり、GitHubには完全な実装例があったのに、検索せずに「N8Nで代替する」という遠回りをしてしまった
 
+### 実装前の必須調査手順（絶対に守ること）
+
+**新しい機能の実装、設定変更、問題解決に取り組む前に、必ず以下の手順を実行:**
+
+1. **既知のミスを確認** (`docs/KNOWN_MISTAKES.md`)
+   - 同じミスを繰り返さないために、過去の失敗事例を確認
+   - 同じツール、同じ機能に関する記録がないかチェック
+
+2. **GitHub Issues/Discussions を検索**
+   - `リポジトリ名 + やりたいこと + error/issue`
+   - `リポジトリ名 + 設定項目名 + example/config`
+   - closed issues も含めて検索（解決済みの問題が多い）
+   - 最低3つの関連Issueを読んでから実装する
+
+3. **X（Twitter）で実装例を検索**
+   - `ツール名 + やりたいこと`
+   - 実際に動かした人のスレッドを探す
+   - config例やスクリーンショットが含まれている投稿を優先
+
+4. **公式ドキュメントを確認**
+   - 該当機能のページを読む
+   - サンプルコード、設定例をコピーする（推測で書かない）
+   - 特に認証、モデル名、APIエンドポイントは必ず公式ドキュメントで確認
+
+5. **GitHub Gists/コード検索で実装例を探す**
+   - `filename:docker-compose.yml サービス名`
+   - `filename:config.json ツール名`
+   - 実際に動いているconfig例をベースにする
+
+6. **APIが存在するか確認**
+   - 「〜のAPIがあるはず」と推測しない
+   - 公式ドキュメント、cURLテスト、Postman等で実際にAPIレスポンスを確認
+   - APIが存在しない場合は代替手段（ライブラリ、スクレイピング等）を検索
+
+7. **最低3つの情報源で裏付けを取る**
+   - 公式ドキュメント + GitHub Issues + ブログ記事
+   - または: GitHub Issues + X + Stack Overflow
+   - 1つの情報源だけで判断しない
+
+**この手順を飛ばして実装を開始することは禁止です。**
+
+### ミス発生時の記録手順（必須）
+
+エラーが発生し、解決した後は**必ず**以下の手順でミスを記録:
+
+1. **即座に記録する**
+   - 解決後すぐに `docs/KNOWN_MISTAKES.md` に追記
+   - 後回しにしない（忘れる前に記録）
+
+2. **記録する内容**
+   - **症状**: 何が起きたか（エラーメッセージ、動作不良の内容）
+   - **根本原因**: なぜ起きたか（設定ミス、認識不足、推測で実装等）
+   - **誤ったアプローチ**: 無駄だった試行錯誤（何を試して失敗したか）
+   - **正しい解決策**: 最終的にどう解決したか（具体的な手順、コード）
+   - **教訓**: 次回どうすべきか（具体的なアクション）
+   - **検索すべきだったキーワード**: 最初から検索していれば見つかったキーワード
+
+3. **記録フォーマット**
+   ```markdown
+   ### YYYY-MM-DD: 問題のタイトル
+   - **症状**: 何が起きたか
+   - **根本原因**: なぜ起きたか
+   - **誤ったアプローチ**: 無駄だった試行錯誤
+   - **正しい解決策**: 最終的にどう解決したか
+   - **教訓**: 次回どうすべきか（具体的なアクション）
+   - **検索すべきだったキーワード**: 最初から検索していれば見つかったキーワード
+   ```
+
+4. **CLAUDE.mdのセクション2を更新**
+   - 頻出するミスは「よくあるミスのクイックリファレンス」テーブルに追加
+   - 重要な教訓は「最重要の教訓」リストに追加
+
+**この記録手順を飛ばすことは禁止です。ミスを記録しなければ、同じミスを繰り返します。**
+
 ### 絶対にやること
 - ファイル変更前に現在の内容を `read_file` で確認する
 - Docker Compose変更時は **実際に使用中のComposeファイル** を特定してから編集する
@@ -375,4 +373,4 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
 
 ---
 
-*最終更新: 2026-02-15 — Neo（Claude Brain）統合完了、AISA自動化パイプライン構築完了（PostgreSQL 5テーブル + N8N 13ワークフロー + コンテンツ20+ファイル）、Jarvis↔Neo共有フォルダ連携、ローカル資料ダウンロード・品質確認完了*
+*最終更新: 2026-02-15 — 調査強制・ミス記録システム構築完了（KNOWN_MISTAKES.md分離、実装前必須調査手順追加、ミス記録手順追加）、Substack自動投稿システム構築完了（python-substack + FastAPI + Cookie認証）*
