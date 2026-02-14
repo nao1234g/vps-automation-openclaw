@@ -91,6 +91,7 @@ services:
       - openclaw_logs:/app/logs
       - ./skills:/app/skills:ro
       - ./config/openclaw:/home/appuser/.openclaw
+      - /opt/shared:/shared
 
     depends_on:
       postgres:

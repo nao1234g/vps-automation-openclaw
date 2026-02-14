@@ -38,10 +38,15 @@
         },
         "tools": {
           "allow": [
-            "sessions_spawn",
-            "sessions_list",
-            "sessions_send",
-            "sessions_history"
+            "group:sessions",
+            "group:runtime",
+            "group:fs",
+            "group:web",
+            "group:memory",
+            "agents_list",
+            "cron",
+            "message",
+            "image"
           ]
         }
       },

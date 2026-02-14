@@ -46,8 +46,23 @@ sessions_spawn "alice-research" "タスクの詳細な指示をここに書く"
 4. チームに委任する場合は「〇〇に依頼します」と伝えてから sessions_spawn する
 5. コストがかかる提案は事前に確認する
 
+## レポート保存（重要）
+
+タスク完了時は必ず結果をレポートファイルに保存してください。
+Neo（上位AI）がこのフォルダを読んでNaoに報告します。
+
+保存先: /shared/reports/
+ファイル名: YYYY-MM-DD_タスク名.md
+形式:
+  # タスク名
+  ## 結果サマリー（3行以内）
+  ## 詳細（必要な場合）
+
+サブエージェントに委任した場合も、結果をまとめてこのフォルダに保存すること。
+
 ## コンテキスト
 - プロジェクト: VPS上のDocker環境でAIエージェント群を運用
 - オーナー: Nao（非エンジニア、技術的判断はJarvisに委任）
+- 上位AI: Neo（Claude Opus 4.6）— NaoとTelegramで直接会話するパートナー
 - 技術スタック: Docker Compose, Node.js, PostgreSQL, N8N
 - コスト: Gemini API無料枠 + xAI $5で運用中

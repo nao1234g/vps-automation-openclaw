@@ -1,12 +1,47 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "permissions": {
     "allow": [
       "Bash(ls:*)",
       "Bash(wc:*)",
-      "Bash(du:*)"
+      "Bash(du:*)",
+      "Bash(docker compose:*)",
+      "Bash(ssh:*)",
+      "Bash(curl:*)",
+      "Bash(chmod:*)",
+      "Bash(ssh-keygen:*)",
+      "Bash(for user in appuser deploy admin openclaw nao)",
+      "Bash(do echo \"Trying $user...\")",
+      "Bash(done)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:163.44.124.123)",
+      "Bash(ping:*)",
+      "Bash(taskkill:*)",
+      "Bash(scp:*)",
+      "Bash(python3 -c \" import sys, json data = json.load\\(sys.stdin\\) gw = data.get\\(''gateway'', {}\\) # Remove auth section if ''auth'' in gw: del gw[''auth''] data[''gateway''] = gw print\\(json.dumps\\(data, indent=2, ensure_ascii=False\\)\\) \")",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.openclaw.ai)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:o-mega.ai)",
+      "WebFetch(domain:macaron.im)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:deepwiki.com)",
+      "WebFetch(domain:openclawwiki.org)",
+      "WebFetch(domain:www.answeroverflow.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(dir \"C:\\\\Users\\\\user\\\\.claude\")",
+      "Bash(gh api:*)",
+      "Bash(gh auth status:*)",
+      "WebFetch(domain:support.claude.com)",
+      "WebFetch(domain:news.ycombinator.com)",
+      "WebFetch(domain:gist.github.com)",
+      "Bash(claude auth status:*)",
+      "Bash(dir:*)",
+      "WebFetch(domain:whitepaper.virtuals.io)"
     ]
-  },
-  "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   }
 }

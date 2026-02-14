@@ -175,6 +175,59 @@
 
 ---
 
+## 2.5. Neo Architecture（Telegram経由Claude Code）
+
+### 概要
+- **名前**: Neo（通称 "Claude Brain"）
+- **モデル**: Claude Opus 4.6
+- **実行環境**: VPS上で `claude-code-telegram` サービスとして稼働
+- **アクセス方法**: Telegram bot `@claude_brain_nn_bot`（ユーザーのスマホから直接対話可能）
+- **役割**: CTO・戦略パートナー（Jarvisチームとは独立、より高レベルの意思決定を担当）
+
+### アーキテクチャ
+```
+User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
+                                              ↓
+                                        Claude Code (SDK)
+                                              ↓
+                                        Claude Opus 4.6 API
+                                              ↓
+                                        VPS filesystem (/opt)
+                                              ↓
+                                        Shared folder: /opt/shared/reports/
+                                              ↑
+                                        OpenClaw container (/shared)
+                                              ↑
+                                        Jarvis (レポート書き込み)
+```
+
+### 重要な設定
+- **作業ディレクトリ**: `/opt`（`APPROVED_DIRECTORY`環境変数で設定）
+- **CLAUDE.md**: `/opt/CLAUDE.md` → `/opt/claude-code-telegram/CLAUDE.md` へのシンボリックリンク
+- **アイデンティティ**: CLAUDE.mdで "Neo" として定義（Claude Codeが起動時に読み込む）
+- **セッション永続化**: `/opt/.claude/projects/` にセッション履歴保存
+- **プログレス表示**: 改良版orchestrator.py（経過時間 + フェーズラベル表示）
+
+### Jarvis↔Neo通信
+- **共有フォルダ**: `/opt/shared/reports/`（ホスト側）= `/shared/reports/`（コンテナ内）
+- **権限**: `chmod 777`（コンテナUID 1001とホストrootの両方が読み書き可能）
+- **フロー**:
+  1. Jarvisがタスク完了時に `/shared/reports/YYYY-MM-DD_タスク名.md` に書き込み
+  2. Neoが `/opt/shared/reports/` を読んで内容確認
+  3. NeoがユーザーにTelegram経由で報告
+
+### ローカルClaude Code との役割分担
+- **Neo（VPS）**: VPSファイル操作、Docker操作、N8N操作、Jarvisへの指示、戦略立案
+- **ローカルClaude Code**: ローカルファイル編集、CLAUDE.md更新、git操作、設計レビュー
+- **衝突回避**: 両者が同時にVPSの同じファイル・サービスを触らないこと（役割を明確に分ける）
+
+### 制約
+- **Claude APIコスト**: Opus 4.6は高額（$15/1M input tokens, $75/1M output tokens）
+- **レート制限**: 1分間に4リクエスト、1日に1,000リクエスト（Tier 1）
+- **getUpdates競合**: OpenClawのTelegram統合とは別botを使用（競合なし）
+
+---
+
 ## 3. Constraints（制約条件）
 
 ### セキュリティ制約
@@ -206,7 +259,7 @@
 
 ## 4. Current State（現在の状態）
 
-### 動作中の構成（2026-02-14時点）
+### 動作中の構成（2026-02-15時点）
 - **使用中Compose**: `docker-compose.quick.yml`
 - **VPS**: ConoHa 163.44.124.123（Caddy リバースプロキシ）
 - **コンテナ**: 3サービス healthy（openclaw-agent, postgres, n8n）
@@ -216,19 +269,22 @@
 - **sessions_spawn**: Jarvis → 他7エージェントへの委任設定済み（`tools.allow` + `subagents.allowAgents`）
 - **SSH**: 復旧済み（ed25519鍵認証 + パスワード認証）
 - **Control UI**: SSHトンネル経由でアクセス可能 (`localhost:8081/?token=...`)
-- **N8N**: Morning Briefingワークフロー稼働中（毎朝8時JST）
+- **N8N**: 13ワークフロー稼働中（AISA自動化パイプライン + Morning Briefing）
+- **Neo**: Claude Opus 4.6 via Telegram（VPS上でClaude Code稼働）
+- **Jarvis↔Neo通信**: `/opt/shared/reports/` 経由で双方向連携
 
-### AIエージェント構成（8人）
-| # | 名前 | 役割 | モデル |
-|---|------|------|--------|
-| 1 | 🎯 Jarvis | 戦略・指揮（DEFAULT） | google/gemini-2.5-pro |
-| 2 | 🔍 Alice | リサーチ | google/gemini-2.5-pro |
-| 3 | 💻 CodeX | 開発 | google/gemini-2.5-pro |
-| 4 | 🎨 Pixel | デザイン | google/gemini-2.5-flash |
-| 5 | ✍️ Luna | 執筆 | google/gemini-2.5-pro |
-| 6 | 📊 Scout | データ処理 | google/gemini-2.5-flash |
-| 7 | 🛡️ Guard | セキュリティ | google/gemini-2.5-flash |
-| 8 | 🦅 Hawk | X/SNSリサーチ | xai/grok-4.1 |
+### AIエージェント構成（9人）
+| # | 名前 | 役割 | モデル | プラットフォーム |
+|---|------|------|--------|-----------------|
+| 1 | 🎯 Jarvis | 戦略・指揮（DEFAULT） | google/gemini-2.5-pro | OpenClaw |
+| 2 | 🔍 Alice | リサーチ | google/gemini-2.5-pro | OpenClaw |
+| 3 | 💻 CodeX | 開発 | google/gemini-2.5-pro | OpenClaw |
+| 4 | 🎨 Pixel | デザイン | google/gemini-2.5-flash | OpenClaw |
+| 5 | ✍️ Luna | 執筆 | google/gemini-2.5-pro | OpenClaw |
+| 6 | 📊 Scout | データ処理 | google/gemini-2.5-flash | OpenClaw |
+| 7 | 🛡️ Guard | セキュリティ | google/gemini-2.5-flash | OpenClaw |
+| 8 | 🦅 Hawk | X/SNSリサーチ | xai/grok-4.1 | OpenClaw |
+| 9 | 🧠 Neo | CTO・戦略パートナー | claude-opus-4.6 | Telegram (Claude Code) |
 
 ### コスト状況
 - Gemini API: **無料枠**で運用中（追加コストなし）
@@ -236,14 +292,24 @@
 - Google AI Pro サブスク: ¥2,900/月（Antigravity用、API とは別）
 - Claude Max: $200/月（Claude Code用、API とは別）
 
+### 完成プロジェクト
+- [x] **AISA（Asia Intelligence Signal Agent）** — アジア暗号資産ニュースレター自動化システム
+  - PostgreSQL `aisa` スキーマ（5テーブル）
+  - N8N 13ワークフロー（データ収集・レポート生成・監視・バックアップ）
+  - コンテンツ20+ファイル（ローンチ記事、レポート6本、SEO設計、収益化設計）
+  - 24時間自動稼働（規制ニュース、市場データ、SNSシグナル収集）
+  - 月額コスト: ¥0（全て無料APIとセルフホスト）
+  - 設計・実装: Neo（2026-02-14〜15）
+
 ### 未解決の課題
 - [ ] OpenClaw を最新版にアップデート
 - [ ] xAI APIキーをローテーション（チャットに表示されたため）
 - [x] VPSのSSHアクセス復旧 → 完了（ed25519鍵 + パスワード認証）
 - [ ] VPSの `chmod 777` を適切な権限に修正（セキュリティ）
-- [x] N8N自動化ワークフロー構築 → Morning Briefing稼働中
+- [x] N8N自動化ワークフロー構築 → AISA完成（13ワークフロー稼働中）
 - [ ] ConoHaセキュリティグループでポート80/443を開放（外部ブラウザアクセス用）
 - [ ] Telegram getUpdatesコンフリクトの完全解消
+- [ ] AISA Substackローンチ（30分作業、全コンテンツ準備済み）
 
 ---
 
@@ -309,4 +375,4 @@
 
 ---
 
-*最終更新: 2026-02-14 — SSH復旧、Control UIトークン認証、N8N Morning Briefingワークフロー稼働、ペルソナファイル更新（Hawk追加・Jarvis委任強化）*
+*最終更新: 2026-02-15 — Neo（Claude Brain）統合完了、AISA自動化パイプライン構築完了（PostgreSQL 5テーブル + N8N 13ワークフロー + コンテンツ20+ファイル）、Jarvis↔Neo共有フォルダ連携、ローカル資料ダウンロード・品質確認完了*
