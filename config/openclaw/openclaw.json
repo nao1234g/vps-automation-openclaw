@@ -1,10 +1,10 @@
 {
   "meta": {
     "lastTouchedVersion": "2026.2.9",
-    "lastTouchedAt": "2026-02-14T06:03:22.803Z"
+    "lastTouchedAt": "2026-02-14T07:18:18.558Z"
   },
   "wizard": {
-    "lastRunAt": "2026-02-14T06:03:22.796Z",
+    "lastRunAt": "2026-02-14T07:18:18.536Z",
     "lastRunVersion": "2026.2.9",
     "lastRunCommand": "doctor",
     "lastRunMode": "local"
@@ -25,14 +25,6 @@
           "name": "Jarvis (CSO / 最高戦略責任者)",
           "emoji": "🎯"
         },
-        "tools": {
-          "allow": [
-            "sessions_spawn",
-            "sessions_list",
-            "sessions_send",
-            "sessions_history"
-          ]
-        },
         "subagents": {
           "allowAgents": [
             "alice-research",
@@ -42,6 +34,14 @@
             "scout-data",
             "guard-security",
             "hawk-xresearch"
+          ]
+        },
+        "tools": {
+          "allow": [
+            "sessions_spawn",
+            "sessions_list",
+            "sessions_send",
+            "sessions_history"
           ]
         }
       },
@@ -103,6 +103,11 @@
       }
     ]
   },
+  "tools": {
+    "agentToAgent": {
+      "enabled": true
+    }
+  },
   "messages": {
     "ackReactionScope": "group-mentions"
   },
@@ -134,11 +139,6 @@
       "telegram": {
         "enabled": true
       }
-    }
-  },
-  "tools": {
-    "agentToAgent": {
-      "enabled": true
     }
   }
 }

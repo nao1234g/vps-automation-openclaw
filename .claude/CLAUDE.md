@@ -150,6 +150,23 @@
 - **無効なキー**: `systemPrompt`, `instructions`, `identity.description` はすべて OpenClaw config で拒否される
 - **有効なキー**: `id`, `model`, `identity` (name, emoji のみ), `default`
 
+### 2026-02-14: sessions_spawn の pairing required エラー
+- **症状**: Jarvis が Telegram 経由で sessions_spawn を使って Alice に仕事を振ろうとすると「pairing required」エラー
+- **追加症状**: `openclaw doctor` も `openclaw devices list` も同じ pairing required で接続不可
+- **根本原因**: Docker コンテナ内の CLI デバイス (`~/.openclaw/identity/device.json`) が Gateway に未登録。`~/.openclaw/devices/paired.json` が空 `{}`
+- **鶏と卵の問題**: `openclaw pairing approve` も Gateway 接続が必要なので、CLI からは承認不可能
+- **正しい解決策**: `paired.json` に手動でデバイスを登録（Node.js スクリプトで）
+  1. `pending.json` からデバイス情報を取得
+  2. `paired.json` にデバイスID をキーとしてエントリを追加（approvedAt, label 付き）
+  3. `pending.json` を `{}` にクリア
+  4. Gateway を再起動（`docker restart openclaw-agent`）
+- **entrypoint.sh の変更**: Gateway 起動時に `--auth token --token "${OPENCLAW_GATEWAY_TOKEN}"` を明示的に指定
+- **教訓**:
+  1. OpenClaw Gateway はデバイス認証とトークン認証が**別レイヤー**で動く。トークンだけでは不十分
+  2. `controlUi.dangerouslyDisableDeviceAuth` は Control UI のみに効く。CLI やサブエージェントには効かない
+  3. `paired.json` はディレクトリマウント上にあるので、コンテナ再起動でも保持される
+  4. サブエージェントは親セッションの接続を継承する（公式ドキュメントより）ので、親の認証が通れば spawn は動く
+
 ### 一般的な落とし穴
 - **PostgreSQL init スクリプト**: 初回起動時のみ実行。再実行するにはボリューム削除が必要
 - **Docker Compose ファイルの選択ミス**: 変更を加えた yml と実際に起動している yml が異なるケースが頻発。`docker compose ps` で確認すること
@@ -193,9 +210,10 @@
 - **使用中Compose**: `docker-compose.quick.yml`
 - **VPS**: ConoHa 163.44.124.123（Caddy リバースプロキシ）
 - **コンテナ**: 3サービス healthy（openclaw-agent, postgres, n8n）
-- **Gateway**: ws://0.0.0.0:3000 でリッスン中（トークン認証）
+- **Gateway**: ws://0.0.0.0:3000 でリッスン中（トークン認証 + デバイスペアリング済み）
 - **Telegram**: `@openclaw_nn2026_bot` 接続済み・ペアリング承認済み
 - **エージェント**: 8人体制（Gemini 2.5 Pro/Flash + xAI Grok 4.1）
+- **sessions_spawn**: Jarvis → 他7エージェントへの委任設定済み（`tools.allow` + `subagents.allowAgents`）
 - **SSH**: 復旧済み（ed25519鍵認証 + パスワード認証）
 - **Control UI**: SSHトンネル経由でアクセス可能 (`localhost:8081/?token=...`)
 - **N8N**: Morning Briefingワークフロー稼働中（毎朝8時JST）

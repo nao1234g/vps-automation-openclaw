@@ -40,12 +40,14 @@ fi
 echo "🚀 Starting OpenClaw Gateway..."
 echo "   Port: ${OPENCLAW_PORT:-3000}"
 echo "   Bind: lan"
+echo "   Auth: token"
 echo ""
 
-# Gateway を起動（認証は openclaw.json の設定に従う）
-# ダッシュボードURL: http://localhost:3000
-
+# Gateway を起動（トークン認証を明示的に指定）
+# sessions_spawn のサブエージェント接続に必要
 exec openclaw gateway run \
     --port "${OPENCLAW_PORT:-3000}" \
     --bind lan \
+    --auth token \
+    --token "${OPENCLAW_GATEWAY_TOKEN}" \
     --verbose
