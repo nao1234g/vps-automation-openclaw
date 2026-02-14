@@ -1,30 +1,30 @@
 {
-  "gateway": {
-    "port": 3000,
-    "mode": "local",
-    "bind": "lan",
-    "trustedProxies": [
-      "0.0.0.0/0"
-    ],
-    "controlUi": {
-      "allowInsecureAuth": true,
-      "dangerouslyDisableDeviceAuth": true
-    },
-    "auth": {
-      "mode": "token",
-      "token": "my-super-secret-openclaw-token-12345"
-    }
+  "meta": {
+    "lastTouchedVersion": "2026.2.9",
+    "lastTouchedAt": "2026-02-14T06:03:22.803Z"
+  },
+  "wizard": {
+    "lastRunAt": "2026-02-14T06:03:22.796Z",
+    "lastRunVersion": "2026.2.9",
+    "lastRunCommand": "doctor",
+    "lastRunMode": "local"
   },
   "agents": {
+    "defaults": {
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
+      }
+    },
     "list": [
       {
         "id": "jarvis-cso",
+        "default": true,
         "model": "google/gemini-2.5-pro",
         "identity": {
           "name": "Jarvis (CSO / 最高戦略責任者)",
           "emoji": "🎯"
-        },
-        "default": true
+        }
       },
       {
         "id": "alice-research",
@@ -83,5 +83,38 @@
         }
       }
     ]
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto"
+  },
+  "gateway": {
+    "port": 3000,
+    "mode": "local",
+    "bind": "lan",
+    "controlUi": {
+      "allowInsecureAuth": true,
+      "dangerouslyDisableDeviceAuth": true
+    },
+    "auth": {
+      "mode": "token",
+      "token": "2265f32ed2136c904b2b5a9f0679565abf2e5d0c7c063123e6dad1aa60f7f78f"
+    },
+    "trustedProxies": [
+      "172.18.0.0/16",
+      "172.17.0.0/16",
+      "127.0.0.1/32",
+      "0.0.0.0/0"
+    ]
+  },
+  "plugins": {
+    "entries": {
+      "telegram": {
+        "enabled": true
+      }
+    }
   }
 }

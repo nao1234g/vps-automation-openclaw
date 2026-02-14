@@ -135,6 +135,11 @@ services:
       GENERIC_TIMEZONE: ${TZ:-Asia/Tokyo}
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
 
+      # AI & Telegram (N8Nワークフロー用)
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+
     volumes:
       - n8n_data:/home/node/.n8n
 

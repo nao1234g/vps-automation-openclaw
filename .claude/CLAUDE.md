@@ -122,6 +122,34 @@
 - **確認方法**: `curl -s "https://generativelanguage.googleapis.com/v1beta/models?key=${GOOGLE_KEY}"` で利用可能モデル一覧を取得
 - **教訓**: Google は preview モデルの名称を頻繁に変更・廃止する。設定前に API で利用可能なモデル名を確認すること
 
+### 2026-02-14: SSH復旧 & Control UI トークン認証
+- **SSH復旧**: cloud-initが `/etc/ssh/sshd_config.d/50-cloud-init.conf` で `PasswordAuthentication no` を上書きしていた → `yes` に変更して解決
+- **Control UI接続**: `dangerouslyDisableDeviceAuth: true` でもデバイス認証が要求される
+- **正しい解決策**: URLにトークンを付与 `http://host:port/?token={GATEWAY_TOKEN}`（GitHub issue #8529）
+- **entrypoint.sh**: `--password` フラグを削除（CLIフラグではなくJSON設定で認証制御）
+- **教訓**:
+  1. cloud-init の sshd_config.d 配下のファイルがメインの sshd_config を上書きする
+  2. OpenClaw Control UIのトークン認証はURLパラメータで渡す
+  3. SSHトンネル: `ssh -i key -f -N -L 8081:localhost:3000 root@VPS`
+
+### 2026-02-14: N8N API アクセス & ワークフロー
+- **N8N API認証**: `X-N8N-API-KEY` ヘッダーが必須。Basic Auth では通らない
+- **APIキー生成**: N8N Web UIまたはREST APIの `/rest/api-keys` で生成（scopes + expiresAt 必須）
+- **N8Nオーナーセットアップ**: DB直接操作で可能（email, password をbcryptハッシュで設定）
+- **ワークフロー実行**: 公開API (`/api/v1/`) にはワークフロー実行エンドポイントがない → スケジュール実行で対応
+- **環境変数**: N8Nコンテナにも `GOOGLE_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` を渡す必要あり
+- **OpenClawにはREST APIがない**: エージェントチャットはWebSocket専用。N8NからOpenClawエージェントを直接呼び出す方法はない
+- **教訓**:
+  1. N8N → OpenClawエージェント呼び出しは不可。N8NからLLM APIを直接呼ぶ設計にする
+  2. Telegram `sendMessage` API はOpenClawの `getUpdates` と競合しない（送信と受信は別）
+  3. N8Nのワークフロー手動実行は公開APIからはできない
+
+### 2026-02-14: ペルソナファイルの仕組み
+- **システムプロンプト**: `openclaw.json` のJSON設定ではなく `personas/{agent-id}.md` ファイルで定義
+- **ワークスペース**: `workspace/` ディレクトリに SOUL.md, USER.md, AGENTS.md 等が存在
+- **無効なキー**: `systemPrompt`, `instructions`, `identity.description` はすべて OpenClaw config で拒否される
+- **有効なキー**: `id`, `model`, `identity` (name, emoji のみ), `default`
+
 ### 一般的な落とし穴
 - **PostgreSQL init スクリプト**: 初回起動時のみ実行。再実行するにはボリューム削除が必要
 - **Docker Compose ファイルの選択ミス**: 変更を加えた yml と実際に起動している yml が異なるケースが頻発。`docker compose ps` で確認すること
@@ -161,13 +189,16 @@
 
 ## 4. Current State（現在の状態）
 
-### 動作中の構成（2026-02-12時点）
+### 動作中の構成（2026-02-14時点）
 - **使用中Compose**: `docker-compose.quick.yml`
 - **VPS**: ConoHa 163.44.124.123（Caddy リバースプロキシ）
 - **コンテナ**: 3サービス healthy（openclaw-agent, postgres, n8n）
-- **Gateway**: ws://0.0.0.0:3000 でリッスン中
+- **Gateway**: ws://0.0.0.0:3000 でリッスン中（トークン認証）
 - **Telegram**: `@openclaw_nn2026_bot` 接続済み・ペアリング承認済み
 - **エージェント**: 8人体制（Gemini 2.5 Pro/Flash + xAI Grok 4.1）
+- **SSH**: 復旧済み（ed25519鍵認証 + パスワード認証）
+- **Control UI**: SSHトンネル経由でアクセス可能 (`localhost:8081/?token=...`)
+- **N8N**: Morning Briefingワークフロー稼働中（毎朝8時JST）
 
 ### AIエージェント構成（8人）
 | # | 名前 | 役割 | モデル |
@@ -190,9 +221,11 @@
 ### 未解決の課題
 - [ ] OpenClaw を最新版にアップデート
 - [ ] xAI APIキーをローテーション（チャットに表示されたため）
-- [ ] VPSのSSHアクセス復旧（sshdが停止中、シリアルコンソールのみ）
+- [x] VPSのSSHアクセス復旧 → 完了（ed25519鍵 + パスワード認証）
 - [ ] VPSの `chmod 777` を適切な権限に修正（セキュリティ）
-- [ ] N8N自動化ワークフロー構築（毎朝ニュース収集等）
+- [x] N8N自動化ワークフロー構築 → Morning Briefing稼働中
+- [ ] ConoHaセキュリティグループでポート80/443を開放（外部ブラウザアクセス用）
+- [ ] Telegram getUpdatesコンフリクトの完全解消
 
 ---
 
@@ -249,4 +282,4 @@
 
 ---
 
-*最終更新: 2026-02-12 — Telegram接続完了、8人AI社員体制（Hawk追加）、EBUSY/モデル名問題の教訓を記録*
+*最終更新: 2026-02-14 — SSH復旧、Control UIトークン認証、N8N Morning Briefingワークフロー稼働、ペルソナファイル更新（Hawk追加・Jarvis委任強化）*

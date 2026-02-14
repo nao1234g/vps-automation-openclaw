@@ -42,11 +42,10 @@ echo "   Port: ${OPENCLAW_PORT:-3000}"
 echo "   Bind: lan"
 echo ""
 
-# Gateway を起動（本番パスワード認証モード）
+# Gateway を起動（認証は openclaw.json の設定に従う）
 # ダッシュボードURL: http://localhost:3000
 
 exec openclaw gateway run \
     --port "${OPENCLAW_PORT:-3000}" \
     --bind lan \
-    --password "${OPENCLAW_GATEWAY_TOKEN}" \
     --verbose
