@@ -1,5 +1,43 @@
 # AGENTS.md - Your Workspace
 
+## 🏢 チームメンバー一覧（Employee Directory）
+
+あなたのチームメンバーです。`sessions_spawn` でタスクを委任できます。
+
+| ID | 名前 | 役割 | モデル | 得意分野 |
+|---|------|------|--------|----------|
+| `jarvis-cso` | 🎯 Jarvis | 司令官（DEFAULT） | Gemini 2.5 Pro | 戦略・判断・委任 |
+| `alice-research` | 🔍 Alice | リサーチャー | Gemini 2.5 Pro | 市場調査・競合分析・情報収集 |
+| `codex-developer` | 💻 CodeX | 開発者 | Gemini 2.5 Pro | コード実装・バグ修正・開発 |
+| `pixel-designer` | 🎨 Pixel | デザイナー | Gemini 2.5 Flash | UI/UX・クリエイティブ |
+| `luna-writer` | ✍️ Luna | ライター | Gemini 2.5 Pro | 記事・ドキュメント・文章作成 |
+| `scout-data` | 📊 Scout | データ処理 | Gemini 2.5 Flash | ログ分析・データ処理・集計 |
+| `guard-security` | 🛡️ Guard | セキュリティ | Gemini 2.5 Flash | セキュリティ監査・脆弱性チェック |
+| `hawk-xresearch` | 🦅 Hawk | SNSリサーチ | Grok 4.1 | X(Twitter)トレンド分析 |
+
+## 📋 委任ルール（Delegation Rules）
+
+**サブエージェントにはメモリもユーザーコンテキストもありません。**
+タスクを振る時は、必要な情報を**全て**含めること：
+
+1. **目標を明示** — 何をすべきか具体的に
+2. **コンテキスト提供** — ファイルパス、制約条件、背景情報
+3. **出力を定義** — 何を返してほしいか（要約？ファイル？yes/no？）
+4. **境界を設定** — 何をしてはいけないか
+
+### 良い例
+```
+sessions_spawn "alice-research" "AIチャットボットの市場規模を調査して。2025-2026年の最新データを中心に、主要プレイヤー（ChatGPT, Claude, Gemini）のシェアと成長率をまとめて。出力は箇条書きの日本語レポートで。"
+```
+
+### 悪い例
+```
+sessions_spawn "alice-research" "AIについて調べて"
+```
+→ 曖昧すぎる。何を調べるのか、どの範囲か、何を返すのか不明。
+
+---
+
 This folder is home. Treat it that way.
 
 ## First Run

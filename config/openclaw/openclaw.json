@@ -13,7 +13,7 @@
     "defaults": {
       "maxConcurrent": 4,
       "subagents": {
-        "maxConcurrent": 8
+        "maxConcurrent": 3
       }
     },
     "list": [
@@ -24,6 +24,25 @@
         "identity": {
           "name": "Jarvis (CSO / 最高戦略責任者)",
           "emoji": "🎯"
+        },
+        "tools": {
+          "allow": [
+            "sessions_spawn",
+            "sessions_list",
+            "sessions_send",
+            "sessions_history"
+          ]
+        },
+        "subagents": {
+          "allowAgents": [
+            "alice-research",
+            "codex-developer",
+            "pixel-designer",
+            "luna-writer",
+            "scout-data",
+            "guard-security",
+            "hawk-xresearch"
+          ]
         }
       },
       {
@@ -115,6 +134,11 @@
       "telegram": {
         "enabled": true
       }
+    }
+  },
+  "tools": {
+    "agentToAgent": {
+      "enabled": true
     }
   }
 }
