@@ -265,6 +265,7 @@ Substack投稿 + X/Reddit/Notes配信
 - [ ] **多言語対応**（既存7記事 → 日本語・中国語・韓国語に翻訳）
 - [ ] **エビデンス強化**（全記事に出典URL追加）
 - [ ] **Neo記事執筆ワークフロー**（週1-2本ペース）
+- [x] **リサーチ強制 + 報酬/ペナルティhooksシステム** → 完了（5 hooks + SCORECARD.md、2026-02-15）
 
 ---
 
@@ -459,4 +460,4 @@ Substack投稿 + X/Reddit/Notes配信
 
 ---
 
-*最終更新: 2026-02-15 — 調査強制・ミス記録システム構築完了（KNOWN_MISTAKES.md分離、実装前必須調査手順追加、ミス記録手順追加）、Substack自動投稿システム構築完了（python-substack + FastAPI + Cookie認証）*
+*最終更新: 2026-02-15 — リサーチ強制hooksシステム完成（SessionStart/PreToolUse/PostToolUse/PostToolUseFailure/SessionEnd、SCORECARD.md報酬追跡）、24/7自律運用システム（X Intelligence Pipeline）デプロイ完了*

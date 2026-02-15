@@ -57,6 +57,7 @@ Thumbs.db
 
 # Claude Code
 .claude/projects/
+.claude/hooks/state/
 
 # Logs
 *.log
