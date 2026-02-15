@@ -93,7 +93,70 @@
       "WebFetch(domain:novaorigin26.github.io)",
       "WebFetch(domain:www.productcompass.pm)",
       "Bash(del \"c:\\\\Users\\\\user\\\\OneDrive\\\\デスクトップ\\\\vps-automation-openclaw\\\\tmp_loop.py\" \"c:\\\\Users\\\\user\\\\OneDrive\\\\デスクトップ\\\\vps-automation-openclaw\\\\tmp_watchdog.sh\" \"c:\\\\Users\\\\user\\\\OneDrive\\\\デスクトップ\\\\vps-automation-openclaw\\\\tmp_memory_gen.py\" \"c:\\\\Users\\\\user\\\\OneDrive\\\\デスクトップ\\\\vps-automation-openclaw\\\\tmp_xintel_loop.service\")",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(CLAUDE_PROJECT_DIR=\".\" bash:*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|WebSearch|WebFetch|Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/research-gate.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "WebSearch|WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/research-reward.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/error-tracker.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-end.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }
