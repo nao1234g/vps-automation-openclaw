@@ -393,4 +393,28 @@
 
 ---
 
-*最終更新: 2026-02-15 — X API Pay-Per-Useモデル変更に関するミスを追加*
+---
+
+## OpenClaw設定関連（2026-02-15）
+
+### 2026-02-15: openclaw.jsonに存在しないキーを追加してコンテナ起動失敗
+- **症状**: OpenClawコンテナが「Config invalid」「Unrecognized key: "systemPrompt"」でunhealthyになる
+- **根本原因**: openclaw.jsonのエージェント設定に`systemPrompt`キーを追加したが、OpenClawはこのキーを認識しない。`identity.description`も同様に無効
+- **誤ったアプローチ**:
+  1. `agents.list[0].systemPrompt` を追加 → 「Unrecognized key」エラー
+  2. `agents.list[0].identity.description` を追加 → 同じく「Unrecognized key」エラー
+  3. OpenClawのドキュメントやGitHubを事前に確認しなかった（リサーチ不足）
+- **正しい解決策**:
+  1. openclaw.jsonからは無効なキーを削除する
+  2. エージェントにルールを伝えるには **共有ファイル** (`/opt/shared/AGENT_RULES.md`) を作成する
+  3. エージェントはファイルシステムにアクセスできるので、共有ファイルを読むことができる
+- **教訓**:
+  - **openclaw.jsonは厳密なバリデーションがある。推測でキーを追加しない**
+  - 設定項目を追加する前に、公式ドキュメントまたはGitHub Issuesで有効なキーを確認する
+  - エージェントへの指示は設定ファイルではなく、共有ファイルシステムを使う
+- **検索すべきだったキーワード**:
+  - `openclaw agent systemPrompt config`
+  - `openclaw.json valid keys schema`
+  - `openclaw agent instructions configuration`
+
+*最終更新: 2026-02-15 — openclaw.json無効キー追加ミスを記録*
