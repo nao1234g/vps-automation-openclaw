@@ -1,0 +1,148 @@
+{
+  "name": "Substack Auto Publish - AISA Newsletter",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "name": "Schedule: Daily at 9:00 AM JST",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "id": "schedule-trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT title, content, created_at FROM aisa.generated_reports WHERE published_at IS NULL ORDER BY created_at DESC LIMIT 1",
+        "options": {}
+      },
+      "name": "Get Latest Unpublished Report",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "id": "postgres-query",
+      "credentials": {
+        "postgres": {
+          "id": "postgres-aisa",
+          "name": "PostgreSQL - AISA"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const report = $input.first().json;\n\nif (!report || !report.title) {\n  throw new Error('No unpublished report found');\n}\n\nreturn {\n  json: {\n    subject: report.title,\n    body: report.content,\n    reportId: report.id\n  }\n};"
+      },
+      "name": "Format Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300],
+      "id": "format-email"
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{$env.SMTP_USER}}",
+        "toEmail": "publish@aisaintel.substack.com",
+        "subject": "={{$json.subject}}",
+        "emailType": "html",
+        "message": "={{$json.body}}",
+        "options": {}
+      },
+      "name": "Send to Substack",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [850, 300],
+      "id": "send-email",
+      "credentials": {
+        "smtp": {
+          "id": "smtp-gmail",
+          "name": "Gmail SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE aisa.generated_reports SET published_at = NOW() WHERE id = {{$json.reportId}}",
+        "options": {}
+      },
+      "name": "Mark as Published",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [1050, 300],
+      "id": "update-published",
+      "credentials": {
+        "postgres": {
+          "id": "postgres-aisa",
+          "name": "PostgreSQL - AISA"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule: Daily at 9:00 AM JST": {
+      "main": [
+        [
+          {
+            "node": "Get Latest Unpublished Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Latest Unpublished Report": {
+      "main": [
+        [
+          {
+            "node": "Format Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Email": {
+      "main": [
+        [
+          {
+            "node": "Send to Substack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Substack": {
+      "main": [
+        [
+          {
+            "node": "Mark as Published",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "AISA",
+      "id": "aisa-tag"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-14T00:00:00.000Z",
+  "versionId": "1"
+}

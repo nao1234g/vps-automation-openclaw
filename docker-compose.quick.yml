@@ -141,6 +141,12 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
 
+      # SMTP for Substack Email Publishing
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 587
+      SMTP_USER: ${SMTP_USER:-neocloop@gmail.com}
+      SMTP_PASS: ${SMTP_PASS:-}
+
     volumes:
       - n8n_data:/home/node/.n8n
 
@@ -153,6 +159,34 @@ services:
 
     healthcheck:
       test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # Substack Publishing API
+  # ============================================
+  substack-api:
+    build:
+      context: ./docker/substack-api
+      dockerfile: Dockerfile
+    container_name: openclaw-substack-api
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:8000:8000"
+
+    environment:
+      SUBSTACK_EMAIL: ${SUBSTACK_EMAIL:-}
+      SUBSTACK_PASSWORD: ${SUBSTACK_PASSWORD:-}
+      SUBSTACK_COOKIES: ${SUBSTACK_COOKIES:-}
+      SUBSTACK_PUBLICATION_URL: ${SUBSTACK_PUBLICATION_URL}
+
+    networks:
+      - openclaw-network
+
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')" ]
       interval: 30s
       timeout: 10s
       retries: 3

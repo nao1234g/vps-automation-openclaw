@@ -1,0 +1,176 @@
+{
+  "name": "Substack Auto Publish - API方式",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "name": "Schedule: Daily at 9:00 AM JST",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "id": "schedule-trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, title, content, created_at FROM aisa.generated_reports WHERE published_at IS NULL ORDER BY created_at DESC LIMIT 1",
+        "options": {}
+      },
+      "name": "Get Latest Unpublished Report",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "id": "postgres-query",
+      "credentials": {
+        "postgres": {
+          "id": "postgres-aisa",
+          "name": "PostgreSQL - AISA"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://substack-api:8000/publish",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "={{$json.title}}"
+            },
+            {
+              "name": "content",
+              "value": "={{$json.content}}"
+            },
+            {
+              "name": "is_draft",
+              "value": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Publish to Substack via API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [650, 300],
+      "id": "publish-api"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE aisa.generated_reports SET published_at = NOW() WHERE id = {{$('Get Latest Unpublished Report').item.json.id}}",
+        "options": {}
+      },
+      "name": "Mark as Published",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [850, 300],
+      "id": "update-published",
+      "credentials": {
+        "postgres": {
+          "id": "postgres-aisa",
+          "name": "PostgreSQL - AISA"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.success}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Check Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [750, 300],
+      "id": "check-success"
+    }
+  ],
+  "connections": {
+    "Schedule: Daily at 9:00 AM JST": {
+      "main": [
+        [
+          {
+            "node": "Get Latest Unpublished Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Latest Unpublished Report": {
+      "main": [
+        [
+          {
+            "node": "Publish to Substack via API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to Substack via API": {
+      "main": [
+        [
+          {
+            "node": "Check Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Success": {
+      "main": [
+        [
+          {
+            "node": "Mark as Published",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "AISA",
+      "id": "aisa-tag"
+    },
+    {
+      "name": "Substack",
+      "id": "substack-tag"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-14T00:00:00.000Z",
+  "versionId": "1"
+}

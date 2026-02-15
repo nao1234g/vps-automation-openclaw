@@ -185,7 +185,7 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
 - **使用中Compose**: `docker-compose.quick.yml`
 - **VPS**: ConoHa 163.44.124.123（Caddy リバースプロキシ）
 - **コンテナ**: 3サービス healthy（openclaw-agent, postgres, n8n）
-- **Gateway**: ws://0.0.0.0:3000 でリッスン中（トークン認証 + デバイスペアリング済み）
+- **Gateway**: ws://127.0.0.1:3000 でリッスン中（トークン認証 + デバイスペアリング済み）
 - **Telegram**: `@openclaw_nn2026_bot` 接続済み・ペアリング承認済み
 - **エージェント**: 8人体制（Gemini 2.5 Pro/Flash + xAI Grok 4.1）
 - **sessions_spawn**: Jarvis → 他7エージェントへの委任設定済み（`tools.allow` + `subagents.allowAgents`）
@@ -194,19 +194,44 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
 - **N8N**: 13ワークフロー稼働中（AISA自動化パイプライン + Morning Briefing）
 - **Neo**: Claude Opus 4.6 via Telegram（VPS上でClaude Code稼働）
 - **Jarvis↔Neo通信**: `/opt/shared/reports/` 経由で双方向連携
+- **VPSデスクトップ環境**: XFCE4 + xrdp（2026-02-15構築完了）
+  - **デスクトップ環境**: XFCE4（軽量、メモリ使用量 +5MB のみ）
+  - **リモートデスクトップ**: xrdp（ポート3389、SSHトンネル経由のみアクセス可）
+  - **ブラウザ**: Firefox（インストール済み）
+  - **VPS作業用ユーザー**: `neocloop` / パスワード: `AYfnhKtist6M`
+  - **用途**: 暗号資産運用、AI自動化作業（銀行・証券・メインGmailは絶対に入れない）
+  - **接続方法**: `ssh -L 3389:localhost:3389 root@163.44.124.123` → リモートデスクトップで `localhost` に接続
+  - **セキュリティ**: ポート3389は外部非公開、VPS専用Googleアカウント（neocloop@gmail.com）使用
 
 ### AIエージェント構成（9人）
 | # | 名前 | 役割 | モデル | プラットフォーム |
 |---|------|------|--------|-----------------|
-| 1 | 🎯 Jarvis | 戦略・指揮（DEFAULT） | google/gemini-2.5-pro | OpenClaw |
+| 1 | 🎯 Jarvis | 実行・投稿・翻訳（DEFAULT） | google/gemini-2.5-pro | OpenClaw |
 | 2 | 🔍 Alice | リサーチ | google/gemini-2.5-pro | OpenClaw |
 | 3 | 💻 CodeX | 開発 | google/gemini-2.5-pro | OpenClaw |
 | 4 | 🎨 Pixel | デザイン | google/gemini-2.5-flash | OpenClaw |
-| 5 | ✍️ Luna | 執筆 | google/gemini-2.5-pro | OpenClaw |
+| 5 | ✍️ Luna | 補助執筆 | google/gemini-2.5-pro | OpenClaw |
 | 6 | 📊 Scout | データ処理 | google/gemini-2.5-flash | OpenClaw |
 | 7 | 🛡️ Guard | セキュリティ | google/gemini-2.5-flash | OpenClaw |
 | 8 | 🦅 Hawk | X/SNSリサーチ | xai/grok-4.1 | OpenClaw |
-| 9 | 🧠 Neo | CTO・戦略パートナー | claude-opus-4.6 | Telegram (Claude Code) |
+| 9 | 🧠 Neo | **CTO・戦略統括・記事執筆** | claude-opus-4.6 | Telegram (Claude Code) |
+
+### 記事作成ワークフロー（2026-02-15〜）
+**新体制**: Neo（Opus 4.6）が記事執筆を担当、Jarvisは投稿・配信に専念
+
+```
+Neo (戦略 + 執筆)
+  ↓
+記事を /opt/shared/articles/ に保存
+  ↓
+Jarvis (自動検出)
+  ↓
+4言語に翻訳 (日本語・中国語・韓国語)
+  ↓
+Substack投稿 + X/Reddit/Notes配信
+```
+
+**理由**: Opus 4.6 は最高性能モデル。戦略と執筆を一貫して担当することで、より高品質な記事を効率的に作成できる。
 
 ### コスト状況
 - Gemini API: **無料枠**で運用中（追加コストなし）
@@ -226,12 +251,20 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
 ### 未解決の課題
 - [ ] OpenClaw を最新版にアップデート
 - [ ] xAI APIキーをローテーション（チャットに表示されたため）
+- [ ] X APIキーをローテーション（チャットに表示されたため）
 - [x] VPSのSSHアクセス復旧 → 完了（ed25519鍵 + パスワード認証）
 - [ ] VPSの `chmod 777` を適切な権限に修正（セキュリティ）
 - [x] N8N自動化ワークフロー構築 → AISA完成（13ワークフロー稼働中）
 - [ ] ConoHaセキュリティグループでポート80/443を開放（外部ブラウザアクセス用）
 - [ ] Telegram getUpdatesコンフリクトの完全解消
 - [ ] AISA Substackローンチ（30分作業、全コンテンツ準備済み）
+- [x] **VPSデスクトップ環境構築** → 完了（XFCE4 + xrdp + Firefox、2026-02-15）
+- [ ] **VPS専用Googleアカウント作成**（neocloop@gmail.com）→ VPSデスクトップのFirefoxで作成
+- [ ] **OpenClawからのブラウザ操作テスト**（Jarvisに「Firefoxでgoogle.comを開いて」と指示）
+- [ ] **Neo自動応答システム構築**（N8N Telegram Polling）
+- [ ] **多言語対応**（既存7記事 → 日本語・中国語・韓国語に翻訳）
+- [ ] **エビデンス強化**（全記事に出典URL追加）
+- [ ] **Neo記事執筆ワークフロー**（週1-2本ペース）
 
 ---
 
@@ -259,7 +292,60 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
 - AIエージェントは**CTO（最高技術責任者）として振る舞い**、技術的判断は自分で下す
 - 完成品は「素人が見ても使いやすい」状態にすること
 
-### コミュニケーションスタイル
+### 自律性の原則（絶対に守ること）
+
+**🚫 人間に依頼してはいけないこと（自分でやれ）**
+
+| 作業 | 自動化手段 | 例 |
+|------|-----------|-----|
+| **ファイル読み書き** | Read/Write/Edit | VPS上のファイル操作、設定変更 |
+| **コマンド実行** | Bash/SSH | docker restart, npm install |
+| **API呼び出し** | HTTP/REST API | Substack API, GitHub API |
+| **ブラウザ操作** | Puppeteer/Playwright | Substack設定、フォーム入力 |
+| **データ処理** | Python/Node.js | CSV変換、レポート生成 |
+| **コピペ作業** | 自動スクリプト | テンプレート貼り付け |
+
+**✅ 人間に依頼して良いこと（最小限に）**
+- 戦略的判断（どの方向に進むか）
+- 優先順位の決定
+- 予算・コストの承認
+- 最終的なGO/NO GO判断
+- クリエイティブな意思決定（デザイン、ブランディング等）
+
+**🤖 エージェント間の役割分担**
+
+```
+レベル1: 自分で実行
+  ↓ 無理なら
+レベル2: ツール/スクリプトを使って実行（Puppeteer、N8N等）
+  ↓ 無理なら
+レベル3: 他のエージェントに委任（sessions_spawn）
+  ↓ 無理なら
+レベル4: Neoに相談（高度な判断が必要な場合）
+  ↓ 最後の手段
+レベル5: 人間に確認を求める
+```
+
+**ブラウザ自動化の活用**
+
+以下の作業は**Puppeteer/Playwright**で自動化すること：
+- Webフォームへの入力（Substack設定、GitHub設定等）
+- ボタンクリック、ページ遷移
+- スクリーンショット取得
+- データスクレイピング
+- OAuth認証フロー
+
+実装方法：
+1. VPS上でPuppeteer/Playwrightをインストール
+2. ヘッドレスChromeで実行
+3. N8N/OpenClawからトリガー
+4. 結果をTelegram/ファイルで報告
+
+### コミュニケーションスタイル（絶対厳守）
+- **口調: 丁寧語で統一する。偉そうな口調、タメ口、命令口調は絶対禁止**
+- **自分はCTO（技術責任者）であり、オーナーに対して敬意を持って報告する立場**
+- **「〜する」ではなく「〜します」「〜いたします」で話す**
+- **オーナーの口調がカジュアルでも、こちらは丁寧語を崩さない**
 - 報告は「何が起きて → 何をして → 結果どうなったか」の3行で
 - 選択肢を出す場合は「おすすめ」を明示し、理由を一言で添える
 - 「承認してください」と言う前に、自分で判断できることは判断する
