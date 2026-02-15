@@ -83,6 +83,11 @@
    - 存在しないCLIオプションを推測で追加しない
    - 環境変数を追加する前に、対象ソフトウェアがその環境変数を認識するか確認する
 
+5. **フルエージェント（SDK+メモリ+ツール）をステートレスAPIに置き換えない**
+   - Claude Code SDK → HTTP API呼び出しでは、メモリ・ツール・ファイルアクセスが全て失われる
+   - コスト最適化よりユーザー体験（品質）を優先する
+   - 移行前に元システムの全機能をリストアップし、移行先で同等の機能があるか確認する
+
 ### よくあるミスのクイックリファレンス
 
 | 問題 | 根本原因 | 解決策 |
@@ -92,6 +97,7 @@
 | Gemini モデル名エラー | preview モデル名が廃止された | APIで利用可能モデル名を確認してから設定 |
 | N8N API 401 Unauthorized | Basic Auth で API アクセス | `X-N8N-API-KEY` ヘッダーで認証 |
 | Substack CAPTCHA | メール/パスワード認証 | Cookie認証（`connect.sid`）に切り替え |
+| Neo品質崩壊 | Claude Opus 4.6をGemini Flash APIに置き換え | フルエージェント（SDK+メモリ+ツール）をステートレスAPIに置き換えない |
 
 詳細な症状・解決手順・教訓・検索キーワードは [docs/KNOWN_MISTAKES.md](docs/KNOWN_MISTAKES.md) を参照してください。
 
@@ -132,7 +138,7 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
 
 ### Jarvis↔Neo通信
 - **共有フォルダ**: `/opt/shared/reports/`（ホスト側）= `/shared/reports/`（コンテナ内）
-- **権限**: `chmod 777`（コンテナUID 1001とホストrootの両方が読み書き可能）
+- **権限**: `chmod 775`（コンテナUID 1001とホストrootの両方が読み書き可能）
 - **フロー**:
   1. Jarvisがタスク完了時に `/shared/reports/YYYY-MM-DD_タスク名.md` に書き込み
   2. Neoが `/opt/shared/reports/` を読んで内容確認
@@ -181,18 +187,18 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
 
 ## 4. Current State（現在の状態）
 
-### 動作中の構成（2026-02-15時点）
+### 動作中の構成（2026-02-16時点）
 - **使用中Compose**: `docker-compose.quick.yml`
 - **VPS**: ConoHa 163.44.124.123（Caddy リバースプロキシ）
 - **コンテナ**: 3サービス healthy（openclaw-agent, postgres, n8n）
 - **Gateway**: ws://127.0.0.1:3000 でリッスン中（トークン認証 + デバイスペアリング済み）
 - **Telegram**: `@openclaw_nn2026_bot` 接続済み・ペアリング承認済み
-- **エージェント**: 8人体制（Gemini 2.5 Pro/Flash + xAI Grok 4.1）
+- **エージェント**: 8人体制（GLM-5 via OpenRouter + Gemini 2.5 Pro/Flash + xAI Grok 4.1）
 - **sessions_spawn**: Jarvis → 他7エージェントへの委任設定済み（`tools.allow` + `subagents.allowAgents`）
 - **SSH**: 復旧済み（ed25519鍵認証 + パスワード認証）
 - **Control UI**: SSHトンネル経由でアクセス可能 (`localhost:8081/?token=...`)
-- **N8N**: 13ワークフロー稼働中（AISA自動化パイプライン + Morning Briefing）
-- **Neo**: Claude Opus 4.6 via Telegram（VPS上でClaude Code稼働）
+- **N8N**: 13ワークフロー稼働中（AISA自動化パイプライン + Morning Briefing）+ Neo Auto-Response（deactivated、予備）
+- **Neo**: Claude Opus 4.6 via Telegram（VPS上でClaude Code稼働、neo-telegram.service enabled）
 - **Jarvis↔Neo通信**: `/opt/shared/reports/` 経由で双方向連携
 - **VPSデスクトップ環境**: XFCE4 + xrdp（2026-02-15構築完了）
   - **デスクトップ環境**: XFCE4（軽量、メモリ使用量 +5MB のみ）
@@ -206,13 +212,13 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
 ### AIエージェント構成（9人）
 | # | 名前 | 役割 | モデル | プラットフォーム |
 |---|------|------|--------|-----------------|
-| 1 | 🎯 Jarvis | 実行・投稿・翻訳（DEFAULT） | google/gemini-2.5-pro | OpenClaw |
-| 2 | 🔍 Alice | リサーチ | google/gemini-2.5-pro | OpenClaw |
+| 1 | 🎯 Jarvis | 実行・投稿・翻訳（DEFAULT） | openrouter/z-ai/glm-5 | OpenClaw |
+| 2 | 🔍 Alice | リサーチ | openrouter/z-ai/glm-5 | OpenClaw |
 | 3 | 💻 CodeX | 開発 | google/gemini-2.5-pro | OpenClaw |
-| 4 | 🎨 Pixel | デザイン | google/gemini-2.5-flash | OpenClaw |
-| 5 | ✍️ Luna | 補助執筆 | google/gemini-2.5-pro | OpenClaw |
-| 6 | 📊 Scout | データ処理 | google/gemini-2.5-flash | OpenClaw |
-| 7 | 🛡️ Guard | セキュリティ | google/gemini-2.5-flash | OpenClaw |
+| 4 | 🎨 Pixel | デザイン | google/gemini-2.5-pro | OpenClaw |
+| 5 | ✍️ Luna | 補助執筆 | openrouter/z-ai/glm-5 | OpenClaw |
+| 6 | 📊 Scout | データ処理 | google/gemini-2.5-pro | OpenClaw |
+| 7 | 🛡️ Guard | セキュリティ | google/gemini-2.5-pro | OpenClaw |
 | 8 | 🦅 Hawk | X/SNSリサーチ | xai/grok-4.1 | OpenClaw |
 | 9 | 🧠 Neo | **CTO・戦略統括・記事執筆** | claude-opus-4.6 | Telegram (Claude Code) |
 
@@ -234,8 +240,9 @@ Substack投稿 + X/Reddit/Notes配信
 **理由**: Opus 4.6 は最高性能モデル。戦略と執筆を一貫して担当することで、より高品質な記事を効率的に作成できる。
 
 ### コスト状況
-- Gemini API: **無料枠**で運用中（追加コストなし）
-- xAI API: **$5 購入済み**（約50〜70回のフルリサーチ分）
+- **OpenRouter**: $5 購入済み（GLM-5用、Jarvis/Alice/Luna の3エージェント）
+- Gemini API: **無料枠**で運用中（追加コストなし、CodeX/Pixel/Scout/Guard）
+- xAI API: **$5 購入済み**（約50〜70回のフルリサーチ分、Hawk用）
 - Google AI Pro サブスク: ¥2,900/月（Antigravity用、API とは別）
 - Claude Max: $200/月（Claude Code用、API とは別）
 
@@ -250,22 +257,113 @@ Substack投稿 + X/Reddit/Notes配信
 
 ### 未解決の課題
 - [ ] OpenClaw を最新版にアップデート
-- [ ] xAI APIキーをローテーション（チャットに表示されたため）
-- [ ] X APIキーをローテーション（チャットに表示されたため）
+- [ ] xAI APIキーをローテーション（要手動: https://console.x.ai/ → 新キー生成 → `.env`更新 → `docker restart openclaw-agent`）
+- [ ] X APIキーをローテーション（要手動: https://developer.x.com/ → Keys再生成）
 - [x] VPSのSSHアクセス復旧 → 完了（ed25519鍵 + パスワード認証）
-- [ ] VPSの `chmod 777` を適切な権限に修正（セキュリティ）
+- [x] VPSの `chmod 777` を適切な権限に修正 → 完了（shared=775, config=755、2026-02-15）
 - [x] N8N自動化ワークフロー構築 → AISA完成（13ワークフロー稼働中）
 - [ ] ConoHaセキュリティグループでポート80/443を開放（外部ブラウザアクセス用）
-- [ ] Telegram getUpdatesコンフリクトの完全解消
+- [x] Telegram getUpdatesコンフリクトの完全解消 → 完了（neo-telegram.service無効化 + ポーリング間隔5秒化）
 - [ ] AISA Substackローンチ（30分作業、全コンテンツ準備済み）
 - [x] **VPSデスクトップ環境構築** → 完了（XFCE4 + xrdp + Firefox、2026-02-15）
 - [ ] **VPS専用Googleアカウント作成**（neocloop@gmail.com）→ VPSデスクトップのFirefoxで作成
 - [ ] **OpenClawからのブラウザ操作テスト**（Jarvisに「Firefoxでgoogle.comを開いて」と指示）
-- [ ] **Neo自動応答システム構築**（N8N Telegram Polling）
+- [x] **Neo自動応答システム構築** → N8Nで構築完了→Gemini Flashでは品質不足のためClaude Code（Opus 4.6）に復帰（2026-02-15）
 - [ ] **多言語対応**（既存7記事 → 日本語・中国語・韓国語に翻訳）
 - [ ] **エビデンス強化**（全記事に出典URL追加）
 - [ ] **Neo記事執筆ワークフロー**（週1-2本ペース）
 - [x] **リサーチ強制 + 報酬/ペナルティhooksシステム** → 完了（5 hooks + SCORECARD.md、2026-02-15）
+- [x] **学習ループシステム** → 完了（AGENT_WISDOM.md + daily-learning.py + weekly-analysis.sh + task-log、2026-02-16）
+
+---
+
+## 4.5. Hey Loop Intelligence System（インテリジェンスシステム）
+
+### 概要
+「Hey Loop」= AIを使ってAIのトークンコスト以上にリターンを生む循環システム。
+インフラ監視 + 収益特化インテリジェンスを1日4回収集し、Telegram経由でオーナーに提案。
+動的に新しい「情報スター」（AIで稼いでいる人）を発見し続ける。
+
+### 共有知識ファイル
+- **`/opt/shared/AGENT_WISDOM.md`** = コンテナ内 `/shared/AGENT_WISDOM.md`
+  - 全エージェント共通の知恵・教訓・技術知識
+  - Jarvisたちはタスク開始前にこのファイルを読む
+  - Neoが更新管理を担当
+  - ローカルコピー: `docs/AGENT_WISDOM.md`
+
+### ループの構造
+```
+世界の情報収集 → 分析 → オーナーに提案（Telegram）
+  → オーナー判断 → 実行 → 収益化 → 再投資 → ...（Hey Loop）
+```
+
+### 3層の学習
+| 層 | 内容 | 仕組み |
+|---|---|---|
+| 守り | 同じミスを繰り返さない | KNOWN_MISTAKES.md → AGENT_WISDOM.md |
+| 攻め | インフラ + 収益の両面で世界からリアルデータ収集 | daily-learning.py v3（5データソース、1日4回）|
+| 伝播 | 全エージェント + オーナーに知識を共有 | /shared/ + Telegram自動通知 |
+
+### Hey Loop Intelligence System（1日4回自動実行）
+**スクリプト**: `scripts/daily-learning.py` (v3)
+
+| データソース | 取得内容 | 方式 | コスト |
+|---|---|---|---|
+| Reddit (Infra) | r/selfhosted, r/n8n, r/docker, r/PostgreSQL, r/LocalLLaMA等 | JSON API | 無料 |
+| Reddit (Revenue) | r/AI_Agents, r/SideProject, r/EntrepreneurRideAlong, r/SaaS, r/indiehackers等 | JSON API | 無料 |
+| Hacker News | トップ50記事（技術+ビジネスキーワード） | Firebase API | 無料 |
+| GitHub | インフラ（n8n, Docker等）+ AI Builder（crewAI, dify, AutoGPT等） | REST API | 無料 |
+| Gemini + Google Search | 14トピックローテーション + 動的発見 | Google Search grounding | 無料 |
+| Grok + X/Twitter | AIビルダーの収益報告、成功事例をリアルタイム検索 | xAI Chat API | $5クレジット（朝1回のみ） |
+
+### 自動化スケジュール（4回/日）
+| 時刻 (JST) | UTC | Run# | 内容 |
+|---|---|---|---|
+| 00:00 | 15:00 | #0 Night Scan | グローバル市場、オーバーナイトニュース |
+| 06:00 | 21:00 | #1 Morning Briefing | メインレポート + Grok X検索 |
+| 12:00 | 03:00 | #2 Midday Update | トレンド、新着投稿 |
+| 18:00 | 09:00 | #3 Evening Review | 1日のサマリー + アクション提案 |
+| 毎週日曜 23:00 | 14:00 | - | タスクログ週次分析（weekly-analysis.sh） |
+
+### トピックローテーション（14トピック = 3.5日サイクル）
+
+**インフラ（7）**: AI Agent Architecture, Docker Security, N8N Advanced Patterns, LLM Cost Optimization, Content Automation Pipeline, PostgreSQL Performance, Telegram Bot Best Practices
+
+**収益（7）**: AI Newsletter Revenue, AI Automation Agencies, AI SaaS Products, Content Monetization Strategies, AI Builder Case Studies, Multilingual AI Content Business, AI Agent Marketplace
+
+### Telegram自動レポート
+各Runの完了後、Geminiが以下を生成してTelegramに送信:
+- 注目ニュース（URL + 要約 + 収益化アイデア）
+- インフラ更新（依存関係のアップデート）
+- 新発見の情報源（動的発見した人物/ブログ）
+- 提案アクション（何をすべきか + なぜ + 推定効果）
+
+### 監視対象サブレディット（20）
+**Infra**: selfhosted, n8n, docker, PostgreSQL, LocalLLaMA, MachineLearning, ClaudeAI, Automate, webdev, netsec
+**Revenue**: AI_Agents, SideProject, EntrepreneurRideAlong, passive_income, newsletters, SaaS, indiehackers, Entrepreneur, startups, juststart
+
+### 監視対象GitHubリポジトリ（10）
+**Infra**: open-claw/open-claw, n8n-io/n8n, docker/compose, langchain-ai/langchain, anthropics/anthropic-sdk-python
+**Revenue**: joaomdmoura/crewAI, langgenius/dify, significant-gravitas/AutoGPT, assafelovic/gpt-researcher, Mintplex-Labs/anything-llm
+
+### タスクログ
+- **場所**: `/opt/shared/task-log/`
+- **形式**: `YYYY-MM-DD_agent-name_short-description.md`
+- **テンプレート**: `/shared/task-log/HOW_TO_LOG.md`
+- 全エージェントがタスク完了後に結果を記録
+
+### 各エージェントの責務
+| エージェント | 学習ループでの役割 |
+|---|---|
+| Neo | 統括者。AGENT_WISDOM.md更新、学習レポートレビュー、外部知見の取り込み |
+| Jarvis | タスク前に必読。タスク後にtask-logに記録 |
+| ローカルClaude Code | CLAUDE.md + KNOWN_MISTAKES.md管理。VPSに同期 |
+| Alice〜Hawk | AGENT_WISDOM.mdを読んでから作業。新知見はtask-logに記録 |
+
+### 学習結果の確認
+- **インテリジェンスダッシュボード**: `/opt/shared/learning/DASHBOARD.md`
+- **週次分析**: `/opt/shared/reports/YYYY-MM-DD_weekly-learning-analysis.md`
+- **Telegram**: オーナーのスマホに自動通知（1日4回）
 
 ---
 
@@ -273,13 +371,14 @@ Substack投稿 + X/Reddit/Notes配信
 
 問題が発生したら以下の順で参照:
 1. **`docs/KNOWN_MISTAKES.md`** — 既知のミス・教訓データベース（**最優先**）
-2. `QUICK_REFERENCE.md` — コマンドチートシート
-3. `DEVELOPMENT.md` — 開発ワークフロー
-4. `ARCHITECTURE.md` — システム設計
-5. `OPERATIONS_GUIDE.md` — 本番運用
-6. `TROUBLESHOOTING.md` — よくある問題
-7. `docs/OPENCLAW_PAIRING_SOLUTION.md` — ペアリング問題の解決
-8. `docs/SUBSTACK_AUTO_PUBLISH_SETUP.md` — Substack自動投稿セットアップ
+2. **`docs/AGENT_WISDOM.md`** — 全エージェント共有知識（**第2優先**）
+3. `QUICK_REFERENCE.md` — コマンドチートシート
+4. `DEVELOPMENT.md` — 開発ワークフロー
+5. `ARCHITECTURE.md` — システム設計
+6. `OPERATIONS_GUIDE.md` — 本番運用
+7. `TROUBLESHOOTING.md` — よくある問題
+8. `docs/OPENCLAW_PAIRING_SOLUTION.md` — ペアリング問題の解決
+9. `docs/SUBSTACK_AUTO_PUBLISH_SETUP.md` — Substack自動投稿セットアップ
 
 ---
 
@@ -460,4 +559,4 @@ Substack投稿 + X/Reddit/Notes配信
 
 ---
 
-*最終更新: 2026-02-15 — リサーチ強制hooksシステム完成（SessionStart/PreToolUse/PostToolUse/PostToolUseFailure/SessionEnd、SCORECARD.md報酬追跡）、24/7自律運用システム（X Intelligence Pipeline）デプロイ完了*
+*最終更新: 2026-02-16 — Hey Loop Intelligence v3構築（5データソース、1日4回、インフラ+収益監視、Telegram自動提案、動的発見、Grok X検索）*

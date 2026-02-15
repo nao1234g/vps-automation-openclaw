@@ -26,6 +26,11 @@
           "params": {
             "maxTokens": 8192
           }
+        },
+        "openrouter/z-ai/glm-5": {
+          "params": {
+            "maxTokens": 8192
+          }
         }
       }
     },
@@ -33,9 +38,9 @@
       {
         "id": "jarvis-cso",
         "default": true,
-        "model": "google/gemini-2.5-pro",
+        "model": "openrouter/z-ai/glm-5",
         "identity": {
-          "name": "Jarvis (CSO / 最高戦略責任者)",
+          "name": "Jarvis (CSO) - READ /shared/AGENT_WISDOM.md before every task",
           "emoji": "🎯"
         },
         "subagents": {
@@ -65,7 +70,7 @@
       },
       {
         "id": "alice-research",
-        "model": "google/gemini-2.5-pro",
+        "model": "openrouter/z-ai/glm-5",
         "identity": {
           "name": "Alice (Research Analyst)",
           "emoji": "🔍"
@@ -89,7 +94,7 @@
       },
       {
         "id": "luna-writer",
-        "model": "google/gemini-2.5-pro",
+        "model": "openrouter/z-ai/glm-5",
         "identity": {
           "name": "Luna (Content Writer)",
           "emoji": "✍️"
@@ -120,6 +125,31 @@
         }
       }
     ]
+  },
+  "models": {
+    "providers": {
+      "openrouter": {
+        "baseUrl": "https://openrouter.ai/api/v1",
+        "models": [
+          {
+            "id": "z-ai/glm-5",
+            "name": "GLM-5",
+            "reasoning": true,
+            "input": ["text"],
+            "maxTokens": 8192,
+            "contextWindow": 128000
+          }
+        ]
+      }
+    }
+  },
+  "auth": {
+    "profiles": {
+      "openrouter:default": {
+        "provider": "openrouter",
+        "mode": "api_key"
+      }
+    }
   },
   "tools": {
     "agentToAgent": {

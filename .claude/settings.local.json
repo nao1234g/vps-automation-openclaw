@@ -3,7 +3,10 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "permissions": {
+    "defaultMode": "bypassPermissions",
     "allow": [
+      "Bash(*)",
+      "Task(*)",
       "Bash(ls:*)",
       "Bash(wc:*)",
       "Bash(du:*)",
@@ -94,7 +97,13 @@
       "WebFetch(domain:www.productcompass.pm)",
       "Bash(del \"c:\\\\Users\\\\user\\\\OneDrive\\\\デスクトップ\\\\vps-automation-openclaw\\\\tmp_loop.py\" \"c:\\\\Users\\\\user\\\\OneDrive\\\\デスクトップ\\\\vps-automation-openclaw\\\\tmp_watchdog.sh\" \"c:\\\\Users\\\\user\\\\OneDrive\\\\デスクトップ\\\\vps-automation-openclaw\\\\tmp_memory_gen.py\" \"c:\\\\Users\\\\user\\\\OneDrive\\\\デスクトップ\\\\vps-automation-openclaw\\\\tmp_xintel_loop.service\")",
       "Bash(git reset:*)",
-      "Bash(CLAUDE_PROJECT_DIR=\".\" bash:*)"
+      "Bash(CLAUDE_PROJECT_DIR=\".\" bash:*)",
+      "WebFetch(domain:artificialanalysis.ai)",
+      "WebFetch(domain:llm-stats.com)",
+      "WebFetch(domain:docs.z.ai)",
+      "WebFetch(domain:z.ai)",
+      "WebFetch(domain:openrouter.ai)",
+      "WebFetch(domain:onedollarvps.com)"
     ]
   },
   "hooks": {

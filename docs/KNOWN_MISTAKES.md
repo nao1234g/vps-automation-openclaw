@@ -417,4 +417,193 @@
   - `openclaw.json valid keys schema`
   - `openclaw agent instructions configuration`
 
-*最終更新: 2026-02-15 — openclaw.json無効キー追加ミスを記録*
+---
+
+## N8Nワークフロー作成（2026-02-15）
+
+### 2026-02-15: N8NワークフローをDB直接INSERTで作成しても起動しない
+- **症状**: PostgreSQLの`n8n.workflow_entity`テーブルにワークフローを直接INSERTし`active=true`に設定しても、N8N再起動時に「Start Active Workflows」リストに表示されず、ポーリングトリガーが起動しない
+- **根本原因**: N8NはDB上の`active`フラグだけではワークフローを内部的にアクティベートしない。`staticData`、`activeVersionId`、`workflow_history`テーブル、内部のアクティベーションメカニズムなど、複数のDB要素が正しく設定されている必要がある
+- **誤ったアプローチ**:
+  1. PostgreSQLに直接INSERT → ワークフローは存在するがN8Nが起動時にスキップ
+  2. `staticData`を手動設定 → 改善なし
+  3. `installed_packages`/`installed_nodes`テーブルにコミュニティノードを登録 → 改善なし（ノード自体は標準ノードに変更済み）
+  4. `activeVersionId`を手動設定 → `workflow_history`テーブルの外部キー制約でエラー
+- **正しい解決策**:
+  1. N8N REST API経由でワークフローを作成する（`POST /api/v1/workflows`）
+  2. N8N REST API経由でアクティベートする（`POST /api/v1/workflows/{id}/activate`）
+  3. APIキーは`n8n.user_api_keys`テーブルに直接INSERT可能
+  4. APIコール例: `wget --post-file=workflow.json --header='X-N8N-API-KEY: key' http://localhost:5678/api/v1/workflows`
+- **教訓**:
+  - **N8Nのワークフロー管理はREST API経由で行う。DB直接操作は避ける**
+  - N8NのDB構造は複雑で、`active=true`だけでは不十分
+  - N8N REST APIキーは`user_api_keys`テーブルに`id`, `userId`, `label`, `apiKey`カラムで追加できる
+  - コミュニティノードの利用は不安定。標準ノードだけでポーリングを実現する方が信頼性が高い
+- **検索すべきだったキーワード**:
+  - `N8N create workflow API`
+  - `N8N activate workflow REST API`
+  - `N8N workflow not activating after database insert`
+
+### 2026-02-15: Telegram getUpdates コンフリクト（複数プロセス競合）
+- **症状**: N8Nワークフローが「Conflict: terminated by other getUpdates request」エラー
+- **根本原因**: `neo-telegram.service`（Claude Code Telegram bot）がまだ動作中で、同じbot tokenで`getUpdates`を呼んでいた。一つのbot tokenに対して`getUpdates`を呼べるプロセスは1つだけ
+- **誤ったアプローチ**:
+  1. 前のセッションで`systemctl stop neo-telegram`を実行したつもりが、実際にはサービスが再起動されていた（`disabled`にしていなかった可能性）
+- **正しい解決策**:
+  1. `systemctl stop neo-telegram && systemctl disable neo-telegram`で完全停止＆自動起動無効化
+  2. `ps aux | grep telegram`で関連プロセスが残っていないか確認
+- **教訓**:
+  - **Telegram bot tokenのgetUpdatesは1プロセスのみ。切り替え時は必ず前のサービスを`stop` + `disable`する**
+  - `systemctl stop`だけでは不十分。`disable`も必須（再起動時に自動起動するため）
+  - 切り替え前に`ps aux`でプロセスが完全に終了したか確認する
+
+### 2026-02-15: フルエージェント（Claude Opus 4.6）をステートレスHTTP API（Gemini Flash）に置き換えて品質崩壊
+- **症状**: Neo（Telegram bot）が同じ質問を20回以上繰り返し、ユーザーの指示を理解できず、過去の会話を全く覚えていない。ユーザーから「アホになった」とフィードバック
+- **根本原因**: `neo-telegram.service`（Claude Code SDK + Opus 4.6）をN8Nワークフロー（HTTP Request → Gemini 2.5 Flash API）に置き換えた。Claude Code SDKが提供していた以下の能力が全て失われた:
+  - **セッションメモリ**: 過去の会話の記憶（Gemini Flash APIはステートレス）
+  - **VPSファイルシステムアクセス**: ファイル読み書き、レポート参照
+  - **ツール使用**: Bash、Read、Write、Grep等のツール
+  - **CLAUDE.md読み込み**: アイデンティティ・指示の読み込み
+  - **知能レベル**: Opus 4.6 → Flash（大幅なダウングレード）
+- **誤ったアプローチ**:
+  1. 「N8Nで自動応答」の技術的課題（getUpdatesコンフリクト等）を解決することに集中し、**応答品質の劣化**を見落とした
+  2. 「Gemini Flashは無料なのでコスト最適化になる」と判断したが、品質が使い物にならないレベルに低下
+  3. neo-telegram.serviceを`/dev/null`にシンボリックリンクして完全に削除してしまった
+- **正しい解決策**:
+  1. N8N Neo Auto-Responseワークフローをdeactivate（`POST /api/v1/workflows/{id}/deactivate`）
+  2. `neo-telegram.service`を再作成（systemdサービスファイルを新規作成）
+  3. サービスをstart + enableして元通りに復旧
+  4. N8Nワークフローはdeactivated状態で予備として保持
+- **教訓**:
+  - **フルエージェント（SDK + ツール + メモリ）をステートレスHTTP APIに置き換えてはいけない。能力が根本的に異なる**
+  - コスト最適化よりも**ユーザー体験（品質）を優先する**
+  - 機能を移行する前に、元のシステムが提供している全機能（メモリ、ツール、ファイルアクセス等）をリストアップし、移行先でも同等の機能が提供できるか確認する
+  - サービスを停止する際は`/dev/null`にシンボリックリンクせず、`systemctl disable`で十分。完全削除すると復旧が困難
+  - **「動く」と「使える」は違う。技術的に動作しても、品質が要求を満たさなければ無意味**
+- **検索すべきだったキーワード**:
+  - `Claude Code SDK vs raw API call comparison`
+  - `AI agent stateful vs stateless`
+  - `replacing AI agent with simple API call problems`
+
+### 2026-02-15: Daily Learning Script がGeminiの訓練データを聞き直しているだけだった
+- **症状**: daily-learning.pyが「外部学習」と称して毎日レポートを生成するが、内容がGeminiの訓練データの要約でしかなく、リアルタイムの情報が含まれていなかった
+- **根本原因**: Gemini APIに静的なプロンプトを投げて「best practices for X in 2026」と聞くだけでは、Geminiの訓練データの範囲内の回答しか返らない。実際のWeb検索もデータ収集も行っていなかった
+- **誤ったアプローチ**:
+  1. 「Gemini APIに聞けば最新情報がわかる」と思い込んだ（LLMは訓練データの範囲内でしか回答できない）
+  2. 「外部学習」と名付けたが、実際は外部データソースに一切アクセスしていなかった
+  3. ユーザーに突っ込まれるまで問題に気づかなかった（自分で品質検証していなかった）
+- **正しい解決策**:
+  1. **Gemini Google Search grounding** — APIリクエストに `"tools": [{"google_search": {}}]` を追加するだけでリアルタイムWeb検索が可能（Gemini 2.5は無料）
+  2. **Reddit JSON API** — URLに`.json`を追加するだけで構造化データ取得（認証不要、無料）
+  3. **Hacker News Firebase API** — `https://hacker-news.firebaseio.com/v0/topstories.json`（認証不要、無料）
+  4. **GitHub REST API** — 依存リポジトリの最新リリース情報を取得
+  5. 上記4ソースからリアルデータを収集し、Gemini + Google Searchで分析する構成に全面的に書き直した
+- **教訓**:
+  - **LLMに「最新情報を教えて」と聞くだけでは外部学習にならない。実際のデータソースからデータを取得しなければ意味がない**
+  - Gemini APIには無料で使えるGoogle Search grounding機能がある（`"tools": [{"google_search": {}}]`）。これを最初から使うべきだった
+  - 「やったふう」の仕事をしない。出力の品質を自分で検証してから報告する
+  - 自分のツール（WebSearch）を使って調査すれば、Google Search groundingの存在はすぐにわかった
+- **検索すべきだったキーワード**:
+  - `Gemini API Google Search grounding`
+  - `Gemini API real-time web search tool`
+  - `Reddit JSON API free`
+  - `Hacker News API Firebase`
+
+---
+
+## OpenClaw OpenRouterモデル登録（2026-02-16）
+
+### 2026-02-16: OpenRouterカスタムモデルが「Unknown model」エラー
+- **症状**: openclaw.jsonでエージェントのモデルを`openrouter/z-ai/glm-5`に変更し再起動したが、「Unknown model: openrouter/z-ai/glm-5」エラー
+- **根本原因**: OpenClawはモデルカタログが静的。OpenRouterの全モデルを認識するわけではなく、未登録モデルは拒否される
+- **誤ったアプローチ**:
+  1. openclaw.jsonのモデル名を変更するだけで動くと思った → モデルカタログにない
+  2. `openclaw onboard --auth-choice openrouter-api-key`でプロバイダー登録 → モデルカタログに追加されない
+  3. `models.providers.openrouter.models` をオブジェクト形式で定義 → 「expected array, received object」エラー
+  4. models配列に`output`フィールドを追加 → 「Unrecognized key: output」エラー
+- **正しい解決策**:
+  1. `openclaw onboard --non-interactive --accept-risk --auth-choice openrouter-api-key`でプロバイダー認証を登録
+  2. openclaw.jsonの`models.providers`セクションにカスタムモデルを登録:
+     ```json
+     {
+       "models": {
+         "providers": {
+           "openrouter": {
+             "baseUrl": "https://openrouter.ai/api/v1",
+             "models": [
+               {
+                 "id": "z-ai/glm-5",
+                 "name": "GLM-5",
+                 "reasoning": true,
+                 "input": ["text"],
+                 "maxTokens": 8192,
+                 "contextWindow": 128000
+               }
+             ]
+           }
+         }
+       }
+     }
+     ```
+  3. `baseUrl`（文字列）と`models`（配列）の両方が必須
+  4. modelsの各要素に`output`フィールドは入れない
+- **教訓**:
+  - **OpenClawのモデルカタログは静的。新しいモデルを使うには`models.providers`でカスタム登録が必要**
+  - `models`はオブジェクトではなく配列で定義する
+  - `baseUrl`の設定を忘れると起動時にエラー
+  - `output`など未知のキーがあると「Unrecognized key」で起動失敗
+  - OpenClawのJSON設定は厳密なバリデーションがある（推測でキーを追加しない）
+- **検索すべきだったキーワード**:
+  - `openclaw custom model provider configuration`
+  - `openclaw openrouter setup models.providers`
+  - `openclaw unknown model error custom provider`
+
+### 2026-02-16: `openclaw onboard`がgateway.bindをloopbackに変更する副作用
+- **症状**: `openclaw onboard`実行後、OpenClawがDockerネットワーク外部からアクセス不能になる
+- **根本原因**: `openclaw onboard`コマンドが`gateway.bind`を`"loopback"`に自動変更する副作用がある。これによりlocalhost（127.0.0.1）のみでリッスンし、Dockerネットワーク内の他コンテナからアクセスできなくなる
+- **誤ったアプローチ**:
+  1. onboardコマンドを実行して「プロバイダー登録完了」と思い、bindが変わったことに気づかなかった
+- **正しい解決策**:
+  1. `openclaw onboard`実行後に必ず`gateway.bind`の値を確認
+  2. Docker環境では`"lan"`に戻す: `node -e "...modify openclaw.json..."`
+- **教訓**:
+  - **`openclaw onboard`は設定を変更する副作用がある。実行前後でopenlaw.jsonのdiffを確認する**
+  - Docker環境では`gateway.bind: "lan"`が必須（loopbackだとコンテナ間通信不可）
+- **検索すべきだったキーワード**:
+  - `openclaw onboard side effects`
+  - `openclaw gateway bind loopback vs lan docker`
+
+### 2026-02-16: docker-compose変数警告（SUBSTACK_COOKIESの$記号）
+- **症状**: `docker-compose config`で`WARN[0000] a]$o2$g1$t1771083612$j43$l0$h0`等の不明な変数警告
+- **根本原因**: VPSの`.env`の`SUBSTACK_COOKIES`値にGoogle Analyticsクッキーが含まれており、`$o2`、`$g1`、`$t1771083612`等がdocker-composeに変数参照として解釈された
+- **誤ったアプローチ**:
+  1. docker-compose.ymlの問題だと推測 → 実際は.envの値の問題
+- **正しい解決策**:
+  `.env`内の`$`を`$$`にエスケープ: `$o2` → `$$o2`、`$g1` → `$$g1` 等
+- **教訓**:
+  - **docker-composeの.envファイルでは`$`は変数参照として解釈される。リテラルの`$`は`$$`にエスケープする**
+  - Cookie値などの外部データを.envに保存する際は、`$`の有無を確認する
+- **検索すべきだったキーワード**:
+  - `docker-compose env file dollar sign escape`
+  - `docker-compose WARN variable not set`
+
+### 2026-02-16: Claude Code settings.local.json の defaultMode 配置場所
+- **症状**: `"defaultMode": "bypassPermissions"`をsettings.local.jsonのルートレベルに追加 → 「Unrecognized field: defaultMode」バリデーションエラー
+- **根本原因**: `defaultMode`はルートレベルではなく、`permissions`オブジェクト内に配置する必要がある
+- **正しい解決策**:
+  ```json
+  {
+    "permissions": {
+      "defaultMode": "bypassPermissions",
+      "allow": [...]
+    }
+  }
+  ```
+- **教訓**:
+  - **Claude Codeのsettings.local.jsonはスキーマバリデーションが厳密。設定項目の配置場所を確認する**
+  - `defaultMode`は`permissions`オブジェクト直下に配置
+- **検索すべきだったキーワード**:
+  - `claude code bypassPermissions settings.local.json`
+  - `claude code permissions defaultMode configuration`
+
+*最終更新: 2026-02-16 — OpenRouter カスタムモデル登録、onboard副作用、docker-compose $エスケープ、Claude Code bypassPermissions を記録*
