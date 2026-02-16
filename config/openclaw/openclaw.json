@@ -36,6 +36,24 @@
     },
     "list": [
       {
+        "id": "neo-one",
+        "model": "anthropic/claude-sonnet-4-5",
+        "imageModel": "anthropic/claude-sonnet-4-5",
+        "identity": {
+          "name": "NEO-ONE",
+          "emoji": "🟢"
+        }
+      },
+      {
+        "id": "neo-two",
+        "model": "anthropic/claude-sonnet-4-5",
+        "imageModel": "anthropic/claude-sonnet-4-5",
+        "identity": {
+          "name": "NEO-TWO",
+          "emoji": "🔵"
+        }
+      },
+      {
         "id": "jarvis-cso",
         "default": true,
         "model": "openrouter/z-ai/glm-5",
@@ -188,5 +206,27 @@
         "enabled": true
       }
     }
-  }
+  },
+  "channels": {
+    "telegram": {
+      "accounts": {
+        "default": {
+          "botToken": "${TELEGRAM_BOT_TOKEN}"
+        },
+        "neo2": {
+          "botToken": "${TELEGRAM_BOT_TOKEN_NEO2}"
+        }
+      }
+    }
+  },
+  "bindings": [
+    {
+      "agentId": "neo-one",
+      "match": { "channel": "telegram", "accountId": "default" }
+    },
+    {
+      "agentId": "neo-two",
+      "match": { "channel": "telegram", "accountId": "neo2" }
+    }
+  ]
 }

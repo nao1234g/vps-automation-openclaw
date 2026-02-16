@@ -1,14 +1,18 @@
-# OpenClaw VPS - Quick Start Environment
-# ワンコマンドでOpenClawを起動するための最小構成
+# OpenClaw VPS - Quick Start Environment (NEO Dual Agent)
+# NEO 2体構成：1つのGatewayで2体のNEOが同時稼働
 #
 # 使用方法:
 #   make quick-deploy
 #   または: docker compose -f docker-compose.quick.yml up -d
 #
 # アクセス先:
-#   - OpenClaw API: http://localhost:3000
+#   - OpenClaw Gateway: http://localhost:3000
 #   - N8N: http://localhost:5678
 #   - PostgreSQL: localhost:5432
+#
+# Telegram:
+#   - NEO 1号: @your_neo1_bot（BotFatherで作成）
+#   - NEO 2号: @your_neo2_bot（BotFatherで作成）
 
 services:
   # ============================================
@@ -66,9 +70,9 @@ services:
       XAI_API_KEY: ${XAI_API_KEY:-}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
 
-      # Telegram (optional)
+      # Telegram NEO Dual Agent
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
-      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      TELEGRAM_BOT_TOKEN_NEO2: ${TELEGRAM_BOT_TOKEN_NEO2:-}
 
       # Application
       NODE_ENV: ${NODE_ENV:-production}
@@ -91,7 +95,8 @@ services:
       - openclaw_data:/app/data
       - openclaw_logs:/app/logs
       - ./skills:/app/skills:ro
-      - ./config/openclaw:/home/appuser/.openclaw
+      - ./config/openclaw/openclaw.json:/app/config/openclaw.json:ro
+      - ./config/openclaw/SOUL.md:/app/config/SOUL.md:ro
       - /opt/shared:/shared
 
     depends_on:

@@ -36,9 +36,9 @@ services:
       MODEL_PROVIDER: ${MODEL_PROVIDER:-anthropic}
       MODEL_NAME: ${MODEL_NAME:-claude-sonnet-4}
       
-      # Telegram Bot
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
-      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
+      # Telegram NEO Dual Agent
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_BOT_TOKEN_NEO2: ${TELEGRAM_BOT_TOKEN_NEO2:-}
       
       # Database
       DATABASE_URL: postgresql://${POSTGRES_USER:-openclaw}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-openclaw}
@@ -56,8 +56,9 @@ services:
       NODE_ENV: production
     volumes:
       - openclaw_data:/app/data
-      - ./skills:/app/skills  # カスタムスキルをマウント
-      - ./config/openclaw/openclaw.json:/home/appuser/.openclaw/openclaw.json:ro
+      - ./skills:/app/skills:ro
+      - ./config/openclaw/openclaw.json:/app/config/openclaw.json:ro
+      - ./config/openclaw/SOUL.md:/app/config/SOUL.md:ro
     depends_on:
       postgres:
         condition: service_healthy

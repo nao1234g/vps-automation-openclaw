@@ -192,7 +192,12 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
 - **VPS**: ConoHa 163.44.124.123（Caddy リバースプロキシ）
 - **コンテナ**: 3サービス healthy（openclaw-agent, postgres, n8n）
 - **Gateway**: ws://127.0.0.1:3000 でリッスン中（トークン認証 + デバイスペアリング済み）
-- **Telegram**: `@openclaw_nn2026_bot` 接続済み・ペアリング承認済み
+- **Telegram NEO Dual Agent**:
+  - NEO-ONE 🟢: `neo-one` (anthropic/claude-sonnet-4-5) — 既存ボット `@openclaw_nn2026_bot`
+  - NEO-TWO 🔵: `neo-two` (anthropic/claude-sonnet-4-5) — `@neo_two_nn2026_bot`（BotFather作成済み）
+  - 画像認識: `imageModel: anthropic/claude-sonnet-4-5`（両NEO）
+  - チャンネル設定: `channels.telegram.accounts` + `bindings` で振り分け
+  - トークン注入: `entrypoint.sh` が `${TELEGRAM_BOT_TOKEN}` / `${TELEGRAM_BOT_TOKEN_NEO2}` をsed置換
 - **エージェント**: 8人体制（GLM-5 via OpenRouter + Gemini 2.5 Pro/Flash + xAI Grok 4.1）
 - **sessions_spawn**: Jarvis → 他7エージェントへの委任設定済み（`tools.allow` + `subagents.allowAgents`）
 - **SSH**: 復旧済み（ed25519鍵認証 + パスワード認証）
@@ -559,4 +564,8 @@ Substack投稿 + X/Reddit/Notes配信
 
 ---
 
+<<<<<<< HEAD
 *最終更新: 2026-02-16 — Hey Loop Intelligence v3構築（5データソース、1日4回、インフラ+収益監視、Telegram自動提案、動的発見、Grok X検索）*
+=======
+*最終更新: 2026-02-16 — NEO Dual Agent構成（1 OpenClaw + 2 Telegram Bot）を実装*
+>>>>>>> fd1a22f (Add NEO Dual Agent: two Telegram bots on one OpenClaw Gateway)
