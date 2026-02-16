@@ -98,27 +98,39 @@
 | N8N API 401 Unauthorized | Basic Auth で API アクセス | `X-N8N-API-KEY` ヘッダーで認証 |
 | Substack CAPTCHA | メール/パスワード認証 | Cookie認証（`connect.sid`）に切り替え |
 | Neo品質崩壊 | Claude Opus 4.6をGemini Flash APIに置き換え | フルエージェント（SDK+メモリ+ツール）をステートレスAPIに置き換えない |
+| .envパスワード未展開 | `$(openssl rand)`がdocker-composeで展開されない | 静的な値を設定する |
+| source .envが壊れる | Cookie値のセミコロンがbash区切りに | cron内ではインラインでAPIキー指定 |
+| OpenRouter api:undefined | カスタムモデルのAPIルーティング失敗 | GLM-5はZhipuAI直接API（`zai/`）を使う |
+| NEOをOpenClawに追加 | `anthropic/`はAPI課金 | NEOは別の`claude-code-telegram`サービスで運用 |
 
 詳細な症状・解決手順・教訓・検索キーワードは [docs/KNOWN_MISTAKES.md](docs/KNOWN_MISTAKES.md) を参照してください。
 
 ---
 
-## 2.5. Neo Architecture（Telegram経由Claude Code）
+## 2.5. Neo Architecture（Telegram経由Claude Code — Dual Agent）
 
 ### 概要
-- **名前**: Neo（通称 "Claude Brain"）
-- **モデル**: Claude Opus 4.6
-- **実行環境**: VPS上で `claude-code-telegram` サービスとして稼働
-- **アクセス方法**: Telegram bot `@claude_brain_nn_bot`（ユーザーのスマホから直接対話可能）
-- **役割**: CTO・戦略パートナー（Jarvisチームとは独立、より高レベルの意思決定を担当）
+NEO-ONE/NEO-TWOの2つのClaude Code Telegramサービスが独立稼働。
+**重要: Claude Maxサブスクリプション（$200/月定額）経由で動作。Anthropic API（従量課金）は使用しない。**
+
+| サービス | Bot | systemd | 役割 |
+|---|---|---|---|
+| NEO-ONE | `@claude_brain_nn_bot` | `neo-telegram.service` | CTO・戦略・記事執筆 |
+| NEO-TWO | `@neo_two_nn2026_bot` | `neo2-telegram.service` | 補助・並列タスク実行 |
+
+- **モデル**: Claude Opus 4.6（両方）
+- **課金**: Claude Max サブスクリプション（$200/月定額、従量課金なし）
+- **実行環境**: VPS上の独立した`claude-code-telegram`サービス
+- **OpenClawとは完全に独立**（OpenClawのagents.listには含まない）
 
 ### アーキテクチャ
 ```
-User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
+User (Telegram) → @claude_brain_nn_bot  → neo-telegram.service (VPS)
+                → @neo_two_nn2026_bot   → neo2-telegram.service (VPS)
                                               ↓
                                         Claude Code (SDK)
                                               ↓
-                                        Claude Opus 4.6 API
+                                        Claude Opus 4.6 (Max subscription)
                                               ↓
                                         VPS filesystem (/opt)
                                               ↓
@@ -130,6 +142,8 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
 ```
 
 ### 重要な設定
+- **NEO-ONE**: `/opt/claude-code-telegram/` + `neo-telegram.service`
+- **NEO-TWO**: `/opt/claude-code-telegram-neo2/` + `neo2-telegram.service`
 - **作業ディレクトリ**: `/opt`（`APPROVED_DIRECTORY`環境変数で設定）
 - **CLAUDE.md**: `/opt/CLAUDE.md` → `/opt/claude-code-telegram/CLAUDE.md` へのシンボリックリンク
 - **アイデンティティ**: CLAUDE.mdで "Neo" として定義（Claude Codeが起動時に読み込む）
@@ -149,10 +163,10 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
 - **ローカルClaude Code**: ローカルファイル編集、CLAUDE.md更新、git操作、設計レビュー
 - **衝突回避**: 両者が同時にVPSの同じファイル・サービスを触らないこと（役割を明確に分ける）
 
-### 制約
-- **Claude APIコスト**: Opus 4.6は高額（$15/1M input tokens, $75/1M output tokens）
-- **レート制限**: 1分間に4リクエスト、1日に1,000リクエスト（Tier 1）
-- **getUpdates競合**: OpenClawのTelegram統合とは別botを使用（競合なし）
+### 制約（重要: APIは使わない）
+- **課金方式**: Claude Maxサブスクリプション（$200/月定額）。Anthropic API（従量課金）は使用禁止
+- **getUpdates競合**: NEO-ONE/NEO-TWOは別botなので競合なし。OpenClawのTelegramとも別bot
+- **注意**: OpenClawの`anthropic/`モデルプレフィックスはAPI課金になるため、NEOをOpenClawに追加してはいけない
 
 ---
 
@@ -192,19 +206,18 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
 - **VPS**: ConoHa 163.44.124.123（Caddy リバースプロキシ）
 - **コンテナ**: 3サービス healthy（openclaw-agent, postgres, n8n）
 - **Gateway**: ws://127.0.0.1:3000 でリッスン中（トークン認証 + デバイスペアリング済み）
-- **Telegram NEO Dual Agent**:
-  - NEO-ONE 🟢: `neo-one` (anthropic/claude-sonnet-4-5) — 既存ボット `@openclaw_nn2026_bot`
-  - NEO-TWO 🔵: `neo-two` (anthropic/claude-sonnet-4-5) — `@neo_two_nn2026_bot`（BotFather作成済み）
-  - 画像認識: `imageModel: anthropic/claude-sonnet-4-5`（両NEO）
-  - チャンネル設定: `channels.telegram.accounts` + `bindings` で振り分け
-  - トークン注入: `entrypoint.sh` が `${TELEGRAM_BOT_TOKEN}` / `${TELEGRAM_BOT_TOKEN_NEO2}` をsed置換
-- **エージェント**: 8人体制（GLM-5 via OpenRouter + Gemini 2.5 Pro/Flash + xAI Grok 4.1）
+- **Telegram**: `@openclaw_nn2026_bot` = Jarvis（OpenClaw）
+- **NEO-ONE**: `@claude_brain_nn_bot` = Claude Opus 4.6 via Claude Code SDK（`neo-telegram.service`）
+- **NEO-TWO**: `@neo_two_nn2026_bot` = Claude Opus 4.6 via Claude Code SDK（`neo2-telegram.service`）
+- **OpenClawエージェント**: 8人体制（Gemini 2.5 Pro + xAI Grok 4.1）— NEOはOpenClaw外
 - **sessions_spawn**: Jarvis → 他7エージェントへの委任設定済み（`tools.allow` + `subagents.allowAgents`）
+- **Web検索**: Grokプロバイダー（xAI APIキー使用、`tools.web.search.provider: "grok"`）
 - **SSH**: 復旧済み（ed25519鍵認証 + パスワード認証）
 - **Control UI**: SSHトンネル経由でアクセス可能 (`localhost:8081/?token=...`)
 - **N8N**: 13ワークフロー稼働中（AISA自動化パイプライン + Morning Briefing）+ Neo Auto-Response（deactivated、予備）
-- **Neo**: Claude Opus 4.6 via Telegram（VPS上でClaude Code稼働、neo-telegram.service enabled）
 - **Jarvis↔Neo通信**: `/opt/shared/reports/` 経由で双方向連携
+- **daily-learning.py**: cron 1日4回稼働（00:00/06:00/12:00/18:00 JST）、APIキーはインライン指定
+- **DBパスワード**: `openclaw_secure_2026`（静的設定、2026-02-16修正）
 - **VPSデスクトップ環境**: XFCE4 + xrdp（2026-02-15構築完了）
   - **デスクトップ環境**: XFCE4（軽量、メモリ使用量 +5MB のみ）
   - **リモートデスクトップ**: xrdp（ポート3389、SSHトンネル経由のみアクセス可）
@@ -214,18 +227,19 @@ User (Telegram) → @claude_brain_nn_bot → neo-telegram.service (VPS)
   - **接続方法**: `ssh -L 3389:localhost:3389 root@163.44.124.123` → リモートデスクトップで `localhost` に接続
   - **セキュリティ**: ポート3389は外部非公開、VPS専用Googleアカウント（neocloop@gmail.com）使用
 
-### AIエージェント構成（9人）
+### AIエージェント構成（10人）
 | # | 名前 | 役割 | モデル | プラットフォーム |
 |---|------|------|--------|-----------------|
-| 1 | 🎯 Jarvis | 実行・投稿・翻訳（DEFAULT） | openrouter/z-ai/glm-5 | OpenClaw |
-| 2 | 🔍 Alice | リサーチ | openrouter/z-ai/glm-5 | OpenClaw |
+| 1 | 🎯 Jarvis | 実行・投稿・翻訳（DEFAULT） | google/gemini-2.5-pro | OpenClaw |
+| 2 | 🔍 Alice | リサーチ | google/gemini-2.5-pro | OpenClaw |
 | 3 | 💻 CodeX | 開発 | google/gemini-2.5-pro | OpenClaw |
 | 4 | 🎨 Pixel | デザイン | google/gemini-2.5-pro | OpenClaw |
-| 5 | ✍️ Luna | 補助執筆 | openrouter/z-ai/glm-5 | OpenClaw |
+| 5 | ✍️ Luna | 補助執筆 | google/gemini-2.5-pro | OpenClaw |
 | 6 | 📊 Scout | データ処理 | google/gemini-2.5-pro | OpenClaw |
 | 7 | 🛡️ Guard | セキュリティ | google/gemini-2.5-pro | OpenClaw |
 | 8 | 🦅 Hawk | X/SNSリサーチ | xai/grok-4.1 | OpenClaw |
-| 9 | 🧠 Neo | **CTO・戦略統括・記事執筆** | claude-opus-4.6 | Telegram (Claude Code) |
+| 9 | 🧠 NEO-ONE | **CTO・戦略統括・記事執筆** | claude-opus-4.6 | Telegram (Claude Code SDK, Max subscription) |
+| 10 | 🧠 NEO-TWO | **補助・並列タスク** | claude-opus-4.6 | Telegram (Claude Code SDK, Max subscription) |
 
 ### 記事作成ワークフロー（2026-02-15〜）
 **新体制**: Neo（Opus 4.6）が記事執筆を担当、Jarvisは投稿・配信に専念
@@ -245,11 +259,11 @@ Substack投稿 + X/Reddit/Notes配信
 **理由**: Opus 4.6 は最高性能モデル。戦略と執筆を一貫して担当することで、より高品質な記事を効率的に作成できる。
 
 ### コスト状況
-- **OpenRouter**: $5 購入済み（GLM-5用、Jarvis/Alice/Luna の3エージェント）
-- Gemini API: **無料枠**で運用中（追加コストなし、CodeX/Pixel/Scout/Guard）
-- xAI API: **$5 購入済み**（約50〜70回のフルリサーチ分、Hawk用）
+- Gemini API: **無料枠**で運用中（OpenClaw全8エージェント、追加コストなし）
+- xAI API: **$5 購入済み**（Hawk X検索 + Grok Web検索）
+- OpenRouter: $5 購入済み（**現在未使用** — GLM-5がapi:undefinedでクラッシュするため一時停止中）
 - Google AI Pro サブスク: ¥2,900/月（Antigravity用、API とは別）
-- Claude Max: $200/月（Claude Code用、API とは別）
+- Claude Max: $200/月（NEO-ONE + NEO-TWO + ローカルClaude Code、API とは別）
 
 ### 完成プロジェクト
 - [x] **AISA（Asia Intelligence Signal Agent）** — アジア暗号資産ニュースレター自動化システム
@@ -264,21 +278,26 @@ Substack投稿 + X/Reddit/Notes配信
 - [ ] OpenClaw を最新版にアップデート
 - [ ] xAI APIキーをローテーション（要手動: https://console.x.ai/ → 新キー生成 → `.env`更新 → `docker restart openclaw-agent`）
 - [ ] X APIキーをローテーション（要手動: https://developer.x.com/ → Keys再生成）
-- [x] VPSのSSHアクセス復旧 → 完了（ed25519鍵 + パスワード認証）
-- [x] VPSの `chmod 777` を適切な権限に修正 → 完了（shared=775, config=755、2026-02-15）
-- [x] N8N自動化ワークフロー構築 → AISA完成（13ワークフロー稼働中）
 - [ ] ConoHaセキュリティグループでポート80/443を開放（外部ブラウザアクセス用）
-- [x] Telegram getUpdatesコンフリクトの完全解消 → 完了（neo-telegram.service無効化 + ポーリング間隔5秒化）
 - [ ] AISA Substackローンチ（30分作業、全コンテンツ準備済み）
-- [x] **VPSデスクトップ環境構築** → 完了（XFCE4 + xrdp + Firefox、2026-02-15）
 - [ ] **VPS専用Googleアカウント作成**（neocloop@gmail.com）→ VPSデスクトップのFirefoxで作成
 - [ ] **OpenClawからのブラウザ操作テスト**（Jarvisに「Firefoxでgoogle.comを開いて」と指示）
-- [x] **Neo自動応答システム構築** → N8Nで構築完了→Gemini Flashでは品質不足のためClaude Code（Opus 4.6）に復帰（2026-02-15）
 - [ ] **多言語対応**（既存7記事 → 日本語・中国語・韓国語に翻訳）
 - [ ] **エビデンス強化**（全記事に出典URL追加）
 - [ ] **Neo記事執筆ワークフロー**（週1-2本ペース）
-- [x] **リサーチ強制 + 報酬/ペナルティhooksシステム** → 完了（5 hooks + SCORECARD.md、2026-02-15）
-- [x] **学習ループシステム** → 完了（AGENT_WISDOM.md + daily-learning.py + weekly-analysis.sh + task-log、2026-02-16）
+- [ ] **GLM-5 ZhipuAI直接API設定**（z.aiでAPIキー取得 → `zai/glm-5`でOpenClawに登録）
+- [x] VPSのSSHアクセス復旧 → 完了（ed25519鍵 + パスワード認証）
+- [x] VPSの `chmod 777` を適切な権限に修正 → 完了（shared=775, config=755、2026-02-15）
+- [x] N8N自動化ワークフロー構築 → AISA完成（13ワークフロー稼働中）
+- [x] Telegram getUpdatesコンフリクトの完全解消 → 完了（2026-02-15）
+- [x] **VPSデスクトップ環境構築** → 完了（XFCE4 + xrdp + Firefox、2026-02-15）
+- [x] **Neo自動応答システム構築** → Claude Code復帰（2026-02-15）
+- [x] **リサーチ強制 + 報酬/ペナルティhooksシステム** → 完了（2026-02-15）
+- [x] **学習ループシステム** → 完了（2026-02-16）
+- [x] **NEO-TWOサービス構築** → 完了（`neo2-telegram.service`、2026-02-16）
+- [x] **DBパスワード修正** → 完了（静的パスワードに変更、2026-02-16）
+- [x] **daily-learning.py cron修正** → 完了（インラインAPIキー、2026-02-16）
+- [x] **Grok Web検索有効化** → 完了（`tools.web.search.provider: "grok"`、2026-02-16）
 
 ---
 
@@ -567,5 +586,5 @@ Substack投稿 + X/Reddit/Notes配信
 <<<<<<< HEAD
 *最終更新: 2026-02-16 — Hey Loop Intelligence v3構築（5データソース、1日4回、インフラ+収益監視、Telegram自動提案、動的発見、Grok X検索）*
 =======
-*最終更新: 2026-02-16 — NEO Dual Agent構成（1 OpenClaw + 2 Telegram Bot）を実装*
+*最終更新: 2026-02-16 — NEO Dual Agent修正（Max subscription, OpenClaw外）、全エージェントGemini 2.5 Pro統一、DB/cron/Web検索修正*
 >>>>>>> fd1a22f (Add NEO Dual Agent: two Telegram bots on one OpenClaw Gateway)

@@ -606,4 +606,86 @@
   - `claude code bypassPermissions settings.local.json`
   - `claude code permissions defaultMode configuration`
 
-*最終更新: 2026-02-16 — OpenRouter カスタムモデル登録、onboard副作用、docker-compose $エスケープ、Claude Code bypassPermissions を記録*
+### 2026-02-16: .envのPOSTGRES_PASSWORDがシェル展開されない
+- **症状**: OpenClawとN8NがPostgreSQLに接続できない（認証エラー）。Jarvisが「DB connection failed」と報告
+- **根本原因**: `.env`に `POSTGRES_PASSWORD=openclaw_$(openssl rand -hex 8)` と記載されていたが、docker-composeは`.env`の値をそのまま文字列として読み込む（シェル展開しない）。そのためパスワードが文字通り `openclaw_$(openssl rand -hex 8)` になっていた
+- **誤ったアプローチ**:
+  1. PostgreSQLコンテナ側の設定を疑った → 実際は`.env`の値がシェル展開されていない
+- **正しい解決策**:
+  1. PostgreSQLコンテナ内で `ALTER USER openclaw WITH PASSWORD 'openclaw_secure_2026';` を実行
+  2. `.env`の`POSTGRES_PASSWORD`を静的な値に変更: `POSTGRES_PASSWORD=openclaw_secure_2026`
+  3. 全コンテナを再起動
+- **教訓**:
+  - **docker-composeの`.env`ではシェルコマンド展開（`$()`）は動作しない。静的な値を設定する**
+  - 動的パスワード生成は`.env`ではなく、初期化スクリプトやentrypoint.shで行う
+  - DBパスワード変更時は、DB側（ALTER USER）と`.env`側の両方を同時に更新する
+- **検索すべきだったキーワード**:
+  - `docker-compose env file shell expansion`
+  - `docker-compose .env variable substitution limitations`
+
+### 2026-02-16: cron内の`source .env`がSUBSTACK_COOKIESで壊れる
+- **症状**: daily-learning.pyのcronジョブが静かに失敗。`GOOGLE_API_KEY`が空になりGemini APIが呼べない
+- **根本原因**: cron内で`source /opt/openclaw/.env`を実行すると、`SUBSTACK_COOKIES`の値にセミコロン(`;`)が含まれており、bashがこれをコマンド区切りとして解釈。結果、`GOOGLE_API_KEY`の設定が上書き・消失される
+- **誤ったアプローチ**:
+  1. daily-learning.pyのコード自体を疑った → 実際はcron環境の問題
+  2. `.env`全体を`source`で読み込めると仮定した → Cookie値にbash特殊文字が含まれている
+- **正しい解決策**:
+  cron内で`source .env`を使わず、必要なAPIキーだけをインラインで指定:
+  ```
+  0 15 * * * GOOGLE_API_KEY=AIzaSy... XAI_API_KEY=xai-... TELEGRAM_BOT_TOKEN=7949... TELEGRAM_CHAT_ID=8309... /usr/bin/python3 /opt/shared/scripts/daily-learning.py --run 0
+  ```
+- **教訓**:
+  - **`source .env`は安全ではない。Cookie値やトークン値にbash特殊文字（`;` `$` `(` `)` 等）が含まれるとコマンドが壊れる**
+  - cron内では`source`を避け、必要な変数だけをインラインで渡す
+  - または`env $(grep -v '^#' .env | xargs)`のように安全にパースする
+- **検索すべきだったキーワード**:
+  - `bash source env file semicolon breaks`
+  - `cron environment variables .env file`
+  - `docker env file special characters bash`
+
+### 2026-02-16: OpenRouterモデルが「No API provider registered for api: undefined」でクラッシュ
+- **症状**: `openrouter/z-ai/glm-5`をエージェントのモデルに設定すると、OpenClawが起動直後にクラッシュ。エラー: "No API provider registered for api: undefined"
+- **根本原因**: `models.providers.openrouter`と`auth.profiles.openrouter:default`を正しく設定しても、OpenClawの内部でモデル→APIプロバイダーのマッピングが正しく行われない。おそらくOpenClawの現行バージョンのバグまたは未サポート機能
+- **誤ったアプローチ**:
+  1. `models.providers`のJSON形式を修正 → 改善なし
+  2. `auth.profiles`の設定を確認 → 正しいが効果なし
+  3. `openrouter/auto`（オートルーティング）を試した → 同じエラー
+- **正しい解決策**:
+  1. 一時的に全エージェントを`google/gemini-2.5-pro`に変更してクラッシュ回避
+  2. GLM-5を使うなら、OpenRouterではなくZhipuAI直接API（`zai/glm-5`）を検討
+  3. OpenClawの`zai`プロバイダーはネイティブサポート。`z.ai`でAPIキーを取得すれば`zai/glm-5`で使える
+- **教訓**:
+  - **OpenClawのOpenRouterカスタムモデル登録は、設定できても実際にAPIルーティングが動くとは限らない**
+  - 新しいプロバイダー/モデルを設定したら、すぐにテストメッセージを送って動作確認する
+  - クラッシュする場合は代替モデルにフォールバックして、本番環境を保護する
+  - GLM-5はZhipuAI直接API（`zai/`プレフィックス）の方が安定する可能性が高い
+- **検索すべきだったキーワード**:
+  - `openclaw openrouter "No API provider registered"`
+  - `openclaw custom provider api undefined error`
+  - `openclaw zai zhipuai glm-5 direct api`
+
+### 2026-02-16: NEO-ONE/TWOをOpenClawエージェントとして追加する（間違ったアーキテクチャ）
+- **症状**: NeoがOpenClawのopenclaw.jsonにNEO-ONE/NEO-TWOをエージェントとして追加（`anthropic/claude-sonnet-4-5`モデル）。オーナーから「APIは使わないで」と指摘
+- **根本原因**: NEO-ONE/TWOはClaude Maxサブスクリプション（$200/月）経由でClaude Code SDKを使用する設計。OpenClawのエージェントとして`anthropic/`プレフィックスで追加すると、Anthropic APIの従量課金（$15/1M input, $75/1M output）になり、設計意図と全く異なる
+- **誤ったアプローチ**:
+  1. Neoが`openclaw.json`のagents.listにNEO-ONE/TWOを追加 → OpenClaw APIルーティング経由になる
+  2. モデルを`anthropic/claude-sonnet-4-5`に設定 → API課金が発生する
+  3. OpenClawを2つ起動する案 → 不要な複雑化
+- **正しい解決策**:
+  1. OpenClawは1つ（Jarvis + 7サブエージェント専用）
+  2. NEO-ONE/TWOは**別のclaude-code-telegramサービス**として起動（`neo-telegram.service`、`neo2-telegram.service`）
+  3. 各サービスがClaude Code SDKを使用 → Claude Maxサブスクリプション（定額$200/月）で動作
+  4. 各サービスに独自のTelegram bot token を設定
+- **教訓**:
+  - **Claude Maxサブスクリプション（定額）とAnthropic API（従量課金）は全く異なる課金モデル。混同しない**
+  - OpenClawの`anthropic/`モデルプレフィックスはAPI課金。Claude Maxを使うにはClaude Code SDKが必要
+  - NEO系エージェントはOpenClawとは独立した`claude-code-telegram`サービスとして運用する
+  - アーキテクチャ変更時は、オーナーのコスト意図を最優先で確認する
+- **検索すべきだったキーワード**:
+  - `claude max subscription vs api pricing`
+  - `claude code sdk subscription billing`
+  - `openclaw anthropic model api cost`
+
+---
+
+*最終更新: 2026-02-16 — DB password未展開、source .env破損、OpenRouter api:undefined、NEO-ONE/TWOアーキテクチャ誤り を記録*

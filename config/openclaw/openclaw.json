@@ -36,27 +36,9 @@
     },
     "list": [
       {
-        "id": "neo-one",
-        "model": "anthropic/claude-sonnet-4-5",
-        "imageModel": "anthropic/claude-sonnet-4-5",
-        "identity": {
-          "name": "NEO-ONE",
-          "emoji": "🟢"
-        }
-      },
-      {
-        "id": "neo-two",
-        "model": "anthropic/claude-sonnet-4-5",
-        "imageModel": "anthropic/claude-sonnet-4-5",
-        "identity": {
-          "name": "NEO-TWO",
-          "emoji": "🔵"
-        }
-      },
-      {
         "id": "jarvis-cso",
         "default": true,
-        "model": "openrouter/z-ai/glm-5",
+        "model": "google/gemini-2.5-pro",
         "identity": {
           "name": "Jarvis (CSO) - READ /shared/AGENT_WISDOM.md before every task",
           "emoji": "🎯"
@@ -88,7 +70,7 @@
       },
       {
         "id": "alice-research",
-        "model": "openrouter/z-ai/glm-5",
+        "model": "google/gemini-2.5-pro",
         "identity": {
           "name": "Alice (Research Analyst)",
           "emoji": "🔍"
@@ -112,7 +94,7 @@
       },
       {
         "id": "luna-writer",
-        "model": "openrouter/z-ai/glm-5",
+        "model": "google/gemini-2.5-pro",
         "identity": {
           "name": "Luna (Content Writer)",
           "emoji": "✍️"
@@ -172,6 +154,13 @@
   "tools": {
     "agentToAgent": {
       "enabled": true
+    },
+    "web": {
+      "search": {
+        "provider": "grok",
+        "maxResults": 5,
+        "timeoutSeconds": 30
+      }
     }
   },
   "messages": {
@@ -212,21 +201,14 @@
       "accounts": {
         "default": {
           "botToken": "${TELEGRAM_BOT_TOKEN}"
-        },
-        "neo2": {
-          "botToken": "${TELEGRAM_BOT_TOKEN_NEO2}"
         }
       }
     }
   },
   "bindings": [
     {
-      "agentId": "neo-one",
+      "agentId": "jarvis-cso",
       "match": { "channel": "telegram", "accountId": "default" }
-    },
-    {
-      "agentId": "neo-two",
-      "match": { "channel": "telegram", "accountId": "neo2" }
     }
   ]
 }
