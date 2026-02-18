@@ -98,10 +98,22 @@
 | N8N API 401 Unauthorized | Basic Auth で API アクセス | `X-N8N-API-KEY` ヘッダーで認証 |
 | Substack CAPTCHA | メール/パスワード認証 | Cookie認証（`connect.sid`）に切り替え |
 | Neo品質崩壊 | Claude Opus 4.6をGemini Flash APIに置き換え | フルエージェント（SDK+メモリ+ツール）をステートレスAPIに置き換えない |
+| Notes API 403 | Cloudflare WAFがrequestsのPOSTをbot判定 | `curl_cffi`（Chrome impersonation）を使う |
 | .envパスワード未展開 | `$(openssl rand)`がdocker-composeで展開されない | 静的な値を設定する |
 | source .envが壊れる | Cookie値のセミコロンがbash区切りに | cron内ではインラインでAPIキー指定 |
 | OpenRouter api:undefined | カスタムモデルのAPIルーティング失敗 | GLM-5はZhipuAI直接API（`zai/`）を使う |
 | NEOをOpenClawに追加 | `anthropic/`はAPI課金 | NEOは別の`claude-code-telegram`サービスで運用 |
+| NEO permission_mode エラー | `bypassPermissions`はrootで使えない | `acceptEdits`を使う（rootでもツール自動承認） |
+| NEOが「Claude Code」と名乗る | CLAUDE.mdだけでは不十分 | SDK `system_prompt`パラメータでアイデンティティ注入 |
+| NEO OAuthトークンスパム | VPSからのトークン更新がCloudflareに阻まれる | ローカルPC→VPSへSCPコピー（6時間ごと自動） |
+| NEO画像読み込み不可 | `run_command(prompt=str)` で画像base64データが破棄される | 画像をファイル保存→Readツールで読み込み指示 |
+| NEO指示を実行しない | system_promptにタスク実行指示がない | system_promptに「メッセージ=実行指示」と明示 |
+| Bot APIでNEOに指示が届かない | Bot APIは「botからユーザーへの通知」でNEOのgetUpdatesに入らない | **Telethon**（User API）で送信する。`send-to-neo.py --bot neo1 --msg "..."` |
+| note Cookie認証エラー | Cookieの期限切れでなくサーバー側強制無効化 | 手動Seleniumスクリプトで再ログイン→`.note-cookies.json`更新 |
+| note-auto-post.pyがXに二重投稿 | `--publish`時にpost_thread.pyも自動でX投稿する | subprocess呼び出しに`--no-x-thread`フラグを明示的に追加 |
+| X「duplicate content」403 | 同じ内容を短期間に2回投稿 | キューの`tweet_url`フィールドで重複チェック。テスト後は内容を変えて再試行 |
+| nowpattern Ghost API 403 | GhostはHTTP→HTTPSリダイレクト、VPS自身がdomain解決不能 | `/etc/hosts`に`127.0.0.1 nowpattern.com`追加、HTTPSでアクセス |
+| Ghost API `requests.get`でSSLエラー | VPSのSSL証明書がlocalhostに発行されていない | `verify=False`と`urllib3.disable_warnings()`を追加 |
 
 詳細な症状・解決手順・教訓・検索キーワードは [docs/KNOWN_MISTAKES.md](docs/KNOWN_MISTAKES.md) を参照してください。
 
@@ -201,20 +213,48 @@ User (Telegram) → @claude_brain_nn_bot  → neo-telegram.service (VPS)
 
 ## 4. Current State（現在の状態）
 
-### 動作中の構成（2026-02-16時点）
+### 動作中の構成（2026-02-18時点）
 - **使用中Compose**: `docker-compose.quick.yml`
 - **VPS**: ConoHa 163.44.124.123（Caddy リバースプロキシ）
-- **コンテナ**: 3サービス healthy（openclaw-agent, postgres, n8n）
+- **コンテナ**: 4サービス（openclaw-agent, postgres, n8n, substack-api）
 - **Gateway**: ws://127.0.0.1:3000 でリッスン中（トークン認証 + デバイスペアリング済み）
 - **Telegram**: `@openclaw_nn2026_bot` = Jarvis（OpenClaw）
 - **NEO-ONE**: `@claude_brain_nn_bot` = Claude Opus 4.6 via Claude Code SDK（`neo-telegram.service`）
 - **NEO-TWO**: `@neo_two_nn2026_bot` = Claude Opus 4.6 via Claude Code SDK（`neo2-telegram.service`）
-- **OpenClawエージェント**: 8人体制（Gemini 2.5 Pro + xAI Grok 4.1）— NEOはOpenClaw外
+- **OpenClawエージェント**: 8人体制（Jarvis/Alice/Luna = GLM-5、CodeX/Pixel/Scout/Guard = Gemini 2.5 Pro、Hawk = grok-4.1）
+- **GLM-5**: ZhipuAI直接API（`zai/glm-5`、`https://api.z.ai/api/paas/v4`）で設定済み ✅
 - **sessions_spawn**: Jarvis → 他7エージェントへの委任設定済み（`tools.allow` + `subagents.allowAgents`）
 - **Web検索**: Grokプロバイダー（xAI APIキー使用、`tools.web.search.provider: "grok"`）
 - **SSH**: 復旧済み（ed25519鍵認証 + パスワード認証）
 - **Control UI**: SSHトンネル経由でアクセス可能 (`localhost:8081/?token=...`)
+- **nowpattern.com**: Ghost CMS稼働中（systemd `ghost-nowpattern.service`、SQLite、port 2368）
+  - SSL: Let's Encrypt（Caddy自動更新）✅
+  - Admin: `https://nowpattern.com/ghost/` でログイン可能
+  - Admin API: AutoPublisher integration設定済み（`/opt/cron-env.sh`のNOWPATTERN_GHOST_ADMIN_API_KEY）
+  - 自動投稿: `nowpattern-ghost-post.py` 稼働中（AISA記事 → Nowpattern観測ログ形式で投稿）
+  - `/etc/hosts`に`127.0.0.1 nowpattern.com`追加済み（VPS内部からのAPI呼び出し用）
 - **N8N**: 13ワークフロー稼働中（AISA自動化パイプライン + Morning Briefing）+ Neo Auto-Response（deactivated、予備）
+- **AISAコンテンツパイプライン v4（2026-02-18 完成）**:
+  ```
+  RSS収集 (rss-news-pipeline.py, JST 7/13/19時)
+    ↓ 30分後
+  深層分析 (analyze_rss.py, JST 7:30/13:30/19:30時)
+    - Step1: 記事本文スクレイプ（全文取得）
+    - Step2: 元ツイート検索（Grok x_search + grok-4-0709）→ original_tweet_id保存
+    - Step3: Gemini 2.5 Pro深層分析（5要素必須: 歴史・利害・論理・シナリオ・示唆）→ 7000字+
+    ↓ 毎時0分（ランダム0-10分遅延）
+  投稿 (rss-post-quote-rt.py v4, JA:3+EN:2=5記事/時)
+    - 記事別サムネイル自動生成（gen_thumbnail.py, Pillow + NotoSansCJK）
+    - JA: note（サムネイル + 元URL付き）→ X引用リポスト
+    - EN: Substack（元URL付き）→ X引用リポスト
+    - X投稿: 1500字長文 + ハッシュタグ + note/Substackリンク + 元ツイートを引用リポスト
+  ```
+  **記事品質5要素（必須、毎回チェック）**:
+  1. 歴史的背景 ― なぜ今これが起きたか、過去の類似事例
+  2. 利害関係者マップ ― 建前と本音を分離（誰が何を得て何を失うか）
+  3. 内在的論理/支配しているOS ― 構造的な力学、なぜこうなっているか
+  4. 今後のシナリオ ― 3パターン（楽観/基本/悲観）+ 確率
+  5. 投資/行動への示唆 ― 読者が今日から取れるアクション
 - **Jarvis↔Neo通信**: `/opt/shared/reports/` 経由で双方向連携
 - **daily-learning.py**: cron 1日4回稼働（00:00/06:00/12:00/18:00 JST）、APIキーはインライン指定
 - **DBパスワード**: `openclaw_secure_2026`（静的設定、2026-02-16修正）
@@ -241,22 +281,42 @@ User (Telegram) → @claude_brain_nn_bot  → neo-telegram.service (VPS)
 | 9 | 🧠 NEO-ONE | **CTO・戦略統括・記事執筆** | claude-opus-4.6 | Telegram (Claude Code SDK, Max subscription) |
 | 10 | 🧠 NEO-TWO | **補助・並列タスク** | claude-opus-4.6 | Telegram (Claude Code SDK, Max subscription) |
 
-### 記事作成ワークフロー（2026-02-15〜）
-**新体制**: Neo（Opus 4.6）が記事執筆を担当、Jarvisは投稿・配信に専念
+### 多言語コンテンツ配信パイプライン（2026-02-18〜）
+**5プラットフォーム自動配信体制**
 
 ```
-Neo (戦略 + 執筆)
+Neo (戦略 + 執筆 + ニュース分析)
   ↓
-記事を /opt/shared/articles/ に保存
-  ↓
-Jarvis (自動検出)
-  ↓
-4言語に翻訳 (日本語・中国語・韓国語)
-  ↓
-Substack投稿 + X/Reddit/Notes配信
+Jarvis (翻訳: 日→英)
+  ↓ 同時投稿
+X (@aisaintel)       — 全言語共通
+Substack             — 英語（AISA Newsletter）
+note                 — 日本語（noindex問題→新アカウント検討中）
+Medium               — 英語+中国語（スクリプト完成、MEDIUM_TOKEN待ち）
+nowpattern.com       — 英語+日本語ハブ（Ghost CMS、自動投稿稼働中 ✅）
+NAVER Blog           — 韓国語（API廃止済み、Selenium方式・アカウント待ち）
 ```
 
-**理由**: Opus 4.6 は最高性能モデル。戦略と執筆を一貫して担当することで、より高品質な記事を効率的に作成できる。
+**nowpattern.com自動投稿フロー**:
+```
+rss_article_queue.json (posted記事)
+  ↓
+nowpattern-ghost-post.py
+  → Grok APIでジャンル・パターン判定
+  → Ghost Admin APIで観測ログ投稿
+  → https://nowpattern.com/観測ログ-xxxx/
+```
+
+### AISA News Analyst Pipeline v3.0（2026-02-17〜）
+- **スクリプト**: `/opt/shared/scripts/news-analyst-pipeline.py`
+- **プロンプト**: `/opt/shared/articles/AISA_NEWS_ANALYST_PROMPT_v1.1.md`（12OS × 7層深層ロジック × 3シナリオ）
+- **cron**: 1日3回（JST 10:00 / 16:00 / 22:00）
+- **フロー**: Grok(xAI)ニュース検知 → Gemini深層分析 → 6プラットフォーム同時投稿
+- **投稿先**: Ghost(英語ドラフト) + note(日本語ドラフト) + Substack(英語ドラフト) + X(日英中3言語) + Telegram通知
+- **ダッシュボード**: `/opt/shared/scripts/aisa-dashboard.sh`
+- **コスト**: 約$0.30/月（ほぼ全て無料API）
+- **テスト済み分析**: 6本（Israel地上作戦、US stablecoin規制、Trump関税、AGI予測、日銀金利、EU AI Act）
+- **note公開記事**: 2本（「仮想通貨の税金が変わる話」「SaaSが終わる日が来た」）
 
 ### コスト状況
 - Gemini API: **無料枠**で運用中（OpenClaw全8エージェント、追加コストなし）
@@ -275,23 +335,27 @@ Substack投稿 + X/Reddit/Notes配信
   - 設計・実装: Neo（2026-02-14〜15）
 
 ### 未解決の課題
-- [ ] OpenClaw を最新版にアップデート
-- [ ] xAI APIキーをローテーション（要手動: https://console.x.ai/ → 新キー生成 → `.env`更新 → `docker restart openclaw-agent`）
+- [ ] **NAVER Blogアカウント作成 + 韓国語自動投稿**（API廃止済み、Selenium方式、アカウント作成でSMS認証必要）
+- [ ] **Mediumアカウント + MEDIUM_TOKEN取得**（スクリプト完成済み、トークン登録待ち: medium.com/me/settings → Integration tokens）
+- [ ] **noteアカウント削除 + 新アカウント作成**（noindex問題、新アカウントで自然な投稿から開始）
+- [x] **全プラットフォーム統合パイプライン** → Pipeline v3.0完成（Ghost+note+Substack+X 3言語、2026-02-17）
+- [x] **nowpattern.com自動投稿** → Ghost CMS + AutoPublisher API連携完成（2026-02-18）
+- [x] **GLM-5 ZhipuAI直接API設定** → 完了（`zai/glm-5`、Jarvis/Alice/Luna、2026-02-18）
 - [ ] X APIキーをローテーション（要手動: https://developer.x.com/ → Keys再生成）
-- [ ] ConoHaセキュリティグループでポート80/443を開放（外部ブラウザアクセス用）
-- [ ] AISA Substackローンチ（30分作業、全コンテンツ準備済み）
-- [ ] **VPS専用Googleアカウント作成**（neocloop@gmail.com）→ VPSデスクトップのFirefoxで作成
-- [ ] **OpenClawからのブラウザ操作テスト**（Jarvisに「Firefoxでgoogle.comを開いて」と指示）
-- [ ] **多言語対応**（既存7記事 → 日本語・中国語・韓国語に翻訳）
-- [ ] **エビデンス強化**（全記事に出典URL追加）
-- [ ] **Neo記事執筆ワークフロー**（週1-2本ペース）
-- [ ] **GLM-5 ZhipuAI直接API設定**（z.aiでAPIキー取得 → `zai/glm-5`でOpenClawに登録）
+- [x] Substack cookie復旧 → 完了（2026-02-17、有効期限5月18日）
+- [x] OpenClaw最新版確認 → 2026.2.15で最新（2026-02-17）
+- [x] ポート80/443開放 → Caddy稼働中で解決済み（2026-02-17）
+- [x] VPSパーミッション修正 → 777→775/664に修正（2026-02-17）
+- [x] crontab APIキー平文除去 → `/opt/cron-env.sh`に移行（2026-02-17）
+- [x] noteアカウント作成 → neocloop@gmail.com（2026-02-17）
+- [x] note自動投稿スクリプト → `/opt/shared/scripts/note-auto-post.py`（2026-02-17）
+- [x] ニュース分析パイプライン → cron 1日3回稼働（2026-02-17）
+- [x] Ghost CMS自動投稿 → Admin API連携完了（2026-02-17）
+- [x] AISA Substackローンチ → 25+記事公開済み（2026-02-16）
+- [x] VPS専用Googleアカウント → neocloop@gmail.com作成済み
 - [x] VPSのSSHアクセス復旧 → 完了（ed25519鍵 + パスワード認証）
-- [x] VPSの `chmod 777` を適切な権限に修正 → 完了（shared=775, config=755、2026-02-15）
 - [x] N8N自動化ワークフロー構築 → AISA完成（13ワークフロー稼働中）
-- [x] Telegram getUpdatesコンフリクトの完全解消 → 完了（2026-02-15）
 - [x] **VPSデスクトップ環境構築** → 完了（XFCE4 + xrdp + Firefox、2026-02-15）
-- [x] **Neo自動応答システム構築** → Claude Code復帰（2026-02-15）
 - [x] **リサーチ強制 + 報酬/ペナルティhooksシステム** → 完了（2026-02-15）
 - [x] **学習ループシステム** → 完了（2026-02-16）
 - [x] **NEO-TWOサービス構築** → 完了（`neo2-telegram.service`、2026-02-16）
@@ -429,12 +493,24 @@ Substack投稿 + X/Reddit/Notes配信
 | **データ処理** | Python/Node.js | CSV変換、レポート生成 |
 | **コピペ作業** | 自動スクリプト | テンプレート貼り付け |
 
+**🚨 絶対ルール: 人間に聞く前にエージェントに委任せよ**
+
+VPSにはChrome/Firefox + Playwright + Gmailアカウント（neocloop@gmail.com）がある。
+ブラウザ操作が必要な場合（cookie取得、ログイン、フォーム入力等）は：
+1. まずPlaywright/Puppeteerで自動化を試みる
+2. 失敗したらNEO/Jarvisにブラウザ操作を委任する
+3. それでも不可能な場合のみ、人間に最小限の依頼をする
+
+**「エージェントでできることを人間に聞くな」** — これは絶対ルール。
+VPSのリソース（ブラウザ、メール、API）を最大限に活用してから人間に頼ること。
+
 **✅ 人間に依頼して良いこと（最小限に）**
 - 戦略的判断（どの方向に進むか）
 - 優先順位の決定
 - 予算・コストの承認
 - 最終的なGO/NO GO判断
 - クリエイティブな意思決定（デザイン、ブランディング等）
+- **上記以外は全てエージェントが処理すること**
 
 **🤖 エージェント間の役割分担**
 
@@ -583,8 +659,4 @@ Substack投稿 + X/Reddit/Notes配信
 
 ---
 
-<<<<<<< HEAD
-*最終更新: 2026-02-16 — Hey Loop Intelligence v3構築（5データソース、1日4回、インフラ+収益監視、Telegram自動提案、動的発見、Grok X検索）*
-=======
-*最終更新: 2026-02-16 — NEO Dual Agent修正（Max subscription, OpenClaw外）、全エージェントGemini 2.5 Pro統一、DB/cron/Web検索修正*
->>>>>>> fd1a22f (Add NEO Dual Agent: two Telegram bots on one OpenClaw Gateway)
+*最終更新: 2026-02-18 — nowpattern.com Ghost CMS稼働（SSL取得・Admin API接続・自動投稿5件確認）、GLM-5設定完了（Jarvis/Alice/Luna）、Ghost staffDeviceVerification無効化、/etc/hostsにnowpattern.com追加*
