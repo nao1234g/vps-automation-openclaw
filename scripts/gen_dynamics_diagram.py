@@ -49,10 +49,10 @@ COLORS = {
 }
 
 NODE_COLORS = {
-    "power": {"fill": "#121e30", "text": "#c9a84c", "stroke": "#c9a84c"},
-    "affected": {"fill": "#f8f6f0", "text": "#121e30", "stroke": "#e0dcd4"},
-    "regulator": {"fill": "#27ae60", "text": "#ffffff", "stroke": "#1e8449"},
-    "neutral": {"fill": "#ffffff", "text": "#121e30", "stroke": "#121e30"},
+    "power":     {"fill": "#121e30", "text": "#c9a84c", "stroke": "#c9a84c"},  # 濃紺+金 — 支配者
+    "affected":  {"fill": "#dbeafe", "text": "#1e3a5f", "stroke": "#3b82f6"},  # 水色 — 影響を受ける側
+    "regulator": {"fill": "#14532d", "text": "#ffffff", "stroke": "#22c55e"},  # 深緑 — 規制者
+    "neutral":   {"fill": "#f9fafb", "text": "#374151", "stroke": "#9ca3af"},  # 薄グレー — 中立
 }
 
 EDGE_COLORS = {
@@ -243,11 +243,11 @@ def _generate_flow(title: str, nodes: list[dict], edges: list[dict],
     svg += _svg_text(18, legend_top + 24, "凡例", fill=COLORS["navy"], size=14,
                      anchor="start", bold=True)
 
-    # Row 1: ノードタイプ（色付き四角＋名称のみ、色コード文字は出さない）
+    # Row 1: ノードタイプ（色付き四角＋シンプルな名称のみ）
     node_legend = [
-        ("支配者（濃紺）", NODE_COLORS["power"]["fill"]),
-        ("影響を受ける側（白）", NODE_COLORS["affected"]["stroke"]),
-        ("規制者・第三者（緑）", NODE_COLORS["regulator"]["fill"]),
+        ("支配者", NODE_COLORS["power"]["fill"]),
+        ("影響を受ける側", NODE_COLORS["affected"]["fill"]),
+        ("規制者・第三者", NODE_COLORS["regulator"]["fill"]),
     ]
     row1_y = legend_top + 26
     step = int(width * 0.28)
@@ -419,6 +419,7 @@ def generate_dynamics_diagram(
     output_path: str = "",
     width: int = 960,
     height: int = 760,
+    show_edge_labels: bool = True,
 ) -> str:
     """力学ダイアグラムSVGを生成する
 
@@ -430,18 +431,22 @@ def generate_dynamics_diagram(
         output_path: SVGファイルの出力先（空文字列の場合はファイル保存しない）
         width: SVG幅（px）
         height: SVG高さ（px）
+        show_edge_labels: Falseにすると矢印ラベルを非表示（交差が多い複雑な図向け）
 
     Returns:
         SVG文字列
     """
     nodes = nodes or []
-    edges = edges or []
+    # show_edge_labels=False の場合はラベルを除去
+    edges_input = edges or []
+    if not show_edge_labels:
+        edges_input = [{k: v for k, v in e.items() if k != "label"} for e in edges_input]
 
     generator = DIAGRAM_GENERATORS.get(diagram_type)
     if not generator:
         raise ValueError(f"Unknown diagram type: {diagram_type}. Use: {list(DIAGRAM_GENERATORS.keys())}")
 
-    svg = generator(title, nodes, edges, width, height)
+    svg = generator(title, nodes, edges_input, width, height)
 
     if output_path:
         p = Path(output_path)
