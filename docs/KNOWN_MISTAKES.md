@@ -1078,6 +1078,39 @@
 - **正しい解決策**: `/v1/responses` エンドポイント + `{"type": "x_search"}` + `grok-4-0709`
 - **検索キーワード**: `xAI API x_search`, `grok agent tools API`, `docs.x.ai/docs/guides/tools`
 
+### 2026-02-18: Ghost Settings API 501エラー（Integration APIではSettings PUT不可）
+- **症状**: `PUT /ghost/api/admin/settings/` → 501 "Not Implemented"
+- **根本原因**: Ghost 5.130ではIntegration（Admin API Key）経由でのSettings更新がサポートされていない。GETは可能だがPUTは501を返す
+- **誤ったアプローチ**: `requests`ライブラリで`allow_redirects=False`を試行。リダイレクト問題は解決したが、501は根本的にAPIが未対応
+- **正しい解決策**: Ghost SQLiteデータベース（`/var/www/nowpattern/content/data/ghost.db`）を直接更新。`UPDATE settings SET value = '<style>...' WHERE key = 'codeinjection_head';` + Ghost再起動
+- **追加の教訓**: `requests`ライブラリはリダイレクト時にAuthorizationヘッダーを除去する（セキュリティ仕様）。`http://localhost:2368` → `https://nowpattern.com` のリダイレクトで403になる
+- **検索すべきだったキーワード**: `ghost admin api settings put 501`, `ghost integration api permissions`, `ghost codeinjection sqlite`
+
+### 2026-02-18: Ghost 5.x 投稿の本文が空（html/markdownフィールドが無視される）
+- **症状**: Ghost Admin APIで記事投稿後、タイトルは表示されるが本文が完全に空。APIレスポンスの`html`フィールドが0文字、`lexical`が空のrootノード（155文字）のみ
+- **根本原因**: Ghost 5.x はデフォルトで **lexical エディタ**を使用する。`html`フィールドや`markdown`フィールドを直接送っても、Ghostはそれらを無視して空のlexicalドキュメントを作成する
+- **誤ったアプローチ**:
+  1. `"html": html` でPOST → 本文空
+  2. `"markdown": markdown` でPOST → 本文空（markdownフィールドはGhost APIで未対応）
+  3. lexical HTML card形式（`{"type":"html","version":1,"html":"..."}` ）でPUT → APIは200を返すがhtmlフィールドは0のまま（しかし実際にはlexical内に格納されていて表示される場合もある）
+- **正しい解決策**: Ghost Admin APIのURLに **`?source=html`** パラメータを追加する
+  ```python
+  # POST（新規投稿）
+  url = f"{ghost_url}/ghost/api/admin/posts/?source=html"
+  body = {"posts": [{"title": title, "html": html, ...}]}
+
+  # PUT（既存記事更新）
+  url = f"{ghost_url}/ghost/api/admin/posts/{post_id}/?source=html"
+  body = {"posts": [{"html": html, "updated_at": updated_at}]}
+  ```
+  `?source=html` を付けると、GhostがHTMLを内部的にlexical形式に自動変換する。APIレスポンスの`html`は0のままだが、`lexical`フィールドに正しく格納され、Webページ上では正常に表示される
+- **影響範囲**: `nowpattern_publisher.py`（Deep Pattern/Speed Log投稿）、`nowpattern-ghost-post.py`（観測ログ投稿）の両方に影響。**全ての既存Ghost記事が空の本文で投稿されていた**
+- **教訓**:
+  1. Ghost 5.xでは`html`や`markdown`フィールドを直接送っても無視される。必ず`?source=html`を使う
+  2. APIレスポンスの`html`長さが0でも、`lexical`フィールドに内容があればWebページ上では正常表示される
+  3. Ghost公式ドキュメントよりもフォーラム（forum.ghost.org）の方が実践的な解決策が見つかる
+- **検索すべきだったキーワード**: `ghost admin api source=html`, `ghost 5 lexical post empty`, `ghost api html to lexical conversion`, `forum.ghost.org lexical html card`
+
 ---
 
-*最終更新: 2026-02-18 — 引用リポスト・RSS分析品質・Grok API変更を追加*
+*最終更新: 2026-02-18 — Ghost 5.x lexical空本文問題を追加*

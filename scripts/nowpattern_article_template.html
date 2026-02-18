@@ -1,0 +1,133 @@
+<!--
+  Nowpattern Ghost Article Template v3.0
+  2モード制: Deep Pattern (6,000-7,000語) + Speed Log (200-400語)
+  3社融合フォーマット: Semafor(分離) × Axios(Smart Brevity) × Stratechery(フレームワーク)
+
+  使い方:
+  - nowpattern_article_builder.py の build_deep_pattern_html() / build_speed_log_html() でHTML生成
+  - nowpattern_publisher.py の publish_deep_pattern() / publish_speed_log() でGhost投稿+インデックス更新
+  - このファイルは参照用テンプレート。実際のHTML生成は Python スクリプトが担当
+
+  CSS: Ghost Admin → Code injection → Site Header に .np-* クラスのCSSを注入済み
+  インラインスタイルもバックアップとして出力（Ghost互換）
+-->
+
+<!-- ================================================================== -->
+<!-- DEEP PATTERN テンプレート（6,000-7,000語）                          -->
+<!-- ================================================================== -->
+
+<!-- Section 1: Why it matters (Axios式) -->
+<blockquote class="np-why-box" style="border-left: 4px solid #c9a84c; padding: 12px 16px; margin: 0 0 24px 0; background: #f8f6f0;">
+  <strong style="color: #c9a84c;">Why it matters:</strong> {why_it_matters}
+</blockquote>
+
+<hr class="np-section-hr" style="border: none; border-top: 1px solid #e0dcd4; margin: 24px 0;">
+
+<!-- Section 2: THE NEWS (Semafor式 — 事実のみ, 400-600語) -->
+<h2 style="font-size: 1.3em; color: #121e30; margin-top: 32px;">What happened</h2>
+{facts_html}
+
+<hr class="np-section-hr" style="border: none; border-top: 1px solid #e0dcd4; margin: 24px 0;">
+
+<!-- Section 3: THE BIG PICTURE (Axios + Semafor KNOW MORE, 1,000-1,500語) -->
+<h2 style="font-size: 1.3em; color: #121e30; margin-top: 32px;">The Big Picture</h2>
+
+<h3 style="font-size: 1.1em; color: #121e30; margin-top: 24px;">歴史的文脈</h3>
+{history_html}
+
+<h3 style="font-size: 1.1em; color: #121e30; margin-top: 24px;">利害関係者マップ</h3>
+{stakeholder_html}
+
+<h3 style="font-size: 1.1em; color: #121e30; margin-top: 24px;">データで見る構造</h3>
+{data_points_html}
+
+<p><strong>The delta:</strong> <em>{delta}</em></p>
+
+<hr class="np-section-hr" style="border: none; border-top: 1px solid #e0dcd4; margin: 24px 0;">
+
+<!-- Section 4: NOW PATTERN (Nowpattern独自, 2,000-3,000語) -->
+<div class="np-pattern-box" style="background: #121e30; border-radius: 8px; padding: 24px 28px; margin: 24px 0;">
+  <h2 style="font-size: 1.3em; color: #c9a84c; margin: 0 0 12px 0; letter-spacing: 0.1em;">NOW PATTERN</h2>
+  <p class="np-pattern-tag" style="color: #c9a84c; font-size: 1.1em; font-weight: bold; margin: 0 0 16px 0;">
+    {dynamics_tags}
+  </p>
+  <p class="np-pattern-summary" style="color: #e0dcd4; font-style: italic; margin: 0 0 16px 0;">
+    {dynamics_summary}
+  </p>
+  <div class="np-pattern-body" style="color: #ffffff; line-height: 1.7;">
+    <!-- 力学タグ1: 引用→分析パターン ×1-2回 -->
+    <h3 style="color: #c9a84c; font-size: 1.1em; margin: 24px 0 12px 0;">{tag1_name}: {tag1_subheader}</h3>
+    {tag1_analysis_html}
+
+    <!-- 力学タグ2: 引用→分析パターン ×1-2回 -->
+    <h3 style="color: #c9a84c; font-size: 1.1em; margin: 24px 0 12px 0;">{tag2_name}: {tag2_subheader}</h3>
+    {tag2_analysis_html}
+
+    <!-- 力学の交差点 -->
+    <h3 style="color: #c9a84c; font-size: 1.1em; margin: 24px 0 12px 0;">力学の交差点</h3>
+    {dynamics_intersection_html}
+  </div>
+</div>
+
+<!-- 力学ダイアグラム (gen_dynamics_diagram.py で自動生成) -->
+<div class="np-diagram" style="text-align: center; margin: 24px 0;">
+  {diagram_html}
+</div>
+
+<hr class="np-section-hr" style="border: none; border-top: 1px solid #e0dcd4; margin: 24px 0;">
+
+<!-- Section 5: PATTERN HISTORY (Stratechery式, 800-1,200語) -->
+<h2 style="font-size: 1.3em; color: #121e30; margin-top: 32px;">Pattern History</h2>
+{pattern_history_html}
+
+<hr class="np-section-hr" style="border: none; border-top: 1px solid #e0dcd4; margin: 24px 0;">
+
+<!-- Section 6: WHAT'S NEXT (Axios式拡張, 600-1,000語) -->
+<h2 style="font-size: 1.3em; color: #121e30; margin-top: 32px;">What's Next</h2>
+{scenarios_html}
+
+<hr class="np-section-hr" style="border: none; border-top: 1px solid #e0dcd4; margin: 24px 0;">
+
+<!-- Section 7: FOOTER -->
+<div class="np-footer" style="font-size: 0.9em; color: #666; padding-top: 8px;">
+  <p><strong>Tags:</strong> {genre_tags} / {event_tags}</p>
+  <p><strong>NOW PATTERN:</strong> {dynamics_tags}</p>
+  {related_links_html}
+  {sources_html}
+</div>
+
+
+<!-- ================================================================== -->
+<!-- SPEED LOG テンプレート（200-400語）                                  -->
+<!-- ================================================================== -->
+<!--
+<blockquote class="np-why-box" style="border-left: 4px solid #c9a84c; padding: 12px 16px; margin: 0 0 24px 0; background: #f8f6f0;">
+  <strong style="color: #c9a84c;">Why it matters:</strong> {why_it_matters}
+</blockquote>
+
+<hr class="np-section-hr" style="border: none; border-top: 1px solid #e0dcd4; margin: 24px 0;">
+
+<h2 style="font-size: 1.3em; color: #121e30; margin-top: 32px;">What happened</h2>
+{facts_html}
+
+<hr class="np-section-hr" style="border: none; border-top: 1px solid #e0dcd4; margin: 24px 0;">
+
+<div class="np-pattern-box" style="background: #121e30; border-radius: 8px; padding: 24px 28px; margin: 24px 0;">
+  <h2 style="font-size: 1.3em; color: #c9a84c; margin: 0 0 12px 0; letter-spacing: 0.1em;">NOW PATTERN</h2>
+  <p class="np-pattern-tag" style="color: #c9a84c; font-size: 1.1em; font-weight: bold; margin: 0 0 16px 0;">{dynamics_tag}</p>
+  <p class="np-pattern-body" style="color: #ffffff; line-height: 1.7;">{dynamics_one_liner}</p>
+</div>
+
+<hr class="np-section-hr" style="border: none; border-top: 1px solid #e0dcd4; margin: 24px 0;">
+
+<h2 style="font-size: 1.3em; color: #121e30; margin-top: 32px;">What's Next</h2>
+<p><strong>基本シナリオ:</strong> {base_scenario}</p>
+
+<hr class="np-section-hr" style="border: none; border-top: 1px solid #e0dcd4; margin: 24px 0;">
+
+<div class="np-footer" style="font-size: 0.9em; color: #666; padding-top: 8px;">
+  <p><strong>Tags:</strong> {genre_tags} / {event_tags}</p>
+  <p><strong>Deep Pattern:</strong> <a href="{deep_pattern_url}" style="color: #c9a84c;">詳細分析はこちら</a></p>
+  <p><strong>Source:</strong> <a href="{source_url}" style="color: #c9a84c;">{source_url}</a></p>
+</div>
+-->

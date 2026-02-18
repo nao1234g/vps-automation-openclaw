@@ -114,6 +114,9 @@
 | X「duplicate content」403 | 同じ内容を短期間に2回投稿 | キューの`tweet_url`フィールドで重複チェック。テスト後は内容を変えて再試行 |
 | nowpattern Ghost API 403 | GhostはHTTP→HTTPSリダイレクト、VPS自身がdomain解決不能 | `/etc/hosts`に`127.0.0.1 nowpattern.com`追加、HTTPSでアクセス |
 | Ghost API `requests.get`でSSLエラー | VPSのSSL証明書がlocalhostに発行されていない | `verify=False`と`urllib3.disable_warnings()`を追加 |
+| Ghost Settings API 501 | Integration APIではSettings PUT不可（Ghost 5.130） | SQLite直接更新（`ghost.db`）+ Ghost再起動 |
+| `requests`でGhost API 403 | リダイレクト時にAuthヘッダーが除去される | `allow_redirects=False`またはSQLite直接方式 |
+| Ghost投稿の本文が空 | Ghost 5.xはhtml/markdownフィールドを無視しlexical形式のみ | URLに`?source=html`を追加（GhostがHTMLをlexicalに自動変換） |
 
 詳細な症状・解決手順・教訓・検索キーワードは [docs/KNOWN_MISTAKES.md](docs/KNOWN_MISTAKES.md) を参照してください。
 
@@ -233,6 +236,17 @@ User (Telegram) → @claude_brain_nn_bot  → neo-telegram.service (VPS)
   - Admin API: AutoPublisher integration設定済み（`/opt/cron-env.sh`のNOWPATTERN_GHOST_ADMIN_API_KEY）
   - 自動投稿: `nowpattern-ghost-post.py` 稼働中（AISA記事 → Nowpattern観測ログ形式で投稿）
   - `/etc/hosts`に`127.0.0.1 nowpattern.com`追加済み（VPS内部からのAPI呼び出し用）
+  - **2モード制（v3.0、2026-02-18）**:
+    - Deep Pattern: 6,000-7,000語の深層分析（Stratechery型）
+    - Speed Log: 200-400語の速報（Axios型）
+    - 3層タクソノミー: ジャンル(12) × イベントタグ(22) × 力学タグ(12)
+  - **Nowpatternスクリプト群**:
+    - `scripts/nowpattern_article_builder.py` — v3.0 HTML生成（Deep Pattern + Speed Log）
+    - `scripts/nowpattern_publisher.py` — Ghost投稿 + 記事インデックス管理
+    - `scripts/gen_dynamics_diagram.py` — 力学ダイアグラムSVG自動生成（4種: flow/before_after/layers/matrix）
+    - `scripts/nowpattern_article_index.json` — 自己参照ナレッジグラフ（力学×ジャンル逆引きインデックス）
+    - `scripts/nowpattern_article_template.html` — v3.0テンプレート（2モード対応）
+    - `docs/NEO_INSTRUCTIONS_V2.md` — NEO執筆指示書v2.0（17セクション、2モード制）
 - **N8N**: 13ワークフロー稼働中（AISA自動化パイプライン + Morning Briefing）+ Neo Auto-Response（deactivated、予備）
 - **AISAコンテンツパイプライン v4（2026-02-18 完成）**:
   ```
@@ -659,4 +673,4 @@ VPSのリソース（ブラウザ、メール、API）を最大限に活用し�
 
 ---
 
-*最終更新: 2026-02-18 — nowpattern.com Ghost CMS稼働（SSL取得・Admin API接続・自動投稿5件確認）、GLM-5設定完了（Jarvis/Alice/Luna）、Ghost staffDeviceVerification無効化、/etc/hostsにnowpattern.com追加*
+*最終更新: 2026-02-18 — Nowpattern 2モード制v3.0完成（Deep Pattern 6,000-7,000語 + Speed Log 200-400語）、builder/publisher分離、力学ダイアグラムSVG生成、自己参照ナレッジグラフ、NEO_INSTRUCTIONS_V2.md 17セクション完成*
