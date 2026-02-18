@@ -70,12 +70,13 @@ EDGE_COLORS = {
 # SVG helpers
 # ---------------------------------------------------------------------------
 
-def _svg_header(width: int = 800, height: int = 500) -> str:
+def _svg_header(width: int = 960, height: int = 680) -> str:
+    # width="100%" + viewBox でGhost記事幅いっぱいにレスポンシブ表示
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
-        f'width="{width}" height="{height}" '
-        f'style="font-family: \'Noto Sans CJK JP\', \'Noto Sans\', sans-serif;">\n'
-        f'  <rect width="{width}" height="{height}" fill="{COLORS["bg"]}"/>\n'
+        f'width="100%" style="max-width:100%; display:block; '
+        f'font-family: \'Noto Sans CJK JP\', \'Noto Sans\', sans-serif;">\n'
+        f'  <rect width="{width}" height="{height}" fill="{COLORS["bg"]}" rx="4"/>\n'
     )
 
 
@@ -147,16 +148,19 @@ def _svg_arrow(x1: float, y1: float, x2: float, y2: float,
 # ---------------------------------------------------------------------------
 
 def _generate_flow(title: str, nodes: list[dict], edges: list[dict],
-                   width: int = 960, height: int = 600) -> str:
+                   width: int = 960, height: int = 680) -> str:
     """フロー図（箱+矢印）を生成"""
+    LEGEND_H = 80  # 下部凡例エリアの高さ
+    chart_h = height - LEGEND_H  # ノード配置に使える縦幅
+
     svg = _svg_header(width, height)
 
     # Title
-    svg += _svg_text(width / 2, 36, title, fill=COLORS["navy"], size=20, bold=True)
+    svg += _svg_text(width / 2, 38, title, fill=COLORS["navy"], size=22, bold=True)
 
     # Position nodes in a layout
     n = len(nodes)
-    node_w, node_h = 160, 70
+    node_w, node_h = 170, 74
     positions = {}
 
     if n <= 3:
@@ -164,18 +168,18 @@ def _generate_flow(title: str, nodes: list[dict], edges: list[dict],
         spacing = width / (n + 1)
         for i, node in enumerate(nodes):
             x = spacing * (i + 1) - node_w / 2
-            y = height / 2 - node_h / 2
+            y = chart_h / 2 - node_h / 2 + 20
             positions[node["id"]] = (x + node_w / 2, y + node_h / 2)
             colors = NODE_COLORS.get(node.get("type", "neutral"), NODE_COLORS["neutral"])
             svg += _svg_rounded_rect(x, y, node_w, node_h, colors["fill"], colors["stroke"])
-            svg += _svg_text(x + node_w / 2, y + node_h / 2 + 5, node["label"],
-                           fill=colors["text"], size=13, bold=True)
+            svg += _svg_text(x + node_w / 2, y + node_h / 2 + 6, node["label"],
+                           fill=colors["text"], size=15, bold=True)
     elif n <= 6:
         # Two-row layout
         top_count = (n + 1) // 2
         bot_count = n - top_count
-        top_y = height / 2 - 80
-        bot_y = height / 2 + 40
+        top_y = chart_h * 0.30
+        bot_y = chart_h * 0.60
         for i in range(top_count):
             node = nodes[i]
             spacing = width / (top_count + 1)
@@ -183,8 +187,8 @@ def _generate_flow(title: str, nodes: list[dict], edges: list[dict],
             positions[node["id"]] = (x + node_w / 2, top_y + node_h / 2)
             colors = NODE_COLORS.get(node.get("type", "neutral"), NODE_COLORS["neutral"])
             svg += _svg_rounded_rect(x, top_y, node_w, node_h, colors["fill"], colors["stroke"])
-            svg += _svg_text(x + node_w / 2, top_y + node_h / 2 + 5, node["label"],
-                           fill=colors["text"], size=12, bold=True)
+            svg += _svg_text(x + node_w / 2, top_y + node_h / 2 + 6, node["label"],
+                           fill=colors["text"], size=14, bold=True)
         for i in range(bot_count):
             node = nodes[top_count + i]
             spacing = width / (bot_count + 1)
@@ -192,14 +196,14 @@ def _generate_flow(title: str, nodes: list[dict], edges: list[dict],
             positions[node["id"]] = (x + node_w / 2, bot_y + node_h / 2)
             colors = NODE_COLORS.get(node.get("type", "neutral"), NODE_COLORS["neutral"])
             svg += _svg_rounded_rect(x, bot_y, node_w, node_h, colors["fill"], colors["stroke"])
-            svg += _svg_text(x + node_w / 2, bot_y + node_h / 2 + 5, node["label"],
-                           fill=colors["text"], size=12, bold=True)
+            svg += _svg_text(x + node_w / 2, bot_y + node_h / 2 + 6, node["label"],
+                           fill=colors["text"], size=14, bold=True)
     else:
         # Grid layout
         cols = 4
         rows = (n + cols - 1) // cols
         cell_w = width / (cols + 1)
-        cell_h = (height - 80) / (rows + 1)
+        cell_h = (chart_h - 60) / (rows + 1)
         for i, node in enumerate(nodes):
             r, c = divmod(i, cols)
             x = cell_w * (c + 1) - node_w / 2
@@ -207,8 +211,8 @@ def _generate_flow(title: str, nodes: list[dict], edges: list[dict],
             positions[node["id"]] = (x + node_w / 2, y + node_h / 2)
             colors = NODE_COLORS.get(node.get("type", "neutral"), NODE_COLORS["neutral"])
             svg += _svg_rounded_rect(x, y, node_w, node_h, colors["fill"], colors["stroke"])
-            svg += _svg_text(x + node_w / 2, y + node_h / 2 + 5, node["label"],
-                           fill=colors["text"], size=11, bold=True)
+            svg += _svg_text(x + node_w / 2, y + node_h / 2 + 6, node["label"],
+                           fill=colors["text"], size=13, bold=True)
 
     # Draw edges
     for edge in edges:
@@ -219,24 +223,66 @@ def _generate_flow(title: str, nodes: list[dict], edges: list[dict],
             svg += _svg_arrow(src[0], src[1], dst[0], dst[1],
                             color=color, label=edge.get("label", ""))
 
-    # Legend
-    legend_y = height - 30
-    legend_items = [
-        ("power", "支配者", NODE_COLORS["power"]["fill"]),
-        ("affected", "影響を受ける側", NODE_COLORS["affected"]["stroke"]),
-        ("regulator", "規制者", NODE_COLORS["regulator"]["fill"]),
+    # ─── Legend box (bottom) ───────────────────────────────────────────────
+    legend_top = height - LEGEND_H
+    # 背景
+    svg += (
+        f'  <rect x="0" y="{legend_top}" width="{width}" height="{LEGEND_H}" '
+        f'fill="#f4f2ee" rx="0"/>\n'
+        f'  <line x1="0" y1="{legend_top}" x2="{width}" y2="{legend_top}" '
+        f'stroke="{COLORS["light_gray"]}" stroke-width="1"/>\n'
+    )
+
+    # ラベル「凡例」
+    svg += _svg_text(18, legend_top + 20, "凡例", fill=COLORS["navy"], size=13,
+                     anchor="start", bold=True)
+
+    # Row 1: ノードタイプ (塗り色の四角 + 名称)
+    node_legend = [
+        ("支配者", NODE_COLORS["power"]["fill"], NODE_COLORS["power"]["text"]),
+        ("影響を受ける側", NODE_COLORS["affected"]["stroke"], COLORS["mid_gray"]),
+        ("規制者・第三者", NODE_COLORS["regulator"]["fill"], "#ffffff"),
     ]
-    for i, (_, label, color) in enumerate(legend_items):
-        lx = 30 + i * 200
-        svg += f'  <rect x="{lx}" y="{legend_y - 8}" width="12" height="12" rx="2" fill="{color}"/>\n'
-        svg += _svg_text(lx + 20, legend_y + 3, label, fill=COLORS["mid_gray"], size=11, anchor="start")
+    row1_y = legend_top + 22
+    step = int(width * 0.28)
+    start_x = 70
+    for i, (label, bg, fg) in enumerate(node_legend):
+        lx = start_x + i * step
+        svg += (
+            f'  <rect x="{lx}" y="{row1_y - 10}" width="18" height="18" '
+            f'rx="3" fill="{bg}" stroke="{COLORS["light_gray"]}" stroke-width="1"/>\n'
+        )
+        # bg が黒系なら白テキスト
+        svg += _svg_text(lx + 10, row1_y + 2, fg if fg != COLORS["mid_gray"] else "", fill=fg, size=9)
+        svg += _svg_text(lx + 24, row1_y + 3, label, fill=COLORS["navy"], size=13, anchor="start")
+
+    # Row 2: エッジタイプ (色線 + 意味)
+    edge_legend_items = [
+        ("支配・制御", EDGE_COLORS["dominance"]),
+        ("取り込み・操作", EDGE_COLORS["capture"]),
+        ("規制・法的圧力", EDGE_COLORS["regulation"]),
+        ("抵抗・反発", EDGE_COLORS["resistance"]),
+    ]
+    row2_y = legend_top + 55
+    step2 = int(width * 0.22)
+    start_x2 = 70
+    for i, (label, color) in enumerate(edge_legend_items):
+        lx = start_x2 + i * step2
+        # 矢印サンプル線
+        svg += (
+            f'  <line x1="{lx}" y1="{row2_y - 4}" x2="{lx + 22}" y2="{row2_y - 4}" '
+            f'stroke="{color}" stroke-width="3"/>\n'
+            f'  <polygon points="{lx + 22},{row2_y - 4} {lx + 15},{row2_y - 8} {lx + 15},{row2_y}" '
+            f'fill="{color}"/>\n'
+        )
+        svg += _svg_text(lx + 28, row2_y, label, fill=COLORS["navy"], size=13, anchor="start")
 
     svg += _svg_footer()
     return svg
 
 
 def _generate_before_after(title: str, nodes: list[dict], edges: list[dict],
-                            width: int = 960, height: int = 600) -> str:
+                            width: int = 960, height: int = 680) -> str:
     """Before/After比較図を生成"""
     svg = _svg_header(width, height)
 
@@ -292,7 +338,7 @@ def _generate_before_after(title: str, nodes: list[dict], edges: list[dict],
 
 
 def _generate_layers(title: str, nodes: list[dict], edges: list[dict],
-                     width: int = 960, height: int = 600) -> str:
+                     width: int = 960, height: int = 680) -> str:
     """レイヤー図を生成"""
     svg = _svg_header(width, height)
     svg += _svg_text(width / 2, 30, title, fill=COLORS["navy"], size=18, bold=True)
@@ -314,7 +360,7 @@ def _generate_layers(title: str, nodes: list[dict], edges: list[dict],
 
 
 def _generate_matrix(title: str, nodes: list[dict], edges: list[dict],
-                     width: int = 960, height: int = 600) -> str:
+                     width: int = 960, height: int = 680) -> str:
     """2×2マトリクスを生成"""
     svg = _svg_header(width, height)
     svg += _svg_text(width / 2, 30, title, fill=COLORS["navy"], size=18, bold=True)
@@ -369,7 +415,7 @@ def generate_dynamics_diagram(
     edges: list[dict] | None = None,
     output_path: str = "",
     width: int = 960,
-    height: int = 600,
+    height: int = 680,
 ) -> str:
     """力学ダイアグラムSVGを生成する
 
