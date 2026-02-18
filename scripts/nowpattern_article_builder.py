@@ -328,8 +328,11 @@ def build_deep_pattern_html(
     source_urls: list[tuple[str, str]] | None = None,
     related_articles: list[tuple[str, str]] | None = None,
     diagram_html: str = "",
+    english_html: str = "",
 ) -> str:
-    """Deep Pattern記事のHTMLを生成する（6,000-7,000語対応）"""
+    """Deep Pattern記事のHTMLを生成する（6,000-7,000語対応）
+    english_html を指定すると記事上部に日英切り替えボタンが追加される。
+    """
 
     facts_html = _build_facts_html(facts)
     stakeholder_html = _build_stakeholder_html(stakeholder_map or [])
@@ -355,7 +358,39 @@ def build_deep_pattern_html(
 
     tag_badges_html = _build_tag_badges(genre_tags, event_tags, dynamics_tags)
 
-    template = f"""<!-- Tag Badges -->
+    # 日英切り替えボタン (english_html が提供された場合のみ表示)
+    lang_toggle_html = ""
+    en_block_html = ""
+    if english_html:
+        lang_toggle_html = """<!-- Language Toggle -->
+<div id="np-lang-toggle" style="text-align:right; margin-bottom:16px;">
+  <button onclick="npToggleLang()" id="np-lang-btn"
+    style="background:none; border:1px solid #e0dcd4; padding:6px 18px; border-radius:20px; cursor:pointer; font-size:0.85em; color:#555; font-weight:600; letter-spacing:0.05em;">
+    🇺🇸 Read in English
+  </button>
+</div>
+<script>
+function npToggleLang(){
+  var ja=document.getElementById('np-content-ja');
+  var en=document.getElementById('np-content-en');
+  var btn=document.getElementById('np-lang-btn');
+  if(en.style.display==='none'||en.style.display===''){
+    ja.style.display='none'; en.style.display='block';
+    btn.textContent='🇯🇵 日本語で読む';
+  } else {
+    ja.style.display='block'; en.style.display='none';
+    btn.textContent='🇺🇸 Read in English';
+  }
+}
+</script>"""
+        en_block_html = f'\n<div id="np-content-en" style="display:none;">\n{english_html}\n</div>'
+
+    ja_open = '<div id="np-content-ja">' if english_html else ''
+    ja_close = '</div>' if english_html else ''
+
+    template = f"""{lang_toggle_html}
+{ja_open}
+<!-- Tag Badges -->
 <div style="margin: 0 0 20px 0; padding-bottom: 12px; border-bottom: 1px solid #e0dcd4;">
 {tag_badges_html}
 </div>
@@ -423,7 +458,9 @@ def build_deep_pattern_html(
   <p><strong>NOW PATTERN:</strong> {dynamics_tags}</p>
   {related_html}
   {sources_html}
-</div>"""
+</div>
+{ja_close}
+{en_block_html}"""
 
     return template
 

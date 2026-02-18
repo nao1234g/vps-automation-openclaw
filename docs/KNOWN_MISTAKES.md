@@ -1113,4 +1113,65 @@
 
 ---
 
-*最終更新: 2026-02-18 — Ghost 5.x lexical空本文問題を追加*
+## Nowpattern記事UIデバッグ（2026-02-18 セッション2）
+
+### ミス履歴図（今回のセッションで繰り返したパターン）
+
+```
+[ミス1] VPS同期がパッチを上書き
+   原因: ローカル版(unpatched)をVPSに同期 → 以前のパッチが消える
+   教訓: 同期前に「VPS側に追加パッチがあるか」確認する
+      ↓
+[ミス2] Ghost再起動直後にAPIを呼び出す
+   原因: CSS注入→Ghost再起動→即API呼び出し → 空レスポンス(JSONDecodeError)
+   教訓: systemctl restart後は5秒待ってからAPIを呼ぶ
+      ↓
+[ミス3] scenariosのデータ形式がdict vs tuple
+   原因: fix_hormuz_lexical.pyがdict形式で渡したが、builderはtuple期待
+   症状: What's Next が "label（確率: probability）" とプレースホルダー表示
+   教訓: builderの関数シグネチャをよく読んでから呼び出す
+      ↓
+[ミス4] dynamics_sectionsのキーが"explanation"vs"lead"
+   原因: fix_hormuz_lexical.pyが"explanation"キーを使ったが、builderは"lead"期待
+   症状: NOW PATTERNボックス内が "..." のみ表示
+   教訓: builderが期待するdict keyを確認してから渡す
+      ↓
+[ミス5] _build_dynamics_section_htmlのlead重複表示バグ
+   原因: f'{lead[:20]}...</strong> {lead}' で先頭20文字+全文を両方出力
+   症状: 本文が「イランは核交渉の行き詰まり...イランは核交渉の行き詰まり（全文）」と重複
+   教訓: テンプレート文字列でf-string内変数を複数回使う場合は重複表示に注意
+```
+
+### 2026-02-18: VPS同期がローカルパッチを上書きする
+- **症状**: VPSにsyncした後、Ghost記事のタグバッジが消えた（旧スタイルに戻った）
+- **根本原因**: `sync-nowpattern-vps.ps1` がローカル版を無条件に上書きする。ローカル版には `patch_tag_*.py` が適用されていなかった
+- **誤ったアプローチ**: patchスクリプトをVPS上で毎回手動実行
+- **正しい解決策**: ローカルの `nowpattern_article_builder.py` に全パッチを統合してから同期する（今回実施）
+- **教訓**: パッチスクリプト（`patch_*.py`）は一時的なもの。本体ファイルに統合して「ローカルが正」の状態にすること
+- **検索すべきだったキーワード**: (なし。設計判断の問題)
+
+### 2026-02-18: Ghost再起動直後のAPIコールでJSONDecodeError
+- **症状**: `python3 fix_hormuz_lexical.py` を実行するとJSONDecodeError（空レスポンス）
+- **根本原因**: `systemctl restart ghost-nowpattern` 直後はGhostが起動中で、APIが空レスポンスを返す
+- **誤ったアプローチ**: 即座に再試行（同じエラー）
+- **正しい解決策**: Ghost再起動後に `sleep 3` (最低5秒) 待ってからAPIを呼ぶ
+- **教訓**: `systemctl restart <service>` 後は必ず `sleep 5` してから後続処理を実行すること
+- **検索すべきだったキーワード**: (Ghost起動時間の問題、汎用的な教訓)
+
+### 2026-02-18: builderへのデータ渡し形式ミス（dict vs tuple）
+- **症状**:
+  - `What's Next` が `label（確率: probability）` と表示（プレースホルダーのまま）
+  - `NOW PATTERN` ボックスが `...` のみ表示
+- **根本原因**:
+  - `_build_scenarios_html` はtupleを期待するが、`fix_hormuz_lexical.py` はdict形式で渡した
+  - `_build_dynamics_section_html` は `"lead"` キーを期待するが、`"explanation"` キーで渡した
+- **誤ったアプローチ**: 症状を見てCSSやHTMLの問題と思い込んだ
+- **正しい解決策**:
+  - builderを修正してdict/tuple両対応に（今回実施）
+  - `"explanation"` キーを `"lead"` としてもフォールバック対応（今回実施）
+- **教訓**: builder関数のシグネチャとデータ形式を呼び出し側と合わせること。builderを修正する際は後方互換性も確認
+- **検索すべきだったキーワード**: (コードを読めば分かる問題)
+
+---
+
+*最終更新: 2026-02-18 セッション2 — Nowpatternミス履歴図 + VPS同期/Ghost再起動/データ形式ミスを追加*

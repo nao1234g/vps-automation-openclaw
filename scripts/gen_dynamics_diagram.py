@@ -56,11 +56,13 @@ NODE_COLORS = {
 }
 
 EDGE_COLORS = {
-    "dominance": "#c0392b",
-    "capture": "#c9a84c",
-    "regulation": "#27ae60",
-    "neutral": "#888888",
-    "flow": "#121e30",
+    "dominance": "#c9a84c",   # gold — 支配・制御
+    "capture": "#FF1A75",     # pink — 取り込み・操作
+    "regulation": "#27ae60",  # green — 規制・法的圧力
+    "feedback": "#c9a84c",    # gold — フィードバックループ
+    "resistance": "#b0a090",  # muted — 抵抗・反発
+    "neutral": "#888888",     # gray — 中立
+    "flow": "#121e30",        # navy — 基本フロー
 }
 
 
@@ -128,7 +130,7 @@ def _svg_arrow(x1: float, y1: float, x2: float, y2: float,
 
     result = (
         f'  <line x1="{x1 + dx}" y1="{y1 + dy}" x2="{ax2}" y2="{ay2}" '
-        f'stroke="{color}" stroke-width="2"/>\n'
+        f'stroke="{color}" stroke-width="2.5"/>\n'
         f'  <polygon points="{ax2},{ay2} {lx},{ly} {rx},{ry}" fill="{color}"/>\n'
     )
 
@@ -145,16 +147,16 @@ def _svg_arrow(x1: float, y1: float, x2: float, y2: float,
 # ---------------------------------------------------------------------------
 
 def _generate_flow(title: str, nodes: list[dict], edges: list[dict],
-                   width: int = 800, height: int = 500) -> str:
+                   width: int = 960, height: int = 600) -> str:
     """フロー図（箱+矢印）を生成"""
     svg = _svg_header(width, height)
 
     # Title
-    svg += _svg_text(width / 2, 30, title, fill=COLORS["navy"], size=18, bold=True)
+    svg += _svg_text(width / 2, 36, title, fill=COLORS["navy"], size=20, bold=True)
 
     # Position nodes in a layout
     n = len(nodes)
-    node_w, node_h = 140, 60
+    node_w, node_h = 160, 70
     positions = {}
 
     if n <= 3:
@@ -234,7 +236,7 @@ def _generate_flow(title: str, nodes: list[dict], edges: list[dict],
 
 
 def _generate_before_after(title: str, nodes: list[dict], edges: list[dict],
-                            width: int = 800, height: int = 500) -> str:
+                            width: int = 960, height: int = 600) -> str:
     """Before/After比較図を生成"""
     svg = _svg_header(width, height)
 
@@ -290,7 +292,7 @@ def _generate_before_after(title: str, nodes: list[dict], edges: list[dict],
 
 
 def _generate_layers(title: str, nodes: list[dict], edges: list[dict],
-                     width: int = 800, height: int = 500) -> str:
+                     width: int = 960, height: int = 600) -> str:
     """レイヤー図を生成"""
     svg = _svg_header(width, height)
     svg += _svg_text(width / 2, 30, title, fill=COLORS["navy"], size=18, bold=True)
@@ -312,7 +314,7 @@ def _generate_layers(title: str, nodes: list[dict], edges: list[dict],
 
 
 def _generate_matrix(title: str, nodes: list[dict], edges: list[dict],
-                     width: int = 800, height: int = 500) -> str:
+                     width: int = 960, height: int = 600) -> str:
     """2×2マトリクスを生成"""
     svg = _svg_header(width, height)
     svg += _svg_text(width / 2, 30, title, fill=COLORS["navy"], size=18, bold=True)
@@ -366,8 +368,8 @@ def generate_dynamics_diagram(
     nodes: list[dict] | None = None,
     edges: list[dict] | None = None,
     output_path: str = "",
-    width: int = 800,
-    height: int = 500,
+    width: int = 960,
+    height: int = 600,
 ) -> str:
     """力学ダイアグラムSVGを生成する
 
