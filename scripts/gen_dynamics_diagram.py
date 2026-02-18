@@ -56,13 +56,13 @@ NODE_COLORS = {
 }
 
 EDGE_COLORS = {
-    "dominance": "#c9a84c",   # gold — 支配・制御
-    "capture": "#FF1A75",     # pink — 取り込み・操作
-    "regulation": "#27ae60",  # green — 規制・法的圧力
-    "feedback": "#c9a84c",    # gold — フィードバックループ
-    "resistance": "#b0a090",  # muted — 抵抗・反発
-    "neutral": "#888888",     # gray — 中立
-    "flow": "#121e30",        # navy — 基本フロー
+    "dominance":  "#e07b00",   # orange-gold — 支配・制御（他と明確に区別）
+    "capture":    "#FF1A75",   # bright pink — 取り込み・操作
+    "regulation": "#16a34a",   # vivid green — 規制・法的圧力
+    "feedback":   "#7c3aed",   # purple — フィードバックループ
+    "resistance": "#1d4ed8",   # strong blue — 抵抗・反発（金と全然違う）
+    "neutral":    "#6b7280",   # gray — 中立
+    "flow":       "#121e30",   # navy — 基本フロー
 }
 
 
@@ -243,42 +243,56 @@ def _generate_flow(title: str, nodes: list[dict], edges: list[dict],
     svg += _svg_text(18, legend_top + 24, "凡例", fill=COLORS["navy"], size=14,
                      anchor="start", bold=True)
 
-    # Row 1: ノードタイプ（色付き四角＋シンプルな名称のみ）
-    node_legend = [
-        ("支配者", NODE_COLORS["power"]["fill"]),
-        ("影響を受ける側", NODE_COLORS["affected"]["fill"]),
-        ("規制者・第三者", NODE_COLORS["regulator"]["fill"]),
-    ]
+    # Row 1: ノードタイプ（使われているタイプのみ動的表示）
+    _NODE_LEGEND_LABELS = {
+        "power": "支配者", "affected": "影響を受ける側",
+        "regulator": "規制者・第三者", "neutral": "中立",
+    }
+    seen_nt: set = set()
+    node_legend = []
+    for nd in nodes:
+        t = nd.get("type", "neutral")
+        if t in _NODE_LEGEND_LABELS and t not in seen_nt:
+            seen_nt.add(t)
+            node_legend.append((_NODE_LEGEND_LABELS[t], NODE_COLORS[t]["fill"]))
     row1_y = legend_top + 26
-    step = int(width * 0.28)
-    start_x = 70
-    for i, (label, bg) in enumerate(node_legend):
-        lx = start_x + i * step
-        svg += (
-            f'  <rect x="{lx}" y="{row1_y - 10}" width="20" height="20" '
-            f'rx="3" fill="{bg}" stroke="{COLORS["light_gray"]}" stroke-width="1.5"/>\n'
-        )
-        svg += _svg_text(lx + 28, row1_y + 4, label, fill=COLORS["navy"], size=13, anchor="start")
+    if node_legend:
+        step = min(int(width * 0.28), (width - 80) // len(node_legend))
+        start_x = 70
+        for i, (label, bg) in enumerate(node_legend):
+            lx = start_x + i * step
+            svg += (
+                f'  <rect x="{lx}" y="{row1_y - 10}" width="20" height="20" '
+                f'rx="3" fill="{bg}" stroke="{COLORS["light_gray"]}" stroke-width="1.5"/>\n'
+            )
+            svg += _svg_text(lx + 28, row1_y + 4, label, fill=COLORS["navy"], size=13, anchor="start")
 
-    # Row 2: エッジタイプ（矢印サンプル＋意味）
-    edge_legend_items = [
-        ("支配・制御", EDGE_COLORS["dominance"]),
-        ("取り込み・操作", EDGE_COLORS["capture"]),
-        ("規制・法的圧力", EDGE_COLORS["regulation"]),
-        ("抵抗・反発", EDGE_COLORS["resistance"]),
-    ]
+    # Row 2: エッジタイプ（使われているタイプのみ動的表示）
+    _EDGE_LEGEND_LABELS = {
+        "dominance": "支配・制御", "capture": "取り込み・操作",
+        "regulation": "規制・法的圧力", "feedback": "フィードバック",
+        "resistance": "抵抗・反発", "flow": "情報フロー",
+    }
+    seen_et: set = set()
+    edge_legend_items = []
+    for eg in edges:
+        t = eg.get("type", "neutral")
+        if t in _EDGE_LEGEND_LABELS and t not in seen_et:
+            seen_et.add(t)
+            edge_legend_items.append((_EDGE_LEGEND_LABELS[t], EDGE_COLORS[t]))
     row2_y = legend_top + 64
-    step2 = int(width * 0.22)
-    start_x2 = 70
-    for i, (label, color) in enumerate(edge_legend_items):
-        lx = start_x2 + i * step2
-        svg += (
-            f'  <line x1="{lx}" y1="{row2_y - 4}" x2="{lx + 24}" y2="{row2_y - 4}" '
-            f'stroke="{color}" stroke-width="3"/>\n'
-            f'  <polygon points="{lx + 24},{row2_y - 4} {lx + 16},{row2_y - 9} {lx + 16},{row2_y + 1}" '
-            f'fill="{color}"/>\n'
-        )
-        svg += _svg_text(lx + 30, row2_y + 1, label, fill=COLORS["navy"], size=13, anchor="start")
+    if edge_legend_items:
+        step2 = min(int(width * 0.22), (width - 80) // len(edge_legend_items))
+        start_x2 = 70
+        for i, (label, color) in enumerate(edge_legend_items):
+            lx = start_x2 + i * step2
+            svg += (
+                f'  <line x1="{lx}" y1="{row2_y - 4}" x2="{lx + 24}" y2="{row2_y - 4}" '
+                f'stroke="{color}" stroke-width="3"/>\n'
+                f'  <polygon points="{lx + 24},{row2_y - 4} {lx + 16},{row2_y - 9} {lx + 16},{row2_y + 1}" '
+                f'fill="{color}"/>\n'
+            )
+            svg += _svg_text(lx + 30, row2_y + 1, label, fill=COLORS["navy"], size=13, anchor="start")
 
     svg += _svg_footer()
     return svg

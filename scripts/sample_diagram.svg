@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 760" width="100%" style="max-width:100%; display:block; font-family: 'Noto Sans CJK JP', 'Noto Sans', sans-serif;">
+  <rect width="960" height="760" fill="#ffffff" rx="4"/>
+  <text x="480.0" y="44" text-anchor="middle" fill="#121e30" font-size="26" font-weight="bold">プラットフォーム支配 × 規制の捕獲</text>
+  <rect x="140.0" y="300.0" width="200" height="90" rx="8" fill="#121e30" stroke="#c9a84c" stroke-width="2"/>
+  <text x="240.0" y="341.2" text-anchor="middle" fill="#c9a84c" font-size="18" font-weight="bold">Apple</text>
+  <text x="240.0" y="362.8" text-anchor="middle" fill="#c9a84c" font-size="18" font-weight="bold">(App Store)</text>
+  <rect x="380.0" y="300.0" width="200" height="90" rx="8" fill="#f8f6f0" stroke="#e0dcd4" stroke-width="2"/>
+  <text x="480.0" y="341.2" text-anchor="middle" fill="#121e30" font-size="18" font-weight="bold">開発者</text>
+  <text x="480.0" y="362.8" text-anchor="middle" fill="#121e30" font-size="18" font-weight="bold">(200万人)</text>
+  <rect x="620.0" y="300.0" width="200" height="90" rx="8" fill="#27ae60" stroke="#1e8449" stroke-width="2"/>
+  <text x="720.0" y="341.2" text-anchor="middle" fill="#ffffff" font-size="18" font-weight="bold">EU</text>
+  <text x="720.0" y="362.8" text-anchor="middle" fill="#ffffff" font-size="18" font-weight="bold">(DMA)</text>
+  <line x1="255.0" y1="345.0" x2="465.0" y2="345.0" stroke="#c9a84c" stroke-width="2.5"/>
+  <polygon points="465.0,345.0 455.78939005997114,348.89418342308653 455.78939005997114,341.10581657691347" fill="#c9a84c"/>
+  <rect x="250.0" y="321.0" width="100" height="24" fill="white" opacity="0.94" rx="4" stroke="#c9a84c" stroke-width="1"/>
+  <text x="300.0" y="342.0" text-anchor="middle" fill="#c9a84c" font-size="14" >30%手数料</text>
+  <line x1="255.0" y1="345.0" x2="705.0" y2="345.0" stroke="#FF1A75" stroke-width="2.5"/>
+  <polygon points="705.0,345.0 695.7893900599712,348.89418342308653 695.7893900599712,341.10581657691347" fill="#FF1A75"/>
+  <rect x="317.0" y="321.0" width="86" height="24" fill="white" opacity="0.94" rx="4" stroke="#FF1A75" stroke-width="1"/>
+  <text x="360.0" y="342.0" text-anchor="middle" fill="#FF1A75" font-size="14" >ロビイング</text>
+  <line x1="705.0" y1="345.0" x2="255.0" y2="345.0" stroke="#27ae60" stroke-width="2.5"/>
+  <polygon points="255.0,345.0 264.21060994002886,341.10581657691347 264.21060994002886,348.89418342308653" fill="#27ae60"/>
+  <rect x="536.0" y="321.0" width="128" height="24" fill="white" opacity="0.94" rx="4" stroke="#27ae60" stroke-width="1"/>
+  <text x="600.0" y="342.0" text-anchor="middle" fill="#27ae60" font-size="14" >制裁金€1.8B</text>
+  <rect x="0" y="670" width="960" height="90" fill="#f4f2ee" rx="0"/>
+  <line x1="0" y1="670" x2="960" y2="670" stroke="#e0dcd4" stroke-width="1"/>
+  <text x="18" y="694" text-anchor="start" fill="#121e30" font-size="14" font-weight="bold">凡例</text>
+  <rect x="70" y="686" width="20" height="20" rx="3" fill="#121e30" stroke="#e0dcd4" stroke-width="1.5"/>
+  <text x="98" y="700" text-anchor="start" fill="#121e30" font-size="13" >支配者（濃紺）</text>
+  <rect x="338" y="686" width="20" height="20" rx="3" fill="#e0dcd4" stroke="#e0dcd4" stroke-width="1.5"/>
+  <text x="366" y="700" text-anchor="start" fill="#121e30" font-size="13" >影響を受ける側（白）</text>
+  <rect x="606" y="686" width="20" height="20" rx="3" fill="#27ae60" stroke="#e0dcd4" stroke-width="1.5"/>
+  <text x="634" y="700" text-anchor="start" fill="#121e30" font-size="13" >規制者・第三者（緑）</text>
+  <line x1="70" y1="730" x2="94" y2="730" stroke="#c9a84c" stroke-width="3"/>
+  <polygon points="94,730 86,725 86,735" fill="#c9a84c"/>
+  <text x="100" y="735" text-anchor="start" fill="#121e30" font-size="13" >支配・制御</text>
+  <line x1="281" y1="730" x2="305" y2="730" stroke="#FF1A75" stroke-width="3"/>
+  <polygon points="305,730 297,725 297,735" fill="#FF1A75"/>
+  <text x="311" y="735" text-anchor="start" fill="#121e30" font-size="13" >取り込み・操作</text>
+  <line x1="492" y1="730" x2="516" y2="730" stroke="#27ae60" stroke-width="3"/>
+  <polygon points="516,730 508,725 508,735" fill="#27ae60"/>
+  <text x="522" y="735" text-anchor="start" fill="#121e30" font-size="13" >規制・法的圧力</text>
+  <line x1="703" y1="730" x2="727" y2="730" stroke="#b0a090" stroke-width="3"/>
+  <polygon points="727,730 719,725 719,735" fill="#b0a090"/>
+  <text x="733" y="735" text-anchor="start" fill="#121e30" font-size="13" >抵抗・反発</text>
+</svg>

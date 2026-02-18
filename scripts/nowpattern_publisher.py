@@ -62,8 +62,15 @@ def post_to_ghost(
     admin_api_key: str = "",
     status: str = "published",
     featured: bool = False,
+    language: str = "ja",
 ) -> dict:
-    """Ghost Admin APIに記事を投稿する（?source=html でGhostがlexical変換）"""
+    """Ghost Admin APIに記事を投稿する（lexical HTML card方式 — CSSを保持）
+
+    NOTE: ?source=html はGhostがHTMLをlexical変換する際にCSS付きdiv/spanのスタイルを
+    剥がしてしまうため使用禁止。lexical HTML card方式で直接送信すること。
+    language="ja" → lang-ja タグ自動付与
+    language="en" → lang-en タグ自動付与
+    """
     import urllib3
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -74,8 +81,21 @@ def post_to_ghost(
         return {}
 
     token = make_ghost_jwt(admin_api_key)
-    # Ghost 5.x: ?source=html を付けるとGhostがHTMLをlexical形式に自動変換する
-    url = f"{ghost_url}/ghost/api/admin/posts/?source=html"
+
+    # lexical HTML card方式: CSSインラインスタイルを保持する
+    lexical_doc = {
+        "root": {
+            "children": [{"type": "html", "version": 1, "html": html}],
+            "direction": None, "format": "", "indent": 0,
+            "type": "root", "version": 1,
+        }
+    }
+
+    # 言語タグを自動付与
+    lang_tag = "lang-ja" if language == "ja" else "lang-en"
+    all_tags = list(tags) + [lang_tag]
+
+    url = f"{ghost_url}/ghost/api/admin/posts/"
     headers = {
         "Authorization": f"Ghost {token}",
         "Content-Type": "application/json",
@@ -84,8 +104,8 @@ def post_to_ghost(
         "posts": [
             {
                 "title": title,
-                "html": html,
-                "tags": [{"name": t} for t in tags],
+                "lexical": json.dumps(lexical_doc),
+                "tags": [{"name": t} for t in all_tags],
                 "status": status,
                 "featured": featured,
             }
@@ -109,7 +129,10 @@ def update_ghost_post(
     ghost_url: str = "https://nowpattern.com",
     admin_api_key: str = "",
 ) -> dict:
-    """既存のGhost記事のコンテンツをlexical HTML cardで更新する"""
+    """既存のGhost記事のコンテンツをlexical HTML card方式で更新する。
+
+    NOTE: ?source=html はCSSインラインスタイルを剥がすため使用禁止。
+    """
     import urllib3
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -120,7 +143,17 @@ def update_ghost_post(
         return {}
 
     token = make_ghost_jwt(admin_api_key)
-    url = f"{ghost_url}/ghost/api/admin/posts/{post_id}/?source=html"
+
+    # lexical HTML card方式: CSSインラインスタイルを保持する
+    lexical_doc = {
+        "root": {
+            "children": [{"type": "html", "version": 1, "html": html}],
+            "direction": None, "format": "", "indent": 0,
+            "type": "root", "version": 1,
+        }
+    }
+
+    url = f"{ghost_url}/ghost/api/admin/posts/{post_id}/"
     headers = {
         "Authorization": f"Ghost {token}",
         "Content-Type": "application/json",
@@ -128,7 +161,7 @@ def update_ghost_post(
     body = {
         "posts": [
             {
-                "html": html,
+                "lexical": json.dumps(lexical_doc),
                 "updated_at": updated_at,
             }
         ]
@@ -137,7 +170,7 @@ def update_ghost_post(
     resp = requests.put(url, json=body, headers=headers, verify=False, timeout=30)
     if resp.status_code == 200:
         post_data = resp.json()["posts"][0]
-        print(f"OK: Updated post {post_id} (html length: {len(post_data.get('html', ''))})")
+        print(f"OK: Updated post {post_id} (lexical: {len(post_data.get('lexical', ''))} chars)")
         return post_data
     else:
         print(f"ERROR {resp.status_code}: {resp.text[:500]}")
