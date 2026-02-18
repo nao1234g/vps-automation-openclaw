@@ -84,10 +84,49 @@ _STYLES = {
     "footer_link": 'style="color: #c9a84c;"',
     "diagram": 'class="np-diagram" style="text-align: center; margin: 24px 0;"',
     "fact_list": 'style="line-height: 1.8; padding-left: 20px;"',
+    "tag_row": 'style="margin: 0 0 6px 0; font-size: 0.85em; line-height: 1.8;"',
+    "tag_label": 'style="color: #888; font-size: 0.8em; margin-right: 6px;"',
+    "tag_genre": 'style="color: #2563eb; font-weight: 600; margin-right: 8px; text-decoration: none;"',
+    "tag_event": 'style="color: #16a34a; font-weight: 600; margin-right: 8px; text-decoration: none;"',
+    "tag_dynamics": 'style="color: #FF1A75; font-weight: 600; margin-right: 8px; text-decoration: none;"',
     "stakeholder_table": 'style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.95em;"',
     "stakeholder_th": 'style="background: #121e30; color: #c9a84c; padding: 8px 12px; text-align: left; border: 1px solid #e0dcd4;"',
     "stakeholder_td": 'style="padding: 8px 12px; border: 1px solid #e0dcd4;"',
 }
+
+
+# ---------------------------------------------------------------------------
+# Tag badge builder (plain #text style, no backgrounds)
+# ---------------------------------------------------------------------------
+
+def _build_tag_badges(genre_tags: str, event_tags: str, dynamics_tags: str) -> str:
+    """3種類のタグを #テキスト形式（色付き、枠なし）で表示するHTMLを生成"""
+    rows = []
+
+    def slugify(name: str) -> str:
+        import unicodedata
+        s = unicodedata.normalize("NFKC", name.lower())
+        s = s.replace(" ", "-").replace("・", "-").replace("　", "-").replace("/", "-")
+        s = s.replace("、", "-").replace("。", "").replace("（", "").replace("）", "")
+        s = "".join(c for c in s if c.isalnum() or c in "-_")
+        return s.strip("-") or "tag"
+
+    genres = [g.strip() for g in genre_tags.replace("/", ",").replace("、", ",").split(",") if g.strip()]
+    if genres:
+        spans = "".join(f'<a href="/tag/{slugify(g)}/" {_STYLES["tag_genre"]}>#{g}</a>' for g in genres)
+        rows.append(f'<div {_STYLES["tag_row"]}><span {_STYLES["tag_label"]}>ジャンル:</span>{spans}</div>')
+
+    events = [e.strip() for e in event_tags.replace("/", ",").replace("、", ",").split(",") if e.strip()]
+    if events:
+        spans = "".join(f'<a href="/tag/{slugify(e)}/" {_STYLES["tag_event"]}>#{e}</a>' for e in events)
+        rows.append(f'<div {_STYLES["tag_row"]}><span {_STYLES["tag_label"]}>イベント:</span>{spans}</div>')
+
+    dynamics = [d.strip() for d in dynamics_tags.replace(" × ", ",").replace("×", ",").replace("/", ",").replace("、", ",").split(",") if d.strip()]
+    if dynamics:
+        spans = "".join(f'<a href="/tag/{slugify(d)}/" {_STYLES["tag_dynamics"]}>#{d}</a>' for d in dynamics)
+        rows.append(f'<div {_STYLES["tag_row"]}><span {_STYLES["tag_label"]}>力学:</span>{spans}</div>')
+
+    return "\n".join(rows)
 
 
 # ---------------------------------------------------------------------------
@@ -147,12 +186,18 @@ def _build_dynamics_section_html(dynamics_sections: list[dict], dynamics_interse
     for section in dynamics_sections:
         tag = section.get("tag", "")
         subheader = section.get("subheader", "")
-        lead = section.get("lead", "")
+        # "explanation" キーも "lead" として扱う（後方互換）
+        explanation = section.get("explanation", "")
+        lead = section.get("lead", explanation)
         quotes = section.get("quotes", [])
         analysis = section.get("analysis", "")
 
-        parts.append(f'<h3 {_STYLES["pattern_h3"]}>{tag}: {subheader}</h3>')
-        parts.append(f'<p style="color: #ffffff;"><strong {_STYLES["pattern_strong"]}>{lead[:20]}...</strong> {lead}</p>')
+        if subheader:
+            parts.append(f'<h3 {_STYLES["pattern_h3"]}>{tag}: {subheader}</h3>')
+        else:
+            parts.append(f'<h3 {_STYLES["pattern_h3"]}>{tag}</h3>')
+        if lead:
+            parts.append(f'<p style="color: #ffffff; line-height: 1.7;">{lead}</p>')
 
         for quote_text, quote_source in quotes:
             parts.append(
@@ -202,12 +247,27 @@ def _build_pattern_history_html(pattern_history: list[dict], history_pattern_sum
     return "\n".join(parts)
 
 
-def _build_scenarios_html(scenarios: list[tuple[str, str, str, str]], triggers: list[tuple[str, str]] | None = None) -> str:
-    """What's NextセクションのHTMLを生成（Axios式拡張: 確率+示唆+トリガー）"""
+def _build_scenarios_html(scenarios: list, triggers: list[tuple[str, str]] | None = None) -> str:
+    """What's NextセクションのHTMLを生成（Axios式拡張: 確率+示唆+トリガー）
+    scenariosはtupleまたはdict形式の両方に対応:
+    - tuple: (label, probability, content, action)
+    - dict: {"label": ..., "probability": ..., "title": ..., "content": ..., "action": ...}
+    """
     parts = []
-    for label, probability, content, action in scenarios:
+    for scenario in scenarios:
+        if isinstance(scenario, dict):
+            label = scenario.get("label", "")
+            probability = scenario.get("probability", "")
+            title = scenario.get("title", "")
+            content = scenario.get("content", "")
+            action = scenario.get("action", "")
+        else:
+            label, probability, content, action = scenario
+            title = ""
+
+        heading = f"{label}シナリオ" if title == "" else f"{label} — {title}"
         parts.append(
-            f'<h3 {_STYLES["h2"]}>{label}（確率: {probability}）</h3>'
+            f'<h3 {_STYLES["h2"]}>{heading}（確率: {probability}）</h3>'
             f'<p>{content}</p>'
         )
         if action:
@@ -293,7 +353,14 @@ def build_deep_pattern_html(
     if diagram_html:
         diagram_section = f'<div {_STYLES["diagram"]}>{diagram_html}</div>'
 
-    template = f"""<!-- Why it matters (Axios式) -->
+    tag_badges_html = _build_tag_badges(genre_tags, event_tags, dynamics_tags)
+
+    template = f"""<!-- Tag Badges -->
+<div style="margin: 0 0 20px 0; padding-bottom: 12px; border-bottom: 1px solid #e0dcd4;">
+{tag_badges_html}
+</div>
+
+<!-- Why it matters (Axios式) -->
 <blockquote {_STYLES["why_box"]}>
   <strong {_STYLES["why_strong"]}>Why it matters:</strong> {why_it_matters}
 </blockquote>

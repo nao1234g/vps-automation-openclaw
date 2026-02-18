@@ -27,7 +27,13 @@ DEFAULT_GHOST_DB = "/var/www/nowpattern/content/data/ghost.db"
 # ---------------------------------------------------------------------------
 
 NOWPATTERN_CSS = """<style>
-/* Nowpattern Custom Styles v3.0 */
+/* Nowpattern Custom Styles v3.1 */
+
+/* Ghost プライマリタグ（タイトル上の大きなタグ表示）を非表示 */
+.gh-article-tag {
+  display: none !important;
+}
+
 .np-pattern-box {
   background: #121e30;
   border-radius: 8px;
@@ -39,6 +45,11 @@ NOWPATTERN_CSS = """<style>
   color: #c9a84c;
   margin: 0 0 12px 0;
   letter-spacing: 0.1em;
+}
+.np-pattern-box h3 {
+  color: #c9a84c;
+  font-size: 1.1em;
+  margin: 24px 0 12px 0;
 }
 .np-pattern-tag {
   color: #c9a84c;
@@ -88,43 +99,17 @@ NOWPATTERN_CSS = """<style>
   max-width: 100%;
   border-radius: 4px;
 }
-/* Tag Badges v1.0 */
-.np-tag-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 0 0 8px 0;
+/* Tag Links v2.0 — 枠なし、#テキスト形式 */
+.np-tag-row {
+  margin: 0 0 6px 0;
+  font-size: 0.85em;
+  line-height: 1.8;
 }
-.np-tag-genre {
-  display: inline-block;
-  background: #1a3a5c;
-  color: #e0f0ff;
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 0.8em;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+.np-tag-row a {
+  text-decoration: none !important;
 }
-.np-tag-event {
-  display: inline-block;
-  background: #3a3a3a;
-  color: #e0dcd4;
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 0.8em;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-}
-.np-tag-dynamics {
-  display: inline-block;
-  background: #121e30;
-  color: #c9a84c;
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 0.8em;
-  font-weight: bold;
-  letter-spacing: 0.05em;
-  border: 1px solid #c9a84c;
+.np-tag-row a:hover {
+  opacity: 0.75;
 }
 </style>"""
 
