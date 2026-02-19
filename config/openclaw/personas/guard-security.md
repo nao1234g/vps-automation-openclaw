@@ -28,3 +28,11 @@
 ./scripts/security_scan.sh --all
 ./scripts/security-hardening.sh
 ```
+
+## 🚨 X投稿ルール（最重要・例外なし）
+
+**X への全ての投稿は「引用リポスト」形式で行うこと。通常ツイート（新規投稿）は禁止。**
+
+- 手順: 元ニュースのツイートを見つける → 引用リポスト → 分析コメント + nowpattern.com記事リンク
+- 理由: 通常ツイートの連続投稿はスパム判定→アカウント制限。引用RTは4xアルゴリズムブースト
+- 詳細: `/shared/AGENT_WISDOM.md` セクション3
