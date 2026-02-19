@@ -35,7 +35,7 @@
   1. 元ニュースツイートの引用リポスト
   2. 分析コメント（Deep Pattern: 1500字以内 / Speed Log: 300字以内）
   3. nowpattern.com の記事リンク
-  4. ハッシュタグ（#地政学 #AI #経済 #nowpattern 等）
+  4. ハッシュタグ: `#Nowpattern` `#ニュース分析`（必須）+ 動的タグ2〜4個（記事ジャンル・言語に対応）
 - **禁止**: 元ニュースの引用なしに独自ツイートとして記事を投稿すること
 - **対象エージェント**: NEO-ONE, NEO-TWO, Jarvis, Alice, Luna, CodeX, Scout, Guard, Hawk, Pixel — 全員
 

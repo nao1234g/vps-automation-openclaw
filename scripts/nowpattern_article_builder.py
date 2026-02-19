@@ -454,8 +454,6 @@ function npToggleLang(){
 
 <!-- Section 7: FOOTER -->
 <div {_STYLES["footer"]}>
-  <p><strong>Tags:</strong> {genre_tags} / {event_tags}</p>
-  <p><strong>NOW PATTERN:</strong> {dynamics_tags}</p>
   {related_html}
   {sources_html}
 </div>
@@ -519,7 +517,6 @@ def build_speed_log_html(
 <hr {_STYLES["hr"]}>
 
 <div {_STYLES["footer"]}>
-  <p><strong>Tags:</strong> {genre_tags} / {event_tags}</p>
   {deep_link}
   {source_line}
 </div>"""
