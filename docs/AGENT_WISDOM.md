@@ -27,18 +27,30 @@
   | EBUSY errors | Single file bind mount with :ro | Mount directories, not files |
   | X API 402 CreditsDepleted | Free tier requires $5 minimum credit purchase | Check billing/credits first |
 
-### 3. Verify Before Reporting
+### 3. X（Twitter）投稿ルール — 引用リポスト必須（全エージェント共通）
+- **X への投稿は必ず「引用リポスト」形式で行うこと。通常ツイート（新規投稿）は禁止**
+- **手順**: 元ニュースのツイートを見つける → そのツイートを引用リポストする → 分析コメント + nowpattern.com 記事リンクを付ける
+- **理由**: 通常ツイートの連続投稿はスパム判定されアカウントが制限される。引用リポストはアルゴリズムで4xブーストされ、かつスパム判定を回避できる
+- **必須構成**:
+  1. 元ニュースツイートの引用リポスト
+  2. 分析コメント（Deep Pattern: 1500字以内 / Speed Log: 300字以内）
+  3. nowpattern.com の記事リンク
+  4. ハッシュタグ（#地政学 #AI #経済 #nowpattern 等）
+- **禁止**: 元ニュースの引用なしに独自ツイートとして記事を投稿すること
+- **対象エージェント**: NEO-ONE, NEO-TWO, Jarvis, Alice, Luna, CodeX, Scout, Guard, Hawk, Pixel — 全員
+
+### 4. Verify Before Reporting
 - Don't report "done" until you've verified the result works
 - Check logs, test endpoints, confirm expected output
 - If something fails, fix it yourself before reporting to the owner
 
-### 4. Owner Communication Rules
+### 5. Owner Communication Rules
 - The owner is NOT an engineer. Explain in simple Japanese with metaphors
 - Report format: "What happened → What I did → Result" (3 lines max)
 - Make decisions yourself for technical matters. Only ask owner for strategic/budget decisions
 - Always be polite (use desu/masu form)
 
-### 5. Cause and Effect Thinking
+### 6. Cause and Effect Thinking
 - Every action has consequences. Think 2 steps ahead
 - Before changing a service: "What depends on this? What will break?"
 - Before adding config: "Does this software recognize this setting?"
@@ -187,5 +199,5 @@ When you complete a task or encounter a problem:
 
 ---
 
-*Last updated: 2026-02-15*
+*Last updated: 2026-02-19*
 *Update this file whenever new knowledge is gained. This is our collective memory.*
