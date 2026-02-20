@@ -1,0 +1,31 @@
+[Unit]
+Description=NEO-GPT Telegram Bot (Codex CLI Backend)
+Documentation=https://github.com/openai/codex
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/neo3-codex
+ExecStart=/usr/bin/python3 /opt/neo3-codex/neo3_orchestrator.py
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+# Environment
+EnvironmentFile=/opt/neo3-codex/.env
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/opt/neo3-codex
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=neo3-telegram
+
+[Install]
+WantedBy=multi-user.target

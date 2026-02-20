@@ -141,6 +141,42 @@ ls ~/.claude/rules/
 
 ---
 
+## NEO-GPT — Codex CLI バックアップエージェント
+
+NEO-1/2 (Claude Code) 停止時のフェイルオーバーとして、OpenAI Codex CLI をバックエンドに使う Telegram bot。
+
+| 項目 | 値 |
+|------|-----|
+| Bot | `@neogpt_nn_bot` |
+| サブスク | ChatGPT Pro $200/月 |
+| バックエンド | `codex exec --full-auto` |
+| VPSパス | `/opt/neo3-codex/` |
+| systemd | `neo3-telegram.service` |
+
+### デプロイ手順
+```bash
+# 1. セットアップスクリプト実行
+scp scripts/setup_neo3.sh root@163.44.124.123:/tmp/
+ssh root@163.44.124.123 'bash /tmp/setup_neo3.sh'
+
+# 2. Codex CLI 認証（初回のみ）
+ssh root@163.44.124.123 'codex login --device-auth'
+
+# 3. サービス起動
+ssh root@163.44.124.123 'systemctl enable --now neo3-telegram'
+```
+
+### NEO-1/2 ↔ NEO-GPT 切替
+```bash
+# NEO-1/2 停止 → NEO-GPT 起動
+systemctl stop claude-telegram && systemctl start neo3-telegram
+
+# NEO-GPT 停止 → NEO-1/2 復帰
+systemctl stop neo3-telegram && systemctl start claude-telegram
+```
+
+---
+
 **ステータス**: ✅ 完全セットアップ完了
 **Claude Code機能**: 🚀 最高レベルに強化済み
 **次のアクション**: VPS/OpenClaw自動化を開始できます！
