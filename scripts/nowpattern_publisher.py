@@ -402,9 +402,9 @@ def publish_speed_log(
     status: str = "published",
     index_path: str = DEFAULT_INDEX_PATH,
 ) -> dict:
-    """Speed Log記事をGhostに投稿し、インデックスを更新する"""
+    """【廃止】Speed Log記事をGhostに投稿する関数。Speed Logは廃止済み。代わりに publish_deep_pattern() を使うこと。"""
 
-    all_tags = genre_tags + event_tags + dynamics_tags + ["Speed Log"]
+    all_tags = genre_tags + event_tags + dynamics_tags + ["Deep Pattern"]
 
     ghost_result = post_to_ghost(
         title=title,
