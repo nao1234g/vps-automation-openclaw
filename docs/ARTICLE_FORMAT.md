@@ -1,6 +1,6 @@
 # Nowpattern 記事フォーマット — 完全ガイド
 
-> 最終更新: 2026-02-20
+> 最終更新: 2026-02-22（v5.0 Delta対応）
 > **記事執筆責任者: NEO-ONE, NEO-TWO**
 > 参照: Jarvis（指示出し）、その他エージェントは内容確認のみ
 
@@ -27,33 +27,65 @@
 
 ### 英語タグ対応表
 
+#### ジャンル（13個）
 | 日本語タグ | English tag |
 |-----------|-------------|
-| 政治・政策 | Politics & Policy |
-| 地政学・安全保障 | Geopolitics |
-| 経済・金融 | Economy & Finance |
-| ビジネス・企業 | Business |
+| 地政学・安全保障 | Geopolitics & Security |
+| 経済・貿易 | Economy & Trade |
+| 金融・市場 | Finance & Markets |
+| ビジネス・産業 | Business & Industry |
 | テクノロジー | Technology |
-| 暗号資産・Web3 | Crypto & Web3 |
-| エネルギー・環境 | Energy & Environment |
-| 社会・人口 | Society |
-| 規制変更 | Regulatory Change |
-| 司法・制裁 | Sanctions & Law |
-| 選挙・政権 | Elections & Power |
-| 市場変動 | Market Shift |
+| 暗号資産 | Crypto & Web3 |
+| エネルギー | Energy |
+| 環境・気候 | Environment & Climate |
+| ガバナンス・法 | Governance & Law |
+| 社会 | Society |
+| 文化・エンタメ・スポーツ | Culture, Entertainment & Sports |
+| メディア・情報 | Media & Information |
+| 健康・科学 | Health & Science |
+
+#### イベント（19個）
+| 日本語タグ | English tag |
+|-----------|-------------|
+| 軍事衝突 | Military Conflict |
+| 制裁・経済戦争 | Sanctions & Economic Warfare |
+| 貿易・関税 | Trade & Tariffs |
+| 規制・法改正 | Regulation & Law Change |
+| 選挙・政権交代 | Election & Political Shift |
+| 市場ショック | Market Shock |
 | 技術進展 | Tech Breakthrough |
+| 条約・同盟変動 | Treaty & Alliance Change |
+| 資源・エネルギー危機 | Resource & Energy Crisis |
+| 司法・裁判 | Judicial Action |
+| 災害・事故 | Disaster & Accident |
+| 健康危機・感染症 | Health Emergency |
+| サイバー攻撃 | Cyber & Information Attack |
+| 社会不安・抗議 | Social Unrest & Protest |
+| 構造シフト | Structural Shift |
+| 事業再編・取引 | Deal & Restructuring |
+| 競争・シェア争い | Competition & Rivalry |
+| スキャンダル・信頼危機 | Scandal & Trust Crisis |
+| 社会変動・世論 | Social Change & Opinion |
+
+#### 力学 / NOW Pattern（16個）
+| 日本語タグ | English tag |
+|-----------|-------------|
 | プラットフォーム支配 | Platform Power |
 | 規制の捕獲 | Regulatory Capture |
-| 物語の覇権 | Narrative Control |
+| 物語の覇権 | Narrative War |
+| 権力の過伸展 | Imperial Overreach |
 | 対立の螺旋 | Escalation Spiral |
-| 同盟の亀裂 | Alliance Fracture |
+| 同盟の亀裂 | Alliance Strain |
 | 経路依存 | Path Dependency |
+| 揺り戻し | Backlash Pendulum |
 | 制度の劣化 | Institutional Decay |
 | 協調の失敗 | Coordination Failure |
 | モラルハザード | Moral Hazard |
-| 危機便乗 | Crisis Exploitation |
-| 後発逆転 | Leapfrog |
-| 勝者総取り | Winner-Takes-All |
+| 伝染の連鎖 | Contagion Cascade |
+| 危機便乗 | Shock Doctrine |
+| 後発逆転 | Tech Leapfrog |
+| 勝者総取り | Winner Takes All |
+| 正統性の空白 | Legitimacy Void |
 
 ---
 
@@ -61,17 +93,51 @@
 
 **目標: 6,000〜7,000語 / 読了20-30分**
 
-### 構造（7セクション固定）
+### 構造（8セクション — v5.0 Delta対応）
 
 ```
-1. タグバッジ（ジャンル/イベント/力学）
-2. Why it matters（2〜3文）
-3. What happened（事実5〜8項目）
-4. The Big Picture（歴史的文脈 + 利害関係者マップ + データ + The delta）
-5. NOW PATTERN（力学分析 × 2 + 力学の交差点）
-6. Pattern History（過去の並行事例 × 2）
-7. What's Next（3シナリオ + トリガー）
+1. BOTTOM LINE（TL;DR — 3秒で核心）
+2. 📊 DELTA（前回記事がある場合のみ表示）
+   - 前回記事リンク + 日付
+   - シナリオ確率変化テーブル（▲▼ + pp）
+   - 何が変わったか（1-2文）
+   - チェーン長: "このトピックN回目の分析"
+   ※ 前回記事がない場合: "このトピック初の分析" バッジのみ表示
+3. タグバッジ（ジャンル/イベント/力学）
+4. Why it matters（2〜3文）
+5. What happened（事実5〜8項目）
+6. The Big Picture（歴史的文脈 + 利害関係者マップ + データ）
+7. Between the Lines（報道が言っていないこと）
+8. NOW PATTERN（力学分析 × 2 + 力学の交差点）
+9. Pattern History（過去の並行事例 × 2）
+10. What's Next（3シナリオ + トリガー）
+11. OPEN LOOP（次のトリガー + 追跡テーマ）
 ```
+
+### Deltaセクションのルール
+
+**行動心理学に基づく設計原則:**
+- **Information Gap Theory（Loewenstein 1994）**: 「前回こう予測した→今回何が変わった？」のギャップが好奇心を生む
+- **Zeigarnik Effect**: 未解決の予測は記憶に残り、読者を再訪させる
+- **Progress Visualization**: ▲▼ + pp表記で変化の方向と規模を3秒で伝える
+
+**Deltaがある場合（前回記事が存在）:**
+```
+📊 DELTA — 前回からの変化  [このトピック3回目の分析]
+前回の分析: トランプ関税150日の時限爆弾（2/21）→ リンク
+
+| シナリオ | 前回  | 今回  | 変化     |
+|---------|-------|-------|---------|
+| 楽観     | 30%   | 35%   | ▲ +5pp  |
+| 基本     | 50%   | 55%   | ▲ +5pp  |
+| 悲観     | 20%   | 10%   | ▼ -10pp |
+
+なぜ変わったか: 最高裁判決でX条項が無効化、悲観の前提条件が崩れた
+```
+
+**Deltaがない場合（新規トピック）:**
+- 「このトピック初の分析（今後の差分の起点）」バッジのみ表示
+- セクション自体は軽量表示（テーブルなし）
 
 ### nowpattern_article_builder.py での呼び出し方
 
@@ -87,7 +153,23 @@ html = build_deep_pattern_html(
         ("Apple", "イノベーション保護", "収益構造維持", "$85B/年エコシステム", "手数料収入30%減"),
     ],
     data_points=[("$85B", "App Store年間取引額"), ...],
-    delta="表面上はEU vs Appleに見えるが、本質は「プラットフォーム税は誰が決めるのか」という権力の問題だ。",
+    delta_data={
+        "prev_article_title": "Apple vs EU — DMA初の制裁金",
+        "prev_article_url": "https://nowpattern.com/apple-eu-dma/",
+        "prev_article_date": "2026-02-10",
+        "prev_scenarios": [
+            {"label": "楽観", "probability": "25%"},
+            {"label": "基本", "probability": "55%"},
+            {"label": "悲観", "probability": "20%"},
+        ],
+        "current_scenarios": [
+            {"label": "楽観", "probability": "30%"},
+            {"label": "基本", "probability": "55%"},
+            {"label": "悲観", "probability": "15%"},
+        ],
+        "delta_reason": "EU加盟国のDMA準拠率が上昇し、Apple側の法的防御が弱体化した",
+        "chain_count": 3,
+    },
     dynamics_tags="プラットフォーム支配 × 規制の捕獲",
     dynamics_summary="場を持つ者がルールを書き、規制者を取り込む構造が限界に達した。",
     dynamics_sections=[
@@ -138,14 +220,17 @@ html = build_deep_pattern_html(
 
 ## タグ付けルール
 
-### ジャンル（1〜2個）
-政治・政策 / 地政学・安全保障 / 経済・金融 / ビジネス・企業 / テクノロジー / 暗号資産・Web3 / エネルギー・環境 / 社会・人口
+### ジャンル（1〜2個） — 13個
+地政学・安全保障 / 経済・貿易 / 金融・市場 / ビジネス・産業 / テクノロジー / 暗号資産 / エネルギー / 環境・気候 / ガバナンス・法 / 社会 / 文化・エンタメ・スポーツ / メディア・情報 / 健康・科学
 
-### イベントタグ（1〜2個）
-規制変更 / 司法・制裁 / 選挙・政権 / 地政学・安全保障 / 公共政策・税制 / 市場変動 / 資本移動・投資 / 技術進展 / セキュリティ・事故 / 標準化・独占
+### イベントタグ（1〜2個） — 19個
+軍事衝突 / 制裁・経済戦争 / 貿易・関税 / 規制・法改正 / 選挙・政権交代 / 市場ショック / 技術進展 / 条約・同盟変動 / 資源・エネルギー危機 / 司法・裁判 / 災害・事故 / 健康危機・感染症 / サイバー攻撃 / 社会不安・抗議 / 構造シフト / 事業再編・取引 / 競争・シェア争い / スキャンダル・信頼危機 / 社会変動・世論
 
-### 力学タグ（1〜2個）
-プラットフォーム支配 / 規制の捕獲 / 物語の覇権 / 対立の螺旋 / 同盟の亀裂 / 経路依存 / 制度の劣化 / 協調の失敗 / モラルハザード / 危機便乗 / 後発逆転 / 勝者総取り
+### 力学タグ（1〜3個） — 16個（4×4構造）
+**支配**: プラットフォーム支配 / 規制の捕獲 / 物語の覇権 / 権力の過伸展
+**対立**: 対立の螺旋 / 同盟の亀裂 / 経路依存 / 揺り戻し
+**崩壊**: 制度の劣化 / 協調の失敗 / モラルハザード / 伝染の連鎖
+**転換**: 危機便乗 / 後発逆転 / 勝者総取り / 正統性の空白
 
 ---
 
@@ -158,6 +243,8 @@ html = build_deep_pattern_html(
 | Big Pictureを省略した | 必ず歴史的文脈400語以上を入れる |
 | What's Nextが1シナリオしかない | 基本/楽観/悲観の3シナリオ必須 |
 | フッターに `Tags:` を手書きした | 手書き禁止。スクリプトが自動追加する |
+| Deltaを省略した（前回記事があるのに） | 前回記事がある場合は必ずDelta差分を書く |
+| delta_reasonが空 | 「なぜ確率が変わったか」を1-2文で必ず書く |
 
 ---
 *タクソノミー定義: `docs/NOWPATTERN_TAXONOMY_v2.md`*

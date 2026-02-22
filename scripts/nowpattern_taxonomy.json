@@ -1,0 +1,374 @@
+{
+  "version": "3.0",
+  "updated": "2026-02-21",
+  "dynamics_structure": "4×4 (支配×対立×崩壊×転換)",
+  "layers": {
+    "genre": "ジャンル — 記事の主題領域",
+    "event": "イベント — 何が起きたか（トリガー）",
+    "dynamics": "力学（NOW Pattern） — なぜそうなるかの構造パターン"
+  },
+  "genres": [
+    {
+      "slug": "genre-geopolitics",
+      "name_ja": "地政学・安全保障",
+      "name_en": "Geopolitics & Security",
+      "description_ja": "国家間の力学・外交・覇権・軍事・サイバー・インテリジェンス",
+      "description_en": "Interstate power dynamics, diplomacy, hegemony, military, cyber, and intelligence"
+    },
+    {
+      "slug": "genre-economy",
+      "name_ja": "経済・貿易",
+      "name_en": "Economy & Trade",
+      "description_ja": "GDP・雇用・サプライチェーン・貿易構造の変動",
+      "description_en": "GDP, employment, supply chains, and shifts in trade structure"
+    },
+    {
+      "slug": "genre-finance",
+      "name_ja": "金融・市場",
+      "name_en": "Finance & Markets",
+      "description_ja": "中央銀行・株式・為替・債券・資本フローの動き",
+      "description_en": "Central banks, equities, forex, bonds, and capital flows"
+    },
+    {
+      "slug": "genre-business",
+      "name_ja": "ビジネス・産業",
+      "name_en": "Business & Industry",
+      "description_ja": "企業戦略・M&A・サプライチェーン・労働市場",
+      "description_en": "Corporate strategy, M&A, supply chains, and labor markets"
+    },
+    {
+      "slug": "genre-technology",
+      "name_ja": "テクノロジー",
+      "name_en": "Technology",
+      "description_ja": "AI・半導体・プラットフォーム・宇宙・量子技術",
+      "description_en": "AI, semiconductors, platforms, space, and quantum technology"
+    },
+    {
+      "slug": "genre-crypto",
+      "name_ja": "暗号資産",
+      "name_en": "Crypto & Web3",
+      "description_ja": "ブロックチェーン・DeFi・トークン経済・規制の交差点",
+      "description_en": "Blockchain, DeFi, token economics, and the regulatory frontier"
+    },
+    {
+      "slug": "genre-energy",
+      "name_ja": "エネルギー",
+      "name_en": "Energy",
+      "description_ja": "化石燃料・再生可能エネルギー・電力網・原子力の地政学",
+      "description_en": "Fossil fuels, renewables, power grids, and nuclear geopolitics"
+    },
+    {
+      "slug": "genre-environment",
+      "name_ja": "環境・気候",
+      "name_en": "Environment & Climate",
+      "description_ja": "気候変動・生態系・資源の限界点・持続可能性",
+      "description_en": "Climate change, ecosystems, resource limits, and sustainability"
+    },
+    {
+      "slug": "genre-governance",
+      "name_ja": "ガバナンス・法",
+      "name_en": "Governance & Law",
+      "description_ja": "規制設計・立法・司法・国内政治・行政の機能と崩壊",
+      "description_en": "Regulatory design, legislation, judiciary, domestic politics, and institutional function"
+    },
+    {
+      "slug": "genre-society",
+      "name_ja": "社会",
+      "name_en": "Society",
+      "description_ja": "人口動態・移民・教育・格差・宗教・労働の構造変動",
+      "description_en": "Demographics, migration, education, inequality, religion, and labor shifts"
+    },
+    {
+      "slug": "genre-culture",
+      "name_ja": "文化・エンタメ・スポーツ",
+      "name_en": "Culture, Entertainment & Sports",
+      "description_ja": "芸能・スポーツ・価値観・消費・アイデンティティの変容",
+      "description_en": "Entertainment, sports, values, consumption, and identity shifts"
+    },
+    {
+      "slug": "genre-media",
+      "name_ja": "メディア・情報",
+      "name_en": "Media & Information",
+      "description_ja": "SNS・報道機関・プロパガンダ・情報戦・アルゴリズム支配",
+      "description_en": "Social media, news organizations, propaganda, information warfare, and algorithmic control"
+    },
+    {
+      "slug": "genre-health",
+      "name_ja": "健康・科学",
+      "name_en": "Health & Science",
+      "description_ja": "感染症・医薬品・バイオテック・基礎科学・公衆衛生",
+      "description_en": "Infectious diseases, pharmaceuticals, biotech, basic science, and public health"
+    }
+  ],
+  "events": [
+    {
+      "slug": "event-military",
+      "name_ja": "軍事衝突",
+      "name_en": "Military Conflict",
+      "description_ja": "武力行使・軍事作戦・武力紛争の発生",
+      "description_en": "Use of force, military operations, and armed conflict"
+    },
+    {
+      "slug": "event-sanctions",
+      "name_ja": "制裁・経済戦争",
+      "name_en": "Sanctions & Economic Warfare",
+      "description_ja": "経済制裁・資産凍結・輸出規制の発動",
+      "description_en": "Economic sanctions, asset freezes, and export controls"
+    },
+    {
+      "slug": "event-trade",
+      "name_ja": "貿易・関税",
+      "name_en": "Trade & Tariffs",
+      "description_ja": "関税変更・貿易協定・サプライチェーン再編",
+      "description_en": "Tariff changes, trade agreements, and supply chain restructuring"
+    },
+    {
+      "slug": "event-regulation",
+      "name_ja": "規制・法改正",
+      "name_en": "Regulation & Law Change",
+      "description_ja": "新法施行・規制変更・行政命令",
+      "description_en": "New legislation, regulatory changes, and executive orders"
+    },
+    {
+      "slug": "event-election",
+      "name_ja": "選挙・政権交代",
+      "name_en": "Election & Political Shift",
+      "description_ja": "選挙結果・政権交代・クーデター・政治的転換点",
+      "description_en": "Election outcomes, regime change, coups, and political turning points"
+    },
+    {
+      "slug": "event-market",
+      "name_ja": "市場ショック",
+      "name_en": "Market Shock",
+      "description_ja": "急騰・暴落・流動性危機・金利変動",
+      "description_en": "Surges, crashes, liquidity crises, and interest rate shifts"
+    },
+    {
+      "slug": "event-tech",
+      "name_ja": "技術進展",
+      "name_en": "Tech Breakthrough",
+      "description_ja": "新技術の発表・実用化・技術的ブレイクスルー",
+      "description_en": "New technology announcements, deployments, and breakthroughs"
+    },
+    {
+      "slug": "event-alliance",
+      "name_ja": "条約・同盟変動",
+      "name_en": "Treaty & Alliance Change",
+      "description_ja": "条約の締結・失効・同盟関係の変化",
+      "description_en": "Treaty signing, expiration, and shifts in alliance relationships"
+    },
+    {
+      "slug": "event-resource",
+      "name_ja": "資源・エネルギー危機",
+      "name_en": "Resource & Energy Crisis",
+      "description_ja": "資源供給の途絶・エネルギー価格ショック・資源紛争",
+      "description_en": "Resource supply disruptions, energy price shocks, and resource conflicts"
+    },
+    {
+      "slug": "event-judicial",
+      "name_ja": "司法・裁判",
+      "name_en": "Judicial Action",
+      "description_ja": "裁判・判決・起訴・制裁金・法的手続き",
+      "description_en": "Trials, verdicts, indictments, fines, and legal proceedings"
+    },
+    {
+      "slug": "event-disaster",
+      "name_ja": "災害・事故",
+      "name_en": "Disaster & Accident",
+      "description_ja": "自然災害・産業事故・インフラ崩壊",
+      "description_en": "Natural disasters, industrial accidents, and infrastructure failures"
+    },
+    {
+      "slug": "event-health",
+      "name_ja": "健康危機・感染症",
+      "name_en": "Health Emergency",
+      "description_ja": "パンデミック・感染症アウトブレイク・公衆衛生危機",
+      "description_en": "Pandemics, infectious outbreaks, and public health emergencies"
+    },
+    {
+      "slug": "event-cyber",
+      "name_ja": "サイバー攻撃",
+      "name_en": "Cyber & Information Attack",
+      "description_ja": "ハッキング・データ漏洩・情報操作キャンペーン",
+      "description_en": "Hacking, data breaches, and information manipulation campaigns"
+    },
+    {
+      "slug": "event-social",
+      "name_ja": "社会不安・抗議",
+      "name_en": "Social Unrest & Protest",
+      "description_ja": "デモ・暴動・ストライキ・大衆運動",
+      "description_en": "Protests, riots, strikes, and mass movements"
+    },
+    {
+      "slug": "event-structural",
+      "name_ja": "構造シフト",
+      "name_en": "Structural Shift",
+      "description_ja": "特定のイベントではなく、進行中の構造的変動",
+      "description_en": "Not a single event but an ongoing structural transformation"
+    },
+    {
+      "slug": "event-deal",
+      "name_ja": "事業再編・取引",
+      "name_en": "Deal & Restructuring",
+      "description_ja": "M&A・契約・提携・移籍・買収・事業再編",
+      "description_en": "M&A, contracts, partnerships, transfers, acquisitions, and restructuring"
+    },
+    {
+      "slug": "event-competition",
+      "name_ja": "競争・シェア争い",
+      "name_en": "Competition & Rivalry",
+      "description_ja": "市場シェア争い・リーグ競争・覇権争い・記録更新",
+      "description_en": "Market share battles, league competition, rivalry, and record-breaking milestones"
+    },
+    {
+      "slug": "event-trust",
+      "name_ja": "スキャンダル・信頼危機",
+      "name_en": "Scandal & Trust Crisis",
+      "description_ja": "不祥事・品質問題・ドーピング・信頼崩壊・評判毀損",
+      "description_en": "Scandals, quality issues, doping, trust collapse, and reputation damage"
+    },
+    {
+      "slug": "event-social-shift",
+      "name_ja": "社会変動・世論",
+      "name_en": "Social Change & Opinion",
+      "description_ja": "世論変動・文化論争・人口動態・ライフスタイル変化・価値観シフト",
+      "description_en": "Public opinion shifts, cultural debates, demographics, lifestyle changes, and value shifts"
+    }
+  ],
+  "dynamics": [
+    {
+      "slug": "p-platform",
+      "name_ja": "プラットフォーム支配",
+      "name_en": "Platform Power",
+      "category": "支配",
+      "description_ja": "インフラ・場・標準を握った者がルールを書き換え、参入障壁を構築する",
+      "description_en": "Whoever controls the platform writes the rules and builds moats against entry"
+    },
+    {
+      "slug": "p-capture",
+      "name_ja": "規制の捕獲",
+      "name_en": "Regulatory Capture",
+      "category": "支配",
+      "description_ja": "規制者が被規制者に取り込まれ、規制が骨抜きになる",
+      "description_en": "Regulators are co-opted by the industries they oversee, gutting oversight"
+    },
+    {
+      "slug": "p-narrative",
+      "name_ja": "物語の覇権",
+      "name_en": "Narrative War",
+      "category": "支配",
+      "description_ja": "事実ではなく「物語」の支配権を争う。フレーミング・スケープゴート転換を含む",
+      "description_en": "The battle for control of the story, not the facts — framing, scapegoating, and spin"
+    },
+    {
+      "slug": "p-overreach",
+      "name_ja": "権力の過伸展",
+      "name_en": "Imperial Overreach",
+      "category": "支配",
+      "description_ja": "覇権国・独占企業が力を伸ばしすぎて内側から崩れる。抑止の崩壊を含む",
+      "description_en": "A hegemon or monopoly overextends and collapses from within. Includes deterrence failure"
+    },
+    {
+      "slug": "p-escalation",
+      "name_ja": "対立の螺旋",
+      "name_en": "Escalation Spiral",
+      "category": "対立",
+      "description_ja": "対立が段階的に自己強化し、双方が止められなくなる構造",
+      "description_en": "Conflict self-reinforces step by step, trapping both sides in an upward spiral"
+    },
+    {
+      "slug": "p-alliance-strain",
+      "name_ja": "同盟の亀裂",
+      "name_en": "Alliance Strain",
+      "category": "対立",
+      "description_ja": "同盟国間の利害の乖離が内部から同盟を侵食する。出口のゲームを含む",
+      "description_en": "Diverging interests between allies erode the alliance from within. Includes exit games"
+    },
+    {
+      "slug": "p-path-dependency",
+      "name_ja": "経路依存",
+      "name_en": "Path Dependency",
+      "category": "対立",
+      "description_ja": "過去の選択が現在の選択肢を狭め、非合理な継続を強いる。資源の呪いを含む",
+      "description_en": "Past choices narrow present options, forcing irrational continuation. Includes resource curse"
+    },
+    {
+      "slug": "p-backlash",
+      "name_ja": "揺り戻し",
+      "name_en": "Backlash Pendulum",
+      "category": "対立",
+      "description_ja": "行き過ぎた政策・介入が反動を生み、発動者に跳ね返る。ブローバックを含む",
+      "description_en": "Overreaching policies or interventions provoke a counter-reaction. Includes blowback"
+    },
+    {
+      "slug": "p-institutional-rot",
+      "name_ja": "制度の劣化",
+      "name_en": "Institutional Decay",
+      "category": "崩壊",
+      "description_ja": "組織が内部から腐る。汚職・形骸化・自己利益優先。静かな危機・脆弱性を含む",
+      "description_en": "Organizations decay from within: corruption, hollowed-out standards. Includes silent crisis and systemic fragility"
+    },
+    {
+      "slug": "p-collective-failure",
+      "name_ja": "協調の失敗",
+      "name_en": "Coordination Failure",
+      "category": "崩壊",
+      "description_ja": "全員が協調すべきだと分かっていても動けない。囚人のジレンマ・共有地の悲劇",
+      "description_en": "Everyone knows cooperation is needed but no one moves. Prisoner's dilemma and tragedy of the commons"
+    },
+    {
+      "slug": "p-moral-hazard",
+      "name_ja": "モラルハザード",
+      "name_en": "Moral Hazard",
+      "category": "崩壊",
+      "description_ja": "救済の期待がリスクテイクを助長し、次の危機を自ら作り出す",
+      "description_en": "The expectation of bailouts encourages reckless risk-taking, seeding the next crisis"
+    },
+    {
+      "slug": "p-contagion",
+      "name_ja": "伝染の連鎖",
+      "name_en": "Contagion Cascade",
+      "category": "崩壊",
+      "description_ja": "一国・一社の危機が連鎖的に他国・他社に波及する。資本逃避・金融伝染を含む",
+      "description_en": "A crisis in one entity cascades through interconnected systems. Includes capital flight and financial contagion"
+    },
+    {
+      "slug": "p-shock-doctrine",
+      "name_ja": "危機便乗",
+      "name_en": "Shock Doctrine",
+      "category": "転換",
+      "description_ja": "危機を利用して平時には不可能な改革・権力拡大を強行する",
+      "description_en": "Exploiting crisis to force through reforms or power grabs impossible in normal times"
+    },
+    {
+      "slug": "p-tech-leapfrog",
+      "name_ja": "後発逆転",
+      "name_en": "Tech Leapfrog",
+      "category": "転換",
+      "description_ja": "後発プレイヤーが既存インフラを飛び越えて一気に優位に立つ",
+      "description_en": "A latecomer skips legacy infrastructure and leaps directly to a superior position"
+    },
+    {
+      "slug": "p-winner-takes-all",
+      "name_ja": "勝者総取り",
+      "name_en": "Winner Takes All",
+      "category": "転換",
+      "description_ja": "ネットワーク効果・規模の経済で勝者が市場を独占し、敗者が消滅する",
+      "description_en": "Network effects and economies of scale let the winner monopolize, eliminating losers"
+    },
+    {
+      "slug": "p-legitimacy-void",
+      "name_ja": "正統性の空白",
+      "name_en": "Legitimacy Void",
+      "category": "転換",
+      "description_ja": "権威や制度が正当性を失い、誰もルールを信じなくなった状態。権力の真空",
+      "description_en": "Authority or institutions lose legitimacy and no one believes in the rules. Power vacuum"
+    }
+  ],
+  "fixed_tags": [
+    {"slug": "nowpattern", "name": "Nowpattern", "description": "Nowpattern記事固定タグ"},
+    {"slug": "deep-pattern", "name": "Deep Pattern", "description": "Deep Pattern記事"},
+    {"slug": "lang-ja", "name": "日本語", "description": "日本語記事"},
+    {"slug": "lang-en", "name": "English", "description": "English articles"}
+  ]
+}

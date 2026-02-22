@@ -1,0 +1,52 @@
+【重要タスク】Nowpattern タクソノミー v3.0 — 全35記事の整合性レビュー＆修正
+
+## 背景
+力学タグが20→16に統一されました。既存35記事のタグと本文の整合性を取る必要があります。
+
+## 指示ファイル
+/opt/shared/article_review_v3_instructions.json を読んでください。各記事の問題点と修正ガイドが書かれています。
+
+## レビュースクリプト
+/opt/shared/scripts/article_review_v3.py --report でレポート生成済み。
+
+## やること（優先順）
+
+### 1. 自動修正可能なタグ（7箇所）
+以下の旧タグを持つ記事のタグをGhost APIで新タグに変更：
+- Institutional Rot → Institutional Decay
+- Blowback → Backlash Pendulum
+
+### 2. レビュー必要なタグ（旧力学タグ）
+以下の旧タグは記事の内容を読んで最適な新タグを選ぶ：
+- Exit Game → Winner Takes All / Path Dependency / Escalation Spiral のどれか
+- Resource Power → Platform Power / Path Dependency のどれか
+- Financial Coercion → Path Dependency / Regulatory Capture のどれか
+- Deterrence Failure → Escalation Spiral に吸収（すでにEscalation Spiralがある場合は Imperial Overreach 等を検討）
+- Capital Flight → Contagion Cascade
+- Systemic Fragility → Contagion Cascade or Institutional Decay
+
+### 3. 日本語独自タグ（8記事 — 最初に投稿された日本語記事）
+これらはタクソノミー外のカスタムタグを使っている。v3.0のジャンル(12)+イベント(19)+力学(16)から正しいタグに振り直す。
+
+### 4. 記事本文の整合性
+タグを変更した記事のNOW PATTERNセクションで旧タグ名が使われている場合は、新タグ名に書き換える。分析の論旨が新タグの定義と合っているか確認。
+
+## v3.0 力学タグ（16個 = 4x4）
+支配: Platform Power / Regulatory Capture / Narrative War / Imperial Overreach
+対立: Escalation Spiral / Alliance Strain / Path Dependency / Backlash Pendulum
+崩壊: Institutional Decay / Coordination Failure / Moral Hazard / Contagion Cascade
+転換: Shock Doctrine / Tech Leapfrog / Winner Takes All / Legitimacy Void
+
+## v3.0 イベントタグ（19個）
+Military Conflict / Sanctions & Economic Warfare / Trade & Tariffs / Regulation & Law Change / Election & Political Shift / Market Shock / Tech Breakthrough / Treaty & Alliance Change / Resource & Energy Crisis / Judicial Action / Disaster & Accident / Health Emergency / Cyber & Information Attack / Social Unrest & Protest / Structural Shift / Deal & Restructuring / Competition & Rivalry / Scandal & Trust Crisis / Social Change & Opinion
+
+## Ghost API
+- API key: /opt/cron-env.sh の NOWPATTERN_GHOST_ADMIN_API_KEY
+- タグ変更: Ghost Admin API PUT /ghost/api/admin/posts/{id}/
+- 本文変更: lexical HTML card方式（?source=html は使わない）
+- JWT生成: /opt/shared/scripts/nowpattern_publisher.py の make_ghost_jwt() を参考に
+
+## 注意
+- 1記事ずつ処理して、5記事ごとにTelegramに進捗報告すること
+- エラーが出たら止めて報告すること
+- 作業完了後、全記事のタグ一覧をレポートとして送ること

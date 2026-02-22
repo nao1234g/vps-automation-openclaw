@@ -1174,4 +1174,76 @@
 
 ---
 
-*最終更新: 2026-02-18 セッション2 — Nowpatternミス履歴図 + VPS同期/Ghost再起動/データ形式ミスを追加*
+### 2026-02-21: Ghost 404エラー — routes.yamlのタグフィルタとタグ名の不一致
+- **症状**: NEO-ONEが投稿した新しい記事がすべて`/404/`URLになり、ブラウザでアクセスできない
+- **根本原因**: Ghost routes.yamlで`filter: 'tag:lang-ja'`（**スラッグ**`lang-ja`で照合）と設定されているが、`nowpattern_publisher.py`がタグ**名前**として`"lang-ja"`を使っていた。Ghostには既に`日本語`（slug: `lang-ja`）というタグが存在するため、APIが新しいタグ`lang-ja`（slug: `lang-ja-2`）を自動作成。結果、記事はどのコレクションにも属さず`/404/`になった
+- **誤ったアプローチ**: スラッグ長すぎ仮説（×）、記事削除+再作成（×）、Ghost再起動（×）、unpublish/republish（×）。すべて無意味だった。タグの問題を見つけるまでに4つの修正スクリプトを書いて実行した
+- **正しい解決策**:
+  1. `nowpattern_publisher.py`の`lang_tag`を`"lang-ja"` → `"日本語"`、`"lang-en"` → `"English"`に変更
+  2. 既存の壊れた記事のタグを`lang-ja` → `日本語`にGhost Admin APIで更新
+- **教訓**: Ghost routes.yamlのcollection filterは**タグのスラッグ**で照合する。APIでタグを追加する際はタグの**表示名**を使うため、同じスラッグを持つ既存タグが存在するか確認すること。`/ghost/api/admin/tags/?limit=all`で全タグのname/slugペアを確認してから投稿する
+- **検索すべきだったキーワード**: `ghost routes.yaml tag filter slug mismatch`, `ghost collection filter not matching posts`
+
+### 2026-02-21: X投稿失敗 — twikitがCloudflareに弾かれる
+- **症状**: `x_quote_repost.py`がXに投稿できない。`KeyError 'code'`エラー
+- **根本原因**: twikit（Cookie認証でXのWebサイトにブラウザ偽装アクセス）がCloudflare WAFにbot判定されて403 Forbidden。HTML(Cloudflare画面)が返されるため、JSONパース失敗
+- **誤ったアプローチ**: Cookie更新、twikit再ログイン試行
+- **正しい解決策**: twikit → OAuth1（公式Twitter API v2）に書き換え。`requests_oauthlib.OAuth1`と`api.twitter.com/2/tweets`を使用。同じ認証方式で`rss-post-quote-rt.py`は正常動作していた
+- **教訓**: VPSからのWeb操作はCloudflare等のWAFに弾かれるリスクがある。可能な限り公式APIを使うこと。Cookie認証（twikit等）は不安定で、いつでもWAFに弾かれる可能性がある
+- **検索すべきだったキーワード**: `twikit cloudflare 403`, `twitter api v2 quote tweet oauth1`
+
+---
+
+## NEOタグ整合性問題 + Ghost slug truncation（2026-02-22）
+
+### 2026-02-22: NEOが勝手にカスタムタグを作成 — 37記事中37記事が不正タグ
+- **症状**: Ghost内の全37記事がタクソノミーに存在しないタグを持っていた。101個のタグが存在し、うち49個がorphan（未使用）、34個がタクソノミー外のカスタムタグ
+- **根本原因**:
+  1. NEOのsystem_promptにタクソノミーの完全なタグリスト（コピペ可能形式）が含まれていなかった
+  2. publisher.pyのバリデーションが**警告のみ**で投稿をブロックしていなかった
+  3. NEOが「ステーブルコイン3000億ドル突破」「最高裁関税判決, ビットコイン, デジタルゴールド」等の完全にカスタムなタグを自由に作成していた
+  4. validate_tags()のauto_fixが英語→日本語変換を行い、Ghost内に日本語名の新タグ（ローマ字slug）を作成していた
+- **誤ったアプローチ**:
+  1. バリデーションを「警告 + auto_fix」にしていた（ミスを隠してしまう）
+  2. Ghost APIにタグをname onlyで送信し、slugをGhostの自動生成に任せていた
+- **正しい解決策**:
+  1. Ghost DBの全タグをtaxonomy.json基準で正規化（fix_all_tags.py）
+  2. publisher.pyをv3.0に改修: STRICTバリデーション（不正タグ→投稿ブロック）、slug明示指定
+  3. resolve_tag()でJA/EN/slug任意入力→正規タグに自動解決
+  4. post_to_ghost()でtag_objects（name+slug指定）方式に変更
+- **教訓**:
+  1. **AIに自由にタグを作らせない** — AP/Reuters方式。タクソノミーはenum制約で物理的にブロック
+  2. **auto-fixではなくREJECTする** — AIの間違いを直してあげると学習しない。突き返すべき
+  3. **バリデーションはfail-fast** — 生成時点でブロックし、公開後に修正するのは遅い
+- **検索すべきだったキーワード**: `AI content validation pipeline`, `guardrails AI structured output`, `enum constraint LLM output`
+
+### 2026-02-22: Ghost slug truncation による X投稿リンクの404エラー
+- **症状**: Xに投稿済みのnowpattern.comリンクが404エラーになっていた
+- **根本原因**: Ghost 5.xはスラッグを約70文字で切り詰める。publisher.pyはGhost APIレスポンスのURLではなく、予測URL（ghost_url + "/" + slug + "/"）を使っていた。日本語タイトルのローマ字スラッグが70文字超の場合、予測URLと実際のURLが一致しない
+- **誤ったアプローチ**: routes.yamlにリダイレクトを書こうとした（400エラー — routes.yamlのroutesセクションはリダイレクト用ではない）
+- **正しい解決策**:
+  1. Ghost `redirects.yaml`（/var/www/nowpattern/content/data/redirects.yaml）で301リダイレクト設定
+  2. publisher.pyをGhost APIレスポンスの`url`フィールドを使うように修正
+  3. 予測URLの使用を廃止
+- **教訓**: Ghost APIにPOSTした後のレスポンスには実際のslugとurlが含まれる。これを使えばslug truncationの問題は起きない
+- **検索すべきだったキーワード**: `ghost cms slug length limit`, `ghost redirects.yaml format`
+
+### 2026-02-22: 「指示書を読まない問題」— プロンプトレベルのルールだけでは不十分
+- **症状**: NEO指示書（NEO_INSTRUCTIONS_V2.md）にタグルールを詳細に書いたが、NEOが37記事すべてで無視。カスタムタグを量産した
+- **根本原因**: LLMはプロンプト（指示書）を「読むべき参考情報」として扱い、100%遵守する保証がない。長文プロンプトでは特に指示の遵守率が下がる。これはLLM全般の根本的な制約
+- **誤ったアプローチ**: 指示書をより詳しく書く、タグリストをコピペ用に整備する → これだけでは効果が限定的
+- **正しい解決策**: 5層防御アーキテクチャを構築
+  - Layer 1: article_validator.py（コードレベル、JSON公開前ゲート）
+  - Layer 2: publisher.py STRICT（投稿時タクソノミー検証、ValueError送出）
+  - Layer 3: ghost_guard.py PreToolUseフック（Ghost API直接アクセスをブロック）
+  - Layer 4: nowpattern_post_audit.py（30分毎の投稿後監査cron）
+  - Layer 5: NEO-GPT環境分離（Ghost APIキーを環境から除去、ドラフト専用化）
+- **教訓**:
+  - LLMにルールを「読ませる」だけでは不十分。コードレベルで物理的にブロックする必要がある
+  - 「速度標識」（プロンプト）ではなく「スピードバンプ」（コードゲート）で制御する
+  - 防御は多層にする。1層が突破されても次の層で止まる設計
+- **検索すべきだったキーワード**: `AI agent guardrails`, `LLM output validation`, `structured output enforcement`, `pydantic AI output schema`
+
+---
+
+*最終更新: 2026-02-22 — 5層防御アーキテクチャ完成（A1/A2/B3/B4/C5全実装）*

@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+"""Temporary script to update NEO CLAUDE.md section 0.6 with v4.0 format."""
+
+NEW_SECTION = (
+    "## 0.6. \u8a18\u4e8b\u30d5\u30a9\u30fc\u30de\u30c3\u30c8\u30eb\u30fc\u30eb v4.0\uff082026-02-21 \u30aa\u30fc\u30ca\u30fc\u78ba\u5b9a \u2014 \u5fc5\u9808\uff09\n"
+    "\n"
+    "> **\u26a1 \u8a18\u4e8b\u3092\u66f8\u304f\u524d\u306b\u5fc5\u305a `/opt/shared/scripts/ARTICLE_FORMAT_SPEC.md` \u3092\u8aad\u3080\u3053\u3068\u3002**\n"
+    "> \u3053\u308c\u304c\u8a18\u4e8b\u30d5\u30a9\u30fc\u30de\u30c3\u30c8\u306e\u552f\u4e00\u306e\u771f\u5b9f\u6e90\uff08Single Source of Truth\uff09\u3067\u3059\u3002\n"
+    "\n"
+    "### Speed Log \u306f\u5ec3\u6b62\n"
+    "\n"
+    "**Speed Log\uff08200-400\u8a9e\u306e\u77ed\u3044\u8a18\u4e8b\uff09\u306f\u66f8\u304b\u306a\u3044\u3053\u3068\u3002**\n"
+    "- nowpattern.com\u306b\u516c\u958b\u3059\u308b\u8a18\u4e8b\u306f\u5168\u3066 Deep Pattern \u306e\u307f\n"
+    "\n"
+    "### Deep Pattern \u306e\u6700\u4f4e\u8a9e\u6570\n"
+    "\n"
+    "- **\u6700\u4f4e 6,000\u8a9e**\uff08\u65e5\u672c\u8a9e\u30fb\u82f1\u8a9e\u3068\u3082\u306b\uff09\n"
+    "- \u76ee\u6a19 7,000\u301c8,000\u8a9e\n"
+    "- 6,000\u8a9e\u672a\u6e80\u306f\u516c\u958b\u3057\u306a\u3044\u3002\u66f8\u304d\u76f4\u3059\u3053\u3068\n"
+    "\n"
+    "### v4.0 \u5fc5\u9808\u30d5\u30a3\u30fc\u30eb\u30c9\uff082026-02-21\u301c \u7d76\u5bfe\u306b\u542b\u3081\u308b\u3053\u3068\uff09\n"
+    "\n"
+    "\u8a18\u4e8bJSON\u306b\u4ee5\u4e0b\u306e\u30d5\u30a3\u30fc\u30eb\u30c9\u304c**\u5168\u3066\u5fc5\u9808**\u30021\u3064\u3067\u3082\u6b20\u3051\u308b\u3068\u516c\u958b\u304c\u30d6\u30ed\u30c3\u30af\u3055\u308c\u307e\u3059\u3002\n"
+    "\n"
+    "| \u30d5\u30a3\u30fc\u30eb\u30c9 | \u8aac\u660e |\n"
+    "|---|---|\n"
+    "| bottom_line | \u8a18\u4e8b\u306e\u6838\u5fc3\u30921\u6587\u3067\u8981\u7d04\uff083\u79d2\u3067\u7406\u89e3\u3067\u304d\u308b\u30ec\u30d9\u30eb\uff09 |\n"
+    "| bottom_line_pattern | \u529b\u5b66\u30d1\u30bf\u30fc\u30f3\u540d\u306e\u8981\u7d04 |\n"
+    "| bottom_line_scenario | \u57fa\u672c\u30b7\u30ca\u30ea\u30aa\u306e\u4e00\u6587\u8981\u7d04 |\n"
+    "| bottom_line_watch | \u6b21\u306e\u6ce8\u76ee\u30a4\u30d9\u30f3\u30c8+\u65e5\u4ed8 |\n"
+    "| between_the_lines | \u5831\u9053\u304c\u300c\u8a00\u3063\u3066\u3044\u306a\u3044\u3053\u3068\u300d\u30921\u6bb5\u843d\u3067\u5206\u6790 |\n"
+    "| open_loop_trigger | \u6b21\u306b\u3053\u306e\u30b9\u30c8\u30fc\u30ea\u30fc\u304c\u52d5\u304f\u30c8\u30ea\u30ac\u30fc+\u65e5\u4ed8 |\n"
+    "| open_loop_series | \u3053\u306e\u30d1\u30bf\u30fc\u30f3\u306e\u7d9a\u304d\u3068\u3057\u3066\u8ffd\u8de1\u3059\u3079\u304d\u30c6\u30fc\u30de |\n"
+    "\n"
+    "### \u8a18\u4e8b\u69cb\u9020\uff08\u3053\u306e\u9806\u5e8f\u3067\u66f8\u304f\u3053\u3068\uff09\n"
+    "\n"
+    "1. BOTTOM LINE\uff08TL;DR\uff09  \u2190 v4.0 \u65b0\u898f\u30fb\u5fc5\u9808\n"
+    "2. \u30bf\u30b0\u30d0\u30c3\u30b8\n"
+    "3. Why it matters\n"
+    "4. What happened\n"
+    "5. The Big Picture\uff08\u6b74\u53f2+\u5229\u5bb3\u95a2\u4fc2\u8005+\u30c7\u30fc\u30bf\uff09\n"
+    "6. Between the Lines  \u2190 v4.0 \u65b0\u898f\u30fb\u5fc5\u9808\n"
+    "7. NOW PATTERN\uff08\u529b\u5b66\u5206\u6790\uff09\n"
+    "8. Pattern History\n"
+    "9. What's Next\uff083\u30b7\u30ca\u30ea\u30aa+\u78ba\u7387\uff09\n"
+    "10. Open Loop  \u2190 v4.0 \u65b0\u898f\u30fb\u5fc5\u9808\n"
+    "\n"
+    "### \u6587\u4f53\u30eb\u30fc\u30eb\n"
+    "\n"
+    "- **\u592a\u5b57\u5f37\u8abf**: dynamics_sections \u306e analysis \u5185\u3067 **\u6700\u91cd\u8981\u30d5\u30ec\u30fc\u30ba\u3092\u592a\u5b57** \u306b\u3059\u308b\n"
+    "- **\u4f1a\u8a71\u8abf**: Matt Levine \u30b9\u30bf\u30a4\u30eb\uff08\u8aad\u8005\u306b\u8a71\u3057\u304b\u3051\u308b\u3088\u3046\u306b\uff09\n"
+    "- **\u30b7\u30ca\u30ea\u30aa\u30e9\u30d9\u30eb**: \u300c\u697d\u89b3\u300d\u300c\u57fa\u672c\u300d\u300c\u60b2\u89b3\u300d\u306e\u77ed\u3044\u30e9\u30d9\u30eb\uff08\u300c\u697d\u89b3\u30b7\u30ca\u30ea\u30aa\u300d\u306f\u4e0d\u8981\u3001\u30d3\u30eb\u30c0\u30fc\u304c\u81ea\u52d5\u4ed8\u52a0\uff09\n"
+    "\n"
+    "### \u65e5\u672c\u8a9e\u8a18\u4e8b\u3092\u66f8\u3044\u305f\u3089\u82f1\u8a9e\u7248\u3082\u5fc5\u305a\u66f8\u304f\u3053\u3068\n"
+    "\n"
+    "\u8a18\u4e8b\u3092\u66f8\u304f\u624b\u9806:\n"
+    "1. \u65e5\u672c\u8a9e\u7248\u3092\u66f8\u3044\u3066\u516c\u958b\u3059\u308b\n"
+    "2. **\u5fc5\u305a**\u82f1\u8a9e\u7248\u3082\u66f8\u3044\u3066\u516c\u958b\u3059\u308b\uff08\u30b9\u30e9\u30c3\u30b0 + `-en`\uff09\n"
+    "\n"
+    "---\n"
+    "\n"
+)
+
+# Read files
+for path in ["/opt/claude-code-telegram/CLAUDE.md", "/opt/claude-code-telegram-neo2/CLAUDE.md"]:
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        old_start = content.find("## 0.6.")
+        old_end = content.find("## 1. Architecture Rules")
+
+        if old_start >= 0 and old_end >= 0:
+            new_content = content[:old_start] + NEW_SECTION + content[old_end:]
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+            print(f"OK: Updated {path}")
+        else:
+            print(f"SKIP: Section markers not found in {path}")
+    except Exception as e:
+        print(f"ERROR: {path}: {e}")

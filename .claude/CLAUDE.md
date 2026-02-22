@@ -117,6 +117,8 @@
 | Ghost Settings API 501 | Integration APIではSettings PUT不可（Ghost 5.130） | SQLite直接更新（`ghost.db`）+ Ghost再起動 |
 | `requests`でGhost API 403 | リダイレクト時にAuthヘッダーが除去される | `allow_redirects=False`またはSQLite直接方式 |
 | Ghost投稿の本文が空 | Ghost 5.xはhtml/markdownフィールドを無視しlexical形式のみ | URLに`?source=html`を追加（GhostがHTMLをlexicalに自動変換） |
+| NEOがカスタムタグ作成 | プロンプトルールだけでは遵守されない | 5層防御: validator→publisher STRICT→ghost_guard hook→audit cron→env isolation |
+| sync-vps.ps1がVPS修正を上書き | ローカル版を無条件にVPSにコピー | v2.0: バックアップ付き同期 + VPS専用ファイル保護 |
 
 詳細な症状・解決手順・教訓・検索キーワードは [docs/KNOWN_MISTAKES.md](docs/KNOWN_MISTAKES.md) を参照してください。
 
@@ -236,10 +238,10 @@ User (Telegram) → @claude_brain_nn_bot  → neo-telegram.service (VPS)
   - Admin API: AutoPublisher integration設定済み（`/opt/cron-env.sh`のNOWPATTERN_GHOST_ADMIN_API_KEY）
   - 自動投稿: `nowpattern-ghost-post.py` 稼働中（AISA記事 → Nowpattern観測ログ形式で投稿）
   - `/etc/hosts`に`127.0.0.1 nowpattern.com`追加済み（VPS内部からのAPI呼び出し用）
-  - **2モード制（v3.0、2026-02-18）**:
-    - Deep Pattern: 6,000-7,000語の深層分析（Stratechery型）
-    - Speed Log: 200-400語の速報（Axios型）
-    - 3層タクソノミー: ジャンル(12) × イベントタグ(22) × 力学タグ(12)
+  - **タクソノミー v3.0（2026-02-21）**:
+    - Deep Pattern一択（Speed Log廃止済み）
+    - 3層タクソノミー: ジャンル(13) × イベントタグ(19) × 力学タグ(16)
+    - 力学は4×4構造: 支配(4) × 対立(4) × 崩壊(4) × 転換(4)
   - **Nowpatternスクリプト群**:
     - `scripts/nowpattern_article_builder.py` — v3.0 HTML生成（Deep Pattern + Speed Log）
     - `scripts/nowpattern_publisher.py` — Ghost投稿 + 記事インデックス管理
@@ -673,4 +675,4 @@ VPSのリソース（ブラウザ、メール、API）を最大限に活用し�
 
 ---
 
-*最終更新: 2026-02-18 — Nowpattern 2モード制v3.0完成（Deep Pattern 6,000-7,000語 + Speed Log 200-400語）、builder/publisher分離、力学ダイアグラムSVG生成、自己参照ナレッジグラフ、NEO_INSTRUCTIONS_V2.md 17セクション完成*
+*最終更新: 2026-02-21 — タクソノミーv3.0統一完了（力学16個4×4 + イベント19個 + ジャンル12個）、publisher.pyバリデーション追加、Speed Log廃止*
