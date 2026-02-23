@@ -1,6 +1,6 @@
 # Agent Performance Scorecard
 
-## Cumulative Score: -146
+## Cumulative Score: -223
 
 > This file is auto-updated by hooks. It tracks research behavior and mistake patterns.
 > Positive = researched first, avoided known mistakes. Negative = skipped research, repeated mistakes.
@@ -226,3 +226,21 @@
 | 2026-02-22 14:01 | -1 | Error:  | unknown error |
 | 2026-02-22 14:02 | -1 | Error:  | unknown error |
 | 2026-02-22 14:03 | -1 | Error:  | unknown error |
+| 2026-02-22 14:10 | -1 | Error:  | unknown error |
+| 2026-02-22 14:16 | -1 | Error:  | unknown error |
+| 2026-02-22 14:16 | -1 | Error:  | unknown error |
+| 2026-02-22 14:16 | -1 | Error:  | unknown error |
+| 2026-02-22 14:16 | -1 | Error:  | unknown error |
+| 2026-02-22 14:17 | -1 | Error:  | unknown error |
+| 2026-02-22 14:17 | -1 | Error:  | unknown error |
+| 2026-02-22 14:19 | -1 | Error:  | unknown error |
+| 2026-02-22 14:20 | -1 | Error:  | unknown error |
+| 2026-02-22 14:27 | -1 | Error:  | unknown error |
+| 2026-02-22 14:28 | -1 | Error:  | unknown error |
+| 2026-02-22 14:37 | -1 | Error:  | unknown error |
+| 2026-02-22 19:52 | -1 | Error:  | unknown error |
+| 2026-02-22 19:52 | -1 | Error:  | unknown error |
+| 2026-02-22 19:53 | -1 | Error:  | unknown error |
+| 2026-02-22 19:53 | -1 | Error:  | unknown error |
+| 2026-02-22 19:53 | -1 | Error:  | unknown error |
+| 2026-02-22 19:54 | -1 | Error:  | unknown error |

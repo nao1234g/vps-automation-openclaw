@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a1628"/>
+      <stop offset="100%" style="stop-color:#0d2137"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff"/>
+      <stop offset="100%" style="stop-color:#0088cc"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff"/>
+      <stop offset="50%" style="stop-color:#0099dd"/>
+      <stop offset="100%" style="stop-color:#00d4ff"/>
+    </linearGradient>
+    <!-- Subtle grid pattern -->
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(0,212,255,0.05)" stroke-width="0.5"/>
+    </pattern>
+    <clipPath id="circleClip">
+      <circle cx="200" cy="200" r="195"/>
+    </clipPath>
+  </defs>
+
+  <!-- Full background (for safety) -->
+  <rect width="400" height="400" fill="#0a1628"/>
+
+  <!-- Main circle background -->
+  <circle cx="200" cy="200" r="195" fill="url(#bg)"/>
+
+  <!-- Grid inside circle -->
+  <g clip-path="url(#circleClip)">
+    <rect width="400" height="400" fill="url(#grid)"/>
+  </g>
+
+  <!-- Outer ring (glowing accent) -->
+  <circle cx="200" cy="200" r="190" fill="none" stroke="url(#ring)" stroke-width="3" opacity="0.7"/>
+
+  <!-- Inner subtle ring -->
+  <circle cx="200" cy="200" r="175" fill="none" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+
+  <!-- Main "N" lettermark -->
+  <text x="200" y="225" font-family="'Helvetica Neue', Arial, sans-serif" font-size="180" font-weight="800" fill="white" text-anchor="middle" dominant-baseline="central" letter-spacing="-6">N</text>
+
+  <!-- Accent dot (analysis point) -->
+  <circle cx="295" cy="120" r="10" fill="url(#accent)"/>
+
+  <!-- Small dots pattern around the circle -->
+  <circle cx="200" cy="22" r="3" fill="#00d4ff" opacity="0.4"/>
+  <circle cx="310" cy="55" r="2.5" fill="#00d4ff" opacity="0.3"/>
+  <circle cx="370" cy="140" r="2" fill="#00d4ff" opacity="0.3"/>
+  <circle cx="380" cy="250" r="2.5" fill="#00d4ff" opacity="0.3"/>
+  <circle cx="335" cy="345" r="2" fill="#00d4ff" opacity="0.3"/>
+  <circle cx="200" cy="385" r="3" fill="#00d4ff" opacity="0.4"/>
+  <circle cx="65" cy="345" r="2" fill="#00d4ff" opacity="0.3"/>
+  <circle cx="22" cy="250" r="2.5" fill="#00d4ff" opacity="0.3"/>
+  <circle cx="30" cy="140" r="2" fill="#00d4ff" opacity="0.3"/>
+  <circle cx="90" cy="55" r="2.5" fill="#00d4ff" opacity="0.3"/>
+</svg>

@@ -1,9 +1,15 @@
 """
-Nowpattern Publisher v3.0
+Nowpattern Publisher v3.1
 Ghost投稿 + 記事インデックス更新を担当する。
 
 責務: 記事の外部公開とインデックス管理。HTML生成は nowpattern_article_builder.py が担当。
 タクソノミーバリデーション: taxonomy.json駆動のSTRICTバリデーション。不正タグは投稿をブロックする。
+フォーマットゲート: v5.3準拠チェック（FAST READ, TAG_BADGE, SUMMARY, Between the Lines, OPEN LOOP）
+
+v3.1 changes:
+  - genre slugプレフィックス廃止（genre-geopolitics → geopolitics）
+  - v5.3フォーマットゲート（np-tag-badge, np-summary 必須追加）
+  - speakable JSONLD更新（np-bottom-line廃止 → np-fast-read, np-summary, np-why-box）
 
 Ghostタグルール（v3.0）:
   - 全タグは英語name_en + taxonomy slugで統一（日本語名はbuilder側で表示翻訳）
@@ -35,6 +41,33 @@ import time
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+
+# ---------------------------------------------------------------------------
+# Genre-based URL structure (v4.0: routes.yaml collection routing)
+# ---------------------------------------------------------------------------
+
+# Routes.yaml collection priority order — determines URL for multi-genre articles.
+# The first matching genre in this order becomes the article's URL genre.
+GENRE_PRIORITY_ORDER = [
+    "geopolitics", "finance", "economy", "technology",
+    "crypto", "energy", "environment", "governance",
+    "business", "culture", "health", "media", "society",
+]
+
+
+def get_primary_genre_url(genre_slugs: list[str]) -> str:
+    """記事のジャンルスラッグリストから、URLに使うプライマリジャンルのパスを返す。
+
+    Args:
+        genre_slugs: ["crypto", "governance"] etc.
+    Returns:
+        "crypto" (routes.yamlの優先順位で最初にマッチしたジャンル)
+    """
+    for g in GENRE_PRIORITY_ORDER:
+        if g in genre_slugs:
+            return g
+    return ""
 
 
 # ---------------------------------------------------------------------------
@@ -236,6 +269,118 @@ def make_ghost_jwt(admin_api_key: str) -> str:
     return f"{signing_input}.{b64url(sig)}"
 
 
+def generate_organization_jsonld(
+    ghost_url: str = "https://nowpattern.com",
+) -> str:
+    """Nowpattern サイト全体の Organization JSON-LD を生成する。
+
+    Ghost 管理画面 → Settings → Code injection → Site Header に貼り付ける。
+    E-E-A-T シグナルとして機能し、AIアシスタントがサイトを「信頼できる情報源」として認識する。
+
+    generate_ghost_header_script() を呼び出すか、
+    ローカルで python -c "from nowpattern_publisher import generate_organization_jsonld; print(generate_organization_jsonld())"
+    を実行して Ghost に貼り付ける。
+    """
+    schema = {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "@id": f"{ghost_url}/#organization",
+        "name": "Nowpattern",
+        "url": ghost_url,
+        "logo": {
+            "@type": "ImageObject",
+            "url": f"{ghost_url}/content/images/2026/02/nowpattern_logo_profile.svg",
+            "width": 512,
+            "height": 512,
+        },
+        "sameAs": [
+            "https://x.com/nowpattern",
+        ],
+        "description": (
+            "Nowpattern analyzes global geopolitical and macro events through structural dynamics. "
+            "Each article maps historical patterns, stakeholder conflicts, and 3-scenario probability forecasts."
+        ),
+        "knowsAbout": [
+            "Geopolitics", "Macroeconomics", "Platform Economics",
+            "Structural Pattern Analysis", "Scenario Forecasting",
+            "Regulatory Capture", "Power Transition Theory",
+            "Geopolitical Risk", "Economic Warfare",
+        ],
+        "publishingPrinciples": f"{ghost_url}/about/",
+        "diversityPolicy": f"{ghost_url}/about/",
+        "foundingDate": "2026",
+        "inLanguage": ["ja", "en"],
+    }
+    jsonld_str = json.dumps(schema, ensure_ascii=False, separators=(",", ":"))
+    return f'<script type="application/ld+json">{jsonld_str}</script>'
+
+
+def generate_article_jsonld(
+    title: str,
+    excerpt: str,
+    url: str,
+    published_at: str,
+    image_url: str = "",
+    dynamics_tags: list[str] | None = None,
+    language: str = "ja",
+    ghost_url: str = "https://nowpattern.com",
+) -> str:
+    """記事ごとのJSONLDを生成する（SpeculativeArticle + speakable）。
+
+    AIO最適化の要:
+    - `SpeculativeArticle`: nowpatternの3シナリオ予測をGoogleがAI予測記事として認識
+    - `speakable`: BOTTOM LINE / Why it matters がGoogleAIOに直接引用される
+    - `author.knowsAbout`: 力学タグを専門知識シグナルとして登録
+
+    Ghost APIの`codeinjection_foot`フィールドに文字列として渡す。
+    """
+    keywords = [t.replace(" ", "-").lower() for t in (dynamics_tags or [])]
+
+    schema = {
+        "@context": "https://schema.org",
+        "@type": ["NewsArticle", "SpeculativeArticle"],
+        "headline": title[:110],  # Googleは110文字以内を推奨
+        "description": excerpt[:200],
+        "url": url,
+        "datePublished": published_at,
+        "dateModified": published_at,
+        "author": {
+            "@type": "Organization",
+            "name": "Nowpattern",
+            "url": f"{ghost_url}/about/",
+            "knowsAbout": keywords or [
+                "Geopolitics", "Economic Analysis", "Platform Economics",
+                "Structural Pattern Analysis", "Scenario Forecasting",
+            ],
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Nowpattern",
+            "logo": {
+                "@type": "ImageObject",
+                "url": f"{ghost_url}/content/images/2026/02/nowpattern_logo_profile.svg",
+            },
+        },
+        "inLanguage": "ja" if language == "ja" else "en",
+        "keywords": keywords,
+        # speakable: これらのCSSセレクタの内容をAI/音声が直接引用する
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": [".np-fast-read", ".np-summary", ".np-why-box"],
+        },
+    }
+    if image_url:
+        schema["image"] = {
+            "@type": "ImageObject",
+            "url": image_url,
+            "width": 1200,
+            "height": 630,
+        }
+
+    jsonld_str = json.dumps(schema, ensure_ascii=False, separators=(",", ":"))
+    return f'<script type="application/ld+json">{jsonld_str}</script>'
+
+
 def post_to_ghost(
     title: str,
     html: str,
@@ -246,6 +391,7 @@ def post_to_ghost(
     featured: bool = False,
     language: str = "ja",
     tag_objects: list[dict] | None = None,
+    codeinjection_foot: str = "",
 ) -> dict:
     """Ghost Admin APIに記事を投稿する（lexical HTML card方式 — CSSを保持）
 
@@ -308,18 +454,18 @@ def post_to_ghost(
         "Authorization": f"Ghost {token}",
         "Content-Type": "application/json",
     }
-    body = {
-        "posts": [
-            {
-                "title": title,
-                "lexical": json.dumps(lexical_doc),
-                "tags": ghost_tags,
-                "status": status,
-                "featured": featured,
-                "email_segment": "none",
-            }
-        ]
+    post_payload: dict = {
+        "title": title,
+        "lexical": json.dumps(lexical_doc),
+        "tags": ghost_tags,
+        "status": status,
+        "featured": featured,
+        "email_segment": "none",
     }
+    if codeinjection_foot:
+        post_payload["codeinjection_foot"] = codeinjection_foot
+
+    body = {"posts": [post_payload]}
 
     resp = requests.post(url, json=body, headers=headers, verify=False, timeout=30)
     if resp.status_code == 201:
@@ -393,6 +539,8 @@ def update_ghost_post(
 # ---------------------------------------------------------------------------
 
 DEFAULT_INDEX_PATH = "/opt/shared/nowpattern_article_index.json"
+DEFAULT_SITEMAP_PATH = "/opt/shared/sitemap-news.xml"
+DEFAULT_LLMS_TXT_PATH = "/opt/shared/llms.txt"
 
 
 def load_index(index_path: str = DEFAULT_INDEX_PATH) -> dict:
@@ -525,6 +673,54 @@ def generate_article_id(mode: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# X (Twitter) API v2 posting
+# ---------------------------------------------------------------------------
+
+_X_MAX_CHARS = 1400
+
+
+def post_to_x(
+    text: str,
+    api_key: str,
+    api_secret: str,
+    access_token: str,
+    access_token_secret: str,
+) -> dict:
+    """X API v2 でツイートを投稿する（OAuth1.0a / requests_oauthlib）。
+
+    認証情報は環境変数から渡すこと（コードに直書き禁止）:
+        TWITTER_API_KEY, TWITTER_API_SECRET,
+        TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET
+    """
+    if not all([api_key, api_secret, access_token, access_token_secret]):
+        print("  SKIP X: API credentials not set")
+        return {"skipped": True, "reason": "Missing X API credentials"}
+
+    try:
+        from requests_oauthlib import OAuth1
+        import requests as req
+    except ImportError:
+        print("  ERROR X: requests_oauthlib not installed. Run: pip install requests-oauthlib")
+        return {"error": "requests_oauthlib not installed"}
+
+    auth = OAuth1(api_key, api_secret, access_token, access_token_secret)
+    resp = req.post(
+        "https://api.twitter.com/2/tweets",
+        auth=auth,
+        json={"text": text[:_X_MAX_CHARS]},
+        timeout=30,
+    )
+    if resp.status_code in (200, 201):
+        tweet_id = resp.json().get("data", {}).get("id", "")
+        tweet_url = f"https://x.com/i/web/status/{tweet_id}"
+        print(f"  OK X: published → {tweet_url}")
+        return {"tweet_id": tweet_id, "url": tweet_url}
+    else:
+        print(f"  ERROR X {resp.status_code}: {resp.text[:300]}")
+        return {"error": resp.status_code, "detail": resp.text[:300]}
+
+
+# ---------------------------------------------------------------------------
 # High-level publish functions
 # ---------------------------------------------------------------------------
 
@@ -548,6 +744,19 @@ def publish_deep_pattern(
     # v5.0: Delta support
     bottom_line: str = "",
     scenario_summary: list[dict] | None = None,
+    # v5.1: X posting (JP + EN 同時投稿)
+    # build_x_post_texts() で生成したテキストを渡す。空文字ならX投稿スキップ
+    x_post_ja: str = "",
+    x_post_en: str = "",
+    x_api_key: str = "",
+    x_api_secret: str = "",
+    x_access_token: str = "",
+    x_access_token_secret: str = "",
+    # v5.2: JSONLD excerpt (指定しなければ bottom_line にフォールバック)
+    excerpt: str = "",
+    # v5.2: 投稿後に sitemap を自動再生成するか
+    auto_sitemap: bool = True,
+    sitemap_output_path: str = DEFAULT_SITEMAP_PATH,
 ) -> dict:
     """Deep Pattern記事をGhostに投稿し、インデックスを更新する
 
@@ -557,13 +766,14 @@ def publish_deep_pattern(
     - 実際のGhost APIレスポンスURLを使用（slug truncationによる404を防止）
     """
 
-    # --- v4.0 フォーマットゲート（最終出口バリデーション） ---
-    v4_markers = ["np-bottom-line", "np-between-lines", "np-open-loop"]
-    missing = [m for m in v4_markers if m not in html]
+    # --- v5.3 フォーマットゲート（最終出口バリデーション） ---
+    # v5.3: TAG_BADGE (np-tag-badge) + SUMMARY (np-summary) 必須追加
+    v5_markers = ["np-fast-read", "np-between-lines", "np-open-loop", "np-tag-badge", "np-summary"]
+    missing = [m for m in v5_markers if m not in html]
     if missing:
-        print(f"  BLOCK v4.0 validation: HTML missing {', '.join(missing)}")
-        print(f"     -> See ARTICLE_FORMAT_SPEC.md to add v4.0 fields")
-        raise ValueError(f"v4.0 format validation failed: missing {', '.join(missing)}")
+        print(f"  BLOCK v5.3 validation: HTML missing {', '.join(missing)}")
+        print(f"     -> See docs/ARTICLE_FORMAT.md for required sections")
+        raise ValueError(f"v5.3 format validation failed: missing {', '.join(missing)}")
 
     # --- タクソノミーバリデーション + 正規化（STRICT: 不正タグ→投稿ブロック） ---
     print("  Taxonomy validation (STRICT)...")
@@ -571,13 +781,40 @@ def publish_deep_pattern(
     event_resolved = resolve_tag_list(event_tags, "event")
     dynamics_resolved = resolve_tag_list(dynamics_tags, "dynamics")
 
-    # 固定タグ追加
+    # --- ジャンル数バリデーション（1〜2個必須） ---
+    if len(genre_resolved) < 1:
+        raise ValueError("ジャンルタグが0個です。最低1個のジャンルタグが必要です。")
+    if len(genre_resolved) > 2:
+        raise ValueError(f"ジャンルタグが{len(genre_resolved)}個です。最大2個までです: {[t['name'] for t in genre_resolved]}")
+
+    # --- ジャンルタグをroutes.yaml優先順位でソート（URL決定に影響） ---
+    genre_resolved.sort(
+        key=lambda t: GENRE_PRIORITY_ORDER.index(t["slug"]) if t["slug"] in GENRE_PRIORITY_ORDER else 99
+    )
+
+    # タグ構築: ジャンルを先頭に（Ghost primary_tag = 最初のタグ → URL決定に使用）
     tag_objects = (
-        [{"name": "Nowpattern", "slug": "nowpattern"}, {"name": "Deep Pattern", "slug": "deep-pattern"}]
-        + genre_resolved + event_resolved + dynamics_resolved
+        genre_resolved
+        + [{"name": "Nowpattern", "slug": "nowpattern"}, {"name": "Deep Pattern", "slug": "deep-pattern"}]
+        + event_resolved + dynamics_resolved
     )
 
     # Step 1: Ghost投稿（slug指定方式）
+    # JSONLD事前生成（published_atは暫定値。Ghost APIレスポンスのURLが確定後に使う）
+    published_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00")
+    # excerpt: 明示指定 > bottom_line > title の優先順
+    _excerpt = excerpt or bottom_line or title
+    jsonld = generate_article_jsonld(
+        title=title,
+        excerpt=_excerpt,
+        url="",  # Ghost投稿前はURLが不明 — 投稿後に update_ghost_post でURLを更新できるが
+                 # 初回投稿時はtitleベースのslugで十分（AIOはクロール後に拾う）
+        published_at=published_at,
+        dynamics_tags=dynamics_tags,
+        language="ja" if not title_en else ("en" if title_en == title else "ja"),
+        ghost_url=ghost_url,
+    )
+
     ghost_result = post_to_ghost(
         title=title,
         html=html,
@@ -586,6 +823,7 @@ def publish_deep_pattern(
         admin_api_key=admin_api_key,
         status=status,
         featured=True,
+        codeinjection_foot=jsonld,
     )
 
     # 実際のGhost URLを使用（slug truncationによる404を防止）
@@ -593,7 +831,18 @@ def publish_deep_pattern(
     ghost_id = ghost_result.get("id", "")
     url = ghost_result.get("url", "")
     if not url and slug:
-        url = f"{ghost_url}/{slug}/"
+        # フォールバック: routes.yamlのジャンルベースURL構造に合わせる
+        genre_slugs = [t["slug"] for t in genre_resolved]
+        primary_genre = get_primary_genre_url(genre_slugs)
+        lang = "ja" if not title_en else ("en" if title_en == title else "ja")
+        if lang == "en" and primary_genre:
+            url = f"{ghost_url}/en/{primary_genre}/{slug}/"
+        elif lang == "en":
+            url = f"{ghost_url}/en/{slug}/"
+        elif primary_genre:
+            url = f"{ghost_url}/{primary_genre}/{slug}/"
+        else:
+            url = f"{ghost_url}/{slug}/"
 
     # 正規化後のタグ名をリストに書き戻す（インデックス用）
     genre_names = [t["name"] for t in genre_resolved]
@@ -624,12 +873,42 @@ def publish_deep_pattern(
     )
     save_index(index, index_path)
 
+    # Step 3: X 投稿（JP + EN 同時投稿）
+    # x_post_ja / x_post_en は build_x_post_texts() で事前生成して渡す
+    x_results = {}
+    x_creds = dict(
+        api_key=x_api_key,
+        api_secret=x_api_secret,
+        access_token=x_access_token,
+        access_token_secret=x_access_token_secret,
+    )
+    if x_post_ja:
+        print("  Posting to X (JA)...")
+        x_results["ja"] = post_to_x(text=x_post_ja, **x_creds)
+    if x_post_en:
+        print("  Posting to X (EN)...")
+        x_results["en"] = post_to_x(text=x_post_en, **x_creds)
+
+    # Step 4: Sitemap 自動再生成（投稿後にインデックスが更新された状態で生成）
+    sitemap_path = ""
+    if auto_sitemap:
+        try:
+            sitemap_path = generate_news_sitemap(
+                index_path=index_path,
+                output_path=sitemap_output_path,
+                ghost_url=ghost_url,
+            )
+        except Exception as e:
+            print(f"  WARN: sitemap generation failed: {e}")
+
     print(f"OK: Deep Pattern '{title}' published + indexed as {article_id}")
     return {
         "article_id": article_id,
         "ghost_result": ghost_result,
         "url": url,
         "index_updated": True,
+        "x_results": x_results,
+        "sitemap_path": sitemap_path,
     }
 
 
@@ -692,6 +971,191 @@ def publish_speed_log(
 
 
 # ---------------------------------------------------------------------------
+# News Sitemap generation (Google News Sitemap + llms.txt deployment)
+# ---------------------------------------------------------------------------
+
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def generate_news_sitemap(
+    index_path: str = DEFAULT_INDEX_PATH,
+    output_path: str = DEFAULT_SITEMAP_PATH,
+    ghost_url: str = "https://nowpattern.com",
+    max_articles: int = 1000,
+    news_days: int = 2,
+) -> str:
+    """Google News Sitemap XML を記事インデックスから生成する。
+
+    Google News Sitemap は直近 2日間 の記事のみ収録可能。
+    通常の sitemap.xml は max_articles 件の全記事を収録する。
+
+    出力:
+        output_path に sitemap-news.xml を書き込む
+        output_path.replace("-news.xml", ".xml") に全記事 sitemap.xml を書き込む
+
+    VPS Caddyでの配信方法（/etc/caddy/Caddyfile に追記）:
+        handle /sitemap-news.xml {
+            root * /opt/shared
+            file_server
+        }
+        handle /sitemap.xml {
+            root * /opt/shared
+            file_server
+        }
+    """
+    index = load_index(index_path)
+    articles = index.get("articles", [])
+
+    if not articles:
+        print("WARN: No articles in index, skipping sitemap generation")
+        return ""
+
+    now_utc = datetime.now(timezone.utc)
+    cutoff_news = now_utc.timestamp() - (news_days * 86400)
+
+    # ─── Google News Sitemap (直近2日間のみ) ─────────────────────────────
+    news_items = []
+    for a in sorted(articles, key=lambda x: x.get("published_at", ""), reverse=True):
+        url = a.get("url", "")
+        if not url:
+            slug = a.get("slug", "")
+            if slug:
+                url = f"{ghost_url}/{slug}/"
+            else:
+                continue
+
+        pub_at = a.get("published_at", "")
+        try:
+            dt = datetime.fromisoformat(pub_at.replace("Z", "+00:00"))
+            if dt.timestamp() < cutoff_news:
+                continue  # 2日以上前の記事はNews Sitemapに含めない
+            pub_str = dt.strftime("%Y-%m-%dT%H:%M:%S+00:00")
+        except (ValueError, AttributeError):
+            continue
+
+        title = a.get("title_ja") or a.get("title_en", "")
+        genre_tags = a.get("genre_tags", [])
+        keywords = ", ".join(genre_tags[:3]) if genre_tags else "geopolitics"
+
+        news_items.append(
+            f'  <url>\n'
+            f'    <loc>{url}</loc>\n'
+            f'    <news:news>\n'
+            f'      <news:publication>\n'
+            f'        <news:name>Nowpattern</news:name>\n'
+            f'        <news:language>ja</news:language>\n'
+            f'      </news:publication>\n'
+            f'      <news:publication_date>{pub_str}</news:publication_date>\n'
+            f'      <news:title><![CDATA[{title}]]></news:title>\n'
+            f'      <news:keywords>{keywords}</news:keywords>\n'
+            f'    </news:news>\n'
+            f'  </url>'
+        )
+
+    news_xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
+        '        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">\n'
+        + ("\n".join(news_items) if news_items else "  <!-- no recent articles -->") + "\n"
+        "</urlset>\n"
+    )
+
+    # ─── Standard Sitemap (全記事) ────────────────────────────────────────
+    all_items = []
+    for a in sorted(articles, key=lambda x: x.get("published_at", ""), reverse=True)[:max_articles]:
+        url = a.get("url", "")
+        if not url:
+            slug = a.get("slug", "")
+            if slug:
+                url = f"{ghost_url}/{slug}/"
+            else:
+                continue
+
+        pub_at = a.get("published_at", "")
+        try:
+            dt = datetime.fromisoformat(pub_at.replace("Z", "+00:00"))
+            lastmod = dt.strftime("%Y-%m-%d")
+        except (ValueError, AttributeError):
+            lastmod = now_utc.strftime("%Y-%m-%d")
+
+        all_items.append(
+            f'  <url>\n'
+            f'    <loc>{url}</loc>\n'
+            f'    <lastmod>{lastmod}</lastmod>\n'
+            f'    <changefreq>weekly</changefreq>\n'
+            f'    <priority>0.8</priority>\n'
+            f'  </url>'
+        )
+
+    all_xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        + ("\n".join(all_items) if all_items else "  <!-- no articles -->") + "\n"
+        "</urlset>\n"
+    )
+
+    # ─── Write files ─────────────────────────────────────────────────────
+    p_news = Path(output_path)
+    p_news.parent.mkdir(parents=True, exist_ok=True)
+    p_news.write_text(news_xml, encoding="utf-8")
+    print(f"OK: News sitemap ({len(news_items)} articles) -> {output_path}")
+
+    p_all = Path(output_path.replace("-news.xml", ".xml"))
+    p_all.write_text(all_xml, encoding="utf-8")
+    print(f"OK: Full sitemap ({len(all_items)} articles) -> {p_all}")
+
+    return output_path
+
+
+def deploy_llms_txt(
+    output_path: str = DEFAULT_LLMS_TXT_PATH,
+) -> str:
+    """llms.txt をスクリプトディレクトリから /opt/shared/ にコピーする。
+
+    VPS Caddyでの配信方法（/etc/caddy/Caddyfile に追記）:
+        handle /llms.txt {
+            root * /opt/shared
+            file_server
+        }
+    """
+    src = os.path.join(_SCRIPT_DIR, "llms.txt")
+    if not os.path.exists(src):
+        print(f"WARN: llms.txt not found at {src}")
+        return ""
+
+    p = Path(output_path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    import shutil
+    shutil.copy2(src, output_path)
+    print(f"OK: llms.txt deployed -> {output_path}")
+    return output_path
+
+
+def deploy_robots_txt(
+    output_path: str = "/opt/shared/robots.txt",
+) -> str:
+    """robots.txt をスクリプトディレクトリから /opt/shared/ にコピーする。
+
+    Ghost は独自の robots.txt を持つが、Caddy レベルで上書きする方法:
+        handle /robots.txt {
+            root * /opt/shared
+            file_server
+        }
+    """
+    src = os.path.join(_SCRIPT_DIR, "robots.txt")
+    if not os.path.exists(src):
+        print(f"WARN: robots.txt not found at {src}")
+        return ""
+
+    p = Path(output_path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    import shutil
+    shutil.copy2(src, output_path)
+    print(f"OK: robots.txt deployed -> {output_path}")
+    return output_path
+
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
@@ -707,5 +1171,8 @@ if __name__ == "__main__":
     print("  publish_speed_log()     - Speed Log記事投稿+インデックス更新")
     print("  find_related_articles() - 同じ力学タグの過去記事検索")
     print("  generate_article_id()   - 記事ID自動生成")
+    print("  generate_news_sitemap() - Google News + 全記事 sitemap.xml 生成")
+    print("  deploy_llms_txt()       - llms.txt を /opt/shared/ にデプロイ")
+    print("  deploy_robots_txt()     - robots.txt を /opt/shared/ にデプロイ")
     print()
-    print("HTML生成は nowpattern_article_builder.py を使用してください。")
+    print("HTML生成は nowpattern_article_builder.py を使用してください.")

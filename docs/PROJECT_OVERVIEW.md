@@ -309,8 +309,7 @@ k6 run tests/load/k6-config.js
 
 #### セットアップ
 - [README.md](../README.md) - プロジェクト概要
-- [QUICKSTART.md](QUICKSTART.md) - クイックスタート
-- [DEPLOYMENT.md](../DEPLOYMENT.md) - デプロイメントガイド
+- [DEPLOYMENT.md](../docs/archives/DEPLOYMENT.md) - デプロイメントガイド（アーカイブ）
 
 #### 開発
 - [DEVELOPMENT.md](../DEVELOPMENT.md) - 開発者ガイド
@@ -338,7 +337,6 @@ k6 run tests/load/k6-config.js
 - [FAQ.md](FAQ.md) - よくある質問（45問）
 - [DISASTER_RECOVERY.md](DISASTER_RECOVERY.md) - 災害復旧
 - [COST_OPTIMIZATION.md](COST_OPTIMIZATION.md) - コスト最適化
-- [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) - マイグレーションガイド
 
 ## 🎓 ベストプラクティス
 

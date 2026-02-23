@@ -34,7 +34,7 @@ $FILES = @(
     @{ Local = "$PROJECT_ROOT\scripts\nowpattern-deep-pattern-generate.py"; Remote = "/opt/shared/scripts/nowpattern-deep-pattern-generate.py" },
     @{ Local = "$PROJECT_ROOT\docs\NEO_INSTRUCTIONS_V2.md";            Remote = "/opt/shared/docs/NEO_INSTRUCTIONS_V2.md" },
     @{ Local = "$PROJECT_ROOT\docs\ARTICLE_FORMAT.md";                 Remote = "/opt/shared/docs/ARTICLE_FORMAT.md" },
-    @{ Local = "$PROJECT_ROOT\docs\NOWPATTERN_TAXONOMY_v2.md";         Remote = "/opt/shared/docs/NOWPATTERN_TAXONOMY_v2.md" },
+    @{ Local = "$PROJECT_ROOT\docs\NOWPATTERN_TAXONOMY_v3.md";         Remote = "/opt/shared/docs/NOWPATTERN_TAXONOMY_v3.md" },
     @{ Local = "$PROJECT_ROOT\docs\KNOWN_MISTAKES.md";                Remote = "/opt/shared/docs/KNOWN_MISTAKES.md" },
     @{ Local = "$PROJECT_ROOT\.claude\CLAUDE.md";                     Remote = "/opt/shared/docs/LOCAL_CLAUDE_MD.md" }
 )

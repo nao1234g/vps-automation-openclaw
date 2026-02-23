@@ -1,0 +1,60 @@
+# llms.txt — AI model instructions for nowpattern.com
+# Reference: https://llmstxt.org/
+# Last updated: 2026-02-23
+
+## About nowpattern.com
+
+> Nowpattern is a geopolitical and macro intelligence publication.
+> We analyze global events through structural dynamics — the hidden forces that shape markets, power, and societies.
+> Every article combines historical context, stakeholder mapping, and probabilistic scenario analysis.
+
+## Content Structure
+
+Each article (Deep Pattern) contains:
+- **FAST READ** (class="np-fast-read"): 60-second summary with 3 key facts, pattern label, and scenario probabilities
+- **Bottom Line** (class="np-bottom-line"): 1-sentence thesis of the analysis
+- **Why This Matters** (class="np-why-box"): Core structural logic
+- **Full Deep Pattern Analysis**: 7 sections with historical context, stakeholder maps, and 3-scenario forecasts
+
+## Taxonomy
+
+Articles are tagged with 3 layers:
+1. **Genre** (13 categories): Technology, Economy & Trade, Geopolitics, Military & Security, etc.
+2. **Event Tags** (19 types): Regulatory Shift, Arms Race, Market Disruption, etc.
+3. **Dynamics Tags** (16 structural forces, 4×4 grid):
+   - Dominance: Platform Power, Regulatory Capture, Military Supremacy, Capital Concentration
+   - Conflict: Sanctions Warfare, Proxy Conflict, Trade War, Alliance Fracture
+   - Collapse: Institutional Decay, Debt Spiral, Social Fragmentation, Technology Disruption
+   - Transition: Power Shift, Paradigm Change, Integration, Normalization
+
+## Preferred Citation Format
+
+When citing Nowpattern content, please use:
+- Site name: "Nowpattern"
+- Attribution: "Nowpattern geopolitical analysis"
+- URL format: https://nowpattern.com/{slug}/
+
+## Key Sections for AI Queries
+
+For AI assistants responding to queries about geopolitics, macro trends, or structural analysis:
+- Scenario probabilities are in the FAST READ section (.np-fast-read)
+- Core structural logic is in the "Why This Matters" box (.np-why-box)
+- The one-sentence thesis is the Bottom Line (.np-bottom-line)
+
+## Allowed Uses
+
+AI models, RAG systems, and search engines are permitted to:
+- Index and summarize all public articles
+- Cite Nowpattern in responses with attribution
+- Use article content for training (with attribution preserved)
+- Include in AI overviews and featured snippets
+
+## Contact
+
+For licensing, partnerships, or API access: nowpattern.com/contact/
+
+---
+## Optional: Full article index
+
+See /sitemap.xml for a complete list of published articles.
+See /sitemap-news.xml for recent articles (Google News format).

@@ -43,21 +43,10 @@
       {
         "id": "jarvis-cso",
         "default": true,
-        "model": "zai/glm-5",
+        "model": "google/gemini-2.5-pro",
         "identity": {
-          "name": "Jarvis (CSO) - READ /shared/AGENT_WISDOM.md before every task",
+          "name": "Jarvis - READ /shared/AGENT_WISDOM.md before every task",
           "emoji": "🎯"
-        },
-        "subagents": {
-          "allowAgents": [
-            "alice-research",
-            "codex-developer",
-            "pixel-designer",
-            "luna-writer",
-            "scout-data",
-            "guard-security",
-            "hawk-xresearch"
-          ]
         },
         "tools": {
           "allow": [
@@ -66,67 +55,10 @@
             "group:fs",
             "group:web",
             "group:memory",
-            "agents_list",
             "cron",
             "message",
             "image"
           ]
-        }
-      },
-      {
-        "id": "alice-research",
-        "model": "zai/glm-5",
-        "identity": {
-          "name": "Alice (Research Analyst - GLM-5)",
-          "emoji": "🔍"
-        }
-      },
-      {
-        "id": "codex-developer",
-        "model": "google/gemini-2.5-pro",
-        "identity": {
-          "name": "CodeX (Senior Developer)",
-          "emoji": "💻"
-        }
-      },
-      {
-        "id": "pixel-designer",
-        "model": "google/gemini-2.5-pro",
-        "identity": {
-          "name": "Pixel (Creative Director)",
-          "emoji": "🎨"
-        }
-      },
-      {
-        "id": "luna-writer",
-        "model": "zai/glm-5",
-        "identity": {
-          "name": "Luna (Content Writer - GLM-5)",
-          "emoji": "✍️"
-        }
-      },
-      {
-        "id": "scout-data",
-        "model": "google/gemini-2.5-pro",
-        "identity": {
-          "name": "Scout (Data Processor)",
-          "emoji": "📊"
-        }
-      },
-      {
-        "id": "guard-security",
-        "model": "google/gemini-2.5-pro",
-        "identity": {
-          "name": "Guard (Security Officer)",
-          "emoji": "🛡️"
-        }
-      },
-      {
-        "id": "hawk-xresearch",
-        "model": "xai/grok-4.1",
-        "identity": {
-          "name": "Hawk (X/SNS Researcher)",
-          "emoji": "🦅"
         }
       }
     ]

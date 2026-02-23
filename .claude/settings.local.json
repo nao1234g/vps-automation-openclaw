@@ -1,7 +1,8 @@
 {
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "ANTHROPIC_MODEL": "claude-opus-4-6"
+    "ANTHROPIC_MODEL": "claude-opus-4-6",
+    "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1"
   },
   "permissions": {
     "allow": [
@@ -93,12 +94,70 @@
       "WebFetch(domain:til.simonwillison.net)",
       "WebFetch(domain:vizzly.dev)",
       "Read(//tmp/**)",
-      "Read(//c/tmp/**)"
+      "Read(//c/tmp/**)",
+      "WebFetch(domain:www.mediawiki.org)",
+      "WebFetch(domain:baymard.com)",
+      "WebFetch(domain:www.uxpin.com)",
+      "WebFetch(domain:ithy.com)",
+      "WebFetch(domain:css-tricks.com)",
+      "WebFetch(domain:get.foundation)",
+      "WebFetch(domain:claudefa.st)",
+      "WebFetch(domain:mem0.ai)",
+      "WebFetch(domain:aslamdoctor.com)",
+      "WebFetch(domain:amitkoth.com)",
+      "WebFetch(domain:richardporter.dev)",
+      "WebFetch(domain:openai.com)",
+      "WebFetch(domain:www.eesel.ai)",
+      "WebFetch(domain:platform.openai.com)",
+      "WebFetch(domain:userjot.com)",
+      "WebFetch(domain:nutstudio.imyfone.com)",
+      "WebFetch(domain:www.interconnects.ai)",
+      "WebFetch(domain:www.noviai.ai)",
+      "WebFetch(domain:slator.com)",
+      "WebFetch(domain:www.crescendo.ai)",
+      "WebFetch(domain:www.sciencedaily.com)",
+      "WebFetch(domain:www.nasa.gov)",
+      "WebFetch(domain:developer.tenten.co)",
+      "WebFetch(domain:seranking.com)",
+      "WebFetch(domain:www.advancedwebranking.com)",
+      "WebFetch(domain:www.weglot.com)",
+      "WebFetch(domain:www.stackmatix.com)",
+      "WebFetch(domain:www.seroundtable.com)",
+      "WebFetch(domain:multilipi.com)",
+      "WebFetch(domain:backlinko.com)",
+      "WebFetch(domain:www.gtechme.com)",
+      "WebFetch(domain:www.ulpa.jp)",
+      "WebFetch(domain:llmstxt.org)",
+      "WebFetch"
     ],
     "defaultMode": "bypassPermissions"
   },
   "model": "claude-opus-4-6",
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/flash-cards-inject.sh\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/fact-checker.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "matcher": "",
@@ -131,6 +190,16 @@
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/research-reward.sh\"",
             "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "TodoWrite",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/task-tracker.py\"",
+            "timeout": 10
           }
         ]
       }

@@ -155,6 +155,14 @@ _LABELS = {
         "delta_why": "なぜ変わったか:",
         "delta_chain": "このトピック{n}回目の分析",
         "delta_first": "このトピック初の分析（今後の差分の起点）",
+        # v5.1: Fast Read section
+        "fast_read_label": "FAST READ",
+        "fast_read_subtitle": "読了 1分",
+        "fast_read_points_heading": "── 3点で理解する",
+        "fast_read_pattern_heading": "── NOW PATTERN",
+        "fast_read_scenarios_heading": "── 確率と対応",
+        "fast_read_cta_suffix": "続きを読む",
+        "fast_read_cta_arrow": "↓",
     },
     "en": {
         "genre": "Genre:",
@@ -202,6 +210,14 @@ _LABELS = {
         "delta_why": "What changed:",
         "delta_chain": "Update #{n} on this topic",
         "delta_first": "First analysis on this topic (future delta baseline)",
+        # v5.1: Fast Read section
+        "fast_read_label": "FAST READ",
+        "fast_read_subtitle": "1-min read",
+        "fast_read_points_heading": "── 3 Key Points",
+        "fast_read_pattern_heading": "── NOW PATTERN",
+        "fast_read_scenarios_heading": "── Scenarios & Response",
+        "fast_read_cta_suffix": "Read more",
+        "fast_read_cta_arrow": "↓",
     },
 }
 
@@ -237,14 +253,14 @@ _STYLES = {
     "tag_genre": 'style="color: #2563eb; font-weight: 600; margin-right: 8px; text-decoration: none;"',
     "tag_event": 'style="color: #16a34a; font-weight: 600; margin-right: 8px; text-decoration: none;"',
     "tag_dynamics": 'style="color: #FF1A75; font-weight: 600; margin-right: 8px; text-decoration: none;"',
-    "stakeholder_table": 'style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.95em;"',
-    "stakeholder_th": 'style="background: #121e30; color: #c9a84c; padding: 8px 12px; text-align: left; border: 1px solid #e0dcd4;"',
-    "stakeholder_td": 'style="padding: 8px 12px; border: 1px solid #e0dcd4;"',
-    # v4.0: Bottom Line TL;DR box
-    "bottom_line_box": 'class="np-bottom-line" style="background: linear-gradient(135deg, #121e30, #1a2940); border-radius: 8px; padding: 20px 24px; margin: 0 0 24px 0; border-left: 4px solid #c9a84c;"',
-    "bottom_line_h3": 'style="color: #c9a84c; font-size: 0.85em; letter-spacing: 0.15em; text-transform: uppercase; margin: 0 0 12px 0;"',
-    "bottom_line_text": 'style="color: #ffffff; font-size: 1.05em; line-height: 1.6; margin: 0 0 8px 0;"',
-    "bottom_line_meta": 'style="color: #b0b0b0; font-size: 0.9em; margin: 4px 0 0 0;"',
+    # stakeholder: カード型（CSS classベース — インラインスタイル不要）
+    "stakeholder_grid": 'class="np-stakeholder-grid"',
+    # v5.2: Bottom Line TL;DR box (light mode)
+    "bottom_line_box": 'style="background: #ffffff; border-radius: 8px; padding: 20px 24px; margin: 0 0 24px 0; border: 1px solid #e8e4dc; border-left: 4px solid #FF1A75;"',
+    "bottom_line_h3": 'style="color: #FF1A75; font-size: 0.85em; letter-spacing: 0.15em; text-transform: uppercase; margin: 0 0 12px 0;"',
+    "bottom_line_text": 'style="color: #1a1a1a; font-size: 1.05em; line-height: 1.6; margin: 0 0 8px 0;"',
+    "bottom_line_meta": 'style="color: #555; font-size: 0.9em; margin: 4px 0 0 0;"',
+    "bottom_line_label": 'style="color: #FF1A75; font-weight: 700;"',
     # v4.0: Between the Lines callout
     "between_lines_box": 'class="np-between-lines" style="background: #fff8e6; border: 1px solid #f0d060; border-radius: 6px; padding: 16px 20px; margin: 24px 0;"',
     "between_lines_h3": 'style="color: #8a6d00; font-size: 0.95em; font-weight: 700; margin: 0 0 8px 0;"',
@@ -254,20 +270,158 @@ _STYLES = {
     "open_loop_h3": 'style="color: #121e30; font-size: 1em; margin: 0 0 8px 0;"',
     "open_loop_text": 'style="color: #333; line-height: 1.6; margin: 4px 0;"',
     "open_loop_link": 'style="color: #c9a84c; font-weight: 600;"',
-    # v5.0: Delta section
-    "delta_box": 'class="np-delta" style="background: linear-gradient(135deg, #0d1b2a, #1b2838); border-radius: 8px; padding: 20px 24px; margin: 0 0 24px 0; border-left: 4px solid #00d4ff;"',
-    "delta_h3": 'style="color: #00d4ff; font-size: 0.85em; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 12px 0;"',
-    "delta_prev_link": 'style="color: #00d4ff; text-decoration: underline;"',
+    # v5.2: Delta section (light mode)
+    "delta_box": 'style="background: #f0f7ff; border-radius: 8px; padding: 20px 24px; margin: 0 0 24px 0; border: 1px solid #d0e4f0; border-left: 4px solid #0088cc;"',
+    "delta_h3": 'style="color: #0088cc; font-size: 0.85em; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 12px 0;"',
+    "delta_prev_link": 'style="color: #0066aa; text-decoration: underline;"',
     "delta_table": 'style="width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9em;"',
-    "delta_th": 'style="background: #0a1628; color: #00d4ff; padding: 6px 10px; text-align: center; border: 1px solid #1e3a5f;"',
-    "delta_td": 'style="padding: 6px 10px; text-align: center; color: #e0e0e0; border: 1px solid #1e3a5f;"',
-    "delta_td_up": 'style="padding: 6px 10px; text-align: center; color: #4CAF50; font-weight: bold; border: 1px solid #1e3a5f;"',
-    "delta_td_down": 'style="padding: 6px 10px; text-align: center; color: #FF5252; font-weight: bold; border: 1px solid #1e3a5f;"',
-    "delta_td_neutral": 'style="padding: 6px 10px; text-align: center; color: #888; border: 1px solid #1e3a5f;"',
-    "delta_why_text": 'style="color: #b0c4de; line-height: 1.6; margin: 8px 0 0 0; font-size: 0.95em;"',
-    "delta_chain_badge": 'style="display: inline-block; background: #00d4ff; color: #0a0a23; font-size: 0.75em; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px;"',
+    "delta_th": 'style="background: #e4f0fa; color: #0066aa; padding: 6px 10px; text-align: center; border: 1px solid #c0d8e8; font-weight: 700;"',
+    "delta_td": 'style="padding: 6px 10px; text-align: center; color: #333; border: 1px solid #d0e4f0;"',
+    "delta_td_up": 'style="padding: 6px 10px; text-align: center; color: #16a34a; font-weight: bold; border: 1px solid #d0e4f0;"',
+    "delta_td_down": 'style="padding: 6px 10px; text-align: center; color: #dc2626; font-weight: bold; border: 1px solid #d0e4f0;"',
+    "delta_td_neutral": 'style="padding: 6px 10px; text-align: center; color: #888; border: 1px solid #d0e4f0;"',
+    "delta_why_text": 'style="color: #444; line-height: 1.6; margin: 8px 0 0 0; font-size: 0.95em;"',
+    "delta_chain_badge": 'style="display: inline-block; background: #0088cc; color: #fff; font-size: 0.75em; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px;"',
     "delta_first_badge": 'style="color: #888; font-size: 0.8em; font-style: italic; margin-top: 4px;"',
+    # v5.2: Fast Read box (light mode)
+    "fast_read_box": 'style="background: #faf8f5; border-radius: 10px; padding: 24px 28px; margin: 0 0 28px 0; border: 1px solid #e8e4dc; border-left: 4px solid #c9a84c;"',
+    "fast_read_header_row": 'style="display: flex; align-items: center; justify-content: space-between; margin: 0 0 16px 0;"',
+    "fast_read_label": 'style="color: #c9a84c; font-size: 0.8em; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 700;"',
+    "fast_read_subtitle": 'style="color: #888; font-size: 0.8em;"',
+    "fast_read_hook": 'style="color: #1a1a1a; font-size: 1.05em; line-height: 1.6; margin: 0 0 18px 0; font-weight: 500;"',
+    "fast_read_section_heading": 'style="color: #888; font-size: 0.78em; letter-spacing: 0.08em; margin: 0 0 8px 0; font-weight: 400;"',
+    "fast_read_points_wrap": 'style="margin: 0 0 16px 0;"',
+    "fast_read_point_li": 'style="color: #333; font-size: 0.93em; line-height: 1.65; padding: 2px 0; list-style: none;"',
+    "fast_read_pattern_wrap": 'style="margin: 0 0 16px 0; padding: 12px 16px; background: rgba(201,168,76,0.06); border-radius: 6px; border: 1px solid rgba(201,168,76,0.2);"',
+    "fast_read_pattern_tags": 'style="color: #FF1A75; font-weight: 700; font-size: 1em; margin: 0 0 4px 0;"',
+    "fast_read_pattern_summary": 'style="color: #555; font-size: 0.88em; margin: 0; line-height: 1.5;"',
+    "fast_read_scenarios_wrap": 'style="margin: 0 0 16px 0;"',
+    "fast_read_scenario_line": 'style="color: #333; font-size: 0.9em; line-height: 1.75; margin: 2px 0;"',
+    "fast_read_cta_wrap": 'style="border-top: 1px solid rgba(201,168,76,0.3); padding-top: 12px; margin-top: 4px;"',
+    "fast_read_cta_text": 'style="color: #8a6d1b; font-size: 0.95em; margin: 0;"',
+    "fast_read_cta_strong": 'style="color: #8a6d1b; font-weight: 700;"',
 }
+
+
+# ---------------------------------------------------------------------------
+# Fast Read section builder (v5.1)
+# ---------------------------------------------------------------------------
+
+def _build_fast_read_html(
+    hook: str,
+    facts: list,
+    dynamics_tags: str,
+    dynamics_summary: str,
+    scenarios: list,
+    cta_question: str,
+    cta_time: str = "",
+    language: str = "ja",
+) -> str:
+    """FAST READ セクションのHTMLを生成する（v5.1）
+
+    記事の最上部に置く1分完結サマリーボックス。
+    hook が空の場合は空文字を返す（後方互換: 既存記事には表示しない）。
+
+    Args:
+        hook: 逆説フック1文（「性能の話じゃない。〜」）
+        facts: 事実リスト（tupleまたはstrのリスト）。先頭3件を使用。
+        dynamics_tags: 力学タグ文字列（"後発逆転 × 勝者総取り"）
+        dynamics_summary: 力学の一文説明
+        scenarios: シナリオリスト（tupleまたはdict形式）。先頭3件を使用。
+        cta_question: 好奇心ギャップ質問（「なぜ起きたのか？」）
+        cta_time: 次セクションの読了時間（"2分" or "2 min"）
+        language: "ja" or "en"
+    """
+    if not hook:
+        return ""
+
+    S = _STYLES
+    lbl_label = _L("fast_read_label", language)
+    lbl_subtitle = _L("fast_read_subtitle", language)
+    lbl_points = _L("fast_read_points_heading", language)
+    lbl_pattern = _L("fast_read_pattern_heading", language)
+    lbl_scenarios = _L("fast_read_scenarios_heading", language)
+    lbl_cta_suffix = _L("fast_read_cta_suffix", language)
+    lbl_cta_arrow = _L("fast_read_cta_arrow", language)
+
+    # --- 3点箇条書き（facts先頭3件） ---
+    point_items = []
+    for i, fact in enumerate(facts[:3]):
+        if isinstance(fact, (list, tuple)) and len(fact) >= 2:
+            text = fact[1]
+        elif isinstance(fact, str):
+            text = fact
+        else:
+            text = str(fact)
+        point_items.append(f'<li {S["fast_read_point_li"]}>• {text}</li>')
+    points_html = f'<ul style="padding: 0; margin: 0;">{"".join(point_items)}</ul>'
+
+    # --- NOW PATTERN ---
+    dynamics_display = _localize_tags_string(dynamics_tags, language) if dynamics_tags else ""
+    pattern_html = (
+        f'<div {S["fast_read_pattern_wrap"]}>'
+        f'<p {S["fast_read_section_heading"]}>{lbl_pattern} ─────────</p>'
+        f'<p {S["fast_read_pattern_tags"]}>{dynamics_display}</p>'
+        f'<p {S["fast_read_pattern_summary"]}>{dynamics_summary}</p>'
+        f'</div>'
+    ) if dynamics_display else ""
+
+    # --- 確率と対応 / Scenarios & Response ---
+    scenario_lines = []
+    emoji_map = {"基本": "🟡", "楽観": "🟢", "悲観": "🔴",
+                 "Base": "🟡", "Optimistic": "🟢", "Pessimistic": "🔴",
+                 "base": "🟡", "optimistic": "🟢", "pessimistic": "🔴"}
+    for s in (scenarios or [])[:3]:
+        if isinstance(s, dict):
+            label = s.get("label", "")
+            prob = s.get("probability", "")
+            action = s.get("action", s.get("content", ""))
+        elif isinstance(s, (list, tuple)) and len(s) >= 3:
+            label = str(s[0])
+            prob = str(s[1])
+            action = str(s[3]) if len(s) >= 4 else str(s[2])
+        else:
+            continue
+        emoji = emoji_map.get(label, "•")
+        prob_clean = str(prob).replace("%", "").strip()
+        scenario_lines.append(
+            f'<p {S["fast_read_scenario_line"]}>'
+            f'{emoji} <strong style="color: #1a1a1a; font-weight: 700;">{label} {prob_clean}%</strong>'
+            f' — {action}'
+            f'</p>'
+        )
+    scenarios_fast_html = "".join(scenario_lines)
+
+    # --- CTA ---
+    cta_time_str = f"（{cta_time}）" if cta_time else ""
+    cta_html = (
+        f'<div {S["fast_read_cta_wrap"]}>'
+        f'<p {S["fast_read_cta_text"]}>'
+        f'{cta_question} → '
+        f'<strong {S["fast_read_cta_strong"]}>{lbl_cta_suffix}{cta_time_str} {lbl_cta_arrow}</strong>'
+        f'</p>'
+        f'</div>'
+    ) if cta_question else ""
+
+    return (
+        f'<div class="np-fast-read" {S["fast_read_box"]}>'
+        f'<div {S["fast_read_header_row"]}>'
+        f'<span {S["fast_read_label"]}>⚡ {lbl_label}</span>'
+        f'<span {S["fast_read_subtitle"]}>{lbl_subtitle}</span>'
+        f'</div>'
+        f'<p {S["fast_read_hook"]}>{hook}</p>'
+        f'<div {S["fast_read_points_wrap"]}>'
+        f'<p {S["fast_read_section_heading"]}>{lbl_points} ─────────</p>'
+        f'{points_html}'
+        f'</div>'
+        f'{pattern_html}'
+        f'<div {S["fast_read_scenarios_wrap"]}>'
+        f'<p {S["fast_read_section_heading"]}>{lbl_scenarios} ──────</p>'
+        f'{scenarios_fast_html}'
+        f'</div>'
+        f'{cta_html}'
+        f'</div>'
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -451,31 +605,66 @@ def _build_facts_html(facts: list[tuple[str, str]]) -> str:
 
 
 def _build_stakeholder_html(stakeholder_map: list[tuple[str, str, str, str, str]], language: str = "ja") -> str:
-    """利害関係者マップのHTMLテーブルを生成"""
+    """利害関係者マップを5列スティッキーテーブルで生成（アクター列左固定・横スクロール）"""
     if not stakeholder_map:
         return ""
+
+    # ラベル
+    lbl_actor = _L("actor", language)
+    lbl_public = _L("public_position", language)
+    lbl_private = _L("private_interest", language)
+    lbl_gains = _L("gains", language)
+    lbl_loses = _L("loses", language)
+
+    # スタイル定数
+    S_WRAP = 'style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px;border:1px solid #dde4ed;margin:12px 0"'
+    S_TABLE = 'style="width:100%;border-collapse:collapse;table-layout:auto;font-size:0.88em"'
+
+    # v5.2: ヘッダー行スタイル (light mode)
+    TH_BASE = "padding:9px 12px;font-size:0.78em;font-weight:600;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;border-bottom:2px solid #dde4ed"
+    TH_ACTOR = f'{TH_BASE};position:sticky;left:0;z-index:2;background:#f5f3f0;color:#1a1a1a;text-align:left;min-width:90px'
+    TH_PUBLIC = f'{TH_BASE};background:#f0f4f8;color:#2c3e55;text-align:left;min-width:140px'
+    TH_PRIVATE = f'{TH_BASE};background:#faf6ee;color:#7a5a1a;text-align:left;min-width:140px'
+    TH_GAINS = f'{TH_BASE};background:#f0faf4;color:#1a6b35;text-align:left;min-width:140px'
+    TH_LOSES = f'{TH_BASE};background:#fdf0f0;color:#8b2a2a;text-align:left;min-width:140px'
+
+    header = (
+        f'<tr>'
+        f'<th style="{TH_ACTOR}">{lbl_actor}</th>'
+        f'<th style="{TH_PUBLIC}">{lbl_public}</th>'
+        f'<th style="{TH_PRIVATE}">{lbl_private}</th>'
+        f'<th style="{TH_GAINS}">&#x2705; {lbl_gains}</th>'
+        f'<th style="{TH_LOSES}">&#x274c; {lbl_loses}</th>'
+        f'</tr>'
+    )
+
+    # データ行スタイル
+    TD_BASE = "padding:10px 12px;border-bottom:1px solid #eeeae4;vertical-align:top;line-height:1.5"
     rows = []
-    for actor, public_pos, private_int, gains, loses in stakeholder_map:
+    for i, (actor, public_pos, private_int, gains, loses) in enumerate(stakeholder_map):
+        bg_row = "#faf9f7" if i % 2 == 0 else "#f3f1ee"
+        td_actor = f'{TD_BASE};position:sticky;left:0;z-index:1;background:{bg_row};font-weight:700;color:#1a2940;white-space:nowrap;font-size:0.92em'
+        td_public = f'{TD_BASE};background:{bg_row};color:#2c3e55'
+        td_private = f'{TD_BASE};background:{bg_row};color:#7a5a1a'
+        td_gains = f'{TD_BASE};background:{bg_row};color:#1a6b35'
+        td_loses = f'{TD_BASE};background:{bg_row};color:#8b2a2a'
         rows.append(
             f'<tr>'
-            f'<td {_STYLES["stakeholder_td"]}><strong>{actor}</strong></td>'
-            f'<td {_STYLES["stakeholder_td"]}>{public_pos}</td>'
-            f'<td {_STYLES["stakeholder_td"]}>{private_int}</td>'
-            f'<td {_STYLES["stakeholder_td"]}>{gains}</td>'
-            f'<td {_STYLES["stakeholder_td"]}>{loses}</td>'
+            f'<td style="{td_actor}">{actor}</td>'
+            f'<td style="{td_public}">{public_pos}</td>'
+            f'<td style="{td_private}">{private_int}</td>'
+            f'<td style="{td_gains}">{gains}</td>'
+            f'<td style="{td_loses}">{loses}</td>'
             f'</tr>'
         )
+
     return (
-        f'<table {_STYLES["stakeholder_table"]}>'
-        f'<tr>'
-        f'<th {_STYLES["stakeholder_th"]}>{_L("actor", language)}</th>'
-        f'<th {_STYLES["stakeholder_th"]}>{_L("public_position", language)}</th>'
-        f'<th {_STYLES["stakeholder_th"]}>{_L("private_interest", language)}</th>'
-        f'<th {_STYLES["stakeholder_th"]}>{_L("gains", language)}</th>'
-        f'<th {_STYLES["stakeholder_th"]}>{_L("loses", language)}</th>'
-        f'</tr>'
-        f'{"".join(rows)}'
+        f'<div {S_WRAP}>'
+        f'<table {S_TABLE}>'
+        f'<thead>{header}</thead>'
+        f'<tbody>{"".join(rows)}</tbody>'
         f'</table>'
+        f'</div>'
     )
 
 
@@ -605,6 +794,68 @@ def _build_scenarios_html(scenarios: list, triggers: list[tuple[str, str]] | Non
     return "\n".join(parts)
 
 
+def _build_market_consensus_html(market_consensus: list[dict], language: str = "ja") -> str:
+    """Polymarket市場コンセンサスパネルのHTMLを生成。
+
+    market_consensus: list of dicts with keys:
+      - question: str (e.g., "Fed rate decision in March?")
+      - outcomes: dict (e.g., {"No change": 95.9, "Cut 25bp": 4.1})
+      - volume_usd: float (optional, for display)
+      - source_url: str (optional, link to Polymarket)
+
+    NEOがembed_data.jsonから関連マーケットを選んで渡す。
+    """
+    if not market_consensus:
+        return ""
+
+    heading = "市場コンセンサス（Polymarket）" if language == "ja" else "Market Consensus (Polymarket)"
+    note = "※ 予測市場のリアルタイムオッズ。取引量が多いほど信頼性が高い。" if language == "ja" else "Real-time prediction market odds. Higher volume = higher confidence."
+
+    rows = []
+    for m in market_consensus[:5]:  # Max 5 markets
+        q = m.get("question", "?")
+        outcomes = m.get("outcomes", {})
+        vol = m.get("volume_usd", 0)
+
+        # Build outcome badges
+        badges = []
+        for outcome, prob in sorted(outcomes.items(), key=lambda x: -x[1]):
+            # Color: green for high prob, red for low
+            if prob >= 70:
+                color = "#2d8a4e"
+            elif prob >= 40:
+                color = "#b8860b"
+            else:
+                color = "#888"
+            badges.append(
+                f'<span style="display:inline-block; margin:2px 6px 2px 0; '
+                f'padding:2px 8px; background:{color}15; border:1px solid {color}40; '
+                f'border-radius:12px; font-size:0.85em; color:{color};">'
+                f'{outcome} <strong>{prob:.0f}%</strong></span>'
+            )
+
+        vol_str = ""
+        if vol:
+            vol_str = f' <span style="color:#999; font-size:0.8em;">Vol: ${vol/1e6:.1f}M</span>'
+
+        rows.append(
+            f'<div style="margin-bottom:10px;">'
+            f'<p style="margin:0 0 4px 0; font-weight:600; font-size:0.95em;">{q}{vol_str}</p>'
+            f'<div>{"".join(badges)}</div>'
+            f'</div>'
+        )
+
+    return (
+        f'<div style="margin:20px 0; padding:16px 20px; background:#f8f7f4; '
+        f'border-left:4px solid #6366f1; border-radius:4px;">'
+        f'<h3 style="margin:0 0 4px 0; font-size:1em; color:#6366f1;">{heading}</h3>'
+        f'<p style="margin:0 0 12px 0; font-size:0.8em; color:#999;">{note}</p>'
+        f'{"".join(rows)}'
+        f'<p style="margin:8px 0 0 0; font-size:0.75em; color:#bbb;">Source: Polymarket (gamma-api)</p>'
+        f'</div>'
+    )
+
+
 def _build_sources_html(source_urls: list[tuple[str, str]], language: str = "ja") -> str:
     """ソース一覧のHTMLを生成"""
     if not source_urls:
@@ -662,6 +913,12 @@ def build_deep_pattern_html(
     open_loop_trigger: str = "",
     open_loop_series: str = "",
     prediction_id: str = "",
+    # v5.1: Fast Read section
+    fast_read_hook: str = "",
+    fast_read_cta_question: str = "",
+    fast_read_cta_time: str = "",
+    # v5.3: Polymarket integration
+    market_consensus: list[dict] | None = None,
 ) -> str:
     """Deep Pattern記事のHTMLを生成する（v4.0 Flywheel Format）
     language: "ja" = 日本語見出し, "en" = 英語見出し
@@ -677,12 +934,25 @@ def build_deep_pattern_html(
     - prediction_id: 予測追跡システム用ID
     """
 
+    # --- v5.1: Fast Read section (rendered first if hook provided) ---
+    fast_read_html = _build_fast_read_html(
+        hook=fast_read_hook,
+        facts=facts,
+        dynamics_tags=dynamics_tags,
+        dynamics_summary=dynamics_summary,
+        scenarios=scenarios or [],
+        cta_question=fast_read_cta_question,
+        cta_time=fast_read_cta_time,
+        language=language,
+    )
+
     facts_html = _build_facts_html(facts)
     stakeholder_html = _build_stakeholder_html(stakeholder_map or [], language=language)
     data_html = _build_data_points_html(data_points or [])
     dynamics_body_html = _build_dynamics_section_html(dynamics_sections or [], dynamics_intersection, language=language)
     history_html = _build_pattern_history_html(pattern_history or [], history_pattern_summary, language=language)
     scenarios_html = _build_scenarios_html(scenarios or [], triggers, language=language)
+    market_consensus_html = _build_market_consensus_html(market_consensus or [], language=language)
     sources_html = _build_sources_html(source_urls or [], language=language)
     related_html = _build_related_html(related_articles or [])
 
@@ -713,19 +983,9 @@ def build_deep_pattern_html(
     lbl_stake = _L("stakeholder_map", language)
     lbl_data = _L("by_the_numbers", language)
 
-    # --- v4.0: Bottom Line TL;DR ---
+    # --- v5.2: BOTTOM LINE removed (FAST READ is the complete upper replacement) ---
+    # bottom_line params kept for backward compat but no longer rendered
     bottom_line_html = ""
-    if bottom_line:
-        bl_parts = []
-        bl_parts.append(f'<h3 {_STYLES["bottom_line_h3"]}>{_L("bottom_line", language)}</h3>')
-        bl_parts.append(f'<p {_STYLES["bottom_line_text"]}>{bottom_line}</p>')
-        if bottom_line_pattern:
-            bl_parts.append(f'<p {_STYLES["bottom_line_meta"]}><strong {_STYLES["pattern_strong"]}>{_L("bottom_line_pattern", language)}</strong> {bottom_line_pattern}</p>')
-        if bottom_line_scenario:
-            bl_parts.append(f'<p {_STYLES["bottom_line_meta"]}><strong {_STYLES["pattern_strong"]}>{_L("bottom_line_scenario", language)}</strong> {bottom_line_scenario}</p>')
-        if bottom_line_watch:
-            bl_parts.append(f'<p {_STYLES["bottom_line_meta"]}><strong {_STYLES["pattern_strong"]}>{_L("bottom_line_watch", language)}</strong> {bottom_line_watch}</p>')
-        bottom_line_html = f'<div {_STYLES["bottom_line_box"]}>{"".join(bl_parts)}</div>'
 
     # --- v4.0: Between the Lines ---
     between_lines_html = ""
@@ -757,8 +1017,8 @@ def build_deep_pattern_html(
     lbl_phist = _L("pattern_history", language)
     lbl_next = _L("whats_next", language)
 
-    template = f"""<!-- v5.0: Bottom Line TL;DR -->
-{bottom_line_html}
+    template = f"""<!-- v5.2: Fast Read (1-min summary — replaces Bottom Line) -->
+{fast_read_html}
 
 <!-- v5.0: Delta — What Changed -->
 {delta_section_html}
@@ -825,6 +1085,9 @@ def build_deep_pattern_html(
 <!-- Section 6: What's Next -->
 <h2 {_STYLES["h2"]}>{lbl_next}</h2>
 {scenarios_html}
+
+<!-- v5.3: Market Consensus (Polymarket) -->
+{market_consensus_html}
 
 <!-- v4.0: Open Loop -->
 {open_loop_html}
@@ -951,6 +1214,248 @@ def build_article_html(
 
 
 # ---------------------------------------------------------------------------
+# X post text generator (v5.1)
+# ---------------------------------------------------------------------------
+
+_X_MAX_CHARS = 1400
+
+_X_EMOJI_MAP = {
+    "基本": "🟡", "楽観": "🟢", "悲観": "🔴",
+    "Base": "🟡", "Optimistic": "🟢", "Pessimistic": "🔴",
+}
+
+
+def _build_single_x_post(
+    title: str,
+    fast_read_hook: str,
+    facts: list,
+    dynamics_tags: str,
+    dynamics_summary: str,
+    scenarios: list,
+    url: str,
+    extra_hashtags: list,
+    pattern: str,
+    language: str,
+    delta_data: dict | None,
+) -> str:
+    """JP or EN どちらか1つのX投稿テキストを生成する。"""
+    dyn_local = _localize_tags_string(dynamics_tags, language)
+    tag_tokens = [t.strip() for t in dyn_local.replace(" × ", " / ").split(" / ") if t.strip()]
+    dyn_hashtags = " ".join(f"#{t}" for t in tag_tokens[:2])
+
+    brand_tag = "#Nowpattern"
+    extra = " ".join(f"#{h.strip().lstrip('#')}" for h in (extra_hashtags or [])[:2])
+    hashtag_str = f"{brand_tag} {extra}".strip()
+
+    if pattern == "P1":
+        hook = fast_read_hook or title
+        facts_lines = "\n".join(f"▪ {text}" for _, text in (facts or [])[:3])
+        summary = (dynamics_summary or "")[:120]
+        cta = "深掘りはこちら" if language == "ja" else "Full analysis"
+        parts = [
+            hook, "",
+            facts_lines, "",
+            dyn_hashtags, summary, "",
+            f"🔍 {cta} → {url}",
+            hashtag_str,
+        ]
+
+    elif pattern == "P2":
+        if not delta_data:
+            return _build_single_x_post(
+                title=title, fast_read_hook=fast_read_hook, facts=facts,
+                dynamics_tags=dynamics_tags, dynamics_summary=dynamics_summary,
+                scenarios=scenarios, url=url, extra_hashtags=extra_hashtags,
+                pattern="P1", language=language, delta_data=None,
+            )
+        delta_reason = delta_data.get("delta_reason", "")
+        prev_scens = delta_data.get("prev_scenarios", [])
+        curr_scens = delta_data.get("current_scenarios", [])
+
+        def _get_prob(scen_list, labels):
+            for s in scen_list:
+                if s.get("label") in labels:
+                    return s.get("probability", "?")
+            return "?"
+
+        basic_labels = ["基本", "Base"]
+        prev_p = _get_prob(prev_scens, basic_labels)
+        curr_p = _get_prob(curr_scens, basic_labels)
+
+        if language == "ja":
+            header = "📊 シナリオ確率を更新"
+            change_line = f"前回: {prev_p}  →  今回: {curr_p}"
+            reason_line = f"なぜ変わったか: {delta_reason[:120]}"
+            cta = "更新記事"
+        else:
+            header = "📊 Scenario Update"
+            change_line = f"Before: {prev_p}  →  Now: {curr_p}"
+            reason_line = f"What changed: {delta_reason[:120]}"
+            cta = "Updated analysis"
+
+        parts = [
+            header, "",
+            change_line, reason_line, "",
+            f"🔍 {cta} → {url}",
+            hashtag_str,
+        ]
+
+    elif pattern == "P3":
+        scen_lines = []
+        for scen in (scenarios or [])[:3]:
+            label = scen[0] if len(scen) > 0 else ""
+            prob = scen[1] if len(scen) > 1 else ""
+            action = scen[3] if len(scen) > 3 else (scen[2] if len(scen) > 2 else "")
+            emoji = _X_EMOJI_MAP.get(label, "▪")
+            scen_lines.append(f"{emoji} {label}（{prob}）: {action[:60]}")
+
+        cta_text = "全分析・対応策はこちら" if language == "ja" else "Full analysis & action guide"
+        parts = [
+            title[:80], "",
+            "\n".join(scen_lines), "",
+            f"→ {cta_text} {url}",
+            hashtag_str,
+        ]
+
+    else:
+        parts = [title, url, hashtag_str]
+
+    text = "\n".join(p for p in parts if p is not None)
+    return text[:_X_MAX_CHARS]
+
+
+def build_x_post_texts(
+    title: str,
+    fast_read_hook: str = "",
+    facts: list | None = None,
+    dynamics_tags: str = "",
+    dynamics_summary: str = "",
+    scenarios: list | None = None,
+    url: str = "",
+    extra_hashtags: list[str] | None = None,
+    pattern: str = "P1",
+    delta_data: dict | None = None,
+) -> dict[str, str]:
+    """JP + EN の X投稿テキストを生成する（P1/P2/P3パターン対応）。
+
+    pattern:
+        "P1" — 好奇心ギャップ型（デフォルト）: フック → 3点 → 力学 → リンク
+        "P2" — 差分提示型（Delta）: 前回確率 → 今回確率 → なぜ変わった → リンク
+        "P3" — 損失回避型: シナリオ確率 + 対応策 → リンク
+
+    hashtags: #Nowpattern（必須） + extra_hashtags（1〜2個）
+    ❌ 内部タクソノミータグ（#後発逆転等）はXに入れない（Ghost専用）
+
+    Returns:
+        {"ja": "...", "en": "..."}  — それぞれ1400文字以内
+    """
+    common = dict(
+        title=title,
+        fast_read_hook=fast_read_hook,
+        facts=facts or [],
+        dynamics_tags=dynamics_tags,
+        dynamics_summary=dynamics_summary,
+        scenarios=scenarios or [],
+        url=url,
+        extra_hashtags=extra_hashtags or [],
+        pattern=pattern,
+        delta_data=delta_data,
+    )
+    return {
+        "ja": _build_single_x_post(**common, language="ja"),
+        "en": _build_single_x_post(**common, language="en"),
+    }
+
+
+# ---------------------------------------------------------------------------
+# FAQ section builder (FAQPage schema + AIO-optimized HTML)
+# ---------------------------------------------------------------------------
+
+def build_faq_html(
+    faqs: list[dict],
+    language: str = "ja",
+) -> str:
+    """FAQ セクション HTML + FAQPage JSON-LD を生成する。
+
+    AIアシスタント（ChatGPT/Claude/Perplexity等）は FAQPage スキーマを直接引用する。
+    Google も FAQリッチスニペットとして表示する。
+
+    faqs: [
+        {"q": "なぜ今この問題が重要なのか？", "a": "..."},
+        {"q": "投資家はどう対応すべきか？", "a": "..."},
+        ...
+    ]
+    最大5つまで（Googleのガイドラインに準拠）。
+
+    language: "ja" | "en"
+    """
+    if not faqs:
+        return ""
+
+    faqs = faqs[:5]  # Google推奨: 最大5問
+
+    lbl = {
+        "ja": {"heading": "よくある疑問", "q_prefix": "Q", "a_prefix": "A"},
+        "en": {"heading": "Frequently Asked Questions", "q_prefix": "Q", "a_prefix": "A"},
+    }.get(language, {"heading": "よくある疑問", "q_prefix": "Q", "a_prefix": "A"})
+
+    # --- HTML ---
+    faq_items_html = ""
+    for i, faq in enumerate(faqs, 1):
+        q = faq.get("q", "")
+        a = faq.get("a", "")
+        if not q or not a:
+            continue
+        faq_items_html += (
+            f'<div style="border-bottom:1px solid #2a2a3a;padding:16px 0;"'
+            f' itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">'
+            f'<p style="font-size:15px;font-weight:700;color:#e0d0a0;margin:0 0 8px 0;" itemprop="name">'
+            f'{lbl["q_prefix"]}{i}. {q}</p>'
+            f'<div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">'
+            f'<p style="font-size:14px;color:#b0b8c8;margin:0;line-height:1.7;" itemprop="text">{a}</p>'
+            f'</div>'
+            f'</div>\n'
+        )
+
+    section_html = (
+        f'<div class="np-faq-section" itemscope itemtype="https://schema.org/FAQPage"'
+        f' style="background:#0e1116;border:1px solid #2a2a3a;border-radius:8px;'
+        f'padding:24px;margin:32px 0;">\n'
+        f'<h3 style="font-size:16px;font-weight:700;color:#c9a84c;margin:0 0 16px 0;'
+        f'text-transform:uppercase;letter-spacing:.08em;">{lbl["heading"]}</h3>\n'
+        f'{faq_items_html}'
+        f'</div>\n'
+    )
+
+    # --- FAQPage JSON-LD (for AIO / Google rich results) ---
+    import json as _json
+    schema_items = [
+        {
+            "@type": "Question",
+            "name": faq.get("q", ""),
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": faq.get("a", ""),
+            },
+        }
+        for faq in faqs
+        if faq.get("q") and faq.get("a")
+    ]
+    schema = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": schema_items,
+    }
+    jsonld = (
+        f'<script type="application/ld+json">'
+        f'{_json.dumps(schema, ensure_ascii=False, separators=(",", ":"))}'
+        f'</script>\n'
+    )
+
+    return jsonld + section_html
+
+
+# ---------------------------------------------------------------------------
 # CLI usage
 # ---------------------------------------------------------------------------
 
@@ -967,5 +1472,7 @@ if __name__ == "__main__":
     print("  build_deep_pattern_html(language='en')  - Deep Pattern記事HTML生成")
     print("  build_speed_log_html(language='en')     - Speed Log記事HTML生成")
     print("  build_article_html()       - 旧API互換（Deep Patternにマップ）")
+    print("  build_x_post_texts()       - X投稿テキスト生成（P1/P2/P3、JP+EN）")
+    print("  build_faq_html()           - FAQ セクション + FAQPage JSON-LD 生成")
     print()
     print("Ghost投稿は nowpattern_publisher.py を使用してください。")

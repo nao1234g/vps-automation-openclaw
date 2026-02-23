@@ -1,368 +1,340 @@
 #!/usr/bin/env python3
 """
-article_validator.py — 記事公開前バリデーションゲート v2.0
+Nowpattern 記事品質バリデーター v3.0
+Ghost CMS内の全記事をv5.3フォーマット + genre URL構造で検証する。
 
-taxonomy.json駆動のSTRICTバリデーション。
-不正タグ → 即ブロック + 有効タグ一覧をエラーメッセージで返す。
+v3.0 changes:
+  - TAG_BADGE (np-tag-badge) 必須チェック追加
+  - SUMMARY (np-summary) 必須チェック追加
+  - ジャンルスラグをプレフィックスなしに修正 (geopolitics, economy, etc.)
+  - URL構造チェック修正
 
-breaking_pipeline_helper.py から呼ばれる（Step 0）。
-
-5層防御の第2層:
-  Layer 0: NEO指示書にタグ一覧（プロンプトレベル — 無視される可能性あり）
-  Layer 1: ★このスクリプト★（コードレベル — 回避不可能）
-  Layer 2: publisher.py STRICT validation（投稿時の二重チェック）
-  Layer 3: SDK Hooks（Ghost直接API呼び出しをブロック）
-  Layer 4: 投稿後監査cron（安全網）
-
-使い方:
-  python3 article_validator.py /tmp/article_12345.json          # チェックのみ
-  python3 article_validator.py /tmp/article_12345.json --strict  # 不合格時に exit(1)
-
-戻り値:
-  0 = 合格（公開OK）
-  1 = 不合格（公開ブロック）
+Usage:
+  python3 article_validator.py                # 全記事を検証
+  python3 article_validator.py --slug <slug>  # 特定記事のみ
+  python3 article_validator.py --json         # JSON出力
+  python3 article_validator.py --warnings     # 警告も表示
 """
 
 import json
-import os
+import re
 import sys
-import subprocess
+import time
+import argparse
+import requests
+import urllib3
+import jwt
 
-TELEGRAM_SCRIPT = "/opt/shared/scripts/send-telegram-message.py"
-TAXONOMY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "nowpattern_taxonomy.json")
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# ============================================================
-# Taxonomy Loading — Single Source of Truth
-# ============================================================
+GHOST_URL = "https://nowpattern.com"
+ADMIN_API_KEY = None
 
-_VALID_GENRES = {}      # name_en -> slug
-_VALID_EVENTS = {}      # name_en -> slug
-_VALID_DYNAMICS = {}    # name_en -> slug
-_TAG_LOOKUP = {}        # any_name_or_slug -> {"name_en": ..., "slug": ..., "type": ...}
-_TAXONOMY_LOADED = False
+# ── v5.3 セクション定義 ──
+# 必須セクション（これがないと不合格）
+REQUIRED_SECTIONS = {
+    "ja": {
+        "FAST READ": ["FAST READ", "⚡ FAST READ"],
+        "NOW PATTERN": ["NOW PATTERN"],
+    },
+    "en": {
+        "FAST READ": ["FAST READ", "⚡ FAST READ"],
+        "NOW PATTERN": ["NOW PATTERN"],
+    },
+}
 
+# v5.3必須: TAG_BADGE と SUMMARY（HTMLクラスで検出）
+REQUIRED_HTML_CLASSES = {
+    "np-tag-badge": "TAG_BADGE（タグバッジ）",
+    "np-summary": "SUMMARY（要約）",
+}
 
-def _load_taxonomy():
-    """taxonomy.jsonを読み込み、全タグの逆引きテーブルを構築する。"""
-    global _VALID_GENRES, _VALID_EVENTS, _VALID_DYNAMICS, _TAG_LOOKUP, _TAXONOMY_LOADED
+# 推奨セクション（なくても合格だが警告）
+RECOMMENDED_SECTIONS = {
+    "ja": {
+        "Between the Lines": ["行間を読む", "行間"],
+        "What's Next": ["今後のシナリオ", "今後の展望", "シナリオ分析"],
+        "OPEN LOOP": ["追跡ポイント", "注目すべきトリガー", "OPEN LOOP"],
+        "What happened": ["何が起きたか", "観測事実"],
+        "Big Picture": ["全体像", "歴史的文脈"],
+        "Pattern History": ["パターンの歴史", "パターン史"],
+    },
+    "en": {
+        "Between the Lines": ["Between the Lines"],
+        "What's Next": ["What's Next", "What&#x27;s Next"],
+        "OPEN LOOP": ["OPEN LOOP", "What to Watch Next"],
+        "What happened": ["What happened"],
+        "Big Picture": ["The Big Picture", "Big Picture"],
+        "Pattern History": ["Pattern History"],
+    },
+}
 
-    if _TAXONOMY_LOADED:
-        return
+# 禁止パターン（これがあったら不合格）
+FORBIDDEN_PATTERNS = {
+    "BOTTOM LINE": r"(?i)<h[23][^>]*>\s*BOTTOM\s+LINE\s*</h[23]>",
+    "Speed Log見出し": r"(?i)speed\s+log",
+    "観測ログ番号": r"観測ログ\s*#?\d+",
+    "np-bottom-line CSS": r"np-bottom-line",
+    "フッターTags行": r"Tags:\s*#",
+}
 
-    if not os.path.exists(TAXONOMY_PATH):
-        print(f"WARNING: taxonomy.json not found at {TAXONOMY_PATH}")
-        _TAXONOMY_LOADED = True
-        return
-
-    with open(TAXONOMY_PATH, "r", encoding="utf-8") as f:
-        tax = json.load(f)
-
-    for g in tax.get("genres", []):
-        _VALID_GENRES[g["name_en"]] = g["slug"]
-        _TAG_LOOKUP[g["name_en"]] = {"name_en": g["name_en"], "slug": g["slug"], "type": "genre"}
-        _TAG_LOOKUP[g["name_en"].lower()] = {"name_en": g["name_en"], "slug": g["slug"], "type": "genre"}
-        _TAG_LOOKUP[g["name_ja"]] = {"name_en": g["name_en"], "slug": g["slug"], "type": "genre"}
-        _TAG_LOOKUP[g["slug"]] = {"name_en": g["name_en"], "slug": g["slug"], "type": "genre"}
-
-    for e in tax.get("events", []):
-        _VALID_EVENTS[e["name_en"]] = e["slug"]
-        _TAG_LOOKUP[e["name_en"]] = {"name_en": e["name_en"], "slug": e["slug"], "type": "event"}
-        _TAG_LOOKUP[e["name_en"].lower()] = {"name_en": e["name_en"], "slug": e["slug"], "type": "event"}
-        _TAG_LOOKUP[e["name_ja"]] = {"name_en": e["name_en"], "slug": e["slug"], "type": "event"}
-        _TAG_LOOKUP[e["slug"]] = {"name_en": e["name_en"], "slug": e["slug"], "type": "event"}
-
-    for d in tax.get("dynamics", []):
-        _VALID_DYNAMICS[d["name_en"]] = d["slug"]
-        _TAG_LOOKUP[d["name_en"]] = {"name_en": d["name_en"], "slug": d["slug"], "type": "dynamics"}
-        _TAG_LOOKUP[d["name_en"].lower()] = {"name_en": d["name_en"], "slug": d["slug"], "type": "dynamics"}
-        _TAG_LOOKUP[d["name_ja"]] = {"name_en": d["name_en"], "slug": d["slug"], "type": "dynamics"}
-        _TAG_LOOKUP[d["slug"]] = {"name_en": d["name_en"], "slug": d["slug"], "type": "dynamics"}
-
-    _TAXONOMY_LOADED = True
-
-
-def _resolve_tag(input_tag: str) -> dict | None:
-    """任意の入力（name_en, name_ja, slug）を正規タグに解決する。"""
-    _load_taxonomy()
-    if input_tag in _TAG_LOOKUP:
-        return _TAG_LOOKUP[input_tag]
-    if input_tag.lower() in _TAG_LOOKUP:
-        return _TAG_LOOKUP[input_tag.lower()]
-    return None
-
-
-def _parse_tag_string(tag_value) -> list[str]:
-    """タグ値を個別タグのリストに分解する。
-    入力形式: 文字列（"A / B" or "A × B" or "A, B"）またはリスト
-    """
-    if isinstance(tag_value, list):
-        return [str(t).strip() for t in tag_value if str(t).strip()]
-
-    if isinstance(tag_value, str):
-        # まずスラッシュで分割、次に「×」で分割
-        parts = tag_value.replace("×", "/").replace(",", "/").split("/")
-        return [p.strip() for p in parts if p.strip()]
-
-    return []
-
-
-# ============================================================
-# Validation
-# ============================================================
-
-# v4.0 必須フィールド
-REQUIRED_V4_FIELDS = [
-    "bottom_line",
-    "bottom_line_pattern",
-    "bottom_line_scenario",
-    "bottom_line_watch",
-    "between_the_lines",
-    "open_loop_trigger",
-    "open_loop_series",
+# タグ検証
+VALID_GENRES_JA = [
+    "地政学・安全保障", "経済・貿易", "金融・市場", "ビジネス・産業",
+    "テクノロジー", "暗号資産", "エネルギー", "環境・気候",
+    "ガバナンス・法", "社会", "文化・エンタメ・スポーツ", "メディア・情報", "健康・科学",
+]
+VALID_GENRES_EN = [
+    "Geopolitics & Security", "Economy & Trade", "Finance & Markets",
+    "Business & Industry", "Technology", "Crypto & Web3", "Energy",
+    "Environment & Climate", "Governance & Law", "Society",
+    "Culture, Entertainment & Sports", "Media & Information", "Health & Science",
 ]
 
-# 既存の必須フィールド
-REQUIRED_BASE_FIELDS = [
-    "title",
-    "language",
-    "why_it_matters",
-    "facts",
-    "dynamics_tags",
-    "dynamics_summary",
-    "dynamics_sections",
-    "scenarios",
-    "genre_tags",
-    "event_tags",
-    "source_urls",
-    "x_comment",
+SYSTEM_TAGS = ["nowpattern", "deep-pattern", "lang-ja", "lang-en"]
+
+# ── ジャンルタグ + URL構造 ──
+VALID_GENRE_SLUGS = [
+    "geopolitics", "finance", "economy", "technology",
+    "crypto", "energy", "environment", "governance",
+    "business", "culture", "health", "media", "society",
 ]
+GENRE_PRIORITY_ORDER = list(VALID_GENRE_SLUGS)
 
 
-def _validate_tag_list(tags: list[str], tag_type: str, valid_set: dict) -> list[str]:
-    """タグリストをバリデーション。不正タグごとにエラーメッセージを返す。"""
-    errors = []
-    for tag in tags:
-        resolved = _resolve_tag(tag)
-        if resolved is None:
-            errors.append(
-                f"INVALID_{tag_type.upper()}: '{tag}' はタクソノミーに存在しません。"
-                f" 有効な{tag_type}タグ: {', '.join(sorted(valid_set.keys()))}"
-            )
-        elif resolved["type"] != tag_type:
-            errors.append(
-                f"WRONG_TYPE: '{tag}' は {resolved['type']} タグです（{tag_type} ではありません）。"
-                f" 有効な{tag_type}タグ: {', '.join(sorted(valid_set.keys()))}"
-            )
-    return errors
-
-
-def validate_article(article_data, strict=False):
-    """記事JSONをバリデーション。
-
-    Returns:
-        (is_valid, errors, warnings)
-    """
-    _load_taxonomy()
-    errors = []
-    warnings = []
-
-    title = article_data.get("title", "無題")
-
-    # ============================================================
-    # 1. 必須フィールドチェック
-    # ============================================================
-    for field in REQUIRED_BASE_FIELDS:
-        val = article_data.get(field)
-        if not val or (isinstance(val, (list, dict)) and len(val) == 0):
-            errors.append(f"必須フィールド '{field}' が空です")
-
-    # v4.0 フィールドチェック
-    missing_v4 = []
-    for field in REQUIRED_V4_FIELDS:
-        val = article_data.get(field, "")
-        if not val or (isinstance(val, str) and len(val.strip()) < 5):
-            missing_v4.append(field)
-
-    if missing_v4:
-        errors.append(f"v4.0必須フィールドが欠落: {', '.join(missing_v4)}")
-
-    # ============================================================
-    # 2. タクソノミー STRICT バリデーション（最重要）
-    # ============================================================
-    genre_tags = _parse_tag_string(article_data.get("genre_tags", ""))
-    event_tags = _parse_tag_string(article_data.get("event_tags", ""))
-    dynamics_tags = _parse_tag_string(article_data.get("dynamics_tags", ""))
-
-    # ジャンルタグ検証
-    if len(genre_tags) == 0:
-        errors.append("genre_tags が空です（最低1個必要）")
-    elif len(genre_tags) > 3:
-        errors.append(f"genre_tags が{len(genre_tags)}個（最大3個）")
-    errors.extend(_validate_tag_list(genre_tags, "genre", _VALID_GENRES))
-
-    # イベントタグ検証
-    if len(event_tags) == 0:
-        errors.append("event_tags が空です（最低1個必要）")
-    elif len(event_tags) > 3:
-        errors.append(f"event_tags が{len(event_tags)}個（最大3個）")
-    errors.extend(_validate_tag_list(event_tags, "event", _VALID_EVENTS))
-
-    # 力学タグ検証
-    if len(dynamics_tags) == 0:
-        errors.append("dynamics_tags が空です（最低1個必要）")
-    elif len(dynamics_tags) > 4:
-        errors.append(f"dynamics_tags が{len(dynamics_tags)}個（最大4個）")
-    errors.extend(_validate_tag_list(dynamics_tags, "dynamics", _VALID_DYNAMICS))
-
-    # 力学セクション内のタグも検証
-    for i, section in enumerate(article_data.get("dynamics_sections", [])):
-        section_tag = section.get("tag", "")
-        if section_tag:
-            resolved = _resolve_tag(section_tag)
-            if resolved is None:
-                errors.append(
-                    f"dynamics_sections[{i}].tag: '{section_tag}' はタクソノミーに存在しません。"
-                    f" 有効な力学タグ: {', '.join(sorted(_VALID_DYNAMICS.keys()))}"
-                )
-
-    # ============================================================
-    # 3. タイトルバリデーション
-    # ============================================================
-    if title:
-        forbidden_title_patterns = ["観測ログ", "Speed Log", "Deep Pattern", "#00"]
-        for pattern in forbidden_title_patterns:
-            if pattern in title:
-                errors.append(f"タイトルに禁止文字列 '{pattern}' が含まれています")
-
-    # ============================================================
-    # 4. シナリオチェック
-    # ============================================================
-    scenarios = article_data.get("scenarios", [])
-    if len(scenarios) < 3:
-        errors.append(f"シナリオが{len(scenarios)}件（最低3件必要）")
-    else:
-        total_prob = 0
-        for s in scenarios:
-            if isinstance(s, (list, tuple)) and len(s) >= 2:
-                prob_str = str(s[1]).strip().replace("%", "")
-                try:
-                    prob = float(prob_str)
-                    if prob > 1:
-                        prob = prob / 100.0
-                    total_prob += prob
-                except ValueError:
-                    warnings.append(f"シナリオ確率がパースできません: {s[1]}")
-            elif isinstance(s, dict):
-                prob_str = str(s.get("probability", "0")).strip().replace("%", "")
-                try:
-                    prob = float(prob_str)
-                    if prob > 1:
-                        prob = prob / 100.0
-                    total_prob += prob
-                except ValueError:
-                    pass
-
-        if abs(total_prob - 1.0) > 0.05:
-            warnings.append(f"シナリオ確率の合計が{total_prob*100:.0f}%（100%にすべき）")
-
-    # ============================================================
-    # 5. その他のチェック
-    # ============================================================
-    triggers = article_data.get("triggers", [])
-    if len(triggers) < 2:
-        warnings.append(f"トリガーが{len(triggers)}件（2件以上推奨）")
-
-    sources = article_data.get("source_urls", [])
-    if len(sources) < 2:
-        warnings.append(f"ソースが{len(sources)}件（2件以上推奨）")
-
-    dynamics_sections = article_data.get("dynamics_sections", [])
-    if len(dynamics_sections) < 2:
-        errors.append(f"力学分析が{len(dynamics_sections)}セクション（最低2つ必要）")
-    else:
-        for i, section in enumerate(dynamics_sections):
-            analysis = section.get("analysis", "")
-            if len(analysis) < 200:
-                warnings.append(f"力学分析{i+1}が{len(analysis)}字（300-500語推奨）")
-
-    pattern_history = article_data.get("pattern_history", [])
-    if len(pattern_history) < 1:
-        warnings.append("パターン史が0件（最低1件推奨）")
-
-    # ============================================================
-    # 結果表示
-    # ============================================================
-    print(f"\n{'='*60}")
-    print(f"  ARTICLE VALIDATOR v2.0 - taxonomy.json STRICT validation")
-    print(f"{'='*60}")
-    print(f"  記事: {title[:60]}")
-    print(f"  タグ: {genre_tags} / {event_tags} / {dynamics_tags}")
-
-    if errors:
-        print(f"\n  {'='*56}")
-        print(f"  BLOCKED: {len(errors)}件のエラー（公開不可）")
-        print(f"  {'='*56}")
-        for e in errors:
-            print(f"  X  {e}")
-    else:
-        print(f"\n  PASSED: 全チェック合格")
-
-    if warnings:
-        print(f"\n  警告: {len(warnings)}件")
-        for w in warnings:
-            print(f"  !  {w}")
-
-    is_valid = len(errors) == 0
-
-    if not is_valid:
-        _send_telegram_block(title, errors)
-
-    return is_valid, errors, warnings
-
-
-def _send_telegram_block(title, errors):
-    """公開ブロック時のTelegram通知"""
-    msg = f"ARTICLE BLOCKED\n\n"
-    msg += f"記事: {title[:50]}\n"
-    msg += f"エラー: {len(errors)}件\n\n"
-    for e in errors[:10]:  # 最大10件
-        msg += f"X {e}\n"
-    if len(errors) > 10:
-        msg += f"\n... 他{len(errors)-10}件\n"
-    msg += f"\n修正してから再投稿してください。\n"
-    msg += f"タグ一覧: /opt/shared/scripts/nowpattern_taxonomy.json\n"
-    msg += f"指示書: /opt/shared/docs/NEO_INSTRUCTIONS_V2.md セクション3"
+def load_api_key():
+    global ADMIN_API_KEY
     try:
-        if os.path.exists(TELEGRAM_SCRIPT):
-            subprocess.run(
-                ["python3", TELEGRAM_SCRIPT, msg],
-                capture_output=True, text=True, timeout=15
-            )
-    except Exception:
+        with open("/opt/cron-env.sh", "r") as f:
+            for line in f:
+                m = re.search(r'NOWPATTERN_GHOST_ADMIN_API_KEY="?([^"\s]+)"?', line)
+                if m:
+                    ADMIN_API_KEY = m.group(1)
+                    return
+    except FileNotFoundError:
         pass
+    import os
+    ADMIN_API_KEY = os.environ.get("NOWPATTERN_GHOST_ADMIN_API_KEY")
+    if not ADMIN_API_KEY:
+        print("ERROR: NOWPATTERN_GHOST_ADMIN_API_KEY not found")
+        sys.exit(1)
+
+
+def ghost_jwt():
+    kid, sec = ADMIN_API_KEY.split(":")
+    iat = int(time.time())
+    return jwt.encode(
+        {"iat": iat, "exp": iat + 300, "aud": "/admin/"},
+        bytes.fromhex(sec), algorithm="HS256",
+        headers={"alg": "HS256", "typ": "JWT", "kid": kid},
+    )
+
+
+def ghost_headers():
+    return {"Authorization": f"Ghost {ghost_jwt()}", "Content-Type": "application/json"}
+
+
+def get_all_posts(slug=None):
+    posts = []
+    page = 1
+    while True:
+        url = f"{GHOST_URL}/ghost/api/admin/posts/?formats=html&include=tags&limit=50&page={page}"
+        if slug:
+            url = f"{GHOST_URL}/ghost/api/admin/posts/slug/{slug}/?formats=html&include=tags"
+            resp = requests.get(url, headers=ghost_headers(), verify=False, timeout=30)
+            return resp.json().get("posts", [])
+        resp = requests.get(url, headers=ghost_headers(), verify=False, timeout=30)
+        batch = resp.json().get("posts", [])
+        if not batch:
+            break
+        posts.extend(batch)
+        meta = resp.json().get("meta", {}).get("pagination", {})
+        if page >= meta.get("pages", 1):
+            break
+        page += 1
+    return posts
+
+
+def has_section(html, names):
+    for n in names:
+        if n.lower() in html.lower():
+            return True
+    return False
+
+
+def validate_post(post):
+    """1記事を検証。結果をdictで返す。"""
+    title = post.get("title", "")
+    slug = post.get("slug", "")
+    html = post.get("html", "") or ""
+    status = post.get("status", "")
+    tags = post.get("tags", [])
+    tag_slugs = [t.get("slug", "") for t in tags]
+    tag_names = [t.get("name", "") for t in tags]
+
+    # 言語判定
+    lang = "ja" if "lang-ja" in tag_slugs else "en" if "lang-en" in tag_slugs else None
+
+    errors = []  # 不合格
+    warnings = []  # 警告
+    info = []  # 情報
+
+    # 0. 下書きはスキップ
+    if status != "published":
+        info.append(f"下書き（status={status}）— スキップ")
+        return {"title": title, "slug": slug, "lang": lang, "status": status,
+                "grade": "SKIP", "errors": errors, "warnings": warnings, "info": info}
+
+    # 1. 言語タグチェック
+    if not lang:
+        errors.append("言語タグなし（lang-ja / lang-en どちらもない）")
+
+    # 2. システムタグチェック
+    if "nowpattern" not in tag_slugs:
+        warnings.append("'nowpattern' タグなし")
+    if "deep-pattern" not in tag_slugs:
+        warnings.append("'deep-pattern' タグなし")
+
+    # 2b. ジャンルタグチェック（v4.0: 1〜2個必須）
+    genre_tags_found = [s for s in tag_slugs if s in VALID_GENRE_SLUGS]
+    if len(genre_tags_found) == 0:
+        errors.append("ジャンルタグなし（genre-* タグが1個も付いていない）")
+    elif len(genre_tags_found) > 2:
+        errors.append(f"ジャンルタグ過多: {len(genre_tags_found)}個（最大2個）: {genre_tags_found}")
+
+    # 2c. URL構造チェック（/{genre}/{slug}/ or /en/{genre}/{slug}/）
+    post_url = post.get("url", "")
+    if post_url and lang and genre_tags_found:
+        primary_genre_slug = genre_tags_found[0]  # primary_tag = first tag
+        if lang == "en":
+            expected_prefix = f"/en/{primary_genre_slug}/"
+        else:
+            expected_prefix = f"/{primary_genre_slug}/"
+        url_path = post_url.replace(GHOST_URL, "")
+        if not url_path.startswith(expected_prefix):
+            warnings.append(f"URL構造不一致: 期待={expected_prefix}... 実際={url_path}")
+
+    # 3. 禁止パターンチェック
+    for name, pattern in FORBIDDEN_PATTERNS.items():
+        if re.search(pattern, html):
+            errors.append(f"禁止パターン検出: {name}")
+
+    # 4. 必須セクションチェック
+    if lang:
+        for section_name, search_terms in REQUIRED_SECTIONS[lang].items():
+            if not has_section(html, search_terms):
+                errors.append(f"必須セクション欠落: {section_name}")
+
+    # 4b. v5.3必須: TAG_BADGE + SUMMARY（HTMLクラスで検出）
+    for css_class, label in REQUIRED_HTML_CLASSES.items():
+        if css_class not in html:
+            errors.append(f"v5.3必須要素欠落: {label} (class=\"{css_class}\")")
+
+    # 5. 推奨セクションチェック
+    if lang:
+        for section_name, search_terms in RECOMMENDED_SECTIONS[lang].items():
+            if not has_section(html, search_terms):
+                warnings.append(f"推奨セクション欠落: {section_name}")
+
+    # 6. シナリオチェック（3シナリオ必須）
+    scenario_patterns_ja = [r"楽観", r"基本", r"悲観"]
+    scenario_patterns_en = [r"(?i)bull\s*case|optimistic", r"(?i)base\s*case", r"(?i)bear\s*case|pessimistic"]
+    scenario_patterns = scenario_patterns_ja if lang == "ja" else scenario_patterns_en
+    scenario_count = sum(1 for p in scenario_patterns if re.search(p, html))
+    if scenario_count < 3:
+        warnings.append(f"シナリオ {scenario_count}/3 検出（基本/楽観/悲観 必須）")
+
+    # 7. タイトル形式チェック
+    if re.search(r"観測ログ|#\d{4}|Speed Log|Deep Pattern", title):
+        errors.append(f"タイトルに禁止ワード: {title[:50]}")
+    if len(title) > 80:
+        warnings.append(f"タイトルが長い: {len(title)}文字（目安60文字以内）")
+
+    # 8. 本文長チェック
+    text_only = re.sub(r'<[^>]+>', '', html)
+    word_count = len(text_only)
+    if word_count < 2000:
+        warnings.append(f"本文が短い: {word_count}文字（目安6000-7000語）")
+
+    # グレード判定
+    if errors:
+        grade = "FAIL"
+    elif warnings:
+        grade = "WARN"
+    else:
+        grade = "PASS"
+
+    return {
+        "title": title, "slug": slug, "lang": lang or "??",
+        "status": status, "grade": grade,
+        "errors": errors, "warnings": warnings, "info": info,
+        "word_count": word_count,
+        "url": post.get("url", ""),
+        "genre_tags": genre_tags_found,
+    }
 
 
 def main():
-    import argparse
-    parser = argparse.ArgumentParser(description="Article Validator v2.0 — taxonomy.json駆動STRICTバリデーション")
-    parser.add_argument("json_file", help="記事JSONファイルのパス")
-    parser.add_argument("--strict", action="store_true", help="不合格時に exit(1)")
+    parser = argparse.ArgumentParser(description="Nowpattern記事品質バリデーター")
+    parser.add_argument("--slug", help="特定記事のslugのみ検証")
+    parser.add_argument("--json", action="store_true", help="JSON出力")
+    parser.add_argument("--warnings", action="store_true", help="警告も表示（デフォルトはエラーのみ）")
+    parser.add_argument("--all", action="store_true", help="全記事の詳細を表示")
     args = parser.parse_args()
 
-    if not os.path.exists(args.json_file):
-        print(f"ERROR: ファイルが見つかりません: {args.json_file}")
-        sys.exit(1)
+    load_api_key()
+    posts = get_all_posts(slug=args.slug)
 
-    with open(args.json_file, "r", encoding="utf-8") as f:
-        article_data = json.load(f)
+    results = []
+    for post in posts:
+        result = validate_post(post)
+        results.append(result)
 
-    is_valid, errors, warnings = validate_article(article_data, strict=args.strict)
+    if args.json:
+        print(json.dumps(results, ensure_ascii=False, indent=2))
+        return
 
-    if args.strict and not is_valid:
-        print(f"\nBLOCKED: {len(errors)}件のエラーを修正してください")
-        sys.exit(1)
-    elif is_valid:
-        print(f"\nPASSED: 公開OK")
+    # サマリー出力
+    total = len([r for r in results if r["grade"] != "SKIP"])
+    passed = len([r for r in results if r["grade"] == "PASS"])
+    warned = len([r for r in results if r["grade"] == "WARN"])
+    failed = len([r for r in results if r["grade"] == "FAIL"])
+
+    print("=" * 70)
+    print(f"Nowpattern 記事品質レポート — v5.3 フォーマット準拠チェック")
+    print(f"検証対象: {total} 記事 | ✅ PASS: {passed} | ⚠️ WARN: {warned} | ❌ FAIL: {failed}")
+    print("=" * 70)
+
+    # FAIL記事を表示
+    for r in results:
+        if r["grade"] == "FAIL":
+            print(f"\n❌ [{r['lang'].upper()}] {r['title'][:60]}")
+            for e in r["errors"]:
+                print(f"   ERROR: {e}")
+            if args.warnings or args.all:
+                for w in r["warnings"]:
+                    print(f"   WARN:  {w}")
+
+    # WARN記事を表示（--warnings or --all）
+    if args.warnings or args.all:
+        for r in results:
+            if r["grade"] == "WARN":
+                print(f"\n⚠️  [{r['lang'].upper()}] {r['title'][:60]}")
+                for w in r["warnings"]:
+                    print(f"   WARN:  {w}")
+
+    # PASS記事を表示（--all のみ）
+    if args.all:
+        for r in results:
+            if r["grade"] == "PASS":
+                print(f"\n✅ [{r['lang'].upper()}] {r['title'][:60]}")
+
+    print(f"\n{'=' * 70}")
+    if failed == 0:
+        print("✅ 全記事がv5.3フォーマットに準拠しています。")
+    else:
+        print(f"❌ {failed}記事に修正が必要です。")
+    print("=" * 70)
 
 
 if __name__ == "__main__":

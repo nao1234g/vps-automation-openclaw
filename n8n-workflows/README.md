@@ -1,58 +1,62 @@
-# N8N + OpenClaw 自動化セットアップガイド
+# N8N ワークフロー
 
-## 📁 ファイル構成
-
-```
-vps-automation-openclaw/
-├── n8n-workflows/
-│   ├── note-article-workflow.json      # Note記事自動生成
-│   ├── x-autopost-workflow.json        # X自動投稿
-│   ├── weekly-report-workflow.json     # 週次レポート生成
-│   ├── multi-theme-workflow.json       # マルチテーマローテーション
-│   ├── theme-config.md                 # テーマ設定ドキュメント
-│   ├── prompts.md                      # プロンプト集
-│   └── README.md                       # このファイル
-├── scripts/
-│   ├── install-n8n.sh                  # N8Nインストール
-│   ├── security-hardening.sh           # セキュリティ強化
-│   └── install-skills.sh               # スキルインストール
-└── .env                                # 環境変数
-```
+> 最終更新: 2026-02-23
+> VPS（163.44.124.123）で **13ワークフロー** 稼働中
 
 ---
 
 ## 🔗 アクセス情報
 
-| サービス | URL |
+| サービス | URL / 識別子 |
 |----------|-----|
-| OpenClaw | https://163.44.124.123.nip.io/ |
-| N8N | https://n8n.163.44.124.123.nip.io/ |
-| Telegram | @openclaw_nn2026_bot |
+| N8N | https://n8n.nowpattern.com/ |
+| OpenClaw (Jarvis) | Telegram: @openclaw_nn2026_bot |
+| NEO-ONE | Telegram: @claude_brain_nn_bot |
 
 ---
 
-## 🚀 ワークフロー一覧
+## 🚀 稼働中ワークフロー（13本）
 
+VPS上で稼働中のワークフローは `ssh root@163.44.124.123` → N8N管理画面で確認。
+
+### AISAコンテンツパイプライン（9本）
 | ワークフロー | 実行タイミング | 内容 |
 |-------------|---------------|------|
-| 毎日記事生成 | 毎日9:00 | AIがブログ記事を自動生成 |
-| 週次レポート | 毎週月曜9:00 | AI/テック業界のトレンドまとめ |
-| マルチテーマ | 毎日9:00 | 7テーマからランダム選択 |
+| RSS収集 | 毎日 7/13/19時 JST | rss-news-pipeline.py起動 |
+| 深層分析 | 毎日 7:30/13:30/19:30時 JST | analyze_rss.py（Gemini深層分析） |
+| note投稿 | 毎時0分 | note-auto-post.py（日本語） |
+| Substack投稿 | 毎時0分 | Substack自動投稿（英語） |
+| X投稿 | 毎時0分 | rss-post-quote-rt.py（X引用リポスト） |
+| ニュース分析 | 毎日 10/16/22時 JST | news-analyst-pipeline.py（6プラットフォーム） |
+| Ghost投稿 | ニュース分析後 | nowpattern-ghost-post.py |
+| 週次分析 | 毎週日曜 23時 JST | weekly-analysis.sh（タスクログ集計） |
+| Morning Briefing | 毎朝 | Telegramで要約配信 |
+
+### システム監視（4本）
+| ワークフロー | 実行タイミング | 内容 |
+|-------------|---------------|------|
+| ヘルスチェック | 15分ごと | コンテナ・サービス状態監視 |
+| DB自動バックアップ | 毎日深夜 | PostgreSQLダンプ保存 |
+| 閉ループチェック | 毎時 | パイプライン稼働確認 + Telegram通知 |
+| セキュリティスキャン | 毎週日曜 | Trivy + Docker Bench |
 
 ---
 
-## 🔒 セキュリティ
+## 📁 ローカルファイル構成
 
-VPSで実行：
-```bash
-bash scripts/security-hardening.sh
+```
+n8n-workflows/
+├── theme-config.md     # テーマ設定
+├── prompts.md          # プロンプト集
+├── rss-setup.md        # RSS設定ガイド
+└── README.md           # このファイル
 ```
 
 ---
 
-## 📦 スキル追加
+## 🔒 N8N API認証
 
-VPSで実行：
-```bash
-bash scripts/install-skills.sh
 ```
+Header: X-N8N-API-KEY: <APIキー>
+```
+（Basic Auth は使わない — KNOWN_MISTAKES参照）

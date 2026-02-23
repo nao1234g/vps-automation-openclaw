@@ -383,4 +383,87 @@ User
 
 ---
 
+## 🌐 Nowpattern コンテンツハブ（現在の稼働構成）
+
+> 最終更新: 2026-02-23
+
+### 全体フロー
+
+```
+ユーザー（Telegram）
+    │
+    ├─ @openclaw_nn2026_bot ─── Jarvis（OpenClaw Agent）
+    │                              ├─ Alice/CodeX/Pixel/Luna/Scout/Guard（Gemini 2.5 Pro）
+    │                              └─ Hawk（Grok 4.1）
+    │
+    ├─ @claude_brain_nn_bot ── NEO-ONE（Claude Opus 4.6 via Max subscription）
+    │                              └─ VPS /opt filesystem操作
+    │
+    └─ @neo_two_nn2026_bot ─── NEO-TWO（Claude Opus 4.6）補助・並列タスク
+```
+
+### コンテンツパイプライン
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│               AISAコンテンツパイプライン（N8N管理）             │
+├──────────────────────────────────────────────────────────────┤
+│                                                               │
+│  JST 7/13/19時                                               │
+│  rss-news-pipeline.py ──→ rss_article_queue.json             │
+│                                                               │
+│  JST 7:30/13:30/19:30時                                      │
+│  analyze_rss.py                                              │
+│    Step1: 記事本文スクレイプ                                   │
+│    Step2: Grok x_search（元ツイート検索）                      │
+│    Step3: Gemini 2.5 Pro 深層分析（7,000字+）                 │
+│                                                               │
+│  毎時0分（+0-10分ランダム遅延）                                 │
+│  rss-post-quote-rt.py                                        │
+│    JA: note（サムネイル付き）→ X引用リポスト                    │
+│    EN: Substack → X引用リポスト                               │
+│    Ghost: nowpattern.com自動投稿                              │
+│                                                               │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### プラットフォーム配信先
+
+```
+NEO-ONE（記事執筆）
+    │
+    ▼
+Jarvis（翻訳 JA→EN + 投稿実行）
+    │
+    ├──→ note（日本語）
+    ├──→ Substack（英語）
+    ├──→ X @aisaintel（JA/EN）
+    └──→ nowpattern.com（Ghost CMS / SSL自動更新）
+             ↑
+         n8n-workflows/nowpattern-ghost-post.py
+```
+
+### 共有ストレージ
+
+```
+VPS /opt/shared/
+    ├── reports/        ← Jarvis書き込み → Neo読み取り
+    ├── scripts/        ← 各種Pythonスクリプト
+    ├── articles/       ← 生成記事・プロンプト
+    ├── task-log/       ← 全エージェントの作業ログ
+    ├── learning/       ← daily-learning.py 出力
+    └── AGENT_WISDOM.md ← 全エージェント共通知識（Neoが管理）
+```
+
+### Nowpatternスクリプト群（ローカル scripts/）
+
+| スクリプト | 役割 |
+|-----------|------|
+| `nowpattern_article_builder.py` | Deep Pattern HTML生成（v3.0） |
+| `nowpattern_publisher.py` | Ghost投稿 + 記事インデックス管理 |
+| `gen_dynamics_diagram.py` | 力学ダイアグラムSVG自動生成 |
+| `daily-learning.py` | 情報収集（Reddit/HN/GitHub、1日4回） |
+
+---
+
 **このアーキテクチャは、セキュリティ、可用性、保守性のベストプラクティスに基づいて設計されています。**

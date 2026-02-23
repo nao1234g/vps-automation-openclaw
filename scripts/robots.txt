@@ -1,0 +1,102 @@
+# robots.txt for nowpattern.com
+# AI crawlers and search engines: ALL ALLOWED
+# Last updated: 2026-02-23
+
+# ─── Standard search engines ───────────────────────────────────────────────
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# ─── AI training crawlers ───────────────────────────────────────────────────
+# Explicitly allow all AI crawlers to index and learn from content
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Gemini
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Diffbot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: omgili
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+# ─── Catch-all ──────────────────────────────────────────────────────────────
+User-agent: *
+Allow: /
+Disallow: /ghost/
+Disallow: /p/
+
+# ─── Sitemaps ───────────────────────────────────────────────────────────────
+Sitemap: https://nowpattern.com/sitemap.xml
+Sitemap: https://nowpattern.com/sitemap-news.xml
+
+# ─── AI-specific resources ──────────────────────────────────────────────────
+# llms.txt: AI model instructions (https://llmstxt.org/)
+# https://nowpattern.com/llms.txt

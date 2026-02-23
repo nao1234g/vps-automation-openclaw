@@ -1246,4 +1246,19 @@
 
 ---
 
-*最終更新: 2026-02-22 — 5層防御アーキテクチャ完成（A1/A2/B3/B4/C5全実装）*
+### 2026-02-24: Ghost Lexical — html フィールド/source=html で記事更新できない
+- **症状**: `batch_fix_articles.py` が `?source=html` で全40記事を「FIXED」と報告したが、実際のページにはTAG_BADGE/SUMMARYが表示されなかった。API response は 200 OK だが `Result HTML length: 0`
+- **根本原因**: Ghost 5.x は Lexical エディタを使用。`html` フィールドは**読み取り専用の出力**。`?source=html` でHTMLをLexicalに変換しようとしても、複雑なHTML（インラインCSS付き）は変換に失敗し、空のHTMLが返る
+- **正しい解決策**: Lexical JSONツリーを直接操作する
+  1. Ghost APIから `formats=html,lexical` で記事を取得
+  2. `lexical` フィールドのJSONをパース
+  3. `root.children` 配列にHTMLカードノードを挿入: `{"type": "html", "version": 1, "html": "<content>"}`
+  4. 修正した `lexical` JSON文字列をPUTで送信
+- **教訓**:
+  - Ghost APIのドキュメントには `?source=html` が使えると書いてあるが、**Lexical形式の記事では実質的に動作しない**
+  - API が 200 OK を返しても**実際にデータが保存されたとは限らない**。必ずGET で再取得して検証する
+  - 今後Ghost記事の内容を変更するスクリプトはすべて **Lexical JSON操作方式** を使うこと
+
+---
+
+*最終更新: 2026-02-24 — Ghost Lexical更新方法の教訓追加 + 5層防御v5.3（TAG_BADGE/SUMMARY）完成*

@@ -1,8 +1,8 @@
-# OpenClaw VPS - 完全自動化セキュアデプロイメント
+# OpenClaw VPS — Nowpattern AI 自動化ハブ
 
 <div align="center">
 
-**🚀 VPSへOpenClaw AIエージェントをセキュアにデプロイ 🔒**
+**AIが記事を書き、投稿し、学び続ける — 24時間無人コンテンツ自動化システム**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)](https://www.docker.com/)
@@ -12,38 +12,56 @@
 
 ---
 
+## 現在の稼働状況（2026-02-23）
+
+| レイヤー | サービス | 状態 | 役割 |
+|---------|---------|------|------|
+| コンテンツハブ | [nowpattern.com](https://nowpattern.com) | 稼働中 | Ghost CMS、記事公開 |
+| AI執筆 | NEO-ONE `@claude_brain_nn_bot` | 稼働中 | Claude Opus 4.6 — 戦略・記事執筆 |
+| AI補助 | NEO-TWO `@neo_two_nn2026_bot` | 稼働中 | Claude Opus 4.6 — 並列タスク |
+| 実行エージェント | Jarvis（OpenClaw）`@openclaw_nn2026_bot` | 稼働中 | 投稿実行・翻訳・タスク委任 |
+| ワークフロー | N8N（13本） | 稼働中 | RSSパイプライン + 監視 |
+| 情報収集 | daily-learning.py | 稼働中 | 1日4回 Reddit/HN/GitHub収集 |
+
+### コンテンツパイプライン
+
+```
+ニュース収集（JST 7/13/19時）
+  ↓ 30分後
+Gemini深層分析（7,000字+）
+  ↓ 毎時0分
+note（日本語）・Substack（英語）・X引用リポスト
+  ↓ 同時
+nowpattern.com（Ghost CMS）自動投稿
+```
+
+---
+
 ## 📖 概要
 
-このリポジトリは、**OpenClaw AIエージェント**（旧：Clawdbot/Moltbot）とN8N、OpenNotebookを**セキュアなDocker環境**にワンストップでデプロイするための完全自動化ツールキットです。
+このリポジトリは、**Nowpattern.com** を中心とした AI コンテンツ自動化プラットフォームです。
+NEO-ONE/TWO（Claude Opus 4.6）が戦略立案・記事執筆を担い、Jarvis（OpenClaw）が投稿を実行し、N8N 13ワークフローが24時間稼働します。
+インフラは ConoHa VPS（163.44.124.123）上に Docker Compose で構成されています。
 
-### ✨ 主な特徴
+### AIエージェント（10人体制）
 
-- 🔒 **10層のセキュリティ防御**: UFW/Fail2ban/非rootコンテナ/ネットワーク分離/SSL/TLS
-- 🐳 **Docker Compose統合**: マイクロサービスアーキテクチャで分離された環境
-- ⚡ **完全自動セットアップ**: 対話式ウィザードで5分でデプロイ完了
-- 📊 **統合監視**: ヘルスチェック/セキュリティスキャン/自動バックアップ
-- 🔄 **運用自動化**: Cronジョブによる定期メンテナンス/スキャン/バックアップ
+| # | 名前 | 役割 | モデル |
+|---|------|------|--------|
+| 1 | Jarvis | 実行・投稿・翻訳 | Gemini 2.5 Pro |
+| 2–7 | Alice/CodeX/Pixel/Luna/Scout/Guard | 専門分業（リサーチ/開発/デザイン等） | Gemini 2.5 Pro |
+| 8 | Hawk | X/SNSリサーチ | Grok 4.1 |
+| 9 | NEO-ONE | CTO・戦略・記事執筆 | Claude Opus 4.6 |
+| 10 | NEO-TWO | 補助・並列タスク | Claude Opus 4.6 |
 
----
-
-## 🎯 対象ユーザー
-
-- VPSでAIエージェントを安全に運用したい方
-- Dockerでマイクロサービス環境を構築したい方
-- セキュリティベストプラクティスを実践したい方
-- N8N/OpenNotebook/OpenClawを統合したい方
-
----
-
-## 📦 含まれるコンポーネント
+### インフラ構成
 
 | サービス | 説明 | ポート |
 |---------|------|--------|
-| **OpenClaw** | Claude APIベースのAIエージェント | 3000 |
-| **N8N** | ワークフロー自動化プラットフォーム | 5678 |
-| **OpenNotebook** | NotebookLMオープンソース版 | 8080 |
+| **OpenClaw** | AIエージェント Gateway（Jarvis 他8人） | 3000 |
+| **N8N** | ワークフロー自動化（13本稼働） | 5678 |
 | **PostgreSQL** | 共有データベース | 5432 |
-| **Nginx** | リバースプロキシ（SSL/TLS対応） | 80/443 |
+| **Ghost CMS** | nowpattern.com（systemd管理） | 2368 |
+| **Caddy** | リバースプロキシ（SSL自動更新） | 80/443 |
 
 ---
 
@@ -299,24 +317,24 @@ sudo ./scripts/restore.sh /opt/backups/openclaw/backup_YYYYMMDD_HHMMSS
 
 ---
 
-## 🎯 連携ワークフロー例
+## 🎯 自動化ワークフロー例
 
-### 1. 研究ノート自動作成
-
-```
-Telegram → OpenClaw → Web検索 → OpenNotebook → N8N → Slack通知
-```
-
-### 2. コード自動デプロイ
+### 1. AISAコンテンツパイプライン（24時間稼働）
 
 ```
-GitHub Issue → OpenClaw → コード修正 → PR作成 → N8N → レビュー依頼
+RSS収集 → Gemini深層分析 → note/Substack/X/Ghost 自動投稿
 ```
 
-### 3. VPSメンテナンス
+### 2. NEO記事執筆フロー
 
 ```
-Cron → N8N → OpenClaw → システム更新 → OpenNotebook → Telegram通知
+Telegram指示 → NEO-ONE（戦略立案+執筆） → Jarvis（投稿+翻訳） → nowpattern.com
+```
+
+### 3. VPS自動監視
+
+```
+N8N 15分ごと → ヘルスチェック → 異常時 Telegram通知
 ```
 
 ---
@@ -400,13 +418,24 @@ docker image prune -a
 
 ---
 
-## 🎨 今後の拡張予定
+## 📚 主要ドキュメント
 
-- 🎤 Ibyスピーチ連携（高品質日本語TTS）
-- 🎬 RemoTion統合（動画自動生成）
-- 🤖 サブエージェント機能（複数LLM並列実行）
-- 📊 ダッシュボード機能（進捗可視化）
-- 🔍 分散トレーシング（OpenTelemetry統合）
+| ドキュメント | 内容 |
+|------------|------|
+| [ARCHITECTURE.md](ARCHITECTURE.md) | システム全体構成図 |
+| [docs/ARTICLE_FORMAT.md](docs/ARTICLE_FORMAT.md) | Nowpattern記事フォーマット（Deep Pattern v5.0） |
+| [docs/NOWPATTERN_TAXONOMY_v3.md](docs/NOWPATTERN_TAXONOMY_v3.md) | タクソノミー v3.0（ジャンル13×イベント19×力学16） |
+| [docs/NEO_INSTRUCTIONS_V2.md](docs/NEO_INSTRUCTIONS_V2.md) | NEO執筆指示書 |
+| [docs/KNOWN_MISTAKES.md](docs/KNOWN_MISTAKES.md) | 既知のミスDB（実装前に必読） |
+| [n8n-workflows/README.md](n8n-workflows/README.md) | N8N 13ワークフロー一覧 |
+| [OPERATIONS_GUIDE.md](OPERATIONS_GUIDE.md) | 日常運用マニュアル |
+| [QUICK_REFERENCE.md](QUICK_REFERENCE.md) | コマンド早見表 |
+
+## 🎨 拡張予定
+
+- NAVER Blog韓国語自動投稿（アカウント作成待ち）
+- Medium自動投稿（MEDIUM_TOKEN登録待ち）
+- ドキュメント自動クリーンアップ（廃止検知 + アーカイブ提案）
 
 ---
 

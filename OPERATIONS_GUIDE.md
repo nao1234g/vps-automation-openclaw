@@ -472,4 +472,86 @@ docker compose exec db psql -U openclaw -c "EXPLAIN ANALYZE <クエリ>;"
 
 ---
 
+---
+
+## Nowpattern 運用（コンテンツ自動化）
+
+> この章はNowpatternコンテンツパイプラインの日常確認方法をまとめています。
+
+### NEOエージェントの状態確認
+
+```bash
+# NEO-ONE（@claude_brain_nn_bot）の状態
+ssh root@163.44.124.123 "systemctl status neo-telegram.service"
+
+# NEO-TWO（@neo_two_nn2026_bot）の状態
+ssh root@163.44.124.123 "systemctl status neo2-telegram.service"
+
+# 最新ログ確認
+ssh root@163.44.124.123 "journalctl -u neo-telegram.service -n 50"
+```
+
+### AISAパイプラインの確認
+
+```bash
+# Ghost投稿ログ確認（最新20件）
+ssh root@163.44.124.123 "tail -20 /opt/shared/scripts/ghost_post.log"
+
+# 記事キュー状態
+ssh root@163.44.124.123 "cat /opt/shared/scripts/rss_article_queue.json | python3 -c 'import json,sys; d=json.load(sys.stdin); print(len(d), \"件\")"
+
+# nowpattern.com Ghost状態
+ssh root@163.44.124.123 "systemctl status ghost-nowpattern.service"
+```
+
+### daily-learning.py モニタリング
+
+```bash
+# 最新の学習レポート確認
+ssh root@163.44.124.123 "ls -lt /opt/shared/learning/ | head -10"
+
+# 最新レポートの中身
+ssh root@163.44.124.123 "cat /opt/shared/learning/DASHBOARD.md"
+
+# cronログ確認（実行されているか）
+ssh root@163.44.124.123 "grep 'daily-learning' /var/log/syslog | tail -20"
+```
+
+### nowpattern.com の確認
+
+```bash
+# Ghost CMS 状態
+ssh root@163.44.124.123 "systemctl status ghost-nowpattern.service"
+
+# SSL証明書の期限確認
+ssh root@163.44.124.123 "caddy trust && openssl s_client -connect nowpattern.com:443 -servername nowpattern.com < /dev/null 2>/dev/null | openssl x509 -noout -dates"
+
+# 最新投稿5件確認（VPS内から）
+ssh root@163.44.124.123 "curl -s 'https://nowpattern.com/ghost/api/content/posts/?key=\${NOWPATTERN_GHOST_CONTENT_API_KEY}&limit=5' | python3 -c 'import json,sys; posts=json.load(sys.stdin)[\"posts\"]; [print(p[\"title\"], p[\"published_at\"][:10]) for p in posts]'"
+```
+
+### N8Nワークフローの確認
+
+```bash
+# N8N コンテナ状態
+ssh root@163.44.124.123 "docker ps | grep n8n"
+
+# N8N ログ
+ssh root@163.44.124.123 "docker logs n8n --tail 50"
+```
+
+N8N管理画面: `https://n8n.nowpattern.com/`（X-N8N-API-KEY認証）
+
+### トラブルシューティング（Nowpattern）
+
+| 症状 | 確認コマンド | 対処 |
+|------|------------|------|
+| Ghost投稿が止まった | `systemctl status ghost-nowpattern.service` | `systemctl restart ghost-nowpattern.service` |
+| noteクッキー期限切れ | `/opt/shared/scripts/` の `.note-cookies.json` | Seleniumで再ログイン |
+| Substackクッキー期限切れ | `.substack-cookies.json` 確認 | 有効期限は5月18日 |
+| X投稿失敗 | `X 403 duplicate content` エラー | 内容を変えて再試行（重複投稿禁止） |
+| NEO応答なし | `systemctl status neo-telegram.service` | `systemctl restart neo-telegram.service` |
+
+---
+
 **ヘルプが必要な場合は [GitHub Issues](https://github.com/nao1234g/vps-automation-openclaw/issues) で質問してください。**
