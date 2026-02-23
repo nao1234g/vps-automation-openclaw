@@ -1261,4 +1261,22 @@
 
 ---
 
+### 2026-02-24: NEO-ONE の Claude SDK が bypassPermissions でroot実行不可
+- **症状**: NEO-ONE が全メッセージに対して「Command failed with exit code 1」を返し、何も処理できない
+- **根本原因**: Claude Code 2.1.x 以降、`--dangerously-skip-permissions` (= `bypassPermissions`) は **root/sudoユーザーでは使用禁止**。NEO-ONEサービスはrootで実行されているため、SDK がこのフラグで起動しようとして必ず失敗する
+- **正しい解決策**: `sdk_integration.py` の `permission_mode="bypassPermissions"` を `permission_mode="acceptEdits"` に変更する
+  - ファイル: `/opt/claude-code-telegram/src/claude/sdk_integration.py` line 247
+- **教訓**: `bypassPermissions` はrootでは使えない。rootで実行するサービスは必ず `acceptEdits` を使うこと
+
+### 2026-02-24: NEO TokenSync — neocloopのcredentials期限切れ
+- **症状**: NEO-ONE がメッセージを受信して処理開始するが即座にexit code 1で失敗。`acceptEdits` に修正後も同じ症状
+- **根本原因**: Windowsタスクスケジューラの自動同期スクリプトが Tailscale経由(`100.90.230.1`) でSCPを実行するが、Tailscale接続が切れていた（04:20 JST失敗）。その結果 `/home/neocloop/.claude/.credentials.json` のトークンが期限切れのまま放置された。`/root/.claude/.credentials.json` だけ更新しても、サービスのHOME=`/home/neocloop` なので参照されない
+- **正しい解決策**: 手動で `cp /root/.claude/.credentials.json /home/neocloop/.claude/.credentials.json` を実行してトークンを更新
+- **教訓**:
+  - NEO-ONEサービスのHOMEは `/home/neocloop`。credentialsは **必ずneocloopに置く**
+  - トークン同期スクリプトは `/root/.claude/` と `/home/neocloop/.claude/` の**両方に**コピーする（`sync-neo-token.ps1` は対応済みだがTailscaleが切れると失敗する）
+  - NEO-ONEが動かない場合: まず `cat /home/neocloop/.claude/.credentials.json | python3 -c 'import json,sys,time; d=json.load(sys.stdin); exp=d["claudeAiOauth"]["expiresAt"]; print(f"valid: {exp > int(time.time()*1000)}")'` で確認
+
+---
+
 *最終更新: 2026-02-24 — Ghost Lexical更新方法の教訓追加 + 5層防御v5.3（TAG_BADGE/SUMMARY）完成*
