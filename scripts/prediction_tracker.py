@@ -313,8 +313,8 @@ def show_status():
             print(f"   {p['prediction_id']} | {p['outcome']} | Brier: {p['brier_score']} | {p['article_title'][:30]}...")
 
 
-def show_overdue():
-    """トリガー日を過ぎた未判定予測をリスト"""
+def show_overdue(notify=False):
+    """トリガー日を過ぎた未判定予測をリスト。notify=Trueの場合Telegramに通知"""
     db = load_db()
     now = datetime.now(timezone.utc)
     overdue = []
@@ -339,11 +339,46 @@ def show_overdue():
 
     if overdue:
         print(f"⚠️ トリガー日超過の未判定予測: {len(overdue)}件")
+        lines = []
         for p, trigger in overdue:
             print(f"   {p['prediction_id']} | トリガー: {trigger['name']} ({trigger['date']})")
             print(f"     記事: {p['article_title'][:50]}...")
+            lines.append(f"  {p['prediction_id']}: {p['article_title'][:40]}...\n  トリガー: {trigger['name']} ({trigger['date']})")
+
+        if notify:
+            msg = f"⚠️ 予測の判定が必要です（{len(overdue)}件）\n\n" + "\n\n".join(lines)
+            msg += "\n\n判定方法:\npython3 prediction_tracker.py judge NP-XXXX --outcome 基本"
+            send_telegram(msg)
     else:
         print("✅ トリガー日超過の未判定予測はありません")
+
+
+def send_telegram(text):
+    """Send notification via Telegram bot."""
+    import urllib.request as req
+    # Load bot token from cron-env
+    bot_token = ""
+    chat_id = ""
+    env_path = "/opt/cron-env.sh"
+    if os.path.exists(env_path):
+        with open(env_path) as f:
+            for line in f:
+                line = line.strip()
+                if "TELEGRAM_BOT_TOKEN" in line and "=" in line:
+                    bot_token = line.split("=", 1)[1].strip().strip("\"'")
+                elif "TELEGRAM_CHAT_ID" in line and "=" in line:
+                    chat_id = line.split("=", 1)[1].strip().strip("\"'")
+    if not bot_token or not chat_id:
+        print("WARN: Telegram credentials not found, skipping notification")
+        return
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    data = json.dumps({"chat_id": chat_id, "text": text}).encode()
+    try:
+        r = req.Request(url, data=data, headers={"Content-Type": "application/json"})
+        req.urlopen(r, timeout=10)
+        print("Telegram notification sent")
+    except Exception as e:
+        print(f"WARN: Telegram send failed: {e}")
 
 
 def generate_report(quarter=None):
@@ -408,7 +443,8 @@ def main():
     subparsers.add_parser("status", help="全予測のステータスを表示")
 
     # overdue
-    subparsers.add_parser("overdue", help="トリガー日超過の未判定予測")
+    overdue_parser = subparsers.add_parser("overdue", help="トリガー日超過の未判定予測")
+    overdue_parser.add_argument("--notify", action="store_true", help="Telegram通知を送信")
 
     # report
     report_parser = subparsers.add_parser("report", help="予測精度レポート生成")
@@ -423,7 +459,7 @@ def main():
     elif args.command == "status":
         show_status()
     elif args.command == "overdue":
-        show_overdue()
+        show_overdue(notify=args.notify)
     elif args.command == "report":
         generate_report(args.quarter)
     else:

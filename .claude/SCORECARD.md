@@ -1,6 +1,6 @@
 # Agent Performance Scorecard
 
-## Cumulative Score: -223
+## Cumulative Score: -219
 
 > This file is auto-updated by hooks. It tracks research behavior and mistake patterns.
 > Positive = researched first, avoided known mistakes. Negative = skipped research, repeated mistakes.
@@ -244,3 +244,5 @@
 | 2026-02-22 19:53 | -1 | Error:  | unknown error |
 | 2026-02-22 19:53 | -1 | Error:  | unknown error |
 | 2026-02-22 19:54 | -1 | Error:  | unknown error |
+| 2026-02-24 09:29 | +2 | Research before implementation | WebFetch |
+| 2026-02-24 15:01 | +2 | Research before implementation | WebSearch |
