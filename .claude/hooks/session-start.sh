@@ -85,7 +85,31 @@ echo "3. After errors: RECORD in KNOWN_MISTAKES.md immediately"
 echo "4. Your score is tracked. Research = +points. Repeated mistakes = -points."
 echo "5. ★ @aisaintel は存在しない(廃止)。NowpatternのXは @nowpattern。AISAパイプラインはSUSPENDED。"
 echo "6. 長期記憶: memory_search.py で過去の知識を検索可能"
+echo "7. 新規コード作成前に TodoWrite でタスク計画を書くこと（書かないと物理ブロック）"
 echo "=== END MANDATORY CONTEXT ==="
+
+# ── タスクダッシュボードの状態を表示 ──────────────────────────────────────
+DASHBOARD_HTML="$HOME/.claude/tasks/dashboard.html"
+CURRENT_STATE="$HOME/.claude/tasks/current_state.json"
+echo ""
+echo "📋 タスクボード: file://$DASHBOARD_HTML（ブラウザで開くと10秒ごと自動更新）"
+if [ -f "$CURRENT_STATE" ]; then
+    IN_PROGRESS=$(python3 -c "
+import json, sys
+try:
+    s = json.load(open('$CURRENT_STATE', encoding='utf-8'))
+    ip = s.get('in_progress', [])
+    pd = s.get('pending', [])
+    done = s.get('completed', [])
+    if ip: print('  実行中: ' + ' / '.join(ip[:2]))
+    if pd: print('  未着手: ' + str(len(pd)) + '件')
+    if done: print('  完了: ' + str(len(done)) + '件（本日）')
+except: pass
+" 2>/dev/null)
+    if [ -n "$IN_PROGRESS" ]; then
+        echo "$IN_PROGRESS"
+    fi
+fi
 
 # 5. ★ MEMORY.mdをVPS状態で更新（次セッション用 — バックグラウンド実行）
 python "$PROJECT_DIR/scripts/update_local_memory.py" > /dev/null 2>&1 &

@@ -61,6 +61,9 @@
 | Ghost投稿の本文が空 | URLに`?source=html`を追加 |
 | NEOがカスタムタグ作成 | 5層防御: validator→publisher→hook→audit→env isolation |
 | sync-vps.ps1がVPS修正を上書き | v2.0: バックアップ付き同期 + VPS専用ファイル保護 |
+| **UI変更後に「直った」と思い込む** | **変更後は必ず `python3 /opt/shared/scripts/site_health_check.py --quick` を実行。FAIL 0件が出荷基準** |
+| **一部修正で関連領域を見落とす** | **変更後はスコープ外も確認: EN/JA両方、pagination、prediction tracker** |
+| ENタグ監査で全件FAILと誤検知 | ENタグは `geopolitics`/`crypto` 等（`genre-*` プレフィックスなし）。validator も旧形式を使用 |
 
 ---
 

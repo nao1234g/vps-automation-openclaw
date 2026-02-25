@@ -5,7 +5,7 @@ PostToolUse hook (TodoWrite) として動作
 
 動作:
   - TodoWriteが実行されるたびに実行される
-  - completed になったタスクを ~\.claude\tasks\history.jsonl に記録
+  - completed になったタスクを ~/.claude/tasks/history.jsonl に記録
   - Windowsポップアップ通知 (MessageBox)
   - セッションログを更新 (session-end.pyがTelegram通知に使う)
 """
@@ -170,6 +170,36 @@ state = {
 }
 state_file.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
+# ── UI承認ゲート: ui_approved なしでUIタスクが完了されたら警告 ─────────────
+_ui_task_kws = ['css', 'html', 'ナビ', 'nav', '表示', 'デザイン', 'スタイル',
+                'ui', 'フロント', 'テンプレート', 'レイアウト', 'codeinjection',
+                'カード', 'ghost', 'en ', '/en/', '日本語']
+_ui_completed = [
+    t for t in completed
+    if any(kw in (t.get("content") or "").lower() for kw in _ui_task_kws)
+]
+if _ui_completed:
+    ui_state_path = Path.home() / ".claude" / "projects" / "session.json"
+    # プロジェクトのhooks/state/session.jsonを使う
+    _proj = Path(os.environ.get("CLAUDE_PROJECT_DIR", os.getcwd()))
+    _hook_state = _proj / ".claude" / "hooks" / "state" / "session.json"
+    _ui_approved = False
+    if _hook_state.exists():
+        try:
+            _ui_sess = json.loads(_hook_state.read_text(encoding="utf-8"))
+            _ui_approved = bool(_ui_sess.get("ui_approved", False))
+        except Exception:
+            pass
+    if not _ui_approved:
+        names = [t.get("content", "")[:40] for t in _ui_completed]
+        print(
+            f"⚠️  [UI APPROVAL GATE] UIタスクが「完了」になりましたが、"
+            f"ユーザーの目視確認がまだ記録されていません。\n"
+            f"  タスク: {', '.join(names)}\n"
+            f"  → 「コードを修正しました。ブラウザで確認URL を開いて確認してください」\n"
+            f"    と案内し、ユーザーの「OK」を待ってください。"
+        )
+
 # ── Windows ポップアップ通知（新しく完了したタスクのみ）─────────
 if new_completions:
     latest = new_completions[-1][:80].replace('"', "'").replace('\n', ' ')
@@ -193,5 +223,24 @@ try:
     _generate_dashboard(history_dir, state)
 except Exception:
     pass
+
+# ── research-gate に「プラン作成済み」フラグを書く ────────────────
+# TodoWriteが呼ばれた = プランがある → research-gateのブロックを解除
+try:
+    project_dir = Path(os.environ.get("CLAUDE_PROJECT_DIR", "."))
+    rg_state_dir = project_dir / ".claude" / "hooks" / "state"
+    rg_state_file = rg_state_dir / "session.json"
+    rg_state: dict = {}
+    if rg_state_file.exists():
+        try:
+            rg_state = json.loads(rg_state_file.read_text(encoding="utf-8"))
+        except Exception:
+            rg_state = {}
+    rg_state["plan_created"] = True
+    rg_state["plan_ts"] = timestamp
+    rg_state_dir.mkdir(parents=True, exist_ok=True)
+    rg_state_file.write_text(json.dumps(rg_state, ensure_ascii=False), encoding="utf-8")
+except Exception:
+    pass  # フラグ書き込み失敗はサイレント無視
 
 sys.exit(0)

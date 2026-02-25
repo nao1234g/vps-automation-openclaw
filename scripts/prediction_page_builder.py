@@ -20,6 +20,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sqlite3
 import sys
 import hmac
 import hashlib
@@ -39,6 +40,7 @@ EMBED_DATA = "/opt/shared/polymarket/embed_data.json"
 TRACKER_OUTPUT = "/opt/shared/polymarket/tracker_page_data.json"
 PREDICTIONS_SLUG_JA = "predictions"
 PREDICTIONS_SLUG_EN = "en-predictions"
+MARKET_HISTORY_DB = "/opt/shared/market_history/market_history.db"
 
 POLY_TO_GHOST = {
     "crypto": "crypto", "geopolitics": "geopolitics",
@@ -124,6 +126,18 @@ LABELS = {
         "what_probability": "が起きる確率",
         "en_link": '<a href="/en-predictions/" style="color:#b8860b;font-size:0.9em">English version →</a>',
         "other_lang_link": '<a href="/en-predictions/" style="color:#b8860b;font-size:0.9em">English version →</a>',
+        "scoreboard_title": "🎯 予測精度スコアボード",
+        "scoreboard_hit": "件的中",
+        "scoreboard_miss": "件外れ",
+        "scoreboard_brier": "Brier Score",
+        "scoreboard_brier_good": "（上位10%水準）",
+        "scoreboard_brier_ok": "（標準水準）",
+        "scoreboard_brier_bad": "（改善余地あり）",
+        "scoreboard_no_data": "まだ結果が出た予測がありません",
+        "linked_market": "追跡市場",
+        "expand_hint": "▼ 詳細を見る",
+        "collapse_hint": "▲ 閉じる",
+        "tracking_section_title": "追跡中の予測",
     },
     "en": {
         "page_title": "Prediction Tracker — Nowpattern vs Market",
@@ -169,6 +183,18 @@ LABELS = {
         "what_probability": "probability",
         "en_link": "",
         "other_lang_link": '<a href="/predictions/" style="color:#b8860b;font-size:0.9em">← 日本語版</a>',
+        "scoreboard_title": "🎯 Prediction Accuracy",
+        "scoreboard_hit": "accurate",
+        "scoreboard_miss": "missed",
+        "scoreboard_brier": "Brier Score",
+        "scoreboard_brier_good": "(top 10% level)",
+        "scoreboard_brier_ok": "(standard level)",
+        "scoreboard_brier_bad": "(room for improvement)",
+        "scoreboard_no_data": "No resolved predictions yet",
+        "linked_market": "Tracking Market",
+        "expand_hint": "▼ See details",
+        "collapse_hint": "▲ Collapse",
+        "tracking_section_title": "Tracked Predictions",
     },
 }
 
@@ -235,6 +261,47 @@ def load_embed_data():
     return []
 
 
+def load_linked_markets():
+    """
+    market_history.db の nowpattern_links + probability_snapshots を読み込む。
+    returns: {prediction_id: {"question": str, "yes_prob": float, "direction": str}}
+    """
+    if not os.path.exists(MARKET_HISTORY_DB):
+        return {}
+    try:
+        db = sqlite3.connect(MARKET_HISTORY_DB)
+        db.row_factory = sqlite3.Row
+        cur = db.cursor()
+        cur.execute("""
+            SELECT nl.prediction_id, nl.resolution_direction,
+                   m.question, m.close_date,
+                   ps.yes_prob, ps.snapshot_date
+            FROM nowpattern_links nl
+            JOIN markets m ON nl.market_id = m.id
+            LEFT JOIN (
+                SELECT market_id, yes_prob, snapshot_date
+                FROM probability_snapshots
+                WHERE (market_id, snapshot_date) IN (
+                    SELECT market_id, MAX(snapshot_date)
+                    FROM probability_snapshots GROUP BY market_id
+                )
+            ) ps ON m.id = ps.market_id
+        """)
+        result = {}
+        for row in cur.fetchall():
+            result[row["prediction_id"]] = {
+                "question": row["question"],
+                "yes_prob": row["yes_prob"],
+                "direction": row["resolution_direction"],
+                "close_date": row["close_date"],
+                "snapshot_date": row["snapshot_date"],
+            }
+        db.close()
+        return result
+    except Exception:
+        return {}
+
+
 def _is_japanese(text):
     """Check if text contains Japanese characters."""
     return any('\u3000' <= c <= '\u9fff' or '\uff00' <= c <= '\uffef' for c in text)
@@ -264,10 +331,20 @@ def extract_scenarios_from_html(html):
 def extract_event_summary(pred):
     """Extract a short description of WHAT is being predicted.
     Uses scenario content, open_loop_trigger, or title keywords."""
+    import ast
     # 1) open_loop_trigger is the best source
     trigger = pred.get("open_loop_trigger", "")
     if trigger:
-        return trigger[:80]
+        if isinstance(trigger, dict):
+            return trigger.get("name", trigger.get("content", str(trigger)))[:80]
+        if isinstance(trigger, str) and trigger.strip().startswith("{"):
+            try:
+                d = ast.literal_eval(trigger)
+                if isinstance(d, dict):
+                    return d.get("name", d.get("content", str(d)))[:80]
+            except Exception:
+                pass
+        return str(trigger)[:80]
     # 2) triggers list
     triggers = pred.get("triggers", [])
     if triggers and triggers[0]:
@@ -289,6 +366,85 @@ def extract_keywords(text):
 
 
 # ── Polymarket matching ────────────────────────────────────────
+
+def find_metaculus_match(title):
+    """Search Manifold Markets API for a binary prediction market matching the article title.
+    Returns dict with {question, probability, url} or None.
+
+    NOTE: Uses Manifold Markets API (Metaculus API no longer exposes probability data).
+    Strategy: extract proper nouns (capitalized entities) as primary search terms,
+    fall back to longest content words. Accepts ~30-40% match rate as normal.
+    API: https://api.manifold.markets/v0/search-markets
+    """
+    import urllib.request
+    import urllib.parse
+    import json as _json
+    import ssl
+    import re as _re
+
+    # Extract proper nouns (capitalized words, 4+ chars) — most likely entities
+    _SKIP_CAPS = {
+        "The", "This", "That", "With", "From", "After", "Before", "Into",
+        "When", "What", "Will", "Were", "Have", "Their", "There", "Been",
+        "They", "These", "Those", "Would", "Could", "Should", "About",
+        "Than", "Then", "More", "Most", "Such", "Even", "Over", "Also",
+    }
+    cap_words = [
+        w for w in _re.findall(r"[A-Z][a-zA-Z]{3,}", title)
+        if w not in _SKIP_CAPS
+    ]
+
+    # Build 2-3 search queries to try
+    queries = []
+    if len(cap_words) >= 2:
+        queries.append(" ".join(cap_words[:2]))          # Top 2 entities
+    if len(cap_words) >= 1:
+        queries.append(cap_words[0])                     # Main entity alone
+    # Fallback: 3 longest words
+    long_words = sorted(
+        [w for w in _re.findall(r"[a-zA-Z]{5,}", title)],
+        key=len, reverse=True
+    )[:3]
+    if long_words:
+        queries.append(" ".join(long_words[:2]))
+
+    # Deduplicate queries
+    seen = set()
+    unique_queries = []
+    for q in queries:
+        if q not in seen:
+            seen.add(q)
+            unique_queries.append(q)
+
+    try:
+        ctx = ssl.create_default_context()
+        headers = {"User-Agent": "Nowpattern/1.0"}
+
+        for query in unique_queries[:3]:
+            enc = urllib.parse.quote(query)
+            url = (
+                f"https://api.manifold.markets/v0/search-markets"
+                f"?term={enc}&filter=open&sort=score&limit=5"
+            )
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
+                markets = _json.loads(resp.read())
+            for m in markets:
+                prob = m.get("probability")
+                if prob is None:
+                    continue
+                if not (0.03 <= prob <= 0.97):
+                    continue
+                return {
+                    "question": m.get("question", "")[:80],
+                    "probability": round(prob * 100),
+                    "url": m.get("url", f"https://manifold.markets/{m.get('id', '')}"),
+                    "id": m.get("id", ""),
+                }
+        return None
+    except Exception:
+        return None
+
 
 def find_polymarket_match(title, genres, embed_data):
     """Find best Polymarket match for an article."""
@@ -323,6 +479,10 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
     """Build unified rows filtered by language."""
     rows = []
     seen_slugs = set()
+    seen_titles = set()
+
+    # Load market_history.db nowpattern_links (Pattern A data)
+    linked_markets = load_linked_markets()
 
     # Source 1: prediction_db.json (authoritative)
     for pred in pred_db.get("predictions", []):
@@ -360,6 +520,7 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
             genres = [g.strip().lower() for g in genre_str.split(",")]
 
         pm_match = find_polymarket_match(title, genres, embed_data)
+        mc_match = find_metaculus_match(title)
         divergence = None
         if pm_match and base is not None:
             divergence = round(pm_match["probability"] - base, 1)
@@ -370,6 +531,12 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
         # Extract event summary for context
         event_summary = extract_event_summary(pred)
 
+        # Pattern A: nowpattern_links から market_history.db の追跡市場を取得
+        prediction_id = pred.get("prediction_id", "")
+        linked = linked_markets.get(prediction_id)
+        linked_market_question = linked["question"] if linked else None
+        linked_market_prob = linked["yes_prob"] if linked else None  # 0.0〜1.0
+
         row = {
             "title": title,
             "url": url,
@@ -377,6 +544,7 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
             "base_content": base_content,
             "event_summary": event_summary,
             "polymarket": pm_match,
+            "metaculus": mc_match,
             "divergence": divergence,
             "status": pred.get("status", "open"),
             "outcome": pred.get("outcome"),
@@ -384,16 +552,23 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
             "brier": pred.get("brier_score"),
             "dynamics_str": dynamics_str,
             "source": "prediction_db",
+            # Pattern A fields
+            "prediction_id": prediction_id,
+            "linked_market_question": linked_market_question,
+            "linked_market_prob": linked_market_prob,
         }
         rows.append(row)
 
         slug = url.split("/")[-2] if url else ""
         if slug:
             seen_slugs.add(slug)
+        seen_titles.add(title)
 
     # Source 2: Ghost articles (fallback for articles not in prediction_db)
     for p in ghost_posts:
         if p["slug"] in seen_slugs:
+            continue
+        if p.get("title", "") in seen_titles:
             continue
 
         tags = p.get("tags", [])
@@ -421,6 +596,7 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
         dynamics = [t["slug"] for t in tags if t["slug"].startswith("p-")]
 
         pm_match = find_polymarket_match(title, genres, embed_data)
+        mc_match = find_metaculus_match(title)
         divergence = None
         if pm_match and scenarios.get("base"):
             divergence = round(pm_match["probability"] - scenarios["base"], 1)
@@ -437,6 +613,7 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
             "base_content": "",
             "event_summary": "",
             "polymarket": pm_match,
+            "metaculus": mc_match,
             "divergence": divergence,
             "status": "open",
             "brier": None,
@@ -532,32 +709,131 @@ def _build_featured_card(r, lang="ja"):
 
 
 def _build_article_row(r, lang="ja"):
-    """Build a simple article row with event context."""
+    """Build a Pattern A expandable card: summary line + click-to-expand details."""
     L = LABELS[lang]
+    bear = r.get("pessimistic")
     base = r.get("base")
-    title_short = r["title"][:50] + ("..." if len(r["title"]) > 50 else "")
+    bull = r.get("optimistic")
+    title = r.get("title", "")
     url = r.get("url", "#")
+    base_content = r.get("base_content", "")
+    dynamics_str = r.get("dynamics_str", "")
+    linked_q = r.get("linked_market_question")
+    linked_prob = r.get("linked_market_prob")  # float 0.0-1.0 or None
 
-    # Event context — what is this probability about?
-    event = r.get("event_summary") or r.get("base_content", "")
-    event_short = event[:50] + ("..." if len(event) > 50 else "") if event else ""
-
-    if base is not None:
-        if event_short:
-            scenario_text = f'<span style="font-size:0.85em;color:#555">{event_short}</span><br><strong>{base}%</strong>'
-        else:
-            scenario_text = f'<strong>{base}%</strong>'
+    # Labels per language
+    if lang == "ja":
+        bear_label = "悲観"
+        base_label = "基本"
+        bull_label = "楽観"
+        analyzing = L.get("analyzing", "分析中")
     else:
-        scenario_text = f'<span style="color:#666">{L["analyzing"]}</span>'
+        bear_label = "Bear"
+        base_label = "Base"
+        bull_label = "Bull"
+        analyzing = L.get("analyzing", "Analyzing")
 
-    return (
-        f'<div style="display:flex;align-items:center;gap:12px;padding:10px 0;'
-        f'border-bottom:1px solid #e0e0e0">'
-        f'<a href="{url}" style="color:#b8860b;text-decoration:none;flex:1;'
-        f'font-size:1em;overflow:hidden;text-overflow:ellipsis">{title_short}</a>'
-        f'<span style="color:#333;font-size:0.95em;min-width:120px;text-align:right;line-height:1.4">{scenario_text}</span>'
+    # Build scenario chips (compact, inline)
+    def chip(label, val, bg, color, border=""):
+        if val is not None:
+            border_style = f"border:{border};" if border else ""
+            return (
+                f'<span style="display:inline-flex;flex-direction:column;align-items:center;'
+                f'min-width:52px;padding:4px 6px;border-radius:5px;'
+                f'background:{bg};{border_style}">'
+                f'<span style="font-size:0.68em;color:{color};font-weight:600;opacity:0.85">{label}</span>'
+                f'<span style="font-size:1em;font-weight:700;color:{color}">{val}%</span>'
+                f'</span>'
+            )
+        return (
+            f'<span style="display:inline-flex;flex-direction:column;align-items:center;'
+            f'min-width:52px;padding:4px 6px;border-radius:5px;background:#f5f5f5;">'
+            f'<span style="font-size:0.68em;color:#999;font-weight:600">{label}</span>'
+            f'<span style="font-size:0.85em;color:#bbb">—</span>'
+            f'</span>'
+        )
+
+    has_scenarios = any(v is not None for v in [bear, base, bull])
+    if has_scenarios:
+        chips_html = (
+            f'<span style="display:inline-flex;gap:4px;vertical-align:middle;margin-left:8px">'
+            + chip(bear_label, bear, "#fde8e8", "#dc2626")
+            + chip(base_label, base, "#fff8e1", "#b8860b", "1px solid #b8860b55")
+            + chip(bull_label, bull, "#e8f5e9", "#16a34a")
+            + f'</span>'
+        )
+    else:
+        chips_html = (
+            f'<span style="font-size:0.85em;color:#999;margin-left:8px">{analyzing}</span>'
+        )
+
+    # Market probability badge (from nowpattern_links / market_history.db)
+    market_badge = ""
+    if linked_prob is not None:
+        pct = round(linked_prob * 100)
+        market_badge = (
+            f'<span style="margin-left:8px;padding:3px 8px;border-radius:12px;'
+            f'background:#e8f0fe;color:#1a56db;font-size:0.78em;font-weight:700;'
+            f'white-space:nowrap">{L["linked_market"]}: {pct}%</span>'
+        )
+
+    # ── Summary line (always visible) ──
+    summary_line = (
+        f'<div style="display:flex;align-items:flex-start;flex-wrap:wrap;gap:4px;">'
+        f'<a href="{url}" style="color:#b8860b;text-decoration:none;font-weight:600;'
+        f'font-size:0.97em;line-height:1.5;flex:1;min-width:200px">{title}</a>'
+        f'<span style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px">'
+        + chips_html + market_badge +
+        f'</span>'
         f'</div>'
     )
+
+    # ── Expanded content ──
+    expanded_parts = []
+
+    if base_content:
+        short = base_content[:120] + ("..." if len(base_content) > 120 else "")
+        expanded_parts.append(
+            f'<p style="margin:8px 0 4px 0;color:#444;font-size:0.9em;line-height:1.6">'
+            f'{short}</p>'
+        )
+
+    if linked_q:
+        expanded_parts.append(
+            f'<div style="margin-top:8px;padding:6px 10px;background:#e8f0fe;'
+            f'border-left:3px solid #1a56db;border-radius:3px;font-size:0.82em;color:#333">'
+            f'<span style="font-weight:600;color:#1a56db">{L["linked_market"]}</span>: {linked_q}'
+            + (f' <strong style="color:#1a56db">→ {round(linked_prob*100)}%</strong>' if linked_prob is not None else "")
+            + f'</div>'
+        )
+
+    if dynamics_str:
+        expanded_parts.append(
+            f'<div style="margin-top:6px;font-size:0.8em;color:#777">'
+            f'⚡ {dynamics_str}</div>'
+        )
+
+    expanded_html = "\n".join(expanded_parts) if expanded_parts else ""
+
+    if expanded_html:
+        return (
+            f'<details style="margin-bottom:10px;border-bottom:1px solid #ebebeb;'
+            f'padding-bottom:8px">'
+            f'<summary style="cursor:pointer;list-style:none;user-select:none">'
+            + summary_line +
+            f'</summary>'
+            f'<div style="padding:4px 0 4px 4px">'
+            + expanded_html +
+            f'</div>'
+            f'</details>'
+        )
+    else:
+        return (
+            f'<div style="margin-bottom:10px;border-bottom:1px solid #ebebeb;'
+            f'padding-bottom:8px">'
+            + summary_line +
+            f'</div>'
+        )
 
 
 def _build_resolved_card(r, lang="ja"):
@@ -639,6 +915,51 @@ def build_page_html(rows, stats, lang="ja"):
         f'</div>'
     )
 
+    # ── Brier Scoreboard ──
+    scored_rows = [r for r in resolved if r.get("brier") is not None]
+    hits = sum(1 for r in scored_rows if r.get("brier", 1) < 0.25)
+    misses = len(scored_rows) - hits
+    avg_brier = (sum(r["brier"] for r in scored_rows) / len(scored_rows)) if scored_rows else None
+
+    if scored_rows:
+        if avg_brier < 0.15:
+            brier_quality = L["scoreboard_brier_good"]
+            brier_color = "#16a34a"
+        elif avg_brier < 0.25:
+            brier_quality = L["scoreboard_brier_ok"]
+            brier_color = "#f59e0b"
+        else:
+            brier_quality = L["scoreboard_brier_bad"]
+            brier_color = "#dc2626"
+        scoreboard_html = (
+            f'<div style="margin-bottom:28px;padding:16px 20px;'
+            f'background:linear-gradient(135deg,#fffbeb,#fef3c7);'
+            f'border:1px solid #b8860b44;border-radius:10px">'
+            f'<div style="font-weight:700;color:#b8860b;font-size:1.05em;margin-bottom:10px">'
+            f'{L["scoreboard_title"]}</div>'
+            f'<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center">'
+            f'<div style="font-size:1.5em;font-weight:800;color:#16a34a">{hits}</div>'
+            f'<div style="font-size:0.9em;color:#555">{L["scoreboard_hit"]}</div>'
+            f'<div style="font-size:0.95em;color:#aaa">／</div>'
+            f'<div style="font-size:1.5em;font-weight:800;color:#dc2626">{misses}</div>'
+            f'<div style="font-size:0.9em;color:#555">{L["scoreboard_miss"]}</div>'
+            f'<div style="margin-left:auto;text-align:right">'
+            f'<div style="font-size:0.8em;color:#888">{L["scoreboard_brier"]}</div>'
+            f'<div style="font-size:1.3em;font-weight:700;color:{brier_color}">'
+            f'{avg_brier:.2f}'
+            f'<span style="font-size:0.7em;font-weight:400;margin-left:4px">{brier_quality}</span>'
+            f'</div></div>'
+            f'</div></div>'
+        )
+    else:
+        scoreboard_html = (
+            f'<div style="margin-bottom:28px;padding:14px 20px;'
+            f'background:#f9f9f6;border:1px dashed #ccc;border-radius:10px;'
+            f'text-align:center;color:#888;font-size:0.9em">'
+            f'{L["scoreboard_no_data"]}'
+            f'</div>'
+        )
+
     # ── Section 1: Featured ──
     featured.sort(key=lambda r: abs(r.get("divergence") or 0), reverse=True)
     featured_html = ""
@@ -676,7 +997,7 @@ def build_page_html(rows, stats, lang="ja"):
             '</div>'
         )
 
-    # ── Section 3: Tracking list ──
+    # ── Section 3: Tracking list (individual expandable cards) ──
     tracking_html = ""
     if tracking:
         article_rows = [_build_article_row(r, lang) for r in tracking[:200]]
@@ -685,13 +1006,12 @@ def build_page_html(rows, stats, lang="ja"):
             overflow = f'<div style="padding:10px;text-align:center;color:#888;font-size:0.9em">{L["overflow"].format(count=len(tracking)-200)}</div>'
 
         tracking_html = (
-            f'<details style="margin-bottom:32px">'
-            f'<summary style="cursor:pointer;color:#b8860b;font-size:1.1em;font-weight:600;'
-            f'padding:12px 0;user-select:none">'
-            f'{L["tracking_summary"].format(count=len(tracking))}</summary>'
-            f'<div style="margin-top:10px;padding:12px 16px;background:#f9f9f6;border-radius:8px">'
+            f'<div style="margin-bottom:32px">'
+            f'<h3 style="color:#222;font-size:1.2em;margin:0 0 12px 0">'
+            f'{L["tracking_section_title"]} ({len(tracking)})</h3>'
+            f'<div style="padding:12px 16px;background:#f9f9f6;border-radius:8px">'
             + "\n".join(article_rows) + overflow
-            + '</div></details>'
+            + '</div></div>'
         )
 
     # ── Footer ──
@@ -708,6 +1028,7 @@ def build_page_html(rows, stats, lang="ja"):
     return f"""<div class="np-tracker">
 {hero}
 {stats_html}
+{scoreboard_html}
 {featured_html}
 {resolved_html}
 {tracking_html}
@@ -778,7 +1099,7 @@ def main():
 
     # Fetch articles from Ghost
     ghost_result = ghost_request("GET",
-        "/posts/?limit=all&include=tags&formats=html&fields=id,slug,title,url,html,published_at",
+        "/posts/?limit=all&filter=status:published&include=tags&formats=html&fields=id,slug,title,url,html,published_at",
         api_key)
     ghost_posts = ghost_result.get("posts", [])
     print(f"Ghost articles: {len(ghost_posts)}")

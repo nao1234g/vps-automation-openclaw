@@ -1280,3 +1280,54 @@
 ---
 
 *最終更新: 2026-02-24 — Ghost Lexical更新方法の教訓追加 + 5層防御v5.3（TAG_BADGE/SUMMARY）完成*
+
+### 2026-02-24: 予測解決ロジック — 「人間が判断しない」設計決定
+- **決定事項**: 予測トラッカーの当たり外れ判定は**完全自動**。Naotoが判断する仕組みは作らない
+- **自動化済みスクリプト**: `/opt/shared/scripts/prediction_auto_verifier.py`
+- **フロー**: cron（毎日JST9時）→ トリガー日超過を検出 → Grok(ニュース検索) + Claude Opus(判定) → prediction_db.json自動更新 → Ghostページ更新 → Telegram通知
+- **絶対禁止**: `--resolve` CLIオプションや「Naotoが `--outcome` で記録する」提案は禁止
+- **教訓**: 自動化の決定をKNOWN_MISTAKESに記録すれば次のセッションで矛盾しない
+
+---
+
+### 2026-02-24: 「確認してから報告」の強制 — 品質強制システム設計
+
+- **症状**: 「直した」と報告したが実際は壊れていた。EN記事のタグ監査で全35件FAILと報告したが、実はタグはある（命名規則の違いで誤検知）。`追跡:` 行が生のPython dict文字列(`{'name': ..., 'date': ...}`)を表示していた
+- **根本原因（3つ）**:
+  1. **検品なしの報告** — 変更後にブラウザ確認せずに「直した」と報告
+  2. **一箇所だけ読んで矛盾に気づかない** — KNOWN_MISTAKESの別のエントリと矛盾する提案をした
+  3. **スコープ外を見ない** — 一部を直したが関連領域を確認しなかった
+- **正しい解決策（品質強制システム）**:
+  - `site_health_check.py` — 変更前・変更後に必ず実行（`python3 /opt/shared/scripts/site_health_check.py --quick`）。FAIL 0件が出荷基準
+  - `ui_verify_and_notify.py` — UIが関わる変更後はPlaywright + Telegram通知（`python3 /opt/shared/scripts/ui_verify_and_notify.py --url <URL> --desc "変更内容"`）
+  - 「出荷OK」が出るまで報告しない
+- **教訓（強制システム構成）**:
+  - 出力ファイル: `/opt/shared/scripts/site_health_check.py`
+  - UIチェック: `/opt/shared/scripts/ui_verify_and_notify.py`
+  - ENタグ: ENの実タグは `geopolitics`/`crypto` 等（`genre-*` プレフィックスなし）。taxonomy.json v3.0 は `genre-*` 形式だがGhost DBと validator は旧形式を使用
+  - `追跡:` バグ原因: `extract_event_summary()` でtriggersの最初の要素が dict なのに `str()` 変換していた → `t.get("name","") + t.get("date","")` に修正済み
+
+### 2026-02-25: 「確認した≠表示される」— CSS検証の失敗と4段階検証ルール
+
+- **症状**: ENナビゲーションが「直った」と報告したが、ブラウザで開くと何も表示されなかった。ENカードラベル「⚡ FAST READ」を確認しないで修正完了と報告した
+- **根本原因1**: 検証が「DB内の値確認」止まりで、実際のブラウザ表示まで確認していなかった（代理指標の罠）
+- **根本原因2**: CSSバグ — `.np-en .nav-*::after { font-size: inherit }` が親の `font-size: 0 !important` を継承してテキスト不可視
+- **正しい解決策**: 修正後は必ず `curl -sk https://nowpattern.com/... | grep "期待する文字列"` でHTML/CSSレベルで確認
+- **教訓**: 4段階検証（DB確認→API確認→HTML確認→要素確認）を全修正で実施。CSS変更後は `font-size: inherit` ではなく `font-size: 1rem` 等の明示値を使う
+
+### 2026-02-25: 予測トラッカー — 無関係なPolymarket市場を紐付けて不整合な表示
+
+- **症状**: 予測カードのPolymarket質問（例: Clarity Act成立）と、追跡中の問い（例: Dough Finance訴訟）が全く別のトピック。YES/NOの意味が読者に伝わらない。同じカード内でデータが矛盾。
+- **根本原因**: market_consensusに「最も近い」Polymarket市場を手動紐付けしたが、「近い」≠「同一」。予測の追跡テーマとPolymarket質問が異なるトピックだった（7件中6件が不一致）。
+- **誤ったアプローチ**: Polymarketで検索して「関連しそうな」市場を見つけ、テーマの一致を検証せずにmarket_consensusに設定した。
+- **正しい解決策**: 不一致なmarket_consensusを全削除（Option A）。Polymarket質問 = 予測のopen_loop_triggerと「同一の問い」でなければ紐付けない。
+- **教訓**: 外部データを表示する前に「この質問は同じことを聞いているか？」を確認する。「関連する」と「同一の問い」は全く違う。
+- **再発防止コード**: `/opt/shared/scripts/prediction_page_builder.py` に `_validate_market_consensus()` 関数を追加。ビルド時にmarket_consensus質問と予測テーマのキーワード重複をチェックし、重複ゼロの場合はWARNINGを出力。
+
+### 2026-02-25: ミス記録にコード強制の提案が欠落 — feedback-trapの強化
+
+- **症状**: KNOWN_MISTAKES.mdに「教訓」をテキストで書くだけで終わっていた。テキストの教訓はLLMが読み飛ばすため、同じミスが再発する。
+- **根本原因**: feedback-trap.pyがKNOWN_MISTAKES.mdのテキスト更新のみを強制し、「コードによる再発防止策の実装/提案」は強制していなかった。
+- **正しい解決策**: feedback-trap.pyのリマインダーに「再発防止コード」フィールドを追加。ミス記録時に「どのファイルにどんなバリデーション/hookを追加したか」の記載を必須化。
+- **教訓**: 「ドキュメントに書くだけでは実行されない。全てのルールはコードで強制する」（content-rules.md原則）はミス記録プロセス自体にも適用する。
+- **再発防止コード**: `.claude/hooks/feedback-trap.py` のリマインダー注入に「再発防止コード」欄を追加。KNOWN_MISTAKESの記録フォーマットに `- **再発防止コード**:` を追加。

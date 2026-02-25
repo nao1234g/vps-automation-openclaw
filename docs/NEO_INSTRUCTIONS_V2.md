@@ -1309,6 +1309,34 @@ Step 5: Ghost 投稿（API）
   nowpattern_publisher.py で Ghost Admin API に投稿
   → nowpattern.com/記事スラッグ/
 
+Step 5.5: 予測市場リンク設定（MANDATORY — 必須）
+  What's Next セクションの3シナリオを書いたら、必ず予測市場とリンクすること。
+  これが Nowpattern の「測定装置」としての核心機能。スキップ禁止。
+
+  1. 関連市場を検索する:
+     python3 /opt/shared/scripts/prediction_resolver.py --search "キーワード（英語）" --limit 10
+
+  2. prediction_db.json に記事がなければ nowpattern_publisher.py が自動追加する
+     (NP-2026-XXXX 形式の ID が付与される)
+
+  3. 市場が見つかったらリンクを設定する:
+     python3 /opt/shared/scripts/prediction_resolver.py --add-link \
+       --prediction-id NP-2026-XXXX \
+       --market-id <markets.id> \
+       --direction pessimistic または optimistic
+
+  resolution_direction の決め方:
+    "pessimistic": YES → 悲観シナリオが的中、NO → 楽観シナリオが的中
+    "optimistic":  YES → 楽観シナリオが的中、NO → 悲観シナリオが的中
+
+    例: 「トランプ関税が3ヶ月以内に発動されるか？」という市場で、
+        YES(発動) = 悲観シナリオ → direction = "pessimistic"
+        YES(発動) = 楽観シナリオ → direction = "optimistic"
+
+  市場が見つからない場合:
+    → 検索キーワードを変えて3回試す（英語でも日本語トピックに近い市場を探す）
+    → 3回試してもなければスキップ（prediction_db に resolution_question = null で記録）
+
 Step 6: X 引用リポスト
   元ニュースのツイートを引用リポスト
   → 1500字分析コメント + nowpattern.com リンク
@@ -1359,6 +1387,7 @@ Step 3: Ghost 投稿 + X 引用リポスト
 4. **3シナリオ予測を書く** — 楽観/基本/悲観。「今後に注目です」で終わらせない
 5. **タイトルは25〜30文字** — 数字 or 逆説を含む
 6. **5要素チェック**を全記事で実施 — 1つでも欠けたら書き直し
+7. **予測市場リンクを設定する** — Step 5.5 に従って `prediction_resolver.py --add-link` を必ず実行する。Brier Score 計算の土台になる。設定なしの記事は「測定装置として機能しない」不完全品
 
 ### 絶対にやらないこと
 
@@ -1839,6 +1868,143 @@ NOW PATTERN ボックスのインラインスタイルは Ghost がストリッ�
 
 ---
 
+---
+
+## 19. 予測市場リンク — Prediction Resolver 詳細リファレンス
+
+### なぜ必要か
+
+Nowpattern は「測定装置」を自称している。測定するためには:
+1. 予測を書く（What's Next 3シナリオ）
+2. **その予測が正しかったかを後で測定する仕組み**が必要
+
+この仕組みが `prediction_resolver.py` + `market_history.db` の連携。
+リンクなし記事 = 予測を書いても検証できない記事 = Nowpatternの核心価値がない。
+
+### 判定スコア — Brier Score
+
+- **0.00** = 完璧（100%確率で当てた）
+- **0.15** = 世界のトップ予測者（上位10%）
+- **0.25** = ランダム（コインフリップと同等）
+- **0.50** = 最悪（50%確率を0%として予測した）
+
+Nowpattern の目標: 0.15 以下を維持する。
+
+### 自動判定のロジック
+
+| YES確率 | 処理 |
+|---------|------|
+| ≥ 95% | 自動判定: YES |
+| 70〜94% | Gemini 確認後に自動 |
+| 35〜65% (期日到来) | 基本シナリオ（不確定）として自動判定 |
+| 30〜70% (期日到来) | Telegram 手動通知 |
+| 6〜29% | Gemini 確認後に自動 |
+| ≤ 5% | 自動判定: NO |
+
+### コマンドリファレンス
+
+```bash
+# 市場を検索（キーワードは英語で）
+python3 /opt/shared/scripts/prediction_resolver.py --search "Fed rate cut" --limit 10
+python3 /opt/shared/scripts/prediction_resolver.py --search "tariff" --limit 10
+python3 /opt/shared/scripts/prediction_resolver.py --search "Bitcoin ETF" --limit 5
+
+# リンクを追加
+python3 /opt/shared/scripts/prediction_resolver.py --add-link \
+  --prediction-id NP-2026-0001 \
+  --market-id 42 \
+  --direction pessimistic
+
+# 現在のリンク状況確認
+python3 /opt/shared/scripts/prediction_resolver.py --link
+
+# 全体ステータス確認
+python3 /opt/shared/scripts/prediction_resolver.py --status
+
+# 手動で解決処理を実行（通常は cron 自動）
+python3 /opt/shared/scripts/prediction_resolver.py
+```
+
+### prediction_db.json の管理
+
+**ファイルパス**: `/opt/shared/scripts/prediction_db.json`
+
+記事出版後、以下を手動で追加する（publisher.py は自動追加しない）:
+
+```json
+{
+  "prediction_id": "NP-2026-0008",
+  "article_title": "記事タイトル",
+  "ghost_url": "https://nowpattern.com/記事スラッグ/",
+  "published_at": "2026-02-24T...",
+  "dynamics_tags": "力学タグ1 × 力学タグ2",
+  "genre_tags": "ジャンル名",
+  "resolution_question": "Will [英語で50文字以内のYES/NO質問]?",
+  "resolution_direction": "pessimistic",
+  "scenarios": [
+    {"label": "楽観シナリオ", "probability": 0.25, "content": "..."},
+    {"label": "基本シナリオ", "probability": 0.5, "content": "..."},
+    {"label": "悲観シナリオ", "probability": 0.25, "content": "..."}
+  ],
+  "status": "open",
+  "outcome": null,
+  "resolved_at": null,
+  "brier_score": null,
+  "resolution_note": null
+}
+```
+
+ID は `NP-2026-XXXX` 形式で連番（既存の最大 ID + 1）。
+
+### ⛔ 必須フィールド: resolution_question と resolution_direction
+
+**これを省略した記事は「測定装置」ではなく「ただのブログ」になる。絶対に省略するな。**
+
+| フィールド | 説明 | 例 |
+|-----------|------|-----|
+| `resolution_question` | 英語で50文字以内のYES/NO質問（Polymarketに貼り付けられる形式） | `"Will the Fed cut rates before June 2026?"` |
+| `resolution_direction` | YES=楽観 or YES=悲観のどちらか | `"pessimistic"` or `"optimistic"` |
+
+**resolution_direction の決め方:**
+
+```
+記事の悲観シナリオ → YES で起きる？
+  例: 「米国が景気後退」が悲観シナリオ
+  → Polymarketで「Will US enter recession?」が YES → 悲観
+  → resolution_direction = "pessimistic"
+
+記事の楽観シナリオ → YES で起きる？
+  例: 「Appleが新製品発表」が楽観シナリオ
+  → Polymarketで「Will Apple release new product?」が YES → 楽観
+  → resolution_direction = "optimistic"
+```
+
+### 記事出版後の必須ワークフロー（5ステップ）
+
+記事を出版したら、以下を**必ず同じセッションで**実行する:
+
+```bash
+# Step 1: prediction_db.json に追加（上のJSONをファイルに書く）
+# Step 2: 関連する予測市場を検索（英語キーワードで）
+python3 /opt/shared/scripts/prediction_resolver.py --search "Fed rate cut 2026" --limit 10
+
+# Step 3: 検索結果から最も関連性の高い market_id を特定
+# 出力例: ID=42  [polymarket] Will the Fed cut interest rates before June 2026? (prob: 67%)
+
+# Step 4: リンクを登録
+python3 /opt/shared/scripts/prediction_resolver.py --add-link \
+  --prediction-id NP-2026-0008 \
+  --market-id 42 \
+  --direction pessimistic
+
+# Step 5: 確認
+python3 /opt/shared/scripts/prediction_resolver.py --link
+```
+
+**市場が見つからない場合**: `resolution_question` を英語で3パターン試す（短縮形、別キーワード）。それでも見つからなければ `"market_id": null` でスキップし、resolution_note に「市場なし: 手動解決待ち」と記録する。
+
+---
+
 *このドキュメントの詳細タクソノミー定義は `docs/NOWPATTERN_TAXONOMY_v2.md` を参照*
 *過去のミス全件は `docs/KNOWN_MISTAKES.md` を参照*
 *AISAコンテンツ戦略は `docs/CONTENT_STRATEGY.md` を参照*
@@ -1846,3 +2012,4 @@ NOW PATTERN ボックスのインラインスタイルは Ghost がストリッ�
 *力学ダイアグラム生成: `scripts/gen_dynamics_diagram.py`*
 *記事ビルダー: `scripts/nowpattern_article_builder.py`（HTML生成）*
 *記事パブリッシャー: `scripts/nowpattern_publisher.py`（Ghost投稿+X+インデックス更新）*
+*予測解決エンジン: `scripts/prediction_resolver.py`（市場リンク・Brier Score計算）*

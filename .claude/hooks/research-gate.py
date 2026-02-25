@@ -8,6 +8,8 @@ RESEARCH GATE - PreToolUse Hook (v2 — enforcement mode)
 """
 import json
 import sys
+import re
+import time
 from pathlib import Path
 
 PROJECT_DIR = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(".")
@@ -117,6 +119,26 @@ if tool_name in ("Edit", "Write", "Bash"):
             )
             print(json.dumps({"decision": "block", "reason": msg}))
             sys.exit(2)
+
+    # ── 新規コード作成はTodoWriteによるプラン作成も必須 ────────────────────
+    fp = tool_input.get("file_path", "")
+    CODE_EXTENSIONS = ('.py', '.sh', '.js', '.ts', '.yaml', '.yml')
+    is_new_code_check = tool_name == "Write" and any(fp.endswith(ext) for ext in CODE_EXTENSIONS)
+    if is_new_code_check:
+        plan_created = state.get("plan_created", False)
+        if not plan_created:
+            state["task_started"] = True
+            state["started_without_plan"] = True
+            STATE_FILE.write_text(json.dumps(state))
+            msg = (
+                "🚫 BLOCKED: 新規コードファイルの作成前にTodoWriteでタスク計画が必要です。\n"
+                "→ まず TodoWrite ツールで「やること」を箇条書きにしてください。\n"
+                "→ タスクボード: ~/.claude/tasks/dashboard.html（ブラウザで開くと10秒ごと更新）\n"
+                "→ 計画を書いてから再度コードを作成してください。\n"
+                "（このブロックは「コーディング前に計画を書く」原則の物理的強制です）"
+            )
+            print(json.dumps({"decision": "block", "reason": msg}))
+            sys.exit(2)
         else:
             # 小規模編集・設定変更 → 警告のみ（止めない）
             state["task_started"] = True
@@ -126,6 +148,67 @@ if tool_name in ("Edit", "Write", "Bash"):
             print("KNOWN_MISTAKES.md を確認しましたか？WebSearchで解決策を探しましたか？")
     else:
         state["task_started"] = True
+        STATE_FILE.write_text(json.dumps(state))
+
+    # ── UI変更検出: ui_task_pending を設定（要件1 + 要件2の前提） ─────────────────
+    # CSS/.html/.hbs ファイル編集、または Ghost codeinjection 変更を検出
+    fp_ui = tool_input.get("file_path", "")
+    cmd_ui = tool_input.get("command", "") if tool_name == "Bash" else ""
+    UI_FILE_EXTS = ('.css', '.html', '.hbs', '.scss')
+    _ui_file = any(fp_ui.lower().endswith(ext) for ext in UI_FILE_EXTS)
+    _ui_bash = bool(re.search(
+        r'(codeinjection_head|codeinjection_foot'
+        r'|python3\s+/tmp/fix'
+        r'|systemctl\s+restart\s+ghost)',
+        cmd_ui, re.IGNORECASE
+    ))
+
+    if _ui_file or _ui_bash:
+        # 要件1: TodoWrite でテスト計画がない場合はブロック
+        try:
+            state = json.loads(STATE_FILE.read_text()) if STATE_FILE.exists() else state
+        except Exception:
+            pass
+        plan_ok = state.get("plan_created", False)
+        if not plan_ok:
+            msg = (
+                "🚫 BLOCKED: UI/CSS変更前に視覚テスト計画（TodoWrite）が必要です。\n"
+                "→ まず TodoWrite で以下のような確認タスクを含むリストを書いてください:\n"
+                "  例: 「ブラウザで /en/ を開いてナビゲーションが正しく表示されるか目視確認」\n"
+                "  例: 「修正後 curl で実際のHTMLを取得して期待する文字列があるか確認」\n"
+                "→ 計画を書いてから再実行してください。\n"
+                "（このブロックは「UI修正前に目視テスト計画を書く」原則の物理的強制です）"
+            )
+            print(json.dumps({"decision": "block", "reason": msg}))
+            sys.exit(2)
+        # 要件2: VRT ベースラインチェック（ベースラインなし → ブロック）
+        vrt_ctx_path = STATE_DIR / "vrt_context.json"
+        vrt_ok = False
+        if vrt_ctx_path.exists():
+            try:
+                vrt_age = time.time() - vrt_ctx_path.stat().st_mtime
+                vrt_ctx_data = json.loads(vrt_ctx_path.read_text())
+                # 2時間以内のベースラインは有効
+                if vrt_age < 7200 and vrt_ctx_data.get("status") == "baseline_ready":
+                    vrt_ok = True
+            except Exception:
+                pass
+        if not vrt_ok:
+            msg = (
+                "🚫 BLOCKED: UI/CSS変更前にVRTベースライン撮影が必要です。\n"
+                "→ まず以下のコマンドでベースラインを撮影してください:\n"
+                "  python scripts/ui_vrt_runner.py baseline \\\n"
+                "    --url https://nowpattern.com/en/ \\\n"
+                "    --selector \".gh-navigation-menu\"\n"
+                "→ URLとセレクタは変更する対象に合わせて指定してください。\n"
+                "→ 撮影後に再度編集を試みてください。\n"
+                "（このブロックは「UI修正前にVRTベースラインを撮る」原則の物理的強制です）"
+            )
+            print(json.dumps({"decision": "block", "reason": msg}))
+            sys.exit(2)
+        # 計画あり・ベースラインあり → UI作業中フラグON
+        state["ui_task_pending"] = True
+        state["ui_approved"] = False
         STATE_FILE.write_text(json.dumps(state))
 
 sys.exit(0)

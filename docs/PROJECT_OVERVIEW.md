@@ -1,449 +1,222 @@
-# OpenClaw VPS - Project Overview
-
-## 🎯 プロジェクト概要
-
-OpenClaw VPSは、AI Agentプラットフォーム、自動化ワークフロー、ノートブックシステムを統合したエンタープライズグレードのVPSソリューションです。
-
-### 主要コンポーネント
-
-1. **OpenClaw AI Agent** - Claude Sonnet 4.5搭載のAIエージェント
-2. **N8N** - ワークフロー自動化プラットフォーム
-3. **OpenNotebook** - ナレッジベース管理システム
-4. **PostgreSQL** - リレーショナルデータベース
-5. **Prometheus + Grafana** - 監視・可視化スタック
-
-## 📊 プロジェクト規模
-
-### コードベース統計
-
-- **総コミット数**: 130+
-- **ドキュメントファイル**: 35個
-- **シェルスクリプト**: 18個
-- **Docker Composeファイル**: 5個
-- **N8Nワークフロー**: 6個
-- **Grafanaダッシュボード**: 3個
-- **Terraformファイル**: 7個
-- **Helm Templates**: 16個
-- **テストスイート**: E2E (Playwright) + Load (k6)
-
-### 総開発規模
-
-- **総行数**: 20,000+ 行
-- **開発期間**: 1日（集中開発）
-- **対応環境**: 3つ（Docker Compose、Terraform、Kubernetes）
-
-## 🏗️ アーキテクチャ
-
-### レイヤー構造
-
-```
-┌─────────────────────────────────────────────┐
-│         Ingress / Load Balancer             │
-│         (Nginx + SSL/TLS)                   │
-└─────────────────────────────────────────────┘
-                    ↓
-┌─────────────────────────────────────────────┐
-│         Application Layer                    │
-│  ┌──────────┐ ┌──────┐ ┌──────────────┐   │
-│  │OpenClaw │ │ N8N  │ │OpenNotebook │    │
-│  │AI Agent │ │      │ │             │    │
-│  └──────────┘ └──────┘ └──────────────┘   │
-└─────────────────────────────────────────────┘
-                    ↓
-┌─────────────────────────────────────────────┐
-│         Data Layer                           │
-│  ┌────────────┐ ┌──────────┐               │
-│  │PostgreSQL │ │  Redis   │                │
-│  │(3 schemas)│ │ (Cache)  │                │
-│  └────────────┘ └──────────┘               │
-└─────────────────────────────────────────────┘
-                    ↓
-┌─────────────────────────────────────────────┐
-│         Monitoring Layer                     │
-│  ┌───────────┐ ┌─────────┐ ┌────────────┐ │
-│  │Prometheus│ │Grafana │ │Alertmanager│  │
-│  └───────────┘ └─────────┘ └────────────┘ │
-└─────────────────────────────────────────────┘
-```
-
-### ネットワークアーキテクチャ
-
-- **Frontend Network**: 172.28.1.0/24 (Public-facing)
-- **Backend Network**: 172.28.2.0/24 (Internal only)
-- **Monitoring Network**: 172.28.3.0/24 (Metrics collection)
-
-## 🔐 セキュリティ
-
-### 10層セキュリティアーキテクチャ
-
-1. **ネットワーク層**: UFW ファイアウォール
-2. **アクセス制御**: Fail2ban 侵入検知
-3. **認証層**: SSH鍵認証、JWT
-4. **トランスポート層**: TLS 1.3、Let's Encrypt
-5. **アプリケーション層**: CORS、CSP、セキュリティヘッダー
-6. **コンテナ層**: 非root実行、capability制限
-7. **データベース層**: 暗号化、パラメータ化クエリ
-8. **監視層**: ログ集約、異常検知
-9. **バックアップ層**: 暗号化バックアップ、オフサイト保管
-10. **コンプライアンス層**: 定期的なセキュリティスキャン
-
-### 実装されたセキュリティ機能
-
-- ✅ SSL/TLS暗号化（Let's Encrypt）
-- ✅ SSH鍵認証のみ（パスワード無効化）
-- ✅ UFWファイアウォール（22, 80, 443のみ）
-- ✅ Fail2ban（5回失敗で1時間BAN）
-- ✅ Dockerセキュリティ（非root、read-only FS）
-- ✅ セキュリティヘッダー（HSTS、CSP、X-Frame-Options）
-- ✅ レート制限（10-30 req/s）
-- ✅ 定期的なセキュリティスキャン（Trivy、Docker Bench）
-
-## 📈 パフォーマンス
-
-### ベンチマーク結果
-
-| メトリクス | 目標 | 実測値 |
-|-----------|------|--------|
-| ヘルスチェック | < 200ms | ~150ms |
-| APIレスポンス | < 1000ms | ~400ms |
-| データベースクエリ | < 100ms | ~50ms |
-| スループット | > 100 req/s | ~150 req/s |
-
-### スケーラビリティ
-
-- **垂直スケーリング**: t3.micro → t3.2xlarge
-- **水平スケーリング**: Kubernetes HPA (2-10 replicas)
-- **データベース**: PostgreSQL レプリケーション対応
-- **キャッシング**: Redis統合
-
-## 💰 コスト
-
-### 月額コスト見積もり（AWS東京リージョン）
-
-#### VPS（Docker Compose）
-- **t3.small**: ~$15/月（推奨）
-- **t3.micro**: ~$7.5/月（最小構成）
-- **t3.medium**: ~$30/月（高負荷対応）
-
-#### AWS追加コスト
-- EBS (30GB): ~$3/月
-- Elastic IP: ~$3.65/月
-- データ転送: 従量課金
-- AWS Backup: ~$5-10/月
-
-#### API利用料（Anthropic Claude）
-- Sonnet 4.5 Input: $3/1M tokens
-- Sonnet 4.5 Output: $15/1M tokens
-- 月間想定: $10-50（使用量による）
-
-**合計見積もり**: $40-100/月
-
-### コスト最適化
-
-- ✅ APIモデルの適切な選択（Haiku vs Sonnet）
-- ✅ プロンプト最適化（93%削減事例）
-- ✅ レスポンスキャッシング
-- ✅ 不要なログ削除
-- ✅ 予算アラート設定
-
-## 🚀 デプロイメントオプション
-
-### 1. Docker Compose（VPS）
-
-**メリット**:
-- ✅ シンプル、理解しやすい
-- ✅ 低コスト（月額$20-40）
-- ✅ 迅速なセットアップ（15分）
-
-**推奨環境**:
-- 小規模プロジェクト
-- スタートアップ
-- 個人開発者
-
-**セットアップ**:
-```bash
-git clone https://github.com/nao1234g/vps-automation-openclaw.git
-cd vps-automation-openclaw
-cp .env.example .env
-# .env を編集
-docker compose -f docker-compose.production.yml up -d
-```
-
-### 2. Terraform（AWS IaC）
-
-**メリット**:
-- ✅ インフラのコード化
-- ✅ 再現可能な環境
-- ✅ 自動プロビジョニング
-
-**推奨環境**:
-- 複数環境管理
-- チーム開発
-- CI/CD統合
-
-**セットアップ**:
-```bash
-cd terraform
-cp terraform.tfvars.example terraform.tfvars
-# terraform.tfvars を編集
-terraform init
-terraform plan
-terraform apply
-```
-
-### 3. Kubernetes（Helm Charts）
-
-**メリット**:
-- ✅ エンタープライズグレード
-- ✅ オートスケーリング
-- ✅ 高可用性
-- ✅ ローリングアップデート
-
-**推奨環境**:
-- 大規模本番環境
-- マイクロサービス
-- マルチリージョン展開
-
-**セットアップ**:
-```bash
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm dependency update helm/openclaw
-helm install openclaw helm/openclaw -n openclaw --create-namespace
-```
-
-## 🧪 テスト戦略
-
-### 1. E2Eテスト（Playwright）
-
-- ヘルスチェック
-- APIエンドポイント
-- 監視システム
-- セキュリティヘッダー
-- レート制限
-
-**実行**:
-```bash
-cd tests/e2e
-npm install
-npm test
-```
-
-### 2. 負荷テスト（k6）
-
-- 標準負荷テスト（10-100 VUs）
-- スパイクテスト（200 VUs）
-- ストレステスト（400 VUs）
-- ソークテスト（2時間）
-
-**実行**:
-```bash
-k6 run tests/load/k6-config.js
-```
-
-### 3. セキュリティテスト
-
-- Trivy（コンテナ脆弱性）
-- Docker Bench Security
-- TruffleHog（シークレット検出）
-- ShellCheck（スクリプト静的解析）
-
-**実行**:
-```bash
-./scripts/security_scan.sh
-```
-
-## 📊 監視とアラート
-
-### Prometheus メトリクス
-
-- システムメトリクス（CPU、メモリ、ディスク）
-- コンテナメトリクス（Docker stats）
-- アプリケーションメトリクス（カスタム）
-- ネットワークメトリクス
-
-### Grafana ダッシュボード
-
-1. **System Overview** - システム全体の概要
-2. **Container Monitoring** - コンテナ別リソース
-3. **Cost Tracking** - コスト分析と予測
-
-### Alertmanager 通知
-
-- **Critical**: Slack + Email + Telegram
-- **High**: Slack + Email
-- **Medium**: Slack
-- **Low**: ログのみ
-
-### アラートルール（16ルール）
-
-- CPU使用率 > 80%
-- メモリ使用率 > 90%
-- ディスク使用率 > 85%
-- コンテナダウン
-- データベース接続エラー
-- API応答遅延 > 2秒
-- エラー率 > 5%
-
-## 🔄 CI/CD パイプライン
-
-### GitHub Actions（3ワークフロー）
-
-1. **Security Scan**
-   - トリガー: Push、PR、Daily
-   - 内容: Trivy、TruffleHog、ShellCheck
-   - 結果: GitHub Security タブ
-
-2. **Docker Compose Test**
-   - トリガー: Push、PR
-   - 内容: 起動テスト、ヘルスチェック
-   - タイムアウト: 10分
-
-3. **E2E Tests**
-   - トリガー: Push、PR、Daily
-   - 内容: Playwright E2E テスト
-   - アーティファクト: スクリーンショット、ビデオ
-
-## 📚 ドキュメント
-
-### 完全なドキュメントセット（35ファイル）
-
-#### セットアップ
-- [README.md](../README.md) - プロジェクト概要
-- [DEPLOYMENT.md](../docs/archives/DEPLOYMENT.md) - デプロイメントガイド（アーカイブ）
-
-#### 開発
-- [DEVELOPMENT.md](../DEVELOPMENT.md) - 開発者ガイド
-- [CONTRIBUTING.md](../CONTRIBUTING.md) - コントリビューションガイド
-- [TESTING_GUIDE.md](TESTING_GUIDE.md) - テストガイド
-
-#### 運用
-- [OPERATIONS_GUIDE.md](../OPERATIONS_GUIDE.md) - 運用マニュアル
-- [TROUBLESHOOTING.md](../TROUBLESHOOTING.md) - トラブルシューティング
-- [PERFORMANCE.md](../PERFORMANCE.md) - パフォーマンス最適化
-
-#### セキュリティ
-- [SECURITY_CHECKLIST.md](../SECURITY_CHECKLIST.md) - セキュリティチェックリスト
-- [QUICKSTART_SECURITY.md](../QUICKSTART_SECURITY.md) - 5分セキュリティセットアップ
-
-#### API
-- [API_ENDPOINTS.md](API_ENDPOINTS.md) - API リファレンス
-- [openapi.yaml](openapi.yaml) - OpenAPI仕様書
-
-#### インフラ
-- [terraform/README.md](../terraform/README.md) - Terraform ガイド
-- [helm/README.md](../helm/README.md) - Helm Charts ガイド
-
-#### 詳細ガイド
-- [FAQ.md](FAQ.md) - よくある質問（45問）
-- [DISASTER_RECOVERY.md](DISASTER_RECOVERY.md) - 災害復旧
-- [COST_OPTIMIZATION.md](COST_OPTIMIZATION.md) - コスト最適化
-
-## 🎓 ベストプラクティス
-
-### セキュリティ
-
-1. パスワードは16文字以上
-2. SSH鍵認証のみ使用
-3. 定期的なセキュリティスキャン
-4. 最小権限の原則
-5. 全データの暗号化
-
-### パフォーマンス
-
-1. リソース制限の適切な設定
-2. オートスケーリングの活用
-3. キャッシングの実装
-4. データベースクエリの最適化
-5. CDNの利用
-
-### 運用
-
-1. 定期バックアップ（日次）
-2. 監視アラートの設定
-3. ログローテーション
-4. ドキュメントの維持
-5. 定期的なアップデート
-
-## 🌟 主要機能
-
-### インフラストラクチャ
-- ✅ Docker Compose（5環境）
-- ✅ Terraform（AWS IaC）
-- ✅ Helm Charts（Kubernetes）
-- ✅ マルチクラウド対応準備
-
-### アプリケーション
-- ✅ OpenClaw AI Agent（Claude Sonnet 4.5）
-- ✅ N8N（6ワークフロー）
-- ✅ OpenNotebook
-- ✅ PostgreSQL（コスト追跡統合）
-
-### 監視・運用
-- ✅ Prometheus + Grafana（3ダッシュボード）
-- ✅ Alertmanager（多段階通知）
-- ✅ ステータスダッシュボード
-- ✅ バックアップ検証ツール
-- ✅ コスト追跡・予測システム
-
-### 自動化
-- ✅ バックアップ・復元スクリプト
-- ✅ セキュリティスキャン自動化
-- ✅ ヘルスチェック自動化
-- ✅ SSL証明書自動更新
-
-### テスト
-- ✅ E2Eテスト（Playwright）
-- ✅ 負荷テスト（k6）
-- ✅ セキュリティテスト自動化
-- ✅ パフォーマンスベンチマーク
-
-### CI/CD
-- ✅ GitHub Actions（3ワークフロー）
-- ✅ 自動テスト
-- ✅ セキュリティスキャン
-- ✅ アーティファクト管理
-
-## 📈 今後の拡張可能性
-
-### 短期（1-3ヶ月）
-- [ ] GitOps（ArgoCD/Flux）
-- [ ] サービスメッシュ（Istio）
-- [ ] 追加クラウドプロバイダ（DigitalOcean、Vultr）
-- [ ] より高度な監視ダッシュボード
-
-### 中期（3-6ヶ月）
-- [ ] マルチリージョン展開
-- [ ] カオスエンジニアリング
-- [ ] A/Bテスト機能
-- [ ] 機械学習によるコスト最適化
-
-### 長期（6-12ヶ月）
-- [ ] フルマネージドSaaS版
-- [ ] マーケットプレイス統合
-- [ ] エンタープライズ機能（SSO、RBAC）
-- [ ] AIによる自動最適化
-
-## 🏆 プロジェクトの強み
-
-1. **包括的**: インフラからアプリケーションまで完全カバー
-2. **柔軟性**: 3つのデプロイメントオプション
-3. **セキュア**: 10層セキュリティアーキテクチャ
-4. **スケーラブル**: 小規模から大規模まで対応
-5. **ドキュメント充実**: 35個の詳細ドキュメント
-6. **テスト完備**: E2E、負荷、セキュリティテスト
-7. **本番対応**: エンタープライズグレード品質
-8. **コスト最適化**: 詳細な追跡と予測
-
-## 📞 サポート
-
-- **GitHub Issues**: バグ報告・機能提案
-- **GitHub Discussions**: 質問・議論
-- **Email**: admin@openclaw.io
-
-## 📄 ライセンス
-
-MIT License - 詳細は [LICENSE](../LICENSE) を参照
+# Nowpattern プロジェクト全体像
+
+> **ここだけ見れば全てが分かる。** バラバラなドキュメントのエントリーポイント。
+> Pがずれてきたと思ったらこれを読む。AIエージェントへの読ませ用としても機能する。
+> 最終更新: 2026-02-25 | 管理: ローカルClaude Code
 
 ---
 
-**OpenClaw VPS** - エンタープライズグレードのAI Agent VPSソリューション 🚀
+## ビジョン
+
+**既存の市場を追いかけるだけでなく、自ら「問い」を定義して市場をリードする。**
+
+| 一般メディア | Nowpattern |
+|---|---|
+| 「〜の可能性も」と曖昧に書く | 「43%の確率で起きる」と断言する |
+| 記事を書いたら終わり | トリガー日に自動検証する |
+| 外れを隠す | 的中・外れを全て公開（改ざん不可） |
+| 市場を追いかける | 自ら問いを定義して市場をリード |
+| 人間がバイアスを持つ | 冷徹な自動判定ロジック |
+
+---
+
+## 現在の状態（2026-02-25）
+
+### 唯一の本命プラットフォーム
+
+- **nowpattern.com** — Ghost CMS、42記事（JA:24 / EN:18）
+- **X: @nowpattern** — X Premium加入済み（最大25,000文字投稿可能）
+- **note** — キュー稼働中（auto-post.py）
+- **Substack** — コンテナ稼働中（substack-api）
+
+### 廃止済み（絶対に言及しない）
+
+- **@aisaintel** — X(Twitter)アカウント廃止済み。存在しない。
+- **AISAパイプライン** — SUSPENDED。復活予定なし。
+- **AISA ブランド** — Nowpatternに統合済み。
+
+---
+
+## コンテンツ戦略
+
+### 生産量
+
+- **1日200記事**（JP 100 + EN 100）— これは絶対に妥協しない数字
+- JP記事を書いたら → Opus 4.6（Claude Max内）で自動翻訳してEN版を作る
+- NEO-GPTは翻訳には使わない
+
+### フォーマット: Deep Pattern（唯一）
+
+```
+無料ゾーン（Phase 1）:
+  0. FAST READ    — 1分サマリー、逆説フック
+  1. BOTTOM LINE  — 3秒で核心
+  2. DELTA        — 前回からの変化
+  3. タグバッジ    — ジャンル/イベント/力学
+  4. Why it matters
+  5. What happened
+
+有料ゾーン（Phase 2以降、月$9.99予定）:
+  6. The Big Picture   — 歴史的文脈
+  7. Between the Lines — 報道が言わないこと
+  8. NOW PATTERN       — 力学分析 × 2
+  9. Pattern History   — 過去の並行事例
+  10. What's Next      — 3シナリオ
+  11. OPEN LOOP        — 次のトリガー
+```
+
+### 配信チャネル
+
+| チャネル | 件数/日 | 備考 |
+|---|---|---|
+| Ghost (nowpattern.com) | 200本 | メインハブ |
+| X (@nowpattern) | 100投稿 | 拡声器 |
+| note | 3〜5本 | シャドバン対策、4時間間隔 |
+| Substack | 1〜2本 | メール配信 |
+
+---
+
+## エージェント構成
+
+| エージェント | Bot / 場所 | モデル | 役割 |
+|---|---|---|---|
+| **NEO-ONE** | @claude_brain_nn_bot / Telegram | Claude Opus 4.6 (Max) | CTO・戦略・記事執筆 |
+| **NEO-TWO** | @neo_two_nn2026_bot / Telegram | Claude Opus 4.6 (Max) | 補助・並列タスク・翻訳 |
+| **NEO-GPT** | Telegram / /opt/neo3-codex/ | OpenAI Codex CLI | NEO-ONE/TWOのバックアップ |
+| **Jarvis** | @openclaw_nn2026_bot / Docker | Gemini 2.5 Pro (無料) | 実行・投稿・自動化 |
+| **ローカルCC** | このVSCode | Claude Sonnet 4.6 (Max) | 設計・コード・CLAUDE.md管理 |
+
+**重要な制約**: NEOをOpenClawに追加してはいけない（API従量課金になる）。
+NEOはClaude Max定額（$200/月）で動く専用Telegramサービスとして独立運用する。
+
+---
+
+## 予測トラッカー
+
+### 根本原則: DBマスターの法則
+
+```
+prediction_db.json = 唯一の真実（Single Source of Truth）
+Ghost /predictions/ = DBから生成される「影」に過ぎない
+
+→ Ghost HTMLを直接編集するな
+→ DBを更新して prediction_page_builder.py --update で再生成せよ
+```
+
+### 3フェーズ
+
+| フェーズ | 状態 | 内容 |
+|---|---|---|
+| **Phase 1** | ✅ 実装済み | 的中スコアボード・hit/miss バッジ・Brier Score |
+| **Phase 2** | ✅ 実装済み | resolution_evidence・integrity_hash（SHA-256）・disputed status |
+| **Phase 3** | スキーマ済み | 議論フォーラムUI・読者ランキング・ブロックチェーン公証（将来） |
+
+### 重要な設計決定
+
+- **「人間が判断しない」** — 的中・外れの判定は prediction_auto_verifier.py が完全自動。Naotoが判断する仕組みは作らない。
+
+### 現在の予測状況
+
+- 追跡中: 7件（全件 open）
+- 平均Brierスコア: 未集計（解決済みなし）
+
+---
+
+## 設計原則: PVQE
+
+| 文字 | 意味 | 実装 |
+|---|---|---|
+| **P** | 判断精度 | 実装前に3回検索。推測で語らない。このドキュメントがP崩壊防止用。 |
+| **V** | 改善速度 | エラー→KNOWN_MISTAKES.mdに即記録。同じミスを繰り返さない。 |
+| **Q** | 行動量 | 1日200記事。Hey Loop×4回 + news-analyst×3回。VPS cron 32本稼働。 |
+| **E** | 波及力 | 1記事を4チャネルに展開。X Premium活用（25,000文字の深い投稿）。 |
+
+### 3つの判断基準（全行動はこれを通過する）
+
+1. **可逆性テスト** — 取り消せるか？ YES→即実行。NO→確認を取る。
+2. **価値テスト** — オーナーの利益になるか？ YES→進める。NO→やめる。
+3. **説明責任テスト** — やった後に報告できるか？ できない→やらない。
+
+---
+
+## 技術構成
+
+| レイヤー | 技術 | 備考 |
+|---|---|---|
+| VPS | ConoHa / Ubuntu 22.04 | 163.44.124.123 |
+| リバースプロキシ | Caddy | 自動SSL（Let's Encrypt） |
+| CMS | Ghost 5.x | SQLite / ghost-nowpattern.service |
+| 自動化 | Docker + N8N | docker-compose.quick.yml |
+| DB | PostgreSQL 16 | openclaw_secure_2026 |
+| LLM（定額） | Claude Max $200/月 | Opus 4.6 (NEO) + Sonnet 4.6 (ローカル) |
+| LLM（無料） | Gemini 2.5 Pro | Jarvis用 |
+| X | Grok API + X API | $5クレジット（Pay-Per-Use） |
+
+**Ghost Lexical注意**: Ghost 5.xはLexical使用。`html`フィールドは読み取り専用。
+更新はLexical JSON（`{"root":{"children":[{"type":"html",...}]}}`）で直接操作する。
+
+---
+
+## タグルール（5層防御で強制済み）
+
+### Ghost タグ
+
+全記事に必須: `nowpattern` / `deep-pattern` / `lang-ja` or `lang-en`
+
+3層タクソノミー（taxonomy.json が唯一の定義）:
+- **ジャンル** (13個): テクノロジー / 地政学・安全保障 / 経済・貿易 / 金融・市場 / ビジネス・産業 / 暗号資産 / エネルギー / 環境・気候 / ガバナンス・法 / 社会 / 文化・エンタメ・スポーツ / メディア・情報 / 健康・科学
+- **イベント** (19個): 軍事衝突 / 制裁・経済戦争 / 貿易・関税 / 規制・法改正 / 選挙・政権交代 / 市場ショック / 技術進展 / 条約・同盟変動 / 資源・エネルギー危機 / 司法・裁判 / 災害・事故 / 健康危機・感染症 / サイバー攻撃 / 社会不安・抗議 / 構造シフト / 事業再編・取引 / 競争・シェア争い / スキャンダル・信頼危機 / 社会変動・世論
+- **力学** (16個): プラットフォーム支配 / 規制の捕獲 / 物語の覇権 / 権力の過伸展 / 対立の螺旋 / 同盟の亀裂 / 経路依存 / 揺り戻し / 制度の劣化 / 協調の失敗 / モラルハザード / 伝染の連鎖 / 危機便乗 / 後発逆転 / 勝者総取り / 正統性の空白
+
+リスト外のタグ → article_validator.py が exit(1) でブロック。
+
+### X ハッシュタグ
+
+```
+必須: #Nowpattern + #ニュース分析（JP）or #NewsAnalysis（EN）
+任意: 固有名詞 1〜2個（#Apple #DeepSeek 等）
+合計: 3〜4個
+禁止: 内部タクソノミータグ / 数字タグ / 5個以上
+```
+
+---
+
+## 主要スクリプト（VPS: /opt/shared/scripts/）
+
+| スクリプト | 用途 |
+|---|---|
+| `prediction_page_builder.py` | Ghost予測ページ生成（JA+EN）。`--update` で両ページ再生成 |
+| `prediction_auto_verifier.py` | 予測自動判定。mark_disputed / add_rebuttal / compute_forecaster_rank |
+| `pre_write_market_search.py` | 執筆前市場検索。重複チェック + Polymarket照合 + 推奨アクション |
+| `nowpattern_publisher.py` | Ghost投稿 + タグ検証（STRICT mode）|
+| `article_validator.py` | 記事品質チェック。FAIL=禁止パターン / WARN=推奨セクション欠落 |
+| `add_knowledge.py` | AGENT_WISDOM.md への知識追記 |
+
+---
+
+## ロードマップ
+
+- **2026 Q1** ✅ Phase 1完了: スコアボード・判定バッジ・EN/JA両ページ・予測DB v2.0
+- **2026 Q2** Phase 2: 初の予測解決 → 証拠パネル・integrity_hash公開・disputed実運用
+- **2026 Q3-Q4** Phase 3: 議論フォーラムUI・読者ランキング・ブロックチェーン公証
+- **保留中**: NAVER Blog（SMS認証待ち）/ Medium（MEDIUM_TOKEN待ち）/ noteアカウント刷新
+
+---
+
+## ドキュメントマップ（バラバラなやつの場所）
+
+| 知りたいこと | 読むファイル |
+|---|---|
+| エラーが出た・同じミスを避けたい | `docs/KNOWN_MISTAKES.md` |
+| 記事フォーマットの詳細 | `docs/ARTICLE_FORMAT.md` |
+| NEOへの指示書 | `docs/NEO_INSTRUCTIONS_V2.md` |
+| タクソノミー完全版 | `docs/NOWPATTERN_TAXONOMY_v3.md` |
+| 予測システム設計の根拠 | VPS: `/opt/shared/SYSTEM_DESIGN.md` |
+| エージェントの共有知識 | VPS: `/opt/shared/AGENT_WISDOM.md` |
+| 現在のVPS状態（リアルタイム） | VPS: `/opt/shared/SHARED_STATE.md` |
+| パイプライン全体図 | `docs/PIPELINE_ARCHITECTURE.md` |
+| 運用マニュアル（詳細） | `docs/NOWPATTERN_OPERATIONS_MANUAL.md` |
+
+---
+
+*このファイルが古くなったら → ローカルClaude Codeに「PROJECT_OVERVIEW.mdを更新して」と言えば直る。*
