@@ -59,7 +59,28 @@
     "id": "1078afaa09be6fa0",
     "category": "session_summary",
     "summary": "[2026-02-27] セッションサマリー: 検索0回, エラー0件, リサーチ先行=no",
-    "created_at": "2026-02-27 08:00:31",
+    "created_at": "2026-02-27 16:10:42",
+    "agent": "local-claude"
+  },
+  {
+    "id": "a09cb7611d54009a",
+    "category": "session_summary",
+    "summary": "[2026-02-28] セッションサマリー: 検索0回, エラー0件, リサーチ先行=no",
+    "created_at": "2026-02-28 17:44:48",
+    "agent": "local-claude"
+  },
+  {
+    "id": "241175dc9d25d158",
+    "category": "session_summary",
+    "summary": "[2026-03-01] セッションサマリー: 検索0回, エラー0件, リサーチ先行=no",
+    "created_at": "2026-03-01 21:39:17",
+    "agent": "local-claude"
+  },
+  {
+    "id": "6ee064189bc7e7d6",
+    "category": "session_summary",
+    "summary": "[2026-03-02] セッションサマリー: 検索0回, エラー0件, リサーチ先行=no",
+    "created_at": "2026-03-02 08:06:26",
     "agent": "local-claude"
   }
 ]

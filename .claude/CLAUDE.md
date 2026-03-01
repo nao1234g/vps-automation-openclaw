@@ -7,29 +7,21 @@
 
 ## 参照優先順位（問題発生時）
 
-1. **`docs/KNOWN_MISTAKES.md`** ← 最優先（実装前に必ず確認）
-2. **`docs/AGENT_WISDOM.md`** ← 第2優先
-3. `QUICK_REFERENCE.md` → `DEVELOPMENT.md` → `ARCHITECTURE.md`
-
----
-
-## アーキテクチャ概要（→詳細: @.claude/rules/docker.md）
-
-- **VPS**: ConoHa 163.44.124.123（Caddy リバースプロキシ）
-- **Compose**: `docker-compose.quick.yml`（現在使用中、`/opt/openclaw/`）
-- **DB**: PostgreSQL 16 / `openclaw_secure_2026`
-- **OpenClaw設定**: `config/openclaw/openclaw.json`（CLIフラグは不可）
-- **セキュリティ**: 非root + no-new-privileges + ポートバインド 127.0.0.1 のみ
+1. **`.claude/rules/NORTH_STAR.md`** ← 最優先（Naotoの意図・判断基準）
+2. **`docs/KNOWN_MISTAKES.md`** ← 第2優先（実装前に必ず確認）
+3. **`docs/AGENT_WISDOM.md`** ← 第3優先
+4. 各rulesファイル → `QUICK_REFERENCE.md` → `DEVELOPMENT.md`
 
 ---
 
 ## Known Mistakes クイックリファレンス（→詳細: docs/KNOWN_MISTAKES.md）
 
 ### 最重要の教訓
-1. **実装前に世界中の実装例を検索する** — GitHub/X/公式ドキュメントで3回以上
-2. **機能の存在を推測で語らない** — 公式ドキュメント/APIレスポンスで裏付けを取る
-3. **OpenClawの設定変更は openclaw.json で行う**（CLIフラグではない）
-4. **フルエージェント（SDK+メモリ+ツール）をステートレスAPIに置き換えない**
+1. **指示が来たらすぐ動くのではなく「こういう理解でいいですか？」と確認してから動く**
+2. **実装前に世界中の実装例を検索する** — GitHub/X/公式ドキュメントで3回以上
+3. **機能の存在を推測で語らない** — 公式ドキュメント/APIレスポンスで裏付けを取る
+4. **OpenClawの設定変更は openclaw.json で行う**（CLIフラグではない）
+5. **フルエージェント（SDK+メモリ+ツール）をステートレスAPIに置き換えない**
 
 ### よくあるミス
 | 問題 | 解決策 |
@@ -64,6 +56,7 @@
 | **UI変更後に「直った」と思い込む** | **変更後は必ず `python3 /opt/shared/scripts/site_health_check.py --quick` を実行。FAIL 0件が出荷基準** |
 | **一部修正で関連領域を見落とす** | **変更後はスコープ外も確認: EN/JA両方、pagination、prediction tracker** |
 | ENタグ監査で全件FAILと誤検知 | ENタグは `geopolitics`/`crypto` 等（`genre-*` プレフィックスなし）。validator も旧形式を使用 |
+| **UIレイアウト承認なし変更** | **承認フロー必須: ASCII mockup → proposal_shown.flag → 承認 → ui_layout_approved.flag** |
 
 ---
 
@@ -71,14 +64,12 @@
 
 > 以下のファイルはClaude Codeが自動的に読み込む。テーブルではなく行単位で記述すること。
 
-@.claude/rules/current-state.md
+@.claude/rules/NORTH_STAR.md
 @.claude/rules/execution-map.md
 @.claude/rules/agent-instructions.md
-@.claude/rules/docker.md
-@.claude/rules/neo-architecture.md
-@.claude/rules/hey-loop.md
-@.claude/rules/autonomous-decision.md
+@.claude/rules/infrastructure.md
 @.claude/rules/content-rules.md
+@.claude/rules/prediction-design-system.md
 
 ---
 
@@ -93,4 +84,4 @@
 
 ---
 
-*最終更新: 2026-02-23 — 200行以内に圧縮、rules/ディレクトリ構成に移行*
+*最終更新: 2026-02-27 — NORTH_STAR.md追加、rules/ 9→6ファイルに統合*

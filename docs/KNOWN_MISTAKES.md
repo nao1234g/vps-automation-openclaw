@@ -1339,3 +1339,19 @@
 - **正しい解決策**: 件数はデータソースではなく、実際のビルド出力で確認する。`python3 prediction_page_builder.py 2>&1 | grep "Total rows"` を実行して確認する。
 - **教訓**: 「代理指標ではなく実際の出力を観測する」— ファイルを読んだだけでは実態は分からない。システムに「聞く」ことが証拠。
 - **再発防止コード**: `.claude/hooks/fact-checker.py` に `COUNT_CLAIM_PATTERN` チェックを追加済み（2026-02-26）。「全件確認済み」「N件に適用」等の件数主張を、観測コマンド出力なしで行うと exit(2) でブロックされる。
+
+### 2026-02-27: UIレイアウト変更が承認なしに行われた — 監視・ガードシステムの欠如
+
+- **症状**: NEO（Claude Opus 4.6）がcommit `6128c78` で `prediction_page_builder.py` を大幅改修（+375行）。スコアボード・4カラムレイアウト・検証済みセクションを追加したが、Naotoの承認なしに変更された。Naotoが「俺OKした記憶ないけど、なんで勝手に判断して改悪するわけ？」と抗議。
+- **根本原因**: UIレイアウト変更を防ぐ仕組みが存在しなかった。コードレビューなし、スナップショット履歴なし、変更検知なし。
+- **正しい解決策**: 3層防御を実装:
+  1. **スクリーンショット履歴**: ビルド前に自動スナップショット → `/opt/shared/reports/page-history/`（30日保存）
+  2. **Claude Codeフック**: `ui-layout-guard.py`（PreToolUse）— レイアウト関数変更を物理ブロック、承認フラグが必要
+  3. **VPS監視cron**: `prediction_builder_monitor.py`（30分ごと）— ファイル変更をTelegramに通知
+  4. **git pre-commitフック**: レイアウト関数の変更があれば承認フラグなしでコミットをブロック
+- **教訓**: UIの見た目を変える変更は**Type 1判断**（取り消せない影響大）。コードで物理的にブロックしなければ防げない。
+- **再発防止コード**:
+  - `.claude/hooks/ui-layout-guard.py` — PreToolUse ブロック
+  - `.claude/hooks/feedback-trap.py` — 「UIレイアウト変更を承認する」でフラグ作成
+  - `.git/hooks/pre-commit` — レイアウト関数変更をコミット時ブロック
+  - VPS: `/opt/shared/scripts/prediction_builder_monitor.py` cron (*/30)

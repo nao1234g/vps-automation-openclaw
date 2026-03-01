@@ -68,7 +68,7 @@ MANDATORY_HASHTAGS = ["#Nowpattern", "#ニュース分析"]
 
 ## 3. 記事フォーマット（Deep Pattern一択）
 
-### 全12セクション + 有料/無料の線引き
+### 全13セクション + 有料/無料の線引き
 
 ```
 ★ 無料ゾーン（Phase 1は全文無料、Phase 2以降も無料のまま）
@@ -88,9 +88,44 @@ MANDATORY_HASHTAGS = ["#Nowpattern", "#ニュース分析"]
   9. Pattern History   — 過去の並行事例 × 2
   10. What's Next      — 3シナリオ + トリガー
   11. OPEN LOOP        — 次のトリガー + 追跡テーマ
+  12. ORACLE STATEMENT — 予測追跡ボックス（prediction_db連動記事は必須）
 ```
 
 **Phase 1（月1〜3）= 全文無料。Phase 2（月4〜）で有料化。**
+
+### 12. ORACLE STATEMENT — 予測追跡ボックス（必須条件あり）
+
+**prediction_dbに登録した予測がある記事は、記事末尾に必ずこのボックスを挿入すること。**
+（予測のない記事はスキップ可。Quick Predictionカードのある記事も必須。）
+
+**フォーマット（コピペ用）:**
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 ORACLE STATEMENT — この予測の追跡
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+判定質問: [resolution_question_ja]
+Nowpatternの予測: [our_pick] — [our_pick_prob]%確率
+市場の予測（Polymarket）: [market_consensus.probability]%（[市場の質問]）
+判定日: [triggers[0].date]
+的中条件: [hit_condition_ja]
+↳ 予測一覧: nowpattern.com/predictions/
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**フィールドの埋め方:**
+
+| プレースホルダー | 取得元 |
+|----------------|-------|
+| `resolution_question_ja` | prediction_db の `resolution_question` 日本語フィールド |
+| `our_pick` | prediction_db の `our_pick`（YES/NO/具体的予測） |
+| `our_pick_prob` | prediction_db の `our_pick_prob`（0〜100の整数） |
+| `market_consensus.probability` | prediction_db の `market_consensus.probability` |
+| `triggers[0].date` | prediction_db の `triggers[0].date` |
+| `hit_condition_ja` | prediction_db の `hit_condition` 日本語フィールド |
+
+**Polymarket情報がない場合:** 「市場の予測（Polymarket）: 未取得」と書く。
+**複数予測がある場合:** ボックスを複数並べる。
 
 ---
 
