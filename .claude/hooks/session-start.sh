@@ -19,6 +19,12 @@ cat > "$STATE_DIR/session.json" << 'STATEJSON'
 {"research_done":false,"search_count":0,"errors":[],"task_started":false}
 STATEJSON
 
+# PVQE-P: セッション開始時にクリア（新セッション = 新しいP定義が必要）
+rm -f "$STATE_DIR/pvqe_p.json"
+# intent_confirmed.flag もクリア（前セッションの確認は引き継がない）
+rm -f "$STATE_DIR/intent_confirmed.flag"
+rm -f "$STATE_DIR/intent_needs_confirmation.flag"
+
 echo "=== SESSION START: MANDATORY CONTEXT ==="
 echo ""
 
@@ -48,6 +54,30 @@ else
 fi
 echo ""
 
+# H1: 前回セッションからのVPS変更を差分検知
+VPS_SNAPSHOT="$STATE_DIR/last_vps_snapshot.json"
+if [ -n "$VPS_STATE" ]; then
+    echo "$VPS_STATE" > "$STATE_DIR/vps_current.tmp"
+    if [ -f "$VPS_SNAPSHOT" ]; then
+        H1_DIFF=$(python "$PROJECT_DIR/.claude/hooks/h1-vps-diff.py" \
+            "$VPS_SNAPSHOT" "$STATE_DIR/vps_current.tmp" 2>/dev/null)
+        if [ -n "$H1_DIFF" ]; then
+            echo "--- H1: 前回セッションからのVPS変更 ---"
+            echo "$H1_DIFF"
+            echo ""
+        fi
+    fi
+    # 現在状態をスナップショットとして保存（次回セッション用）
+    python -c "
+import json, datetime
+try:
+    c = open('$STATE_DIR/vps_current.tmp', encoding='utf-8').read()
+    json.dump({'timestamp': datetime.datetime.now().isoformat(), 'content': c},
+              open('$VPS_SNAPSHOT', 'w', encoding='utf-8'), ensure_ascii=False)
+except: pass
+" 2>/dev/null
+fi
+
 # 3b. ★ 全エージェント共有知識ベース（リアルタイム同期）
 echo "--- AGENT SHARED KNOWLEDGE (all agents read/write this) ---"
 AGENT_KNOWLEDGE=$(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -o BatchMode=yes \
@@ -66,14 +96,58 @@ if [ -d "$MEMORY_DIR/entries" ]; then
     if [ "$MEMORY_COUNT" -gt 0 ]; then
         echo "--- LONG-TERM MEMORY ($MEMORY_COUNT entries) ---"
         # 最近の記憶10件を表示
-        RECENT_MEMORIES=$(python3 "$PROJECT_DIR/scripts/memory_search.py" --base-dir "$MEMORY_DIR" --recent 10 2>/dev/null)
+        RECENT_MEMORIES=$(python "$PROJECT_DIR/scripts/memory_search.py" --base-dir "$MEMORY_DIR" --recent 10 2>/dev/null)
         if [ -n "$RECENT_MEMORIES" ]; then
             echo "$RECENT_MEMORIES"
         else
             echo "（最近の記憶なし）"
         fi
         echo ""
-        echo "💡 記憶検索: 'python3 scripts/memory_search.py \"検索ワード\"'"
+        echo "💡 記憶検索: 'python scripts/memory_search.py \"検索ワード\"'"
+        echo ""
+    fi
+fi
+
+# H3: 前回セッションの引き継ぎタスクを表示
+HANDOFF_FILE="$STATE_DIR/handoff.json"
+if [ -f "$HANDOFF_FILE" ]; then
+    H3_OUT=$(python -c "
+import json
+try:
+    h = json.load(open('$HANDOFF_FILE', encoding='utf-8'))
+    ts = h.get('timestamp', '')[:16].replace('T', ' ')
+    ip = h.get('in_progress', [])
+    pd = h.get('pending', [])
+    if ip or pd:
+        print(f'前回セッション ({ts}) の引き継ぎ:')
+        for t in ip[:3]:
+            name = t.get('content', str(t)) if isinstance(t, dict) else str(t)
+            print(f'  🔄 進行中: {name}')
+        for t in pd[:3]:
+            name = t.get('content', str(t)) if isinstance(t, dict) else str(t)
+            print(f'  ⏳ 未着手: {name}')
+except: pass
+" 2>/dev/null)
+    if [ -n "$H3_OUT" ]; then
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "🤝 H3: 前回セッション引き継ぎ"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "$H3_OUT"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+    fi
+fi
+
+# ── バックログ表示（未完了タスクをセッション開始時に必ず見せる） ─────────────
+BACKLOG_FILE="$PROJECT_DIR/docs/BACKLOG.md"
+if [ -f "$BACKLOG_FILE" ]; then
+    PENDING_COUNT=$(grep -c "^- \[ \]" "$BACKLOG_FILE" 2>/dev/null || echo 0)
+    if [ "$PENDING_COUNT" -gt 0 ]; then
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "📋 BACKLOG — 約束済み未完了タスク: ${PENDING_COUNT}件"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        grep "^- \[ \]" "$BACKLOG_FILE"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo ""
     fi
 fi
@@ -86,6 +160,7 @@ echo "4. Your score is tracked. Research = +points. Repeated mistakes = -points.
 echo "5. ★ @aisaintel は存在しない(廃止)。NowpatternのXは @nowpattern。AISAパイプラインはSUSPENDED。"
 echo "6. 長期記憶: memory_search.py で過去の知識を検索可能"
 echo "7. 新規コード作成前に TodoWrite でタスク計画を書くこと（書かないと物理ブロック）"
+echo "8. ★ 新しいタスクを約束したら docs/BACKLOG.md に追加すること（完了まで追跡）"
 echo "=== END MANDATORY CONTEXT ==="
 
 # ── タスクダッシュボードの状態を表示 ──────────────────────────────────────
@@ -94,7 +169,7 @@ CURRENT_STATE="$HOME/.claude/tasks/current_state.json"
 echo ""
 echo "📋 タスクボード: file://$DASHBOARD_HTML（ブラウザで開くと10秒ごと自動更新）"
 if [ -f "$CURRENT_STATE" ]; then
-    IN_PROGRESS=$(python3 -c "
+    IN_PROGRESS=$(python -c "
 import json, sys
 try:
     s = json.load(open('$CURRENT_STATE', encoding='utf-8'))
@@ -113,3 +188,36 @@ fi
 
 # 5. ★ MEMORY.mdをVPS状態で更新（次セッション用 — バックグラウンド実行）
 python "$PROJECT_DIR/scripts/update_local_memory.py" > /dev/null 2>&1 &
+
+# 6. ★ 週次リサーチチェック（7日以上未実施なら警告）
+RESEARCH_STATE="$STATE_DIR/last_research.json"
+RESEARCH_DUE=0
+if [ -f "$RESEARCH_STATE" ]; then
+    DAYS_AGO=$(python -c "
+import json, datetime, sys
+try:
+    d = json.load(open('$RESEARCH_STATE', encoding='utf-8'))
+    last = datetime.datetime.fromisoformat(d.get('last_run', '2000-01-01'))
+    delta = (datetime.datetime.now() - last).days
+    print(delta)
+except:
+    print(999)
+" 2>/dev/null)
+    if [ "${DAYS_AGO:-999}" -ge 7 ]; then
+        RESEARCH_DUE=1
+    fi
+else
+    RESEARCH_DUE=1
+fi
+
+if [ "$RESEARCH_DUE" -eq 1 ]; then
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "🔬 [週次リサーチ] 7日以上未実施 — 未知ミス防止のため実行推奨"
+    echo "  タスク: WebSearchで世界のAIエージェントミスパターンを検索"
+    echo "  対象: 'AI agent mistakes 2026', 'Claude Code pitfalls', 'LLM agent failure modes'"
+    echo "  更新先: docs/KNOWN_MISTAKES.md"
+    echo "  完了後: python \"$PROJECT_DIR/.claude/hooks/vps-ssh-guard.py\" は自動的にlast_research.jsonを更新"
+    echo "  （このセッションで実行したら: python -c \"import json,datetime; open('$RESEARCH_STATE','w').write(json.dumps({'last_run': datetime.datetime.now().isoformat()}))\" ）"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+fi

@@ -63,7 +63,26 @@
 
 ---
 
-## 実装状況
+## ECC Pipeline（ミス防止自己進化システム）— 2026-03-04 追加
+
+> NORTH_STAR ECC原則の実装。これが「穴を塞ぐ」仕組みの実体。
+
+| ステップ | タイプ | 実装 | ファイル |
+|---|---|---|---|
+| ミス発生 → KNOWN_MISTAKES.md 自動記録 | **B型** | PostToolUseFailure + 手動記録 | `.claude/hooks/error-tracker.py` |
+| KNOWN_MISTAKES.md 更新 → パターン自動登録 | **B型** | PostToolUse(Edit/Write)でauto-codifier起動 | `.claude/hooks/auto-codifier.py` |
+| 出力前にパターン照合 → 物理ブロック | **A型** | Stop hookでfact-checker起動（exit 2） | `.claude/hooks/fact-checker.py` |
+| 未知パターンを意味レベルで検知 | **A型** | PreToolUse(Edit/Write)でGemini判定（exit 1） | `.claude/hooks/llm-judge.py` |
+| 全ガードの劣化を毎日テスト | **B型** | regression-runner.py（25/25 PASS確認済み） | `.claude/hooks/regression-runner.py` |
+| 実装前に証拠計画を要求 | **A型** | PreToolUse(Edit/Write)でpvqe_p.json確認 | `.claude/hooks/pvqe-p-gate.py` |
+| 証拠計画の実行を完了前に確認 | **A型** | Stop hookで実行済みBashを確認 | `.claude/hooks/pvqe-p-stop.py` |
+| SSH前にVPS健全性チェック | **A型** | PreToolUse(Bash)でVPS状態確認 | `.claude/hooks/vps-ssh-guard.py` |
+
+**現在のガード数: 20パターン（mistake_patterns.json）/ regression 25/25 PASS**
+
+---
+
+## 実装状況（2026-03-04更新）
 
 ```
 ✅ 完了: 物理ブロック（廃止用語、研究なし新規コード）
@@ -74,10 +93,10 @@
 ✅ 完了: 閉ループチェックスクリプト
 ✅ 完了: rules/ 7ファイル → CLAUDE.mdから正式@importで自動読み込み (2026-02-23)
 ✅ 完了: 「実装したつもり」防止 → fact-checker.py にWebファイル検証チェック追加 (2026-02-23)
-✅ 完了: git pre-commit hook → APIキー漏洩防止 + KNOWN_MISTAKESリマインダー (2026-02-23)
-✅ 完了: NEO SessionStart hook デプロイ済み (2026-02-23)
-✅ 完了: llms.txt デプロイ済み (2026-02-23)
-✅ 完了: EN URL統一 — Caddy /en/tag/* rewrite + codeinjection 10箇所修正 + タグ言語フィルタJS (2026-02-23)
+✅ 完了: ECC Pipeline全段 — auto-codifier + llm-judge + pvqe-p + regression-runner (2026-03-04)
+✅ 完了: regression-runner.py 25/25 PASS (2026-03-04)
+✅ 完了: VPS FileLock + Ghost Webhook改ざん検知 (2026-03-04)
+✅ 完了: VPS本番スクリプトのクラッシュ検知（0記事アラート）— zero-article-alert.py 30分cron (2026-03-04)
 ❌ 未完了: Medium自動投稿（MEDIUM_TOKEN待ち）
 ❌ 未完了: NAVER Blog自動投稿（SMS認証待ち）
 ```

@@ -1,0 +1,229 @@
+# BACKLOG — 因果律から導いた全穴埋めタスク一覧
+
+> **セッションをまたいで追跡する永続タスクリスト。**
+> - 完了したら `[ ]` → `[x]` に変える
+> - 削除禁止（履歴として残す）
+> - 追加方法: このファイルを直接 Edit するか、「バックログに追加: タスク名」と指示
+> - **最終目標**: H3が完了したら、ミスが起きる前に自動修正・自動学習するシステムが完成する
+
+---
+
+## カテゴリ説明（因果律ベース）
+
+| カテゴリ | なぜ必要か |
+|---------|-----------|
+| **A: 記事生成** | 記事がゼロになる原因はコードバグ。バグを自動検知・自動修正しなければ止まり続ける |
+| **B: コンテンツ品質** | 公開後に品質チェックしなければ低品質記事が蓄積してMoatを傷つける |
+| **C: Oracle/予測** | 予測トラックレコードが唯一のMoat。検証が止まればMoatが崩壊する |
+| **D: 配信パイプライン** | X/note/Substackが止まっても誰も気づかなければ波及力（E）がゼロになる |
+| **E: ECC/学習ループ** | VPS上のNEOには同じミスを防ぐフックがない。ローカルで学んだことがVPSに伝わらない |
+| **F: 自律修復** | 人間（Naoto）の承認なしに直せるものは直す。Telegramは「直しました」報告のみ |
+| **G: インフラ監視** | SSL/disk/Docker/OAuthが壊れると全パイプラインが停止する |
+| **H: セッション継続性** | セッションをまたいで状態が引き継がれなければ、毎回同じ確認が必要になる |
+
+---
+
+## A: 記事生成の完全自動修復
+
+- [x] **A1: known_fixes.json作成** (2026-03-04)
+  - VPS: `/opt/shared/scripts/known_fixes.json`
+  - エラー署名→自動修正コマンドのマッピング（5パターン登録済み）
+
+- [x] **A2: generate.py AttributeError修正** (2026-03-04)
+  - `dynamics_sections`/`scenarios`ループに`isinstance(s, dict)`チェック追加
+  - `grep -c 'isinstance(s, dict)'` → 3件確認済み
+
+- [x] **A3/F1: self-healer.py作成（自律修復エンジン）** (2026-03-04)
+  - VPS: `/opt/shared/scripts/self-healer.py`
+  - 15分ごとcron: 記事生成・サービス・disk・SSLを自動チェック
+  - known_fixes.jsonと照合して自動パッチ → 「直しました」Telegram通知
+  - cron: `*/15 * * * *`
+
+- [x] **A4: 記事200本/日カウント監視** (2026-03-04)
+  - VPS: `/opt/shared/scripts/article-count-monitor.py`
+  - cron: `0 8 * * *` — Ghost DBで前日JP/EN記事数確認
+  - JP<100またはEN<100でTelegram警告
+
+- [x] **A5: EN翻訳パイプライン停止検知** (2026-03-04)
+  - VPS: `/opt/shared/scripts/en-translation-monitor.py`
+  - cron: `0 * * * *` — JP記事の2時間以上EN未公開を検知
+  - 3件以上でTelegram通知
+
+---
+
+## B: コンテンツ品質の自動監査
+
+- [x] **B1: 公開後article_validator.py自動実行cron** (2026-03-04)
+  - VPS: `/opt/shared/scripts/content-quality-monitor.py` に統合
+  - cron: `0 4 * * *` — article_validator.py実行 + FAILをTelegram通知
+
+- [x] **B2: VPS上のfact-checker相当機能** (2026-03-04)
+  - `/opt/CLAUDE.md`に4段階検証ルール追記（Python SCP方式で書き込み）
+  - STEP 1: 確認 / STEP 2: 既知ミス確認 / STEP 3: 変更後検証 / STEP 4: ミス記録
+
+- [x] **B3: 文字数・セクション自動監査** (2026-03-04)
+  - content-quality-monitor.py に統合
+  - 6マーカー（np-fast-read等）確認 + 2000文字未満チェック
+
+- [x] **B4: 重複記事検知** (2026-03-04)
+  - content-quality-monitor.py に統合
+  - タイトル重複 + スラッグ重複をGhost DBで検知
+
+- [x] **B5: タグ監査cron稼働確認** (2026-03-04)
+  - content-quality-monitor.py に統合
+  - `crontab -l | grep tag-audit` で確認 + 未登録警告
+
+---
+
+## C: Oracle/予測システムの完全性保証
+
+- [x] **C1: prediction_auto_verifier.py監視** (2026-03-04)
+  - VPS: `/opt/shared/scripts/oracle-monitor.py` に統合
+  - cron: `0 7 * * *` — ログ鮮度確認（26h以内）+ エラー検知
+  - 初回テスト: verifier.logにTraceback検知 → アラート送信確認
+
+- [x] **C2: /predictions/ページ再構築失敗検知** (2026-03-04)
+  - oracle-monitor.py に統合（prediction_page.log + prediction_page_en.log確認）
+  - ログが26h以上更新なし or ERROR検知でTelegram通知
+
+- [x] **C3: 新規予測追加の検証** (2026-03-05)
+  - VPS: `/opt/shared/scripts/prediction-update-checker.py`
+  - cron: `*/30 * * * *` — prediction_db.jsonハッシュ変化を検知、5分後Ghost更新確認
+
+- [x] **C4: Brier Score計算の正確性確認** (2026-03-05)
+  - VPS: `/opt/shared/scripts/brier-score-validator.py`
+  - cron: `0 9 1 * *` — 月1回、差0.01以上でTelegram通知
+
+- [x] **C5: Polymarket自動更新監視** (2026-03-05)
+  - VPS: `/opt/shared/scripts/polymarket-staleness-checker.py`
+  - cron: `0 10 * * 1` — 週次月曜、2週間以上更新なしカードをTelegram通知
+
+---
+
+## D: 配信パイプライン全体監視
+
+- [x] **D1: X投稿停止検知** (2026-03-04)
+  - VPS: `/opt/shared/scripts/pipeline-monitor.py` に統合
+  - cron: `0 21 * * *` — X投稿cron状態確認 + ログカウント
+
+- [x] **D2: noteキューオーバーフロー検知** (2026-03-04)
+  - pipeline-monitor.py に統合 — note-queue.json件数確認
+  - 100件超でTelegram警告
+
+- [x] **D3: Substack投稿確認** (2026-03-04)
+  - pipeline-monitor.py に統合 — `docker ps --filter name=substack`
+  - コンテナ停止でTelegram警告
+
+- [x] **D4: パイプライン健全性ダッシュボード** (2026-03-04)
+  - pipeline-monitor.py が毎日21:00に✅/⚠サマリー送信
+  - Ghost記事数・X cron・noteキュー・Substackを一括報告
+
+---
+
+## E: VPS ECCパイプライン（学習ループ）
+
+- [x] **E1: VPSスクリプトエラー→KNOWN_MISTAKES自動キャプチャ** (2026-03-04)
+  - VPS: `/opt/shared/scripts/vps-error-capture.py`
+  - cron: `0 * * * *` — 6ログファイルをスキャン、MD5重複排除
+  - `/opt/shared/KNOWN_MISTAKES_VPS.md`に自動追記
+
+- [x] **E2: NEOミスのキャプチャ** (2026-03-04)
+  - VPS: `/opt/shared/scripts/neo-mistake-capture.py`
+  - cron: `0 3 * * *` — `/opt/shared/task-log/*.md`スキャン
+  - 失敗パターンをAGENT_WISDOM.mdに追記
+
+- [x] **E3: ローカル→VPS 知識同期** (確認: session-end.py step 4で実装済み)
+  - `session-end.py` の step 4 でSCP同期済み
+  - AGENT_WISDOM.md + mistake_patterns.json を毎セッション終了時にVPSへ
+
+- [x] **E4: デプロイ前cronテスト** (2026-03-05)
+  - VPS: `/opt/shared/scripts/pre-deploy-check.sh`
+  - 構文チェック + 危険パターン検出 + cron式検証 + --dry-run実行
+
+- [x] **E5: VPSリグレッションランナー** (2026-03-05)
+  - VPS: `/opt/shared/scripts/regression-runner.py`
+  - cron: `0 3 * * 0` — 毎週日曜03:00、article_validator/prediction_page_builder/nowpattern_publisherのスモークテスト
+
+---
+
+## F: 自律修復の完成
+
+- [x] **F1/A3: self-healer.py** (Aカテゴリと同一 — 上記A3を参照)
+
+- [x] **F2: 非systemdスクリプトの自動再起動** (2026-03-05)
+  - VPS: `/opt/shared/scripts/hung-process-killer.py`
+  - cron: `*/30 * * * *` — x-auto-post/note-auto-post/nowpattern-generator の実行時間上限超過で SIGKILL
+
+- [x] **F3: NEO自律診断ループ** (2026-03-05)
+  - VPS: `/opt/shared/scripts/neo-morning-diagnosis.py`
+  - cron: `0 7 * * *` — 毎朝07:00 JST、記事数/サービス/disk/cron確認、問題あれば自己修復+Telegram報告
+
+- [x] **F4: 修復後の検証** (2026-03-05)
+  - VPS: `/opt/shared/scripts/repair-verifier.py`
+  - cron: `*/30 * * * *` — サービス連続停止2回で「修復効果なし」通知、3回で known_fixes.json 無効化
+
+---
+
+## G: インフラ監視
+
+- [x] **G1: SSL有効期限監視** (2026-03-04)
+  - self-healer.pyの`check_ssl()`として実装
+  - 14日以内: Telegram警告 / テスト: 74日残で正常動作確認
+
+- [x] **G2: disk使用率監視＋自動クリーンアップ** (2026-03-04)
+  - self-healer.pyの`check_disk()`として実装
+  - 80%超: 古いログ自動削除 / 90%超: Telegram緊急通知
+  - テスト: 29%使用で正常動作確認
+
+- [x] **G3: NEO OAuthトークン更新失敗検知** (2026-03-04)
+  - VPS: `/opt/shared/scripts/infra-monitor.py` に統合
+  - cron: `30 * * * *` — /root/.claude/.credentials.json鮮度確認（8h上限）
+  - テスト: 2.5h以内で正常確認
+
+- [x] **G4: 外部VPS死活監視** (2026-03-05)
+  - ローカル: `scripts/vps_health_monitor.ps1`
+  - Windowsタスクスケジューラ登録済み（5分間隔）
+  - ICMP + TCP port 22、3回連続失敗でTelegram緊急通知
+  - 設定ファイル: `~/.claude/vps_monitor_config.json`
+
+- [x] **G5: Dockerコンテナリソース監視** (2026-03-04)
+  - infra-monitor.py に統合（G3と同一スクリプト）
+  - docker stats + docker ps (unhealthy検知)
+  - テスト: 全5コンテナ正常、CPU最大2%、MEM最大23%
+
+---
+
+## H: セッション間継続性
+
+- [x] **H1: session-start.sh差分ベース状態検知** (2026-03-04)
+  - `h1-vps-diff.py` + session-start.sh に追加
+  - VPSスナップショット比較（記事数・サービス状態・cronジョブ数）
+  - session-end.py が終了時にスナップショット保存
+
+- [x] **H2: NORTH_STAR未解決事項の自動表示** (確認: session-start.sh lines 87-99で実装済み)
+  - BACKLOG.md未完了タスクを件数+一覧表示（セッション開始時に自動）
+  - `grep -c "^- \[ \]"` でカウント → 全件リストアップ
+
+- [x] **H3: セッション間タスク引き継ぎプロトコル** (2026-03-04)
+  - session-end.py がhandoff.json保存（current_state.jsonから）
+  - session-start.sh がhandoff.jsonを読み込んで表示
+  - 保存先: `.claude/hooks/state/handoff.json`
+
+---
+
+## 完了済み（アーカイブ）
+
+- [x] **週次リサーチ実行** (2026-03-04)
+- [x] **Google Search Console SEO修正 + AIO対応** (2026-03-04)
+- [x] **python3フック全滅修正** (2026-03-04)
+- [x] **VPS SSH 破壊的操作ガード実装** (2026-03-04)
+- [x] **週次リサーチトリガー実装** (2026-03-04)
+- [x] **FileLock + Ghost Webhook 改ざん検知** (2026-03-03)
+- [x] **PVQE-P ゲート実装** (2026-03-03)
+- [x] **VPS本番スクリプトクラッシュ検知** (2026-03-04) — zero-article-alert.py 30分cron
+- [x] **A1: known_fixes.json作成** (2026-03-04)
+- [x] **A2: generate.py AttributeError修正** (2026-03-04)
+
+---
+
+*最終更新: 2026-03-05 — 全46タスク完了。残りタスク: 0件。*

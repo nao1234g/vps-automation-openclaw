@@ -6,6 +6,8 @@ When a tool fails:
 2. AUTO-WRITE draft entry to KNOWN_MISTAKES.md (no more "remember to...")
 3. Update scorecard
 4. Detect repeated known mistakes
+5. AUTO-GENERATE GUARD_PATTERN via mistake-auto-guard.py → ECC loop完結
+   (GUARD_PATTERN → auto-codifier.py → mistake_patterns.json → fact-checker.py)
 """
 import json
 import sys
@@ -90,6 +92,26 @@ if not is_trivial and MISTAKES_FILE.exists():
     draft_marker = f"AUTO-DRAFT-{date_header}-{tool_name}"
     existing = MISTAKES_FILE.read_text(encoding="utf-8")
     if draft_marker not in existing:
+        # ── AUTO-GUARD: ミスタイプを分類してGUARD_PATTERNを自動生成 ──────────
+        guard_pattern_line = ""
+        try:
+            import sys as _sys
+            _hooks_dir = PROJECT_DIR / ".claude" / "hooks"
+            if str(_hooks_dir) not in _sys.path:
+                _sys.path.insert(0, str(_hooks_dir))
+            from mistake_auto_guard import classify_mistake, generate_guard_pattern_line
+            result = classify_mistake(tool_name, error_short)
+            if result:
+                guard_pattern_line = generate_guard_pattern_line(result)
+                print(f"🛡️  AUTO-GUARD: ミスタイプ [{result['mistake_id']}] を検出 → GUARD_PATTERN 自動生成")
+        except Exception as _e:
+            pass  # auto-guardが失敗してもメイン処理は継続
+        # ────────────────────────────────────────────────────────────────────
+
+        guard_section = ""
+        if guard_pattern_line:
+            guard_section = f"\n{guard_pattern_line}\n- **自動登録**: auto-codifier.py → fact-checker.py で永久ブロック"
+
         draft = f"""
 ### {date_header} AUTO-DRAFT: {tool_name} エラー ← Claudeが詳細を記入すること
 - **症状**: ツール `{tool_name}` が失敗した
@@ -97,12 +119,16 @@ if not is_trivial and MISTAKES_FILE.exists():
 - **根本原因**: TODO — Claudeが記入すること
 - **誤ったアプローチ**: TODO — 何を試して失敗したか
 - **正しい解決策**: TODO — どう解決したか
-- **教訓**: TODO — 次回どうすべきか
+- **教訓**: TODO — 次回どうすべきか{guard_section}
 <!-- {draft_marker} -->
 """
         with open(MISTAKES_FILE, "a", encoding="utf-8") as f:
             f.write(draft)
-        print("📝 AUTO-RECORDED draft in KNOWN_MISTAKES.md — please fill in root cause and solution.")
+        if guard_pattern_line:
+            print("📝 AUTO-RECORDED draft + GUARD_PATTERN in KNOWN_MISTAKES.md")
+            print("   → auto-codifier.py が次の KNOWN_MISTAKES.md 編集時に永久ブロックを登録します")
+        else:
+            print("📝 AUTO-RECORDED draft in KNOWN_MISTAKES.md — please fill in root cause and solution.")
 
 # 5. Regular score penalty
 if not is_repeated:

@@ -82,5 +82,26 @@
     "summary": "[2026-03-02] セッションサマリー: 検索0回, エラー0件, リサーチ先行=no",
     "created_at": "2026-03-02 08:06:26",
     "agent": "local-claude"
+  },
+  {
+    "id": "e1d92f7b8b87567b",
+    "category": "session_summary",
+    "summary": "[2026-03-03] セッションサマリー: 検索0回, エラー0件, リサーチ先行=no",
+    "created_at": "2026-03-03 17:33:45",
+    "agent": "local-claude"
+  },
+  {
+    "id": "2e585a148c90aabe",
+    "category": "session_summary",
+    "summary": "[2026-03-04] セッションサマリー: 検索0回, エラー0件, リサーチ先行=no",
+    "created_at": "2026-03-04 17:15:18",
+    "agent": "local-claude"
+  },
+  {
+    "id": "c7266d41a653726d",
+    "category": "session_summary",
+    "summary": "[2026-03-05] セッションサマリー: 検索0回, エラー0件, リサーチ先行=no",
+    "created_at": "2026-03-05 07:58:40",
+    "agent": "local-claude"
   }
 ]

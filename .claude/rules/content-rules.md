@@ -66,32 +66,74 @@ MANDATORY_HASHTAGS = ["#Nowpattern", "#ニュース分析"]
 
 ---
 
-## 3. 記事フォーマット（Deep Pattern一択）
+## 3. 記事フォーマット（Deep Pattern v6.0）
 
-### 全13セクション + 有料/無料の線引き
+> **v6.0（2026-03-03）**: 13セクション→8セクションに統合。言語別見出し（JA記事=日本語、EN記事=英語）。Cialdini LIKING原則追加。
+
+### 8セクション構成（全文無料）
 
 ```
-★ 無料ゾーン（Phase 1は全文無料、Phase 2以降も無料のまま）
-  0. FAST READ        — 1分サマリー、逆説フック
-  1. BOTTOM LINE      — 3秒で核心
-  2. DELTA            — 前回からの変化
-  3. タグバッジ        — ジャンル/イベント/力学
-  4. Why it matters   — なぜ重要か
-  5. What happened    — 事実リスト
+★ 全文無料（Phase 1〜）
 
-────────── ★ 有料の壁（Phase 2、$9.99/月） ──────────
+  0. FAST READ / ファーストリード
+     — 1分要約 + タグバッジ + 3シナリオ確率
+     — 見出し: "⚡ FAST READ"（JA/EN共通ブランド名）
 
-★ 有料ゾーン（Phase 2以降）
-  6. The Big Picture   — 歴史的文脈 + 利害関係者マップ
-  7. Between the Lines — 報道が言わないこと
-  8. NOW PATTERN       — 力学分析 × 2 + 交差点
-  9. Pattern History   — 過去の並行事例 × 2
-  10. What's Next      — 3シナリオ + トリガー
-  11. OPEN LOOP        — 次のトリガー + 追跡テーマ
-  12. ORACLE STATEMENT — 予測追跡ボックス（prediction_db連動記事は必須）
+  1. シグナル — 何が起きたか / THE SIGNAL
+     — 「なぜ重要か」+ 事実リスト + 歴史背景 + Delta（変化点）を統合
+     — JA見出し: "📡 シグナル — 何が起きたか"
+     — EN見出し: "📡 THE SIGNAL"
+     — マーカー: np-signal
+
+  2. 行間を読む / Between the Lines
+     — 報道が言っていないこと（インサイダー視点）
+     — JA見出し: "🔍 行間を読む — 報道が言っていないこと"
+     — EN見出し: "🔍 BETWEEN THE LINES"
+     — マーカー: np-between-lines
+
+  3. NOW PATTERN
+     — 力学分析 × 2 + 交差点
+     — 見出し: "NOW PATTERN"（JA/EN共通）
+     — マーカー: np-now-pattern
+
+  4. パターンの歴史 / Pattern History
+     — 過去の並行事例 × 2（歴史的基準率）
+     — JA見出し: "📚 パターンの歴史"
+     — EN見出し: "📚 PATTERN HISTORY"
+
+  5. 次のシナリオ / What's Next
+     — 楽観/基本/悲観シナリオ × 確率
+     — JA見出し: "🔮 次のシナリオ"
+     — EN見出し: "🔮 WHAT'S NEXT"
+
+  6. 追跡ループ / Open Loop
+     — 次のトリガー + 追跡テーマ
+     — + LIKING要素: "あなたはどう読みますか？ 予測に参加 →"
+     — JA見出し: "🔄 追跡ループ"
+     — EN見出し: "🔄 OPEN LOOP"
+     — マーカー: np-open-loop
+
+  7. オラクル宣言 / Oracle Statement
+     — 予測追跡ボックス（prediction_db連動記事は必須）
+     — JA見出し: "🎯 オラクル宣言"
+     — EN見出し: "🎯 ORACLE STATEMENT"
+     — マーカー: np-oracle
 ```
 
 **Phase 1（月1〜3）= 全文無料。Phase 2（月4〜）で有料化。**
+
+### v6.0 必須マーカー（フォーマットゲートが強制）
+
+```
+np-fast-read     — FAST READセクション
+np-signal        — シグナルセクション（v6.0新規）
+np-between-lines — 行間を読むセクション
+np-now-pattern   — NOW PATTERNセクション（v6.0新規）
+np-open-loop     — 追跡ループセクション
+np-tag-badge     — タグバッジ
+```
+
+**これら6マーカーが欠けた記事は `nowpattern_publisher.py` が強制的にDRAFTに降格する。**
 
 ### 12. ORACLE STATEMENT — 予測追跡ボックス（必須条件あり）
 

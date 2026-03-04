@@ -6,6 +6,93 @@
 
 ---
 
+### 2026-03-04: コードを読む前に見積もりを出した — PVQEのP崩壊
+
+- **症状**: コードを1行も読まずに「Option A: 30分 / Option B: 2時間 / Option C: 1.5時間」と見積もりを提示。実際はBrier Scoreが既実装、reader vote HTMLも既実装で、残作業は20分だった。
+- **根本原因**: estimate before reading — 想像でスコープを評価した。正しい順序: READ→ESTIMATE→IMPLEMENT
+- **正しい解決策**: 見積もり・オプション提示の前に必ず関連ファイルをRead/Glob/Grepで確認する
+- **教訓**: 時間見積もりは禁止（システムルール）。スコープを示す場合も「コード確認後」が必須。「〜のはずです」「〜と思います」で未確認のまま答えない
+- **再発防止コード**: fact-checker.py Stop hookに「時間見積もりパターン + 先行コード読み取りなし → exit(2)」を追加。feedback-trap.py UserPromptSubmit hookに「新指示検出時のリマインダー注入」を追加
+
+---
+
+### 2026-03-04: 週次リサーチ — 世界のAIエージェントミスパターン（2026年最新）
+
+> リサーチ元: CNBC, Galileo.ai, Composio, Adversa.ai, Arize.com（2026-03-04 実施）
+
+#### 1. サイレント失敗（Silent Failure at Scale）— 最重大リスク
+- **症状パターン**: エラーが発生していない（HTTP 200）のに、ワークフロー全体が壊れている。在庫エージェントが存在しないSKUコードを生成→下流4つのAPIが正常に処理→出荷まで進んでしまう。
+- **なぜ危険**: クラッシュしないためアラートが鳴らない。数週間・数ヶ月後に「気づいたら大量のゴミデータ」状態になる。
+- **対策**: 出力の意味的整合性チェック（数値範囲・存在確認）を各ステップに挿入。ログを「成功/失敗」だけでなく「出力の品質」で監視する。
+- **本プロジェクトへの適用**: prediction_auto_verifier.py の出力に「存在しない予測IDを参照していないか」チェックを追加すべき。
+
+#### 2. ハルシネーション連鎖（Hallucination Cascade）
+- **症状パターン**: 100ステップのタスクで1ステップあたり1%のエラー率 → タスク全体の失敗率は63%。最初のステップのハルシネーションが後続全ステップに伝播。
+- **対策**: タスクを短いループに分割し、各ループで検証してから次へ進む。長いエージェントチェーンは避ける。
+- **本プロジェクトへの適用**: NEOのタスクは「記事1本ずつ」に分割。一気に10本生成させない。
+
+#### 3. コンテキスト劣化（Context Degradation）
+- **症状パターン**: Claude Codeのセッションが長くなるにつれてパフォーマンスが劣化。最初は正確だった出力が、長いセッションの後半でミスが増える。
+- **数値**: 開発者の66%が「80%問題」（ほぼ正しいが完全ではない）を経験。AIコードのデバッグが自分で書くより長くかかることが45%の開発者で発生。
+- **対策**: `/clear` でコンテキストを定期リセット。CLAUDE.md に重要情報を集約（毎回再読み込みさせる）。
+- **本プロジェクトへの適用**: セッション開始時のMEMORY.md + session-start.sh が既にこれを対策。継続。
+
+#### 4. フィードバックループの欠如
+- **症状パターン**: パイプラインがドキュメントを「前に流す」だけで、失敗フィードバックを拾わない。エージェントが同じミスを繰り返す。
+- **対策**: 失敗を検知したら明示的に原因と修正方法をエージェントに返すアーキテクチャが必要。
+- **本プロジェクトへの適用**: KNOWN_MISTAKES.md + session-start.sh のフィードバックループが既存。hooks の error-tracker.py も対策済み。
+
+#### 5. マルチエージェント協調の複雑性爆発
+- **症状パターン**: エージェントを1→5に増やしても複雑性は5倍にならず指数関数的に増大。ハンドオフミス・メッセージロスト・フォーマット不一致が乗算。
+- **対策**: シンプルな制御ループがマルチエージェントシステムを上回ることが多い。必要最小限のエージェント数で設計する。
+- **本プロジェクトへの適用**: NEO-ONE/TWO/GPT の3本体制は必要最小限。4本目を追加する際は慎重に。
+
+---
+
+### 2026-03-04: Ghost 内部タグが自動でサイトマップに追加される（SEO汚染）
+
+- **症状**: `p-collective-failure` 等の内部タクソノミータグ（Ghost 専用分類）が全て Google にインデックスされていた。サイトマップに内部タグが大量掲載。
+- **根本原因**: Ghost CMS は「公開タグは全てサイトマップに追加する」仕様。内部分類用タグを作った時点で自動的に `sitemap-tags.xml` に追加された。設計時にこの仕様を考慮していなかった。
+- **正しい解決策**: Caddy で `@internal_tags path /tag/p-* /tag/event-* /tag/lang-*` マッチャーを設定し `X-Robots-Tag: noindex, follow` ヘッダーを返す。robots.txt の Disallow は **使わない**（robots.txt Disallow → クロール停止 → noindex 見えない → 永久にインデックス残存）。
+- **教訓**: Ghost でタグを増やす際は「このタグは外部に公開する価値があるか？」を必ず確認する。内部用タグは作成時点で Caddy のパターンに含まれるよう命名規則を守る（p-*, event-*, lang-*）。
+- **再発防止**: Caddy に `/tag/p-*`, `/tag/event-*`, `/tag/lang-*` の自動 noindex を実装済み（新タグも自動適用）
+
+### 2026-03-04: 開発中 Ghost ページを published 状態のまま放置（重複コンテンツ）
+
+- **症状**: `predictions-2` 〜 `predictions-5`、`en-predictions-2`、`taxonomy-ja` 等の開発中ページが `published` 状態のまま残存。サイトマップに重複 URL として掲載され Google に重複コンテンツとして認識される。
+- **根本原因**: Ghost ページを開発中に作成・公開し、正式ページに移行後も古いページを削除・非公開化しなかった。監視がなかったため発覚が遅れた。
+- **正しい解決策**: (1) Ghost DB の `canonical_url` フィールドを設定してサイトマップから除外。(2) Caddy で 301 リダイレクト（`/predictions-2/` → `/predictions/` 等）を追加。
+- **教訓**: Ghost ページを作る際は draft 状態で作成し、意図的に publish する。古いバージョンページは新ページ公開と同時に削除か 301 リダイレクト設定をセットで行う。
+- **再発防止**: nowpattern-redirects.txt に全 9 件の重複ページリダイレクトを追加済み。
+
+### 2026-03-04: robots.txt の Disallow と noindex の矛盾（noindex が機能しない）
+
+- **症状**: robots.txt に `/tag/p-*` を Disallow したが、既にインデックスされているページが de-index されない。
+- **根本原因**: robots.txt Disallow → Google がページをクロールしない → `X-Robots-Tag: noindex` ヘッダーを Google が見れない → noindex 信号が届かない → ページがインデックスに残り続ける。
+- **正しい解決策**: 既にインデックスされているページを de-index するには robots.txt Disallow を **しない**。クロールを許可した上で `X-Robots-Tag: noindex` ヘッダーを返すことで Google が noindex 信号を受け取り de-index する。
+- **教訓**: 「クロールさせたくない = robots.txt Disallow」は間違い。インデックスから除外したいページは noindex (X-Robots-Tag) を使う。robots.txt Disallow は「クロールコストを節約したい、かつ既に未インデックスのページ」にのみ使う。
+
+### 2026-03-03: URLを確認せずに納品して404
+
+- **症状**: 記事を更新してURLを報告したが、ブラウザで開くと404になった
+- **根本原因**:
+  1. GhostのAPIレスポンス `slug` フィールドからURLを組み立てたが、実際の公開URLには `/genre-technology/` などのコレクションプレフィックスが必要
+  2. APIレスポンスの `url` フィールドが正しいURLを返すのに、`slug` フィールドから自分でURLを組み立てた
+  3. 報告前にcurlで200確認をしなかった
+- **正しい解決策**: GhostのAPIレスポンスの `url` フィールドを使う（自分でURL組み立て禁止）
+- **教訓（コード強制）**: **URLを人間に渡す前に必ず `curl -o /dev/null -w '%{http_code}'` で200を確認する。200でなければ渡さない。**
+- **再発防止チェック**: 記事更新スクリプトに以下を追加すること:
+  ```python
+  # PUT後に必ずURL疎通確認
+  actual_url = resp['posts'][0].get('url', '')
+  status = check_url_status(actual_url)  # curlで200確認
+  assert status == 200, f"URL returned {status}: {actual_url}"
+  print(f"VERIFIED 200: {actual_url}")
+  ```
+- **GUARD_PATTERN**: `{"pattern": "nowpattern\\.com/[^\\s\"'<>)\\]]*(?=.*404|.*エラー)", "feedback": "⛔ URL疎通エラー: nowpattern.comのURLが200 OKを返していない可能性があります。Ghost APIの 'url' フィールドを使い、curlで200確認後に報告してください。", "name": "URL_404_DELIVERY", "example": "nowpattern.com/some-article-slug に404エラーが発生しています。"}`
+
+---
+
 ## 記録フォーマット
 
 各エントリは以下の形式で記録：
@@ -1355,3 +1442,54 @@
   - `.claude/hooks/feedback-trap.py` — 「UIレイアウト変更を承認する」でフラグ作成
   - `.git/hooks/pre-commit` — レイアウト関数変更をコミット時ブロック
   - VPS: `/opt/shared/scripts/prediction_builder_monitor.py` cron (*/30)
+
+---
+
+## ECC Enforcement Patterns — 全ミスの物理ブロック
+
+> このセクションはECC Pipeline（Error→Codify→Check）が管理する。
+> GUARD_PATTERNのみを定義し、auto-codifier.pyが自動でmistake_patterns.jsonに登録する。
+> fact-checker.pyが毎レスポンス後にブロックし、regression-runner.pyが毎日全パターンをテストする。
+> **追加方法**: `- **GUARD_PATTERN**: \`{...}\`` の行を追加するだけで自動登録される。
+
+---
+
+- **GUARD_PATTERN**: `{"pattern": "\\?source=html|source=html.*ghost|ghost.*html.*field|Ghost.*html.*フィールド.*更新", "feedback": "⛔ Ghost 5.x は html フィールドと ?source=html をサポートしていません。Lexical JSON を直接操作してください。fetch lexical → parse JSON → insert node → PUT lexical。", "name": "GHOST_HTML_SOURCE", "example": "Ghost APIの ?source=html パラメータを使って記事のhtmlフィールドを更新します。"}`
+
+- **GUARD_PATTERN**: `{"pattern": "Ghost Settings API|/ghost/api/.*settings.*PUT|Ghost.*Settings.*PUT", "feedback": "⛔ Ghost Settings APIはIntegration APIでは501を返します。ghost.dbをSQLite直接更新してGhostを再起動してください。", "name": "GHOST_SETTINGS_API_PUT", "example": "Ghost Settings APIにPUTリクエストを送信して設定を更新します。"}`
+
+- **GUARD_PATTERN**: `{"pattern": "n8n.*workflow_entity.*INSERT|INSERT.*n8n.*active.*true|workflow.*直接.*INSERT.*n8n|n8n.*テーブル.*INSERT", "feedback": "⛔ N8NワークフローをDB直接INSERTで作成しても起動しません。N8N REST API（POST /api/v1/workflows + POST /api/v1/workflows/{id}/activate）を使ってください。", "name": "N8N_DB_DIRECT_INSERT", "example": "n8n.workflow_entityテーブルにワークフローを直接INSERTしてactive=trueに設定します。"}`
+
+- **GUARD_PATTERN**: `{"pattern": "Substack.*公式API|Substack.*official.*api|Substack API.*投稿|Substack.*REST API", "feedback": "⛔ Substackには公式投稿APIが存在しません。Cookie認証（connect.sid）+ python-substackライブラリ、またはFastAPI独自サーバーを使ってください。", "name": "SUBSTACK_OFFICIAL_API", "example": "Substack公式APIを使って記事を投稿します。REST APIエンドポイントを叩きます。"}`
+
+- **GUARD_PATTERN**: `{"pattern": "--no-pairing|OPENCLAW_DISABLE_PAIRING|openclaw.*--disable.*pairing", "feedback": "⛔ openclaw --no-pairing フラグは存在しません。openclaw.jsonの gateway.controlUi.dangerouslyDisableDeviceAuth: true で設定してください。", "name": "OPENCLAW_NONEXISTENT_FLAG", "example": "openclaw --no-pairing オプションを追加してペアリングを無効化します。"}`
+
+- **GUARD_PATTERN**: `{"pattern": "NEO.*(ONE|TWO).*OpenClaw.*エージェント|OpenClaw.*エージェント.*NEO|openclaw\\.json.*neo.*(ONE|TWO)", "feedback": "⛔ NEO-ONE/TWOをOpenClawエージェントとして追加してはいけません。NEOはneo-telegram.serviceで独立運用します。OpenClawのanthropicモデルはAPI従量課金になります。", "name": "NEO_OPENCLAW_AGENT", "example": "NEO-TWOをOpenClawエージェントとして追加するためopenclaw.jsonに設定します。"}`
+
+- **GUARD_PATTERN**: `{"pattern": "NEO.*Gemini.*Flash.*置き換え|N8N.*HTTP.*Request.*NEO.*置き換え|ステートレス.*API.*NEO|NEO.*ステートレス", "feedback": "⛔ NEOをステートレスHTTP APIに置き換えてはいけません。フルエージェント（SDK+メモリ+ツール）とステートレスAPIは能力が根本的に異なります。品質崩壊します。", "name": "NEO_STATELESS_REPLACE", "example": "N8NワークフローのHTTP RequestノードでGemini FlashにNEOを置き換えます。"}`
+
+- **GUARD_PATTERN**: `{"pattern": "duplicate.*content.*403|403.*duplicate.*content|X.*API.*duplicate.*tweet|tweet.*duplicate.*error", "feedback": "⛔ X API duplicate content 403は重複ツイートです。キューの tweet_url フィールドで重複チェックしてください。", "name": "X_DUPLICATE_CONTENT", "example": "X APIがduplicate contentで403エラーを返しています。同じ内容のツイートが重複しています。"}`
+
+- **GUARD_PATTERN**: `{"pattern": "Bot API.*NEO.*メッセージ|Telegram.*Bot API.*送信.*NEO|bot.*token.*send.*NEO.*message", "feedback": "⛔ Bot APIで送ったメッセージはNEO-ONEが無視します。Telethon（User API）で送信してください。", "name": "TELEGRAM_BOT_API_NEO_IGNORE", "example": "Telegram Bot APIを使ってNEO-ONEにメッセージを送信します。"}`
+
+- **GUARD_PATTERN**: `{"pattern": "note-auto-post.*x.*投稿|subprocess.*note.*auto.*post.*--x|note.*自動投稿.*X.*二重", "feedback": "⛔ note-auto-post.pyがX投稿を二重実行します。subprocess呼び出しに --no-x-thread フラグを追加してください。", "name": "NOTE_DOUBLE_X_POST", "example": "note-auto-post.pyを実行してnoteとXの両方に投稿します。"}`
+
+- **GUARD_PATTERN**: `{"pattern": "permission_mode.*bypassPermissions.*root|root.*bypassPermissions.*NEO|NEO.*root.*bypassPermissions.*エラー", "feedback": "⛔ rootユーザーではbypassPermissionsが動作しません。acceptEditsを使ってください。NEOのpermission_modeはacceptEditsが正しい設定です。", "name": "NEO_ROOT_BYPASS_PERMISSIONS", "example": "NEOのpermission_modeをbypassPermissionsに設定します。rootユーザーで実行します。"}`
+
+- **GUARD_PATTERN**: `{"pattern": "system_prompt.*NEO.*Claude Code|NEO.*Claude Code.*名乗る|NEO.*アイデンティティ.*未設定", "feedback": "⛔ NEOが自分を'Claude Code'と名乗らないようにするには、SDKのsystem_promptパラメータでアイデンティティを注入してください。", "name": "NEO_IDENTITY_MISSING", "example": "NEOがClaude Codeと自己紹介してしまいます。アイデンティティ設定が未設定です。"}`
+
+- **GUARD_PATTERN**: `{"pattern": "openclaw\\.json.*systemPrompt|agents.*systemPrompt.*openclaw|identity\\.description.*openclaw", "feedback": "⛔ openclaw.jsonにsystemPromptやidentity.descriptionキーは存在しません。エージェントへの指示は共有ファイル（/opt/shared/AGENT_RULES.md）を使ってください。", "name": "OPENCLAW_INVALID_KEY", "example": "openclaw.jsonのagents設定にsystemPromptキーを追加してエージェントに指示を与えます。"}`
+
+- **GUARD_PATTERN**: `{"pattern": "Ghost.*投稿.*本文.*空|Ghost.*body.*empty|ghost.*lexical.*null|Ghost.*html.*空", "feedback": "⛔ Ghost 5.xの投稿本文が空になる原因はLexical未使用です。html/markdownフィールドではなく、lexicalフィールドに直接書き込んでください。", "name": "GHOST_BODY_EMPTY", "example": "Ghost APIで投稿したが本文が空で表示されています。htmlフィールドに書いています。"}`
+
+
+
+- **GUARD_PATTERN**: `{"pattern": "rfile\\.read\\s*\\((?!.*min\\()", "feedback": "⛔ 大きなHTTPボディをmin()なしで全バイト読み込もうとしています。Ghost webhookは2-3MBあります。read_size = min(content_length, MAX_READ) に変更してください（MAX_READ=65536）", "name": "LARGE_PAYLOAD_READ_UNGUARDED"}`
+
+- **GUARD_PATTERN**: `{"pattern": "self\\.wfile\\.write|self\\.send_response\\b", "feedback": "⛔ HTTPレスポンス送信はBrokenPipeErrorをキャッチしてください。Ghostはタイムアウトで接続を切ります: try: self.send_response(200); ... except BrokenPipeError: pass", "name": "UNGUARDED_HTTP_RESPONSE_SEND"}`
+
+- **GUARD_PATTERN**: `{"pattern": "^import fcntl$", "feedback": "⛔ fcntlはLinux専用です。Windows環境では ModuleNotFoundError になります。import sys; if sys.platform != 'win32': import fcntl でガードしてください", "name": "FCNTL_LINUX_ONLY"}`
+
+- **GUARD_PATTERN**: `{"pattern": "\\bpython3\\b(?! /c/Program)(?!.*ssh)", "feedback": "⛔ Windows環境でpython3はダミーエイリアス（exit 49）です。\"/c/Program Files/Python312/python.exe\" を使ってください。SSHコマンド内のpython3は除外。", "name": "PYTHON3_WINDOWS_DUMMY"}`
+
+- **GUARD_PATTERN**: `{"pattern": "requests\\.(get|post|put)\\([^)]*https://nowpattern(?!.*verify=False)", "feedback": "⛔ Ghost CMS APIへのHTTPSリクエストはverify=Falseが必要です。urllib3.disable_warnings()も追加してください", "name": "GHOST_SSL_VERIFY_MISSING"}`

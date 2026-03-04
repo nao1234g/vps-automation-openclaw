@@ -14,7 +14,33 @@ import json
 import sys
 import re
 import time
+from datetime import datetime
 from pathlib import Path
+
+
+def log_prevention(pattern_name: str, message_preview: str = "") -> None:
+    """fact-checker.py が exit(2) を発火した時に prevention_log.json に記録する"""
+    log_path = Path(__file__).parent / "state" / "prevention_log.json"
+    try:
+        entries = []
+        if log_path.exists():
+            try:
+                entries = json.loads(log_path.read_text(encoding="utf-8"))
+            except Exception:
+                entries = []
+        entries.append({
+            "at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "pattern": pattern_name,
+            "preview": message_preview[:120]
+        })
+        if len(entries) > 1000:
+            entries = entries[-1000:]
+        log_path.write_text(
+            json.dumps(entries, ensure_ascii=False, indent=2),
+            encoding="utf-8"
+        )
+    except Exception:
+        pass  # ログ失敗でも本体の exit(2) は止めない
 
 # トランスクリプト解析: 検証が必要なファイル拡張子（スクリプト・コード + ビジュアル系）
 # .css/.hbs/.html はスクリーンショット検証が必要（語彙チェックでは捕捉不可能な視覚バグ対策）
@@ -155,6 +181,21 @@ KNOWN_ERRORS = [
         "name": "AISAINTEL_GHOST"
     },
 ]
+
+# ── ECC Pipeline: mistake_patterns.json から動的ロード ────────────────────────
+# auto-codifier.py が KNOWN_MISTAKES.md の GUARD_PATTERN フィールドを自動登録する。
+# ここでそのパターンを KNOWN_ERRORS に合流させる（ハードコードなし）。
+_PATTERNS_FILE = Path(__file__).parent / "state" / "mistake_patterns.json"
+if _PATTERNS_FILE.exists():
+    try:
+        _dynamic = json.loads(_PATTERNS_FILE.read_text(encoding="utf-8"))
+        _existing_names = {e.get("name", "") for e in KNOWN_ERRORS}
+        for _p in _dynamic:
+            if _p.get("name", "") not in _existing_names and _p.get("pattern") and _p.get("feedback"):
+                KNOWN_ERRORS.append(_p)
+    except Exception:
+        pass  # パターンファイル読み込み失敗は無視（既存ガードは有効のまま）
+# ─────────────────────────────────────────────────────────────────────────────
 
 # ──────────────────────────────────────────────────────────────────────────────
 # 「実装したつもり」検出: Webアクセス可能なファイル/設定を
@@ -298,6 +339,53 @@ UI_VERIFICATION_REQUEST_PATTERN = re.compile(
 )
 
 
+def _has_code_reads_in_transcript(transcript_path: str) -> bool:
+    """
+    トランスクリプトにRead/Glob/Grep ツール呼び出しがあるか確認する。
+    コードを読まずに見積もりを出す「estimate before reading」ミスを物理ブロックするために使用。
+    """
+    if not transcript_path:
+        return False
+    try:
+        p = Path(transcript_path)
+        if not p.exists():
+            return False
+        with open(p, "r", encoding="utf-8", errors="replace") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if entry.get("type") == "assistant":
+                    content = entry.get("message", {}).get("content", [])
+                    if isinstance(content, list):
+                        for block in content:
+                            if block.get("type") == "tool_use":
+                                if block.get("name", "") in ("Read", "Glob", "Grep"):
+                                    return True
+        return False
+    except Exception:
+        return False
+
+
+# ── 「コード未読見積もり」検出パターン ──────────────────────────────────────────
+# 根本原因(2026-03-04): 「Option A: 30分 / Option B: 2時間」をコード読まずに提示
+# 正しい順序: Read/Glob/Grep → コード確認 → 見積もり/提案
+TIME_ESTIMATE_OPTION_PATTERN = re.compile(
+    r"("
+    r"Option\s+[A-Z]\s*[:\uff1a].{0,120}\d+\s*(分|時間)|"   # Option A: ...30分
+    r"オプション[A-Z1-9\-].{0,120}\d+\s*(分|時間)|"           # オプション1: ...30分
+    r"\d+\s*(分|時間)\s*(くらい|ほど|程度|かかる|で完了|で実装|で対応)|"  # 30分くらい
+    r"所要.{0,20}\d+\s*(分|時間)|"                            # 所要時間: 30分
+    r"\d+\s*hour|about\s+\d+\s*min"                          # about 30 min
+    r")",
+    re.IGNORECASE
+)
+
+
 def get_last_assistant_message(data: dict) -> str:
     """Stopフックのinputから最後のassistantメッセージを取得"""
     try:
@@ -344,7 +432,30 @@ def main():
     if found_errors:
         print("\n".join(found_errors))
         print("\n上記のFACT ERRORが検出されました。回答を修正してから再度応答してください。")
+        log_prevention("FACT_ERROR:" + "|".join(e.get("name","?") for e in KNOWN_ERRORS if re.search(e["pattern"], last_message, re.IGNORECASE)), last_message[:120])
         sys.exit(2)  # exit code 2 = Claudeに再生成を強制
+
+    # ── 「コード未読見積もり」チェック ───────────────────────────────────────────
+    # 時間見積もり・スコープ評価をコードを読まずに出した場合はブロック
+    # 根本原因(2026-03-04): Read/Glob/Grep なしで「Option A: 30分」を提示 → 全部間違い
+    # 正しい順序: Read → ESTIMATE → IMPLEMENT（これを物理強制）
+    if TIME_ESTIMATE_OPTION_PATTERN.search(last_message):
+        if not _has_code_reads_in_transcript(data.get("transcript_path", "")):
+            log_prevention("TIME_ESTIMATE_WITHOUT_CODE_READ", last_message[:120])
+            print(
+                "⛔ コード未読見積もりエラー: 時間見積もり・スコープ評価を\n"
+                "  コードを確認せずに提示しています。\n"
+                "\n"
+                "  正しい順序: Read/Glob/Grep → コード確認 → 見積もり/提案\n"
+                "  ❌ 禁止: 「Option A: 30分 / Option B: 2時間」をコード未読で提示\n"
+                "  ❌ 禁止: 「〜のはずです」「〜と思います」で未確認のまま答える\n"
+                "\n"
+                "  → 関連ファイルを Read/Glob/Grep で確認してから再度提案してください。\n"
+                "  例: Read prediction_page_builder.py → 実際の実装状況確認 → 正確な見積もり\n"
+                "\n"
+                "  ドキュメント: docs/KNOWN_MISTAKES.md「2026-03-04: コードを読む前に見積もり」"
+            )
+            sys.exit(2)
 
     # ── 「実装したつもり」チェック ────────────────────────────────────────────
     # Webアクセス可能なリソースの「実装完了」報告に検証証拠がない場合にブロック
@@ -357,6 +468,7 @@ def main():
                 "  VPSにSSH接続できない場合は「SSH接続できないため未検証、後ほど確認が必要」と明示してください。\n"
                 "  ❌ 禁止: 検証せずに「〜しました」と報告すること"
             )
+            log_prevention("WEB_RESOURCE_CLAIM_UNVERIFIED", last_message[:120])
             sys.exit(2)
 
     # ── Playwright PASS の先読み（RUNTIME_CLAIM_PATTERN より先に実行）──────────
@@ -410,12 +522,14 @@ def main():
                 "  ❌ 禁止: 検証せずに「直りました」「問題が解決しました」と報告すること\n"
                 "  ✅ 許可: コマンド実行結果（Active: active / FAIL:0 等）を本文に含める"
             )
+            log_prevention("RUNTIME_CLAIM_UNVERIFIED", last_message[:120])
             sys.exit(2)
 
     # ── 「件数思い込み」チェック ─────────────────────────────────────────────
     # 「全件確認済み」「N件に適用」等の件数主張に、観測コマンド出力がない場合にブロック
     if COUNT_CLAIM_PATTERN.search(last_message):
         if not COUNT_EVIDENCE_PATTERN.search(last_message):
+            log_prevention("COUNT_CLAIM_NO_EVIDENCE", last_message[:120])
             print(
                 "⛔ 件数未確認エラー: 件数・カード数・合計数を主張する前に、\n"
                 "  実際のシステムから直接観測した出力を回答に含めてください。\n"
@@ -444,6 +558,7 @@ def main():
                 RUNTIME_CLAIM_PATTERN.search(last_message)
             )
             if not already_covered:
+                log_prevention("WORK_COMPLETE_NO_PROOF", last_message[:120])
                 print(
                     "⛔ 作業完了未検証エラー: 「パッチ適用」「全部修正」「実装完了」を報告する前に、\n"
                     "  実際に実行したコマンドの出力を回答に含めてください。\n"
@@ -593,6 +708,7 @@ def main():
                 f"\n"
                 f"  ✅ 検証コマンド実行後は自動的にロックが解除されます。"
             )
+            log_prevention("TRANSCRIPT_UNVERIFIED_EDIT", file_list)
             sys.exit(2)
 
     pending_verif_path = Path(__file__).parent / "state" / "pending_verification.json"
@@ -642,6 +758,7 @@ def main():
                             f"\n"
                             f"  ✅ 検証コマンド実行後は自動的にロックが解除されます。"
                         )
+                        log_prevention("STATE_BASED_UNVERIFIED", file_list)
                         sys.exit(2)
         except Exception:
             pass  # 状態読み取り失敗はサイレント無視
@@ -664,6 +781,7 @@ def main():
                         f"  確認コマンド: ssh root@163.44.124.123 python3 /opt/shared/scripts/site_health_check.py --quick\n"
                         f"  FAIL 0件が確認されるまでこの回答は送信できません。"
                     )
+                    log_prevention("VPS_HEALTH_FAIL", f"FAIL:{fail_count} at {checked_at}")
                     sys.exit(2)  # Claudeに再生成を強制
         except Exception:
             pass  # state読み取り失敗は無視（壊れたstateでブロックしない）
@@ -687,6 +805,7 @@ def main():
                                 "  ❌ 禁止: 「直りました」「正常に表示されるようになりました」\n"
                                 "  → ユーザーが「OK 確認した」と言うまで完了報告はできません。"
                             )
+                            log_prevention("UI_COMPLETION_NO_VERIFY", last_message[:120])
                             sys.exit(2)
         except Exception:
             pass  # state読み取り失敗はサイレント無視
@@ -717,6 +836,7 @@ def main():
                 f"    python scripts/ui_vrt_runner.py compare\n"
                 f"→ VRT_PASS になってから完了報告してください。"
             )
+            log_prevention("VRT_FAIL_UI", f"url={url} diff={outside_pct:.2f}%")
             sys.exit(2)
         # 2〜4. VRT PASS / Playwright PASS / ブラウザ確認依頼 → OK
         if not (vrt_passed or playwright_passed or UI_VERIFICATION_REQUEST_PATTERN.search(last_message)):
@@ -732,6 +852,59 @@ def main():
                 "    「ブラウザで [URL] を開いて確認してください」\n"
                 "  ❌ 禁止: 検証なしで「直りました」と報告すること"
             )
+            log_prevention("UI_VERIFICATION_MISSING", last_message[:120])
+            sys.exit(2)
+
+    # ── nowpattern.com URL 疎通確認（404納品ゼロ）─────────────────────────────
+    # Claudeの回答にnowpattern.comのURLが含まれている場合、
+    # urllib で 200 を確認してから報告する。200 でなければ exit(2) でブロック。
+    # 根本原因: GhostのAPIレスポンス 'url' フィールドを使わず slug からURL組み立てて404
+    _NP_URL_PATTERN = re.compile(r'https://nowpattern\.com/[^\s"\'<>)\]]*', re.IGNORECASE)
+
+    def _check_url_status(url: str) -> str:
+        """Python urllib で URL の HTTP ステータスを返す。失敗時は '000'"""
+        import urllib.request as _ur
+        import ssl as _ssl
+        try:
+            ctx = _ssl.create_default_context()
+            req = _ur.Request(url, method='HEAD')
+            with _ur.urlopen(req, context=ctx, timeout=8) as r:
+                return str(r.status)
+        except Exception as e:
+            try:
+                return str(e.code)
+            except Exception:
+                return '000'
+
+    _np_urls = set()
+    for _u in _NP_URL_PATTERN.findall(last_message):
+        _u = _u.rstrip('.,;:)。、')
+        # Ghost Admin API / 静的ファイル はスキップ
+        if any(x in _u for x in ['/ghost/api/', '/sitemap', '/robots.txt', '/favicon', '/assets/']):
+            continue
+        _np_urls.add(_u)
+
+    if _np_urls:
+        _failed_urls = []
+        for _u in _np_urls:
+            _status = _check_url_status(_u)
+            if _status != '200':
+                _failed_urls.append((_u, _status))
+
+        if _failed_urls:
+            _lines = ["⛔ URL疎通エラー: 以下のURLが200 OKを返しませんでした。404のままユーザーに渡すことを物理ブロックします。"]
+            _lines.append("")
+            for _u, _s in _failed_urls:
+                _lines.append(f"  HTTP {_s}: {_u}")
+            _lines.append("")
+            _lines.append("  原因と対処:")
+            _lines.append("  1. Ghost APIレスポンスの 'url' フィールドを使う（slug からURL組み立て禁止）")
+            _lines.append("  2. /genre-technology/ 等のコレクションプレフィックスが付く場合がある")
+            _lines.append("  3. curl -o /dev/null -w '%{http_code}' で 200 確認後に報告する")
+            _lines.append("")
+            _lines.append("  → 正しいURLを確認してから再度報告してください。")
+            print("\n".join(_lines))
+            log_prevention("URL_404_DELIVERY", str(_failed_urls[:2]))
             sys.exit(2)
 
     # ── 訂正後の KNOWN_MISTAKES 記録チェック（feedback-trap.py との連携） ──────
@@ -757,6 +930,7 @@ def main():
                         "    - **症状**: / **根本原因**: / **正しい解決策**: / **教訓**:\n"
                         "  ❌ 禁止: 記録せずに「完了です」と報告すること"
                     )
+                    log_prevention("CORRECTION_NOT_RECORDED", correction_preview[:80])
                     sys.exit(2)
                 else:
                     # KNOWN_MISTAKES.md が更新された → フラグをクリア

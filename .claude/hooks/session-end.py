@@ -127,4 +127,72 @@ if AGENT_WISDOM.exists():
     except Exception:
         pass  # VPS不達でもローカル更新は完了している
 
+# 5. mistake_patterns.json → VPS同期（proactive_scannerが最新パターンを使えるように）
+# auto-codifier.py が新パターンを登録したら、VPSスキャナーにも即反映する。
+PATTERNS_FILE = STATE_DIR / "mistake_patterns.json"
+if PATTERNS_FILE.exists():
+    try:
+        subprocess.run(
+            ["scp", "-o", "ConnectTimeout=5", "-o", "BatchMode=yes",
+             str(PATTERNS_FILE), "%s:/opt/shared/state/mistake_patterns.json" % VPS],
+            timeout=8, capture_output=True
+        )
+        # パターン数を読んで表示
+        try:
+            patterns = json.loads(PATTERNS_FILE.read_text(encoding="utf-8"))
+            print("🛡️ mistake_patterns.json (%d件) → VPSに同期しました。" % len(patterns))
+        except Exception:
+            print("🛡️ mistake_patterns.json → VPSに同期しました。")
+    except Exception:
+        pass  # VPS不達でもローカルのパターンは有効
+
+# H1: VPSスナップショット保存（次セッション差分比較用）
+try:
+    result = subprocess.run(
+        ["ssh", "-o", "StrictHostKeyChecking=no", "-o", "ConnectTimeout=5",
+         "-o", "BatchMode=yes", VPS, "cat /opt/shared/SHARED_STATE.md"],
+        capture_output=True, text=True, timeout=10
+    )
+    if result.returncode == 0:
+        snapshot = {"timestamp": datetime.now().isoformat(), "content": result.stdout}
+        snap_file = STATE_DIR / "last_vps_snapshot.json"
+        with open(snap_file, "w", encoding="utf-8") as f:
+            json.dump(snapshot, f, ensure_ascii=False, indent=2)
+        print("📸 VPSスナップショット保存（H1: 次セッション差分比較用）")
+except Exception:
+    pass  # VPS不達でも続行
+
+# H3: セッション引き継ぎデータ保存（次セッション用ハンドオフ）
+try:
+    current_state_path = Path.home() / ".claude" / "tasks" / "current_state.json"
+    handoff_file = STATE_DIR / "handoff.json"
+    if current_state_path.exists():
+        cs = json.loads(current_state_path.read_text(encoding="utf-8"))
+        in_progress = cs.get("in_progress", [])
+        pending = cs.get("pending", [])
+        handoff = {
+            "timestamp": datetime.now().isoformat(),
+            "in_progress": in_progress[:5],
+            "pending": pending[:5],
+        }
+        with open(handoff_file, "w", encoding="utf-8") as f:
+            json.dump(handoff, f, ensure_ascii=False, indent=2)
+        ip_count = len(in_progress)
+        if ip_count > 0:
+            print("🤝 H3: 引き継ぎデータ保存（進行中: %d件）" % ip_count)
+except Exception:
+    pass  # ハンドオフが保存できなくても続行
+
+# 6. VPS→ローカル 双方向フィードバック（週1回: 新パターン候補をTelegramへ）
+try:
+    feedback_script = SCRIPTS_DIR / "vps_feedback_sync.py"
+    if feedback_script.exists():
+        subprocess.run(
+            [sys.executable, str(feedback_script)],
+            timeout=30, capture_output=True
+        )
+        # vps_feedback_sync.py 内でweekly制御済み（毎回呼んでOK）
+except Exception:
+    pass  # VPS不達でも続行
+
 sys.exit(0)

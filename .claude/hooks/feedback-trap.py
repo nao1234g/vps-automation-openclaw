@@ -252,6 +252,24 @@ if len(user_message) > 30 and NEW_INSTRUCTION_PATTERNS.search(user_message):
         f"instruction_at: {datetime.now().isoformat()}\n"
         f"preview: {user_message[:100]}"
     )
+    # PVQE-P: 新しいタスク開始 → pvqe_p.json をリセット（新しいP定義が必要）
+    pvqe_p_file = STATE_DIR / "pvqe_p.json"
+    pvqe_p_file.unlink(missing_ok=True)
+
+    # 「コードを読んでから見積もる」リマインダーを毎回注入
+    print(
+        "\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        "📋 [新指示検出] 実装前チェックリスト（強制）\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        "  ⚠️  見積もり・スコープ評価の前に必ずコードを読むこと\n"
+        "       Read/Glob/Grep で実際のコードを確認してから判断する\n"
+        "       「〜のはずです」「〜と思います」は使わない\n"
+        "  ⚠️  KNOWN_MISTAKES.md を実装前に確認すること\n"
+        "  ⚠️  「こういう理解でいいですか？」と確認してから動く\n"
+        "  ⚠️  正しい順序: READ CODE → ESTIMATE → IMPLEMENT\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+    )
 
 # ── 意図確認ゲート: ユーザーの承認を検出 ─────────────────────────────────
 # intent_needs_confirmation.flag が存在する場合のみ承認を検出
