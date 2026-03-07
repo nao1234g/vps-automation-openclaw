@@ -6,6 +6,50 @@
 
 ---
 
+### 2026-03-06: パターンの歴史バグ — スキーマとビルダーのフィールド名不一致
+
+- **症状**: 記事の「パターンの歴史」セクションに「1994年年:」など年号の二重表記と内容が空欄になった
+- **根本原因**:
+  1. AIのJSONスキーマは `event`/`pattern`/`lesson` フィールドで返却
+  2. `nowpattern_article_builder.py` の `_build_pattern_history_html()` は `title`/`content`/`similarity` を読もうとした → 全て空文字
+  3. year末尾の「年」をAIが付けた上にビルダーもさらに「年」を追加 → 「年年」表記
+- **正しい解決策**:
+  - `_build_pattern_history_html()` で `event`/`pattern`/`lesson` を正しく読む（`title`/`content` はフォールバック）
+  - `year_raw.endswith("年")` なら末尾の「年」を除去してから「年」を追加
+- **影響範囲**: 17件の記事でパターン歴史が空欄（`/opt/shared/scripts/articles_needs_regen.json`）
+- **教訓（絶対忘れるな）**:
+  - **スキーマのフィールド名とビルダーのフィールド名を必ず一致させる**
+  - 新フィールド追加時はビルダー側も同時更新する
+  - `quality_check()` は「空文字になっていないか」まで確認する
+- **再発防止コード**:
+  - `nowpattern_article_builder.py` の `_build_pattern_history_html()` を修正（2026-03-06）
+  - `nowpattern-deep-pattern-generate.py` の `quality_check()` に `PATTERN-HISTORY-EMPTY` チェック追加
+    - 空のパターン歴史ケースを検出 → self-refineを強制発動
+- **GUARD_PATTERN**: `{"pattern": "pattern_history.*title|pattern_history.*content.*similarity", "feedback": "⛔ pattern_historyのフィールド名に注意。AIスキーマはevent/pattern/lessonを返す。title/contentはフォールバックのみ。", "name": "PATTERN_HISTORY_FIELD_MISMATCH"}`
+
+---
+
+### 2026-03-06: バイリンガルURLを後で決めた — URL設計の先延ばし
+
+- **症状**: ENページを `/en-about/` で作成。SEO的に正しくない。既存の `/en-predictions/` という誤りパターンを踏襲した
+- **根本原因**:
+  1. URL設計をコンテンツ実装の後回しにした（「後で考えれば」で飛ばした）
+  2. 既存の誤ったパターン (`/en-predictions/`) を確認せずに踏襲した
+  3. バイリンガルURLの標準が定義されていなかった
+- **正しい解決策**: Google推奨のサブディレクトリ型
+  - JA（プライマリ）: `/about/`, `/predictions/`
+  - EN: `/en/about/`, `/en/predictions/`
+  - Caddyで内部rewrite: `/en/about/` → Ghost slug `en-about`
+  - 旧URLから新URLへ301リダイレクト、hreflang + canonical codeinjection_head追加
+- **チェックリスト（新規バイリンガルページ作成時の必須フロー）**:
+  1. URL構造を提案:「JA: /[page]/ + EN: /en/[page]/」→ 承認後に実装
+  2. Caddyfileに `/en/[page]/` → Ghost slug `en-[page]` のrewriteを追加
+  3. hreflang + ENページのcanonical overrideをcodeinjection_headに追加
+  4. 旧URLがある場合: 301リダイレクト追加
+- **GUARD_PATTERN**: `{"pattern": "slug.*en-[a-z]+.*create|pages.*slug.*en-[a-z]+.*post", "feedback": "⛔ ENページのslugをen-XXX形式で直接作成するとURLが /en-XXX/ (SEO非推奨)になります。正しいURL: /en/XXX/。Caddyのrewriteで /en/XXX/ → Ghost slug en-XXX にマッピングしてください", "name": "BILINGUAL_URL_SLUG_WRONG"}`
+
+---
+
 ### 2026-03-04: コードを読む前に見積もりを出した — PVQEのP崩壊
 
 - **症状**: コードを1行も読まずに「Option A: 30分 / Option B: 2時間 / Option C: 1.5時間」と見積もりを提示。実際はBrier Scoreが既実装、reader vote HTMLも既実装で、残作業は20分だった。

@@ -130,7 +130,11 @@
       "WebFetch(domain:llmstxt.org)",
       "WebFetch"
     ],
-    "defaultMode": "bypassPermissions"
+    "defaultMode": "bypassPermissions",
+    "additionalDirectories": [
+      "\\tmp",
+      "c:\\tmp"
+    ]
   },
   "model": "claude-opus-4-6",
   "hooks": {

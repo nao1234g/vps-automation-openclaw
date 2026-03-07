@@ -57,6 +57,58 @@
 | **一部修正で関連領域を見落とす** | **変更後はスコープ外も確認: EN/JA両方、pagination、prediction tracker** |
 | ENタグ監査で全件FAILと誤検知 | ENタグは `geopolitics`/`crypto` 等（`genre-*` プレフィックスなし）。validator も旧形式を使用 |
 | **UIレイアウト承認なし変更** | **承認フロー必須: ASCII mockup → proposal_shown.flag → 承認 → ui_layout_approved.flag** |
+| **ENページのURLをen-[name]にする** | **Ghost slugはen-[name]（内部）、公開URLは必ず/en/[name]/（外部）。Caddyリワイト必須** |
+
+---
+
+## バイリンガルURL標準（2026-03-06 確立）
+
+### ルール（絶対厳守）
+
+```
+JA版: nowpattern.com/[name]/       ← Ghostスラッグ: [name]
+EN版: nowpattern.com/en/[name]/    ← Ghostスラッグ: en-[name]（内部名。公開URLとは別）
+```
+
+### 新規バイリンガルページ作成の必須チェックリスト
+
+1. **URLを先に決める**: JA=`/[name]/` / EN=`/en/[name]/` を宣言してから実装
+2. **Ghostスラッグ命名**: JA=`[name]` / EN=`en-[name]`（内部名。公開URLとは違う）
+3. **Caddyリワイト追加**（`/etc/caddy/Caddyfile`）:
+   ```
+   handle /en/[name]/ {
+       rewrite * /en-[name]/
+       reverse_proxy localhost:2368
+   }
+   ```
+4. **旧URL→新URLリダイレクト追加**（`/etc/caddy/nowpattern-redirects.txt`）:
+   ```
+   redir /en-[name]/ /en/[name]/ permanent
+   ```
+5. **hreflang注入**（Ghost Admin APIで`codeinjection_head`更新）:
+   - JA版: `hreflang="ja"` + `hreflang="en"` + `hreflang="x-default"`
+   - EN版: 上記 + `canonical`を`/en/[name]/`に明示
+6. **検証**: `curl -I https://nowpattern.com/en/[name]/` が200を返すことを確認
+
+### 現在の対応表（完了済み）
+
+| 表示URL（公開） | Ghostスラッグ（内部） | 言語 | hreflang |
+|----------------|----------------------|------|---------|
+| `/about/` | `about` | JA | ✅ |
+| `/en/about/` | `en-about` | EN | ✅ |
+| `/predictions/` | `predictions` | JA | ✅ |
+| `/en/predictions/` | `en-predictions` | EN | ✅ |
+| `/taxonomy/` | `taxonomy-ja` | JA | ✅ |
+| `/en/taxonomy/` | `en-taxonomy` | EN | ✅ |
+| `/taxonomy-guide/` | `taxonomy-guide-ja` | JA | ✅ |
+| `/en/taxonomy-guide/` | `en-taxonomy-guide` | EN | ✅ |
+
+### なぜ`/en/name/`がSEO的・AI的に正しいか
+
+- **スラッシュ = 階層**。`/en/` は「英語セクション」という場所を示す
+- **Googleが言語グループとして認識** → サーチコンソールで`/en/`配下をまとめて管理可能
+- **AI クローラー（GPTBot等）も`lang`属性+URLパスで言語判定** → `/en/`は最も明確な信号
+- **hreflangと組み合わせて双方向リンク必須**（片方だけだとGoogleに無視される）
 
 ---
 
@@ -84,4 +136,4 @@
 
 ---
 
-*最終更新: 2026-02-27 — NORTH_STAR.md追加、rules/ 9→6ファイルに統合*
+*最終更新: 2026-03-06 — バイリンガルURL標準を確立。全8ページのURL統一完了*

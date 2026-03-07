@@ -36,7 +36,8 @@ $FILES = @(
     @{ Local = "$PROJECT_ROOT\docs\ARTICLE_FORMAT.md";                 Remote = "/opt/shared/docs/ARTICLE_FORMAT.md" },
     @{ Local = "$PROJECT_ROOT\docs\NOWPATTERN_TAXONOMY_v3.md";         Remote = "/opt/shared/docs/NOWPATTERN_TAXONOMY_v3.md" },
     @{ Local = "$PROJECT_ROOT\docs\KNOWN_MISTAKES.md";                Remote = "/opt/shared/docs/KNOWN_MISTAKES.md" },
-    @{ Local = "$PROJECT_ROOT\.claude\CLAUDE.md";                     Remote = "/opt/shared/docs/LOCAL_CLAUDE_MD.md" }
+    @{ Local = "$PROJECT_ROOT\.claude\CLAUDE.md";                     Remote = "/opt/shared/docs/LOCAL_CLAUDE_MD.md" },
+    @{ Local = "$PROJECT_ROOT\.claude\hooks\state\mistake_patterns.json"; Remote = "/opt/shared/mistake_patterns.json" }
 )
 
 # --- VPS専用ファイル（同期しない、VPSで直接管理） ---

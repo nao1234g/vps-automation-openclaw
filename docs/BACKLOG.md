@@ -226,4 +226,103 @@
 
 ---
 
-*最終更新: 2026-03-05 — 全46タスク完了。残りタスク: 0件。*
+---
+
+## I: 読者参加型予測プラットフォーム（2026-03-07〜）
+
+> **ビジョン**: 誰がどの予測を、いつ、どんな確率で言ったか → Brier Scoreで精度が積み上がる日本初キャリブレーション予測プラットフォーム
+
+### TIER 0（完了）
+
+- [x] **I1: reader_prediction_api.py 作成（FastAPI + SQLite）** (2026-03-07)
+  - VPS: `/opt/shared/scripts/reader_prediction_api.py`
+  - POST /vote, GET /stats/{id}, GET /stats-bulk, GET /my-votes/{uuid}, GET /leaderboard
+  - SQLite WALモード、UPSERT対応、旧JSONデータ自動移行
+  - port 8766（Caddy: `/reader-predict/*` → 既存設定のまま）
+
+- [x] **I2: systemdサービス更新（uvicorn起動）** (2026-03-07)
+  - `/etc/systemd/system/reader-predict.service` を uvicorn起動に変更
+
+- [x] **I3: /predictions/ コミュニティ投票ウィジェット** (2026-03-07)
+  - Ghost page codeinjection_footにJS注入
+  - stats-bulkで全予測の集計を一括取得、各カードにシナリオバー表示
+  - 投票後にリアルタイムで分布更新
+
+- [x] **I4: NORTH_STAR.md 予測プラットフォームミッション追記** (2026-03-07)
+  - 全AIへの永続指示: ビジョン・モート・API仕様・TIER別状況・禁止事項
+
+### TIER 1（未実装 — 1ヶ月以内）
+
+- [ ] **I5: 読者Brier Score自動計算**
+  - prediction_auto_verifier.py の resolve時に reader_votes を更新
+  - `brier_score`, `resolved_at`, `outcome` カラム追加（SQLite ALTER TABLE）
+  - 計算式: `(probability/100 - outcome_int)^2`
+
+- [ ] **I6: 個人トラックレコードページ**
+  - `/reader-predict/my-votes/{uuid}` API既存
+  - Ghost static page `/my-predictions/` にJS埋め込み（URLパラメータでUUID）
+
+- [ ] **I7: 称号システム（基本4段階）**
+  - 🌱 見習い（初投票）/ 🎯 予測者（10件以上）/ 🔥 精度追求者（Brier<0.25）/ ⚡ Super（Brier<0.15）
+  - `/reader-predict/my-stats/{uuid}` エンドポイント追加
+
+- [ ] **I8: NEO予測の自動参加**
+  - NEO-ONE/TWO が新規予測追加時に `voter_uuid="neo-one-agent"` で自動投票
+  - AI vs 人間比較のベースラインデータ収集開始
+
+- [ ] **I9: 解決時Telegram通知（読者統計付き）**
+  - prediction_auto_verifier.py に「コミュニティ全体: 楽観X% 基本Y% 悲観Z%」を追加
+
+### TIER 2（未実装 — 2〜3ヶ月）
+
+- [ ] **I10: リーダーボード公開ページ**
+  - Brier Score上位20名（匿名UUID short形式）を /predictions/ に表示
+  - UIレイアウト変更 → prediction-design-system.md の承認フロー必須
+
+- [ ] **I11: AI vs 人間 月次レポート**
+  - NEO（AI）vs 読者（人間）のBrier Score比較
+  - Substack配信 + Xスレッド投稿
+
+- [ ] **I12: パストキャスティング（過去問題練習）**
+  - resolved予測を「練習問題」として提示 → Brier Scoreフィードバック
+  - オンボーディング改善
+
+- [ ] **I13: コメント機能**
+  - `reader_votes` テーブルに `comment TEXT(280)` カラム追加
+  - 投票後に上位3コメントを表示
+
+- [ ] **I14: 週次Superforecaster X投稿**
+  - `weekly_prediction_summary.py` 拡張（既存）
+  - コミュニティ精度レポートを毎週月曜に@nowpattern投稿
+
+### TIER 3（未実装 — 4〜6ヶ月）
+
+- [ ] **I15: Substack「予測レター」連携**
+  - 毎月コミュニティ集合知 vs AI予測比較レポートをSubstackで配信
+
+- [ ] **I16: Nowpattern予測コンテスト（四半期）**
+  - Brier Score最優秀者を選出・表彰（名誉）
+  - メディア掲載・バイラル拡散目標
+
+- [ ] **I17: AIエージェント公開参加**
+  - GPT/Gemini等のAIが予測に参加できるAPIエンドポイント公開
+  - 「AI vs Superforecaster vs 一般人」三つ巴比較
+
+### TIER 4（未実装 — 6ヶ月以上）
+
+- [ ] **I18: 公開API v1**
+  - `nowpattern.com/api/v1/predictions` — 全予測データJSON公開
+  - APIキー制（無料枠 + 高頻度有料）
+
+- [ ] **I19: アカウント登録**
+  - Ghost Members API連携、デバイス間トラックレコード同期
+
+- [ ] **I20: Chrome Extension**
+  - ニュースサイト閲覧中に関連Nowpattern予測をポップアップ表示
+
+- [ ] **I21: OTS検証ページ**
+  - `nowpattern.com/verify/` — Bitcoin timestamp証明を読者が検証
+
+---
+
+*最終更新: 2026-03-07 — I1〜I4完了（TIER 0全項目）。次のマイルストーン: I5（Brier Score自動計算）*
