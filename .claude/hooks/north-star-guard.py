@@ -2,11 +2,18 @@
 """
 NORTH STAR GUARD — PreToolUse + PostToolUse Hook
 =================================================
-2つの役割を1ファイルで担う:
+3つの役割を1ファイルで担う:
 
 [PreToolUse / Write] → docs/ への新規 .md 作成をブロック
   - docs/archive/ 配下は許可（アーカイブへの移動はOK）
   - NORTH_STAR.md / KNOWN_MISTAKES.md 以外の docs/*.md 新規作成を禁止
+
+[PreToolUse / Write] → NORTH_STAR.md / OPERATING_PRINCIPLES.md への Write（全体上書き）をブロック
+  - The Eternal Directives（永遠の三原則）は AIによる全体書き換え禁止
+  - CHANGELOGへのEdit追記は許可（PostToolUse側で確認）
+
+[PreToolUse / Edit] → NORTH_STAR.md の Eternal Directives セクションへの直接編集をブロック
+  - old_string に三原則テキストが含まれる場合はブロック
 
 [PostToolUse / Edit] → NORTH_STAR.md の変更後に CHANGELOG 未更新をブロック
   - NORTH_STAR.md を編集した場合、今日の日付が CHANGELOG に含まれているか確認
@@ -33,11 +40,37 @@ tool_name = data.get("tool_name", "")
 tool_input = data.get("tool_input", {})
 
 # ── [PreToolUse] Write: docs/ への新規 .md 作成をブロック ────────────────
+# ── [PreToolUse] Write: NORTH_STAR / OPERATING_PRINCIPLES への全体上書きをブロック ──
 if tool_name == "Write":
     file_path = tool_input.get("file_path", "")
 
     # パスを正規化（バックスラッシュ → スラッシュ）
     normalized = file_path.replace("\\", "/").lower()
+
+    # ── 永遠の三原則 保護: NORTH_STAR.md / OPERATING_PRINCIPLES.md を Write でブロック ──
+    PROTECTED_FILES = [
+        "/.claude/rules/north_star.md",
+        "/docs/archive/operating_principles.md",
+    ]
+    for pf in PROTECTED_FILES:
+        if normalized.endswith(pf.lstrip("/")):
+            print(
+                "\n"
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                "🔒 [NORTH STAR GUARD] Eternal Directives — Write禁止\n"
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                f"  対象ファイル: {file_path}\n"
+                "\n"
+                "  このファイルは「永遠の三原則」を含む憲法ファイルです。\n"
+                "  AIによる全体上書き（Write）は物理的にブロックされています。\n"
+                "\n"
+                "  ✅ 許可される操作:\n"
+                "     - Edit ツールでの部分編集（CHANGELOGへの追記 等）\n"
+                "  ❌ 禁止される操作:\n"
+                "     - Write ツールでの全体置換\n"
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            )
+            sys.exit(2)
 
     # docs/ 配下の .md ファイルか？
     # - docs/archive/ は許可（アーカイブ移動）
@@ -68,8 +101,47 @@ if tool_name == "Write":
         )
         sys.exit(2)
 
+# ── [PreToolUse] Edit: Eternal Directives セクションへの直接編集をブロック ──
+if tool_name == "Edit" and hook_event == "PreToolUse":
+    file_path = tool_input.get("file_path", "")
+    normalized = file_path.replace("\\", "/").lower()
+    old_string = tool_input.get("old_string", "")
+
+    # NORTH_STAR.md の Eternal Directives セクションを保護
+    is_north_star = normalized.endswith("north_star.md")
+    is_op_principles = normalized.endswith("operating_principles.md")
+
+    PROTECTED_PHRASES = [
+        "The Eternal Directives",
+        "永遠の三原則",
+        "第1原則（真理の探求）",
+        "第2原則（創設者への絶対的忠誠）",
+        "第3原則（自律的進化）",
+        "原則11：Evolutionary Ecosystem",
+    ]
+
+    if is_north_star or is_op_principles:
+        for phrase in PROTECTED_PHRASES:
+            if phrase in old_string:
+                print(
+                    "\n"
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                    "🔒 [NORTH STAR GUARD] Eternal Directives 直接編集を禁止\n"
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                    f"  対象ファイル: {file_path}\n"
+                    f"  検出フレーズ: {phrase}\n"
+                    "\n"
+                    "  「永遠の三原則」および「原則11 Evolutionary Ecosystem」は\n"
+                    "  AIによる編集が物理的にブロックされています。\n"
+                    "\n"
+                    "  これはNaotoが設定したRead-Only制約です。\n"
+                    "  変更が必要な場合はNaotoに直接依頼してください。\n"
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                )
+                sys.exit(2)
+
 # ── [PostToolUse] Edit: NORTH_STAR.md の CHANGELOG 未更新をブロック ───────
-if tool_name == "Edit":
+if tool_name == "Edit" and hook_event == "PostToolUse":
     file_path = tool_input.get("file_path", "")
     normalized = file_path.replace("\\", "/")
 

@@ -6,6 +6,46 @@
 
 ---
 
+### 2026-03-09: subprocess引数へのnull byteでdispatcherクラッシュ
+- **症状**: `ValueError: embedded null byte` — neo_queue_dispatcher.py が3件目の記事で毎回クラッシュ
+- **根本原因**: `subprocess.run(["python3", ..., "--msg", message])` の `message` に `\x00`（null byte）が含まれていた。記事本文/タイトルに混入するケースがある
+- **正しい解決策**: `send_to_bot()` の先頭で `message = message.replace(chr(0), '')` を追加。`'\x00'`リテラルをソースに書くとソース自体がSyntaxErrorになるので `chr(0)` を使う
+- **教訓**: subprocess引数は制御文字を通せない。送信前に必ずサニタイズ。`\x00`リテラルをPythonソースに書かないこと（SyntaxError）
+
+### 2026-03-09: AUDIT v5.3で146/158記事が「no genre tag」FAIL（誤検知）
+- **症状**: `AUDIT v5.3: 146/158 articles FAIL ... no genre tag` — 146件がジャンルタグなしと判定
+- **根本原因**: `nowpattern_post_audit.py` の `VALID_GENRE_SLUGS` が旧形式（`economy`, `finance`等プレフィックスなし）のみを列挙。実際の記事は taxonomy.json 準拠の `genre-*` プレフィックス形式（`genre-economy`, `genre-finance`等）を使用しており不一致だった
+- **正しい解決策**: `VALID_GENRE_SLUGS` に `genre-*` プレフィックス形式も追加（後方互換で旧形式も残す）。4件はGhost APIで `genre-geopolitics` タグを付与
+- **教訓**: taxonomy.json とバリデータの有効スラッグリストを常に同期すること。taxonomy変更時は validator も必ず更新
+
+---
+
+### 2026-03-07: ENパイプライン3大品質問題 — リンク・タイトル・画像
+
+- **症状**:
+  1. EN翻訳記事の予測リンクが `/predictions/` (JA向け) のまま → `/en/predictions/` に変更されていなかった
+  2. EN記事タイトルが短すぎ (例: "Iran'" 5文字, "Anthropic" 9文字) — Geminiの thinking tokens がmaxOutputTokensを消費
+  3. 記事の feature_image にpicsum.photos（ランダム無関係写真）が使われていた
+- **根本原因**:
+  1. `a1-bulk-en-translator.py` がHTMLをコピーするだけでリンク変換しなかった
+  2. Gemini 2.5 Flash の `thinkingConfig` がデフォルトON → 150tokenが思考に消費され出力が10文字で切れる
+  3. `picsum_fallback.py` が slug をランダムseedとして使うため記事と無関係な写真が生成される
+- **正しい解決策**:
+  - リンク: `a1-bulk-en-translator.py` に `/predictions/` → `/en/predictions/` 正規表現置換を追加
+  - タイトル: `'thinkingConfig': {'thinkingBudget': 0}` を `generationConfig` 内に追加 + `maxOutputTokens: 500`
+  - 画像: `picsum_fallback.py` を v2.0 に置換（gen_thumbnail.pyでタイトルベース画像生成）
+- **教訓**:
+  - **EN翻訳時はJA→ENでリンク先も変わる。URLパスを含む全置換を必ず確認する**
+  - **Gemini 2.5 Flash はデフォルトでthinkingモード。短いテキスト生成にはthinkingBudget:0必須**
+  - **picsum.photos はランダム写真。記事品質基準として使ってはいけない**
+- **再発防止**:
+  - `a1-bulk-en-translator.py`: リンク修正コード追加済み（2026-03-07）
+  - `en_post_auditor.py`: 投稿後自動監査 cron `30 */4 * * *` 追加済み
+  - `picsum_fallback.py v2.0`: gen_thumbnail.py ベースに置換済み（2026-03-07）
+- **GUARD_PATTERN**: `{"pattern": "picsum.photos|thinkingConfig.*top.level|split.*\\\\n.*0", "feedback": "⛔ picsum使用禁止。Gemini thinkingConfigはgenerationConfig内に。\\n改行でタイトルが切れる場合はreplace使用。", "name": "EN_PIPELINE_QUALITY"}`
+
+---
+
 ### 2026-03-06: パターンの歴史バグ — スキーマとビルダーのフィールド名不一致
 
 - **症状**: 記事の「パターンの歴史」セクションに「1994年年:」など年号の二重表記と内容が空欄になった
@@ -1537,3 +1577,87 @@
 - **GUARD_PATTERN**: `{"pattern": "\\bpython3\\b(?! /c/Program)(?!.*ssh)", "feedback": "⛔ Windows環境でpython3はダミーエイリアス（exit 49）です。\"/c/Program Files/Python312/python.exe\" を使ってください。SSHコマンド内のpython3は除外。", "name": "PYTHON3_WINDOWS_DUMMY"}`
 
 - **GUARD_PATTERN**: `{"pattern": "requests\\.(get|post|put)\\([^)]*https://nowpattern(?!.*verify=False)", "feedback": "⛔ Ghost CMS APIへのHTTPSリクエストはverify=Falseが必要です。urllib3.disable_warnings()も追加してください", "name": "GHOST_SSL_VERIFY_MISSING"}`
+
+
+---
+## VPS Auto-Collected Errors (from KNOWN_MISTAKES_VPS.md)
+
+### 2026-03-05: prediction-verifier エラー検知 (sig: 60dfc87b)
+- **スクリプト**: prediction-verifier
+- **ログ**: /var/log/prediction-verifier.log
+- **エラー**:
+```
+k (most recent call last):
+  File "/opt/shared/scripts/prediction_auto_verifier.py", line 800, in <module>
+    main()
+  File "/opt/shared/scripts/prediction_auto_verifier.py", line 721, in main
+    overdue = find_overdue_predictions()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/shared/scri
+```
+- **検知時刻**: 2026-03-05 01:00 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-05: prediction-verifier エラー検知 (sig: 1f5db241)
+- **スクリプト**: prediction-verifier
+- **ログ**: /var/log/prediction-verifier.log
+- **エラー**:
+```
+Traceback (most recent call last):
+  File "/opt/shared/scripts/prediction_auto_verifier.py", line 800, in <module>
+    main()
+  File "/opt/shared/scripts/prediction_auto_verifier.py", line 731, in main
+    log(f"Stats: {stats['total']} total, {stats['open']} open, {stats['resolved']} resolved")
+    
+```
+- **検知時刻**: 2026-03-05 01:00 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-05: self-healer エラー検知 (sig: 7b6be83b)
+- **スクリプト**: self-healer
+- **ログ**: /opt/shared/logs/self_healer.log
+- **エラー**:
+```
+[2026-03-05 22:00:07] [HEALER] Service restart FAILED: neo2-telegram
+```
+- **検知時刻**: 2026-03-05 23:00 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-09: content-quality エラー検知 (sig: b4ce6112)
+- **スクリプト**: content-quality
+- **ログ**: /opt/shared/logs/content_quality.log
+- **エラー**:
+```
+Traceback (most recent call last):
+  File "/opt/shared/scripts/content-quality-monitor.py", line 199, in <module>
+    main()
+  File "/opt/shared/scripts/content-quality-monitor.py", line 132, in main
+    articles = get_recent_articles(days=CHECK_DAYS)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
+- **検知時刻**: 2026-03-09 05:00 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-09: content-quality エラー検知 (sig: b4ce6112)
+- **スクリプト**: content-quality
+- **ログ**: /opt/shared/logs/content_quality.log
+- **エラー**:
+```
+Traceback (most recent call last):
+  File "/opt/shared/scripts/content-quality-monitor.py", line 199, in <module>
+    main()
+  File "/opt/shared/scripts/content-quality-monitor.py", line 132, in main
+    articles = get_recent_articles(days=CHECK_DAYS)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
+- **検知時刻**: 2026-03-09 05:00 JST
+- **自動記録**: vps-error-capture.py
+

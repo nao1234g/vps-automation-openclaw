@@ -138,6 +138,17 @@ except: pass
     fi
 fi
 
+# ── Hive Mind v2.0: VPS知識をローカルにマージ（バックグラウンド、失敗しても続行）─────
+MERGE_SCRIPT="$PROJECT_DIR/scripts/merge_wisdom.py"
+if [ -f "$MERGE_SCRIPT" ]; then
+    MERGE_RESULT=$(python "$MERGE_SCRIPT" 2>/dev/null)
+    if echo "$MERGE_RESULT" | grep -q "\[NEW\]"; then
+        echo "🧠 [Hive Mind] VPSから新規知識をマージしました:"
+        echo "$MERGE_RESULT" | grep -E "\[NEW\]|\[DONE\]|\+" | head -10
+        echo ""
+    fi
+fi
+
 # ── バックログ表示（未完了タスクをセッション開始時に必ず見せる） ─────────────
 BACKLOG_FILE="$PROJECT_DIR/docs/BACKLOG.md"
 if [ -f "$BACKLOG_FILE" ]; then
@@ -150,6 +161,80 @@ if [ -f "$BACKLOG_FILE" ]; then
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo ""
     fi
+fi
+
+# ── Dev-Time Approval Queue — VPS承認待ちキューを取得して表示 ─────────────────
+APPROVALS_RESULT=$(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -o BatchMode=yes \
+    "$VPS" "python3 -c \"
+import sys; sys.path.insert(0, '/opt/shared/scripts')
+try:
+    from approval_utils import get_pending_summary, get_pending_count
+    cnt = get_pending_count()
+    if cnt > 0:
+        print(get_pending_summary())
+    else:
+        print('')
+except Exception as e:
+    print(f'[WARN] approval_utils: {e}')
+\"" 2>/dev/null)
+
+if [ -n "$APPROVALS_RESULT" ] && echo "$APPROVALS_RESULT" | grep -q "AIからの提案"; then
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "$APPROVALS_RESULT"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+fi
+
+# ── 🧬 Evolutionary Ecosystem Audit — 自己進化サマリー ─────────────────────
+EVO_AUDIT=$(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -o BatchMode=yes \
+    "$VPS" "python3 -c \"
+import json, os
+from datetime import datetime, timezone, timedelta
+
+log_path = '/opt/shared/logs/evolution_log.json'
+if not os.path.exists(log_path):
+    exit()
+
+try:
+    log = json.load(open(log_path, encoding='utf-8'))
+except Exception:
+    exit()
+
+if not log:
+    exit()
+
+# 直近7日以内のエントリ
+cutoff = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+recent = [e for e in log if e.get('timestamp', '') >= cutoff]
+
+if not recent:
+    # 7日以内がなければ最新1件を表示
+    recent = [log[-1]]
+
+print('=== 🧬 EVOLUTIONARY ECOSYSTEM AUDIT ===')
+print(f'直近の自己進化: {len(recent)}回（過去7日）')
+print()
+for e in recent[-3:]:  # 最大3件表示
+    date = e.get('date', '?')
+    brier = e.get('avg_brier', '?')
+    hits  = e.get('hit_count', 0)
+    misses= e.get('miss_count', 0)
+    n_analyzed = e.get('analyzed_count', 0)
+    summary = e.get('insights_summary', '')[:200]
+    print(f'📅 {date} | 分析: {n_analyzed}件 | 的中: {hits} / 外れ: {misses} | 平均Brier: {brier}')
+    print(f'   AIの学習: {summary[:150]}')
+    print()
+
+print('→ 詳細: /opt/shared/logs/evolution_log.json')
+print('→ 原則: 第3原則（自律的進化）+ 原則11 Evolutionary Ecosystem')
+\" " 2>/dev/null)
+
+if [ -n "$EVO_AUDIT" ]; then
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "$EVO_AUDIT"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
 fi
 
 echo "--- RULES ---"
