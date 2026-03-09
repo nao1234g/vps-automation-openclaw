@@ -901,6 +901,21 @@ def publish_deep_pattern(
         except Exception as e:
             print(f"  WARN: sitemap generation failed: {e}")
 
+    # Step 5: 予測トラッカー連携（ghost_url更新 + 市場自動リンク）
+    _prediction_linked = False
+    try:
+        from prediction_tracker import load_db as _pt_load, save_db as _pt_save
+        _ptdb = _pt_load()
+        for _p in _ptdb["predictions"]:
+            if _p.get("article_id") == article_id and not _p.get("ghost_url"):
+                _p["ghost_url"] = url
+                _pt_save(_ptdb)
+                print(f"  prediction_tracker: ghost_url updated for {_p['prediction_id']}")
+                _prediction_linked = True
+                break
+    except Exception as e:
+        print(f"  WARN: prediction_tracker link skipped: {e}")
+
     print(f"OK: Deep Pattern '{title}' published + indexed as {article_id}")
     return {
         "article_id": article_id,
@@ -909,6 +924,7 @@ def publish_deep_pattern(
         "index_updated": True,
         "x_results": x_results,
         "sitemap_path": sitemap_path,
+        "prediction_linked": _prediction_linked,
     }
 
 
