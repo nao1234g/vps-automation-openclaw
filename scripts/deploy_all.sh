@@ -59,6 +59,8 @@ SCRIPTS=(
     "nowpattern_publisher.py"
     "seo_setup.py"
     "x_pipeline_check.py"
+    "x_swarm_dispatcher.py"
+    "x_quote_repost.py"
     "distribution_check.py"
     "article_validator.py"
     "nowpattern_taxonomy.json"
@@ -80,7 +82,7 @@ log_ok "${copied}個のファイルをコピー完了"
 # ──────── Step 2: VPS上でパーミッション設定 ────────
 echo ""
 echo "▶ Step 2: パーミッション設定..."
-ssh "$VPS" "chmod +x ${REMOTE_DIR}/prediction_cron_update.py ${REMOTE_DIR}/seo_setup.py ${REMOTE_DIR}/x_pipeline_check.py ${REMOTE_DIR}/distribution_check.py 2>/dev/null; echo OK"
+ssh "$VPS" "chmod +x ${REMOTE_DIR}/prediction_cron_update.py ${REMOTE_DIR}/seo_setup.py ${REMOTE_DIR}/x_pipeline_check.py ${REMOTE_DIR}/x_swarm_dispatcher.py ${REMOTE_DIR}/distribution_check.py 2>/dev/null; echo OK"
 log_ok "パーミッション設定完了"
 
 # ──────── Step 3: cronジョブ登録 ────────
@@ -90,12 +92,15 @@ echo "▶ Step 3: cronジョブ登録..."
 # prediction_cron_update.py — 毎日 01:00 JST (16:00 UTC)
 CRON_LINE="0 16 * * * /usr/bin/python3 ${REMOTE_DIR}/prediction_cron_update.py >> /var/log/prediction-cron.log 2>&1"
 
+SWARM_CRON="*/5 * * * * source /opt/cron-env.sh && /usr/bin/python3 ${REMOTE_DIR}/x_swarm_dispatcher.py >> /var/log/x-swarm.log 2>&1"
+SWARM_DLQ_CRON="*/30 * * * * source /opt/cron-env.sh && /usr/bin/python3 ${REMOTE_DIR}/x_swarm_dispatcher.py --retry-dlq >> /var/log/x-swarm.log 2>&1"
+
 ssh "$VPS" "
-    # 既存のprediction_cron_updateエントリを除去して新しく追加
-    (crontab -l 2>/dev/null | grep -v 'prediction_cron_update') | crontab -
-    (crontab -l 2>/dev/null; echo '${CRON_LINE}') | crontab -
-    echo 'Cron registered'
-    crontab -l | grep prediction_cron
+    # 既存エントリを除去して新しく追加
+    (crontab -l 2>/dev/null | grep -v 'prediction_cron_update' | grep -v 'x_swarm_dispatcher') | crontab -
+    (crontab -l 2>/dev/null; echo '${CRON_LINE}'; echo '${SWARM_CRON}'; echo '${SWARM_DLQ_CRON}') | crontab -
+    echo 'Cron registered:'
+    crontab -l | grep -E 'prediction_cron|x_swarm'
 "
 log_ok "prediction_cron_update.py を毎日01:00 JSTで登録"
 
