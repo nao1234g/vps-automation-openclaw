@@ -55,15 +55,19 @@ SCRIPTS=(
     "prediction_page_builder.py"
     "prediction_tracker.py"
     "prediction_resolver.py"
-    "prediction_auto_verifier.py"
+    "prediction_verifier.py"
     "nowpattern_publisher.py"
     "seo_setup.py"
+    "seo_structured_data.py"
     "x_pipeline_check.py"
     "x_swarm_dispatcher.py"
     "x_quote_repost.py"
     "distribution_check.py"
     "article_validator.py"
+    "market_history_crawler.py"
+    "substack_notes_poster.py"
     "nowpattern_taxonomy.json"
+    "caddy_activitypub.conf"
 )
 
 copied=0
@@ -82,7 +86,7 @@ log_ok "${copied}個のファイルをコピー完了"
 # ──────── Step 2: VPS上でパーミッション設定 ────────
 echo ""
 echo "▶ Step 2: パーミッション設定..."
-ssh "$VPS" "chmod +x ${REMOTE_DIR}/prediction_cron_update.py ${REMOTE_DIR}/seo_setup.py ${REMOTE_DIR}/x_pipeline_check.py ${REMOTE_DIR}/x_swarm_dispatcher.py ${REMOTE_DIR}/distribution_check.py 2>/dev/null; echo OK"
+ssh "$VPS" "chmod +x ${REMOTE_DIR}/prediction_cron_update.py ${REMOTE_DIR}/prediction_verifier.py ${REMOTE_DIR}/seo_setup.py ${REMOTE_DIR}/seo_structured_data.py ${REMOTE_DIR}/x_pipeline_check.py ${REMOTE_DIR}/x_swarm_dispatcher.py ${REMOTE_DIR}/distribution_check.py ${REMOTE_DIR}/market_history_crawler.py ${REMOTE_DIR}/substack_notes_poster.py 2>/dev/null; echo OK"
 log_ok "パーミッション設定完了"
 
 # ──────── Step 3: cronジョブ登録 ────────
@@ -95,14 +99,20 @@ CRON_LINE="0 16 * * * /usr/bin/python3 ${REMOTE_DIR}/prediction_cron_update.py >
 SWARM_CRON="*/5 * * * * source /opt/cron-env.sh && /usr/bin/python3 ${REMOTE_DIR}/x_swarm_dispatcher.py >> /var/log/x-swarm.log 2>&1"
 SWARM_DLQ_CRON="*/30 * * * * source /opt/cron-env.sh && /usr/bin/python3 ${REMOTE_DIR}/x_swarm_dispatcher.py --retry-dlq >> /var/log/x-swarm.log 2>&1"
 
+# prediction_verifier.py — 毎日 15:00 JST (06:00 UTC) Gemini検証+自動判定
+VERIFIER_CRON="0 6 * * * source /opt/cron-env.sh && /usr/bin/python3 ${REMOTE_DIR}/prediction_verifier.py --auto-judge >> /var/log/prediction-verifier.log 2>&1"
+
+# market_history_crawler.py — 毎日 09:00 JST (00:00 UTC) 市場データ収集
+CRAWLER_CRON="0 0 * * * source /opt/cron-env.sh && /usr/bin/python3 ${REMOTE_DIR}/market_history_crawler.py >> /var/log/market-crawler.log 2>&1"
+
 ssh "$VPS" "
     # 既存エントリを除去して新しく追加
-    (crontab -l 2>/dev/null | grep -v 'prediction_cron_update' | grep -v 'x_swarm_dispatcher') | crontab -
-    (crontab -l 2>/dev/null; echo '${CRON_LINE}'; echo '${SWARM_CRON}'; echo '${SWARM_DLQ_CRON}') | crontab -
+    (crontab -l 2>/dev/null | grep -v 'prediction_cron_update' | grep -v 'x_swarm_dispatcher' | grep -v 'prediction_verifier' | grep -v 'market_history_crawler') | crontab -
+    (crontab -l 2>/dev/null; echo '${CRON_LINE}'; echo '${SWARM_CRON}'; echo '${SWARM_DLQ_CRON}'; echo '${VERIFIER_CRON}'; echo '${CRAWLER_CRON}') | crontab -
     echo 'Cron registered:'
-    crontab -l | grep -E 'prediction_cron|x_swarm'
+    crontab -l | grep -E 'prediction_cron|x_swarm|prediction_verifier|market_history'
 "
-log_ok "prediction_cron_update.py を毎日01:00 JSTで登録"
+log_ok "全cronジョブ登録完了（prediction_cron/verifier/market_crawler/x_swarm）"
 
 # ──────── Step 4: 全チャネル状態確認 ────────
 echo ""
@@ -119,6 +129,31 @@ echo ""
 echo "▶ Step 6: X API認証確認..."
 ssh "$VPS" "cd ${REMOTE_DIR} && python3 x_pipeline_check.py --check 2>&1" || log_warn "x_pipeline_check.py 実行エラー"
 
+# ──────── Step 7: SEO構造化データ挿入 ────────
+echo ""
+echo "▶ Step 7: SEO構造化データ（JSON-LD + robots.txt + llms.txt）..."
+ssh "$VPS" "cd ${REMOTE_DIR} && python3 seo_structured_data.py --inject-global 2>&1" || log_warn "seo_structured_data.py 実行エラー"
+# robots.txt と llms.txt をGhostの公開ディレクトリに生成
+ssh "$VPS" "
+    cd ${REMOTE_DIR}
+    python3 seo_structured_data.py --generate-robots > /var/www/nowpattern/robots.txt 2>/dev/null
+    python3 seo_structured_data.py --generate-llms-txt > /var/www/nowpattern/llms.txt 2>/dev/null
+    echo 'robots.txt + llms.txt generated'
+" || log_warn "robots.txt/llms.txt 生成エラー"
+
+# ──────── Step 8: ActivityPub設定案内 ────────
+echo ""
+echo "▶ Step 8: ActivityPub設定..."
+echo "  Caddy設定ファイルがコピー済みです:"
+echo "  ${REMOTE_DIR}/caddy_activitypub.conf"
+echo ""
+echo "  適用手順（手動）:"
+echo "  1. cat ${REMOTE_DIR}/caddy_activitypub.conf"
+echo "  2. nano /etc/caddy/Caddyfile → nowpattern.comブロックの先頭に追記"
+echo "  3. systemctl reload caddy"
+echo "  4. Ghost管理画面 → Settings → Growth → Network → ActivityPub ON"
+echo "  5. curl https://nowpattern.com/.ghost/activitypub/health"
+
 # ──────── 完了 ────────
 echo ""
 echo "========================================"
@@ -129,4 +164,13 @@ echo "次のアクション:"
 echo "  1. X API認証が❌の場合 → developer.x.comでキー再生成"
 echo "  2. note Cookie期限切れの場合 → Selenium再ログイン"
 echo "  3. GSC確認 → https://search.google.com/search-console"
+echo "  4. ActivityPub → Step 8の手動手順を実行"
+echo "  5. Substack Notes → python3 substack_notes_poster.py --generate"
+echo ""
+echo "cronジョブ一覧:"
+echo "  09:00 JST: market_history_crawler.py（市場データ収集）"
+echo "  10:00 JST: prediction_cron_update.py（予測更新 5ステップ）"
+echo "  15:00 JST: prediction_verifier.py --auto-judge（AI検証）"
+echo "  */5:     x_swarm_dispatcher.py（X投稿）"
+echo "  */30:    x_swarm_dispatcher.py --retry-dlq（DLQリトライ）"
 echo ""

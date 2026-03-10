@@ -57,6 +57,18 @@ def main():
         "Step 3: Auto-link predictions to markets"
     )
 
+    # Step 4: 予測解決エンジン（リンク済み予測の確率チェック → 自動判定）
+    run(
+        [sys.executable, os.path.join(SCRIPTS_DIR, "prediction_resolver.py")],
+        "Step 4: Resolve predictions (market probability check)"
+    )
+
+    # Step 5: AI検証ループ（期限切れトリガーをGeminiで判定 → 自動適用）
+    run(
+        [sys.executable, os.path.join(SCRIPTS_DIR, "prediction_verifier.py"), "--auto-judge"],
+        "Step 5: AI verification + auto-judge (Gemini)"
+    )
+
     print("\n=== Prediction Cron Update Complete ===")
 
 
