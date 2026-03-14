@@ -1,0 +1,79 @@
+# configs/system.yaml
+# AI Civilization OS — システム設定
+# 変更前にNaotoの承認が必要
+
+system:
+  name: "AI Civilization OS"
+  version: "1.0.0"
+  timezone: "Asia/Tokyo"  # JST
+
+# VPS設定
+vps:
+  host: "163.44.124.123"
+  provider: "ConoHa"
+  os: "Ubuntu 22.04 LTS"
+  shared_path: "/opt/shared"
+  scripts_path: "/opt/shared/scripts"
+  logs_path: "/opt/shared/logs"
+
+# データパス（ローカル/VPS共通構造）
+data:
+  prediction_db: "data/prediction_db.json"
+  knowledge_store: "data/knowledge_store.json"
+  agent_wisdom: "data/agent_wisdom_updates.json"
+  evolution_log: "data/evolution_log.json"
+  board_log: "data/board_meeting_log.json"
+  strategic_actions: "data/strategic_actions.json"
+  execution_plans: "data/execution_plans.json"
+  debate_queue: "data/debate_queue.json"
+  debate_results: "data/debate_results.json"
+  capital_projects: "data/capital_projects.json"
+  pending_approvals: "data/pending_approvals.json"
+  reader_predictions_db: "data/reader_predictions.db"
+  generated_articles: "data/generated_articles"
+  logs: "data/logs"
+
+# 予算設定（USD/月）
+budget:
+  claude_max: 200.0      # 定額（従量課金禁止）
+  vps_conoha: 15.0
+  domain: 2.0
+  misc: 10.0
+  discretionary: 50.0   # 裁量（新規API等）
+  approval_threshold: 10.0  # これ以上はNaoto承認必須
+
+# コンテンツ目標
+content:
+  daily_articles_target: 200  # JP100 + EN100
+  daily_articles_warn_below: 50
+  article_format_version: "v6.0"
+  ghost_url: "https://nowpattern.com"
+  ghost_slug_ja: "predictions"
+  ghost_slug_en: "en-predictions"
+
+# 予測品質基準
+prediction:
+  brier_score_excellent: 0.10
+  brier_score_good: 0.15
+  brier_score_warn: 0.25     # これを超えるとBoardがアラート
+  hit_rate_warn: 0.40        # これを下回るとアラート
+  min_probability: 5
+  max_probability: 95
+  moat_fortress_threshold: 30.0  # Moat Score >= これ でFORTRESS
+
+# Cron スケジュール（VPS）
+cron:
+  board_daily: "0 21 * * *"          # 06:00 JST = 21:00 UTC
+  board_weekly: "0 21 * * 0"         # 毎週日曜
+  evolution_loop: "0 0 * * 0"        # 毎週日曜 09:00 JST
+  prediction_page_build: "0 22 * * *" # 07:00 JST
+  prediction_verify: "0 19 * * *"    # 04:00 JST
+  knowledge_update: "0 20 * * *"     # 05:00 JST
+  debate_queue: "*/15 * * * *"       # 15分ごと
+
+# ログ設定
+logging:
+  max_board_log_entries: 90    # 90日分
+  max_evolution_entries: 52    # 52週分
+  max_debate_results: 100
+  max_task_log_entries: 500

@@ -1,0 +1,170 @@
+[
+  {
+    "pattern": "nowpattern\\.com/[^\\s\"'<>)\\]]*(?=.*404|.*エラー)",
+    "feedback": "⛔ URL疎通エラー: nowpattern.comのURLが200 OKを返していない可能性があります。Ghost APIの 'url' フィールドを使い、curlで200確認後に報告してください。",
+    "name": "URL_404_DELIVERY",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier",
+    "example": "nowpattern.com/some-article-slug に404エラーが発生しています。"
+  },
+  {
+    "pattern": "\\?source=html|source=html.*ghost|ghost.*html.*field|Ghost.*html.*フィールド.*更新",
+    "feedback": "⛔ Ghost 5.x は html フィールドと ?source=html をサポートしていません。Lexical JSON を直接操作してください。fetch lexical → parse JSON → insert node → PUT lexical。",
+    "name": "GHOST_HTML_SOURCE",
+    "example": "Ghost APIの ?source=html パラメータを使って記事のhtmlフィールドを更新します。",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier"
+  },
+  {
+    "pattern": "Ghost Settings API|/ghost/api/.*settings.*PUT|Ghost.*Settings.*PUT",
+    "feedback": "⛔ Ghost Settings APIはIntegration APIでは501を返します。ghost.dbをSQLite直接更新してGhostを再起動してください。",
+    "name": "GHOST_SETTINGS_API_PUT",
+    "example": "Ghost Settings APIにPUTリクエストを送信して設定を更新します。",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier"
+  },
+  {
+    "pattern": "n8n.*workflow_entity.*INSERT|INSERT.*n8n.*active.*true|workflow.*直接.*INSERT.*n8n|n8n.*テーブル.*INSERT",
+    "feedback": "⛔ N8NワークフローをDB直接INSERTで作成しても起動しません。N8N REST API（POST /api/v1/workflows + POST /api/v1/workflows/{id}/activate）を使ってください。",
+    "name": "N8N_DB_DIRECT_INSERT",
+    "example": "n8n.workflow_entityテーブルにワークフローを直接INSERTしてactive=trueに設定します。",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier"
+  },
+  {
+    "pattern": "Substack.*公式API|Substack.*official.*api|Substack API.*投稿|Substack.*REST API",
+    "feedback": "⛔ Substackには公式投稿APIが存在しません。Cookie認証（connect.sid）+ python-substackライブラリ、またはFastAPI独自サーバーを使ってください。",
+    "name": "SUBSTACK_OFFICIAL_API",
+    "example": "Substack公式APIを使って記事を投稿します。REST APIエンドポイントを叩きます。",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier"
+  },
+  {
+    "pattern": "--no-pairing|OPENCLAW_DISABLE_PAIRING|openclaw.*--disable.*pairing",
+    "feedback": "⛔ openclaw --no-pairing フラグは存在しません。openclaw.jsonの gateway.controlUi.dangerouslyDisableDeviceAuth: true で設定してください。",
+    "name": "OPENCLAW_NONEXISTENT_FLAG",
+    "example": "openclaw --no-pairing オプションを追加してペアリングを無効化します。",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier"
+  },
+  {
+    "pattern": "NEO.*(ONE|TWO).*OpenClaw.*エージェント|OpenClaw.*エージェント.*NEO|openclaw\\.json.*neo.*(ONE|TWO)",
+    "feedback": "⛔ NEO-ONE/TWOをOpenClawエージェントとして追加してはいけません。NEOはneo-telegram.serviceで独立運用します。OpenClawのanthropicモデルはAPI従量課金になります。",
+    "name": "NEO_OPENCLAW_AGENT",
+    "example": "NEO-TWOをOpenClawエージェントとして追加するためopenclaw.jsonに設定します。",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier"
+  },
+  {
+    "pattern": "NEO.*Gemini.*Flash.*置き換え|N8N.*HTTP.*Request.*NEO.*置き換え|ステートレス.*API.*NEO|NEO.*ステートレス",
+    "feedback": "⛔ NEOをステートレスHTTP APIに置き換えてはいけません。フルエージェント（SDK+メモリ+ツール）とステートレスAPIは能力が根本的に異なります。品質崩壊します。",
+    "name": "NEO_STATELESS_REPLACE",
+    "example": "N8NワークフローのHTTP RequestノードでGemini FlashにNEOを置き換えます。",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier"
+  },
+  {
+    "pattern": "duplicate.*content.*403|403.*duplicate.*content|X.*API.*duplicate.*tweet|tweet.*duplicate.*error",
+    "feedback": "⛔ X API duplicate content 403は重複ツイートです。キューの tweet_url フィールドで重複チェックしてください。",
+    "name": "X_DUPLICATE_CONTENT",
+    "example": "X APIがduplicate contentで403エラーを返しています。同じ内容のツイートが重複しています。",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier"
+  },
+  {
+    "pattern": "Bot API.*NEO.*メッセージ|Telegram.*Bot API.*送信.*NEO|bot.*token.*send.*NEO.*message",
+    "feedback": "⛔ Bot APIで送ったメッセージはNEO-ONEが無視します。Telethon（User API）で送信してください。",
+    "name": "TELEGRAM_BOT_API_NEO_IGNORE",
+    "example": "Telegram Bot APIを使ってNEO-ONEにメッセージを送信します。",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier"
+  },
+  {
+    "pattern": "note-auto-post.*[xX].*投稿|subprocess.*note.*auto.*post.*--x|note.*自動投稿.*[xX].*二重",
+    "feedback": "⛔ note-auto-post.pyがX投稿を二重実行します。subprocess呼び出しに --no-x-thread フラグを追加してください。",
+    "name": "NOTE_DOUBLE_X_POST",
+    "example": "note-auto-post.pyを実行してnoteとXの両方に投稿します。",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier"
+  },
+  {
+    "pattern": "permission_mode.*bypassPermissions.*root|root.*bypassPermissions.*NEO|NEO.*root.*bypassPermissions.*エラー",
+    "feedback": "⛔ rootユーザーではbypassPermissionsが動作しません。acceptEditsを使ってください。NEOのpermission_modeはacceptEditsが正しい設定です。",
+    "name": "NEO_ROOT_BYPASS_PERMISSIONS",
+    "example": "NEOのpermission_modeをbypassPermissionsに設定します。rootユーザーで実行します。",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier"
+  },
+  {
+    "pattern": "system_prompt.*NEO.*Claude Code|NEO.*Claude Code.*名乗る|NEO.*アイデンティティ.*未設定",
+    "feedback": "⛔ NEOが自分を'Claude Code'と名乗らないようにするには、SDKのsystem_promptパラメータでアイデンティティを注入してください。",
+    "name": "NEO_IDENTITY_MISSING",
+    "example": "NEOがClaude Codeと自己紹介してしまいます。アイデンティティ設定が未設定です。",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier"
+  },
+  {
+    "pattern": "openclaw\\.json.*systemPrompt|agents.*systemPrompt.*openclaw|identity\\.description.*openclaw",
+    "feedback": "⛔ openclaw.jsonにsystemPromptやidentity.descriptionキーは存在しません。エージェントへの指示は共有ファイル（/opt/shared/AGENT_RULES.md）を使ってください。",
+    "name": "OPENCLAW_INVALID_KEY",
+    "example": "openclaw.jsonのagents設定にsystemPromptキーを追加してエージェントに指示を与えます。",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier"
+  },
+  {
+    "pattern": "Ghost.*投稿.*本文.*空|Ghost.*body.*empty|ghost.*lexical.*null|Ghost.*html.*空",
+    "feedback": "⛔ Ghost 5.xの投稿本文が空になる原因はLexical未使用です。html/markdownフィールドではなく、lexicalフィールドに直接書き込んでください。",
+    "name": "GHOST_BODY_EMPTY",
+    "example": "Ghost APIで投稿したが本文が空で表示されています。htmlフィールドに書いています。",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier"
+  },
+  {
+    "pattern": "\\bpython3\\b(?! /c/Program)(?!.*ssh)",
+    "feedback": "⛔ Windows環境でpython3はダミーエイリアス（exit 49）です。\"/c/Program Files/Python312/python.exe\" を使ってください。SSHコマンド内のpython3は除外。",
+    "name": "PYTHON3_WINDOWS_DUMMY",
+    "added_at": "2026-03-03",
+    "source": "auto-codifier",
+    "example": "python3 scripts/test.py を実行してください"
+  },
+  {
+    "pattern": "rfile\\.read\\s*\\((?!.*min\\()",
+    "feedback": "⛔ 大きなHTTPボディをmin()なしで全バイト読み込もうとしています。Ghost webhookは2-3MBあります。read_size = min(content_length, MAX_READ) に変更してください（MAX_READ=65536）",
+    "name": "LARGE_PAYLOAD_READ_UNGUARDED",
+    "added_at": "2026-03-04",
+    "source": "auto-codifier",
+    "example": "data = rfile.read(content_length)"
+  },
+  {
+    "pattern": "self\\.wfile\\.write|self\\.send_response\\b",
+    "feedback": "⛔ HTTPレスポンス送信はBrokenPipeErrorをキャッチしてください。Ghostはタイムアウトで接続を切ります: try: self.send_response(200); ... except BrokenPipeError: pass",
+    "name": "UNGUARDED_HTTP_RESPONSE_SEND",
+    "added_at": "2026-03-04",
+    "source": "auto-codifier",
+    "example": "self.send_response(200)"
+  },
+  {
+    "pattern": "^import fcntl$",
+    "feedback": "⛔ fcntlはLinux専用です。Windows環境では ModuleNotFoundError になります。import sys; if sys.platform != 'win32': import fcntl でガードしてください",
+    "name": "FCNTL_LINUX_ONLY",
+    "added_at": "2026-03-04",
+    "source": "auto-codifier",
+    "example": "import fcntl"
+  },
+  {
+    "pattern": "requests\\.(get|post|put)\\([^)]*https://nowpattern(?!.*verify=False)",
+    "feedback": "⛔ Ghost CMS APIへのHTTPSリクエストはverify=Falseが必要です。urllib3.disable_warnings()も追加してください",
+    "name": "GHOST_SSL_VERIFY_MISSING",
+    "added_at": "2026-03-04",
+    "source": "auto-codifier",
+    "example": "requests.get('https://nowpattern.com/ghost/api/admin/posts')"
+  },
+  {
+    "pattern": "claude-opus-4-[0-9]|claude-sonnet-4-[0-9]|claude-haiku-4-[0-9]|Opus 4\\.[0-9]|Sonnet 4\\.[0-9]",
+    "feedback": "⛔ モデルバージョンを constitution / map ファイル（SYSTEM_GOVERNOR.md / SYSTEM_MAP.md / SELF_IMPROVEMENT_LOOP.md）に直書きするのは model-fixation です。これらのファイルでは「Anthropic Claude」または「最新Claude」と書いてください。モデル名を書いてよいのは settings.local.json / MODEL_ROUTING_POLICY.md のみです。",
+    "name": "MODEL_VERSION_FIXATION",
+    "added_at": "2026-03-15",
+    "source": "auto-codifier",
+    "example": "NEO-ONE (Claude Opus 4.6, VPS) → 予測生成"
+  }
+]

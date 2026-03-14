@@ -1,0 +1,17 @@
+{
+  "_schema_version": "1.0",
+  "_description": "ローカルClaude Code の LEVEL2 承認待ちキュー（SYSTEM_GOVERNOR.md 準拠）。LEVEL2 操作（100行超の改修・新API連携・cron変更等）はここに追加してから Naoto に確認する。",
+  "_created_at": "2026-03-15T04:00:00Z",
+  "_field_spec": {
+    "id": "prop-{uuid8} 形式",
+    "ts": "ISO 8601 UTC",
+    "proposer": "エージェント名",
+    "title": "提案タイトル（60字以内）",
+    "description": "何をなぜ変えるか（200字以内）",
+    "expected_roi": "月+$X または Brier -0.0X 改善",
+    "risk_level": "low|medium|high",
+    "reversible": "true|false",
+    "status": "pending|approved|rejected|completed"
+  },
+  "queue": []
+}

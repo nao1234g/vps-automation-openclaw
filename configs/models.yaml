@@ -1,0 +1,110 @@
+# configs/models.yaml
+# AI Civilization OS — LLMモデル設定
+# 重要: Claude Max $200/月定額内でのみ使用。Anthropic API従量課金は禁止。
+
+# デフォルトモデル（Claude Max経由）
+default:
+  provider: "anthropic"
+  model: "claude-opus-4-6"    # 最高精度
+  max_tokens: 4096
+  temperature: 0.3             # 予測タスクは低温（決定論的）
+
+# タスク別モデル割り当て
+task_models:
+  # 記事執筆（NEO-ONE/TWO）
+  article_writing:
+    provider: "anthropic"
+    model: "claude-opus-4-6"
+    max_tokens: 8192
+    temperature: 0.7            # 創造的だが一貫性あり
+
+  # 予測生成（精度重視）
+  prediction_generation:
+    provider: "anthropic"
+    model: "claude-opus-4-6"
+    max_tokens: 2048
+    temperature: 0.2            # 低温 = 一貫した確率推定
+
+  # 翻訳（JP→EN）
+  translation:
+    provider: "anthropic"
+    model: "claude-opus-4-6"   # Max内でカバー。NEO-GPT（OpenAI）は使わない
+    max_tokens: 8192
+    temperature: 0.1
+
+  # エージェントディベート（各エージェントの分析）
+  agent_debate:
+    provider: "anthropic"
+    model: "claude-opus-4-6"
+    max_tokens: 1024
+    temperature: 0.3
+
+  # 知識更新（EvolutionLoop）
+  evolution_analysis:
+    provider: "google"          # Gemini無料枠
+    model: "gemini-2.5-pro"    # Gemini 2.5 Pro
+    max_tokens: 2048
+    temperature: 0.3
+
+  # 予測検証（AutoVerifier）
+  prediction_verification:
+    provider: "anthropic"
+    model: "claude-opus-4-6"
+    max_tokens: 512
+    temperature: 0.0            # 完全決定論的（YES/NO判定）
+
+  # Red-Teaming（品質監査）
+  red_teaming:
+    provider: "google"
+    model: "gemini-2.5-pro"
+    max_tokens: 2048
+    temperature: 0.5
+
+  # X投稿検索（Grokのみ）
+  x_search:
+    provider: "x"               # Grok API $5クレジット内
+    model: "grok-4-1"
+    max_tokens: 1024
+    temperature: 0.0
+
+# コスト制約（ガードレール）
+cost_constraints:
+  # 従量課金禁止（Claude Max定額のみ）
+  anthropic_pay_per_use: false
+  # Gemini無料枠上限（デフォルト）
+  gemini_free_tier_only: true
+  # Grok月額上限
+  grok_monthly_limit_usd: 5.0
+  # 新モデル採用は承認制
+  new_model_requires_approval: true
+
+# フォールバック設定
+fallbacks:
+  # メインモデルが失敗した場合
+  primary_failure:
+    provider: "anthropic"
+    model: "claude-sonnet-4-6"  # Sonnet（Opusより軽量）
+  # Sonnetも失敗した場合
+  secondary_failure:
+    provider: "anthropic"
+    model: "claude-haiku-4-5-20251001"  # 最軽量
+
+# モデル選択ロジック
+selection_rules:
+  - rule: "予測確率の計算は必ずOpusを使う"
+    condition: "task_type in ['prediction_generation', 'prediction_verification']"
+    model: "claude-opus-4-6"
+
+  - rule: "翻訳はNEO-GPT（OpenAI）を使わない"
+    condition: "task_type == 'translation'"
+    provider: "anthropic"
+
+  - rule: "Gemini無料枠を先に使い、足りなくなったらOpusへ"
+    condition: "task_type in ['evolution_analysis', 'red_teaming']"
+    preferred: "gemini-2.5-pro"
+    fallback: "claude-opus-4-6"
+
+  - rule: "X検索はGrokのみ（$5クレジット内）"
+    condition: "task_type == 'x_search'"
+    provider: "x"
+    monthly_cap_check: true

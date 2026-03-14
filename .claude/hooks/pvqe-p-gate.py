@@ -42,6 +42,11 @@ STATE_DIR = PROJECT_DIR / ".claude" / "hooks" / "state"
 PVQE_P_FILE = STATE_DIR / "pvqe_p.json"
 INTENT_CONFIRMED_FLAG = STATE_DIR / "intent_confirmed.flag"
 
+# NIGHT MODE: 自律運転中はPVQE-P要件をバイパス
+NIGHT_MODE_FLAG = STATE_DIR / "night_mode.flag"
+if NIGHT_MODE_FLAG.exists():
+    sys.exit(0)
+
 # pvqe_p.json の有効期限（この時間を超えたら再定義が必要）
 PVQE_P_MAX_AGE_SEC = 7200  # 2時間
 

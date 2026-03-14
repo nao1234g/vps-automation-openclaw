@@ -1,0 +1,25 @@
+{
+  "_schema_version": "1.0",
+  "_description": "知識タイムライン — knowledge_ingestion の実行履歴を追跡する",
+  "_field_definitions": {
+    "run_id": "実行ID（UUID4形式）",
+    "ran_at": "実行日時（ISO）",
+    "source": "知識ソース（arxiv / semantic_scholar / manual / vps_sync）",
+    "items_ingested": "今回のセッションで取り込んだアイテム数",
+    "items_total": "累計アイテム数",
+    "topics": "検索トピックのリスト",
+    "promoted_count": "タスク昇格した件数",
+    "top_items": "上位3件のタイトルリスト",
+    "radar_size": "radar.json の累計サイズ（件数）",
+    "run_status": "ok / partial_error / error",
+    "notes": "備考"
+  },
+  "runs": [],
+  "stats": {
+    "total_runs": 0,
+    "total_items_ingested": 0,
+    "total_promoted": 0,
+    "last_run_at": null,
+    "first_run_at": null
+  }
+}

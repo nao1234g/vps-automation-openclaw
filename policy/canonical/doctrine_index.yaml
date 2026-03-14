@@ -1,0 +1,142 @@
+# doctrine_index.yaml
+# -----------------------------------------------------------
+# Doctrine 文書の責務分担表。
+# 「何をどこで読めばよいか」の機械可読インデックス。
+# -----------------------------------------------------------
+# Generated: NO (human-edited canonical policy file)
+# Last updated: 2026-03-14
+
+format_version: "1.0"
+
+##############################################################
+# Doctrine 階層（上位 → 下位）
+##############################################################
+
+# 読む順序: north_star → founder_constitution → decision_doctrine → ...
+# runtime prompt に入れるべき最小集合: north_star の Eternal Directives + agent-instructions
+
+doctrine_hierarchy:
+
+  tier_1_invariants:
+    description: "ミッション・不変の原則。AIによる書き換え禁止。"
+    documents:
+      - id: "north_star"
+        local_path: ".claude/rules/NORTH_STAR.md"
+        vps_path: "/opt/shared/rules/NORTH_STAR.md"
+        role: "ミッション / Eternal Directives / 経営者OS / Oracle フライホイール"
+        ai_writable: false
+        runtime_injectable: "最小集合のみ（Eternal Directives + identity）"
+
+      - id: "founder_constitution"
+        local_path: "docs/FOUNDER_CONSTITUTION.md"
+        vps_path: "/opt/shared/docs/FOUNDER_CONSTITUTION.md"
+        role: "創設者の意図・世界観・変えてはいけない価値観"
+        ai_writable: false
+        runtime_injectable: false
+        note: "詳細文書。runtime prompt にはまとめのみ注入。"
+
+  tier_2_decision_doctrine:
+    description: "判断基準・意思決定フレーム。"
+    documents:
+      - id: "decision_doctrine"
+        local_path: "docs/DECISION_DOCTRINE.md"
+        vps_path: "/opt/shared/docs/DECISION_DOCTRINE.md"
+        role: "事実分類 / Type1-Type2 / No-Surprise / 判断衛生"
+        ai_writable: false
+        runtime_injectable: "Type1/Type2 定義のみ（短縮版）"
+
+      - id: "long_term_value_doctrine"
+        local_path: "docs/LONG_TERM_VALUE_DOCTRINE.md"
+        vps_path: "/opt/shared/docs/LONG_TERM_VALUE_DOCTRINE.md"
+        role: "LTVスコア・モート思考・投資対効果評価基準"
+        ai_writable: false
+        runtime_injectable: false
+
+  tier_3_operational_doctrine:
+    description: "運用・外部知識・反論の規範。"
+    documents:
+      - id: "wisdom_ingestion_doctrine"
+        local_path: "docs/WISDOM_INGESTION_DOCTRINE.md"
+        vps_path: "/opt/shared/docs/WISDOM_INGESTION_DOCTRINE.md"
+        role: "外部知識（Yanai-Geneen等）取り込み基準・世界標準スキャン方法"
+        ai_writable: false
+        runtime_injectable: false
+
+      - id: "dissent_doctrine"
+        local_path: "docs/DISSENT_DOCTRINE.md"
+        vps_path: "/opt/shared/docs/DISSENT_DOCTRINE.md"
+        role: "反論責任・異議申し立て条件・構造的反論の規範"
+        ai_writable: false
+        runtime_injectable: false
+
+  tier_4_operational_knowledge:
+    description: "実務向け圧縮知識ゲートウェイ。doctrine への入口だが doctrine 原本ではない。"
+    documents:
+      - id: "agent_wisdom"
+        local_path: "N/A (VPS only, auto-synced)"
+        vps_path: "/opt/shared/AGENT_WISDOM.md"
+        role: "全エージェント共有知識ゲートウェイ。doctrine の要約 + 学習ログ"
+        ai_writable: true  # ## 自己学習ログ セクションのみ
+        runtime_injectable: "要約セクションのみ"
+        auto_sections:
+          - "## 自己学習ログ"  # evolution_loop.py が毎週追記
+
+  tier_5_immediate_operator:
+    description: "即時オペレーター向け実務ルール。AIが直接参照する最短距離文書。"
+    documents:
+      - id: "agent_instructions"
+        local_path: ".claude/rules/agent-instructions.md"
+        role: "行動原則 / Type1-Type2 判断 / エスカレーション条件"
+        ai_writable: false
+        runtime_injectable: true  # フル注入OK（コンパクト）
+
+      - id: "content_rules"
+        local_path: ".claude/rules/content-rules.md"
+        role: "Xハッシュタグ / Ghost記事タグ / 配信ルール"
+        ai_writable: false
+        runtime_injectable: "要約のみ"
+
+      - id: "infrastructure"
+        local_path: ".claude/rules/infrastructure.md"
+        role: "VPS / Docker / NEO アーキテクチャ"
+        ai_writable: false
+        runtime_injectable: "key paths のみ"
+
+      - id: "execution_map"
+        local_path: ".claude/rules/execution-map.md"
+        role: "原則→実装対応表"
+        ai_writable: false
+        runtime_injectable: false
+
+  tier_6_runtime_enforcement:
+    description: "runtime に注入する最小集合 + 強制コード。"
+    artifacts:
+      - id: "neo_system_prompt"
+        file: "sdk_integration.py:neo_system_prompt"
+        content: "Eternal Directives + Identity + ECC rules + co_manager_principles (要約)"
+        note: "doctrine 全文ではなく最小限の注入。詳細は working CLAUDE.md を参照。"
+
+      - id: "hooks"
+        files:
+          - ".claude/hooks/pvqe-p-gate.py"
+          - ".claude/hooks/north-star-guard.py"
+          - ".claude/hooks/fact-checker.py"
+          - ".claude/hooks/llm-judge.py"
+          - ".claude/hooks/intent-confirm.py"
+          - ".claude/hooks/research-gate.sh"
+        role: "物理ブロック。テキストルールではなくコードで強制。"
+
+##############################################################
+# 何をどこで読むか（クイックリファレンス）
+##############################################################
+
+quick_reference:
+  "ミッションを確認したい": ".claude/rules/NORTH_STAR.md"
+  "判断に迷った": ".claude/rules/NORTH_STAR.md → docs/DECISION_DOCTRINE.md"
+  "既知のミスを確認": "docs/KNOWN_MISTAKES.md"
+  "コンテンツルール": ".claude/rules/content-rules.md"
+  "インフラ設定": ".claude/rules/infrastructure.md"
+  "予測ページ変更": ".claude/rules/prediction-design-system.md"
+  "VPS最新状態": "/opt/shared/SHARED_STATE.md"
+  "退役済みartifact": "policy/canonical/retirement_registry.yaml"
+  "実効読込経路": "policy/canonical/runtime_truth_registry.yaml"

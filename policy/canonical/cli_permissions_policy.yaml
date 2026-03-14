@@ -1,0 +1,158 @@
+# cli_permissions_policy.yaml
+# -----------------------------------------------------------
+# Claude Code CLI パーミッション設計方針。
+# YES 確認問題の根本原因・採用プロファイル・deny/allow の設計根拠。
+# -----------------------------------------------------------
+# Generated: NO (human-edited canonical policy file)
+# Last updated: 2026-03-14
+
+format_version: "1.0"
+
+##############################################################
+# 問題の定義
+##############################################################
+
+yes_problem:
+  symptom: "Claude Code CLI で Edit / Write / Bash ツール呼び出しのたびに UI 確認ダイアログが出る"
+  root_cause: "settings.json (shared) が存在しなかった。settings.local.json の defaultMode=bypassPermissions は機能しているが、shared での設計が欠如していた。"
+  impact: "AI 運用の throughput 低下。Night Mode でも非効率。"
+
+yes_sources:
+  - tool: "Edit / Write"
+    cause: "defaultMode が default → UI ダイアログ毎回"
+    solution: "acceptEdits で自動承認。hooks (pvqe-p-gate, north-star-guard) で意味的安全確保。"
+
+  - tool: "Bash (safe commands)"
+    cause: "汎用 Bash は ask 対象"
+    solution: "git / diff / cat / ls / status 系を allow リストに明示"
+
+  - tool: "Task (subagent)"
+    cause: "subagent の permission が parent から継承されない場合あり"
+    solution: "subagent_type に応じて permissionMode を指定 (acceptEdits 推奨)"
+
+  - tool: "Read (outside project dir)"
+    cause: "project 外ディレクトリへのアクセス"
+    solution: "additionalDirectories に明示追加"
+
+##############################################################
+# 3プロファイル定義
+##############################################################
+
+profiles:
+
+  safe:
+    name: "safe-profile"
+    description: "共有PC / 初回セットアップ / 見知らぬ repo"
+    defaultMode: "default"
+    yes_frequency: "高（毎回 Edit/Write で確認）"
+    hooks: "全フック有効"
+    deny:
+      - "Read(**/.env*)"
+      - "Read(**/*credentials*)"
+      - "Read(**/*secret*)"
+      - "Read(**/*private_key*)"
+      - "Read(**/*.pem)"
+      - "Read(**/*.key)"
+      - "Write(**/.env*)"
+      - "Bash(*rm -rf /*)"
+      - "Bash(*dd if=*)"
+    notes: "最も安全だが最も遅い。通常運用には非推奨。"
+
+  balanced:
+    name: "balanced-profile"
+    description: "日常開発・このrepoの標準運用（★推奨★）"
+    defaultMode: "acceptEdits"
+    yes_frequency: "低（Read/Bash の一部のみ確認）"
+    hooks: "全フック有効（pvqe-p-gate, north-star-guard, llm-judge が意味的安全を担保）"
+    allow:
+      - "Read(**)"
+      - "Glob(**)"
+      - "Grep(**)"
+      - "WebSearch"
+      - "TodoWrite"
+      - "Bash(git status)"
+      - "Bash(git diff*)"
+      - "Bash(git log*)"
+      - "Bash(git add*)"
+      - "Bash(git show*)"
+      - "Bash(git branch*)"
+      - "Bash(python *doctor.py*)"
+      - "Bash(python *audit_retired_refs.py*)"
+      - "Bash(ssh root@163.44.124.123 *cat /opt/shared/SHARED_STATE.md*)"
+      - "Bash(ssh root@163.44.124.123 *systemctl status*)"
+    deny:
+      - "Read(**/.env*)"
+      - "Read(**/*credentials*)"
+      - "Read(**/*secret*)"
+      - "Read(**/*private_key*)"
+      - "Read(**/*.pem)"
+      - "Read(**/*.key)"
+      - "Write(**/.env*)"
+      - "Write(**/*credentials*)"
+      - "Bash(*rm -rf /*)"
+      - "Bash(*rm -rf ~*)"
+      - "Bash(*dd if=*)"
+      - "Bash(*mkfs*)"
+    ask:
+      - "Bash(ssh*)"  # VPS への任意 SSH は確認（read-only SSH は allow 化済み）
+      - "Bash(git commit*)"
+      - "Bash(git push*)"
+      - "Bash(*docker*)"
+      - "Bash(*systemctl start*)"
+      - "Bash(*systemctl stop*)"
+      - "Bash(*systemctl restart*)"
+    yes_reduction_estimate: "約70-80% 削減"
+    adoption: "recommended"
+
+  automation:
+    name: "automation-profile"
+    description: "Night Mode / CI/CD / 信頼済み isolated sandbox（自己責任）"
+    defaultMode: "bypassPermissions"
+    yes_frequency: "ほぼゼロ（全チェックバイパス）"
+    hooks: "Night Mode フラグで一部フック無効化"
+    warning: "bypassPermissions は deny を含む全チェックをバイパスする。production VPS への直接操作には使わないこと。"
+    deny:
+      - "Read(**/.env*)"
+      - "Read(**/*credentials*)"
+      - "Write(**/.env*)"
+    note: "deny が bypassPermissions で無効化されることに注意。ローカル開発限定推奨。"
+    yes_reduction_estimate: "99% 削減"
+    adoption: "limited (trusted dev only, current settings.local.json の状態)"
+
+##############################################################
+# 採用決定
+##############################################################
+
+adopted_solution:
+  shared_settings: "balanced-profile → .claude/settings.json に反映済み (defaultMode: acceptEdits)"
+  local_override: "automation-profile → settings.local.json 既存設定を維持 (bypassPermissions)"
+  rationale:
+    - "acceptEdits は Edit/Write を自動承認しつつ、pvqe-p-gate / north-star-guard / llm-judge / fact-checker hooks が意味的安全網を提供する"
+    - "bypassPermissions は hooks も完全にバイパスするため通常運用の推奨にしない"
+    - "shared settings.json に acceptEdits を置くことで、チームや CI/CD 環境でのデフォルトが safe になる"
+    - "個人の settings.local.json で bypassPermissions にオーバーライドするのは開発者の自己責任"
+
+##############################################################
+# 機密ファイルポリシー（deny 理由）
+##############################################################
+
+deny_rationale:
+  credential_files:
+    patterns:
+      - "**/.env"
+      - "**/.env.*"
+      - "**/*credentials*"
+      - "**/*secret*"
+      - "**/*private_key*"
+      - "**/*.pem"
+      - "**/*.key"
+    reason: "API キー・秘密鍵・認証情報の漏洩防止。Claude の出力やログに含まれる可能性を排除。"
+    note: "bypassPermissions モードでは deny が無効になるため、nightmode 時は特に注意。"
+
+  destructive_commands:
+    patterns:
+      - "Bash(*rm -rf /*)"
+      - "Bash(*rm -rf ~*)"
+      - "Bash(*dd if=*)"
+      - "Bash(*mkfs*)"
+    reason: "不可逆な破壊操作。Type 1 判断のため必ず人間確認。"

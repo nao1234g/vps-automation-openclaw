@@ -1661,3 +1661,55 @@ Traceback (most recent call last):
 - **検知時刻**: 2026-03-09 05:00 JST
 - **自動記録**: vps-error-capture.py
 
+
+
+### 2026-03-09: prediction-page-builder エラー検知 (sig: e05f782f)
+- **スクリプト**: prediction-page-builder
+- **ログ**: /opt/shared/polymarket/prediction_page.log
+- **エラー**:
+```
+nt.error(
+               ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 559, in error
+    return self._call_chain(*args)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 492, in _call_chain
+    result = func(*args)
+             ^^^^^^^^
+```
+- **検知時刻**: 2026-03-09 23:00 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-10: prediction-page-builder エラー検知 (sig: f5d65db6)
+- **スクリプト**: prediction-page-builder
+- **ログ**: /opt/shared/polymarket/prediction_page.log
+- **エラー**:
+```
+ripts/prediction_page_builder.py", line 2078, in <genexpr>
+    resolved_cards = "\n".join(_build_resolved_card(r, lang) for r in resolved)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/shared/scripts/prediction_page_builder.py", line 1736, in _build_resolved_card
+    resu
+```
+- **検知時刻**: 2026-03-10 23:00 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-11: prediction-verifier エラー検知 (sig: acc880aa)
+- **スクリプト**: prediction-verifier
+- **ログ**: /var/log/prediction-verifier.log
+- **エラー**:
+```
+Traceback (most recent call last):
+  File "/opt/shared/scripts/prediction_auto_verifier.py", line 800, in <module>
+    main()
+  File "/opt/shared/scripts/prediction_auto_verifier.py", line 742, in main
+    log(f"─── Processing {pid}: {pred['article_title'][:50]}...")
+                                
+```
+- **検知時刻**: 2026-03-11 20:00 JST
+- **自動記録**: vps-error-capture.py
+

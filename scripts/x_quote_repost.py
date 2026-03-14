@@ -204,7 +204,7 @@ def quote_repost(item, auth, dry_run=False):
     if resp.status_code == 201:
         data = resp.json().get("data", {})
         new_tweet_id = data.get("id", "")
-        posted_url = f"https://x.com/aisaintel/status/{new_tweet_id}"
+        posted_url = f"https://x.com/nowpattern/status/{new_tweet_id}"
         print(f"  ✅ 引用リポスト完了: {posted_url}")
         item["posted_tweet_url"] = posted_url
         item["posted_at"] = datetime.now(timezone.utc).isoformat()

@@ -1,0 +1,115 @@
+# configs/agents.yaml
+# AI Civilization OS — エージェント設定
+# 各エージェントのバイアス・重み・役割を定義
+
+# デフォルト設定
+defaults:
+  max_memory_entries: 100      # エージェントあたりの最大記憶数
+  memory_importance_threshold: 0.5  # これ以下はメモリに保存しない
+  confidence_floor: 0.50       # 信頼度の最低値
+  probability_min: 5
+  probability_max: 95
+
+# 6専門エージェント
+agents:
+  historian:
+    name: "historian"
+    display_name: "歴史家エージェント"
+    role: "historian"
+    description: "歴史的パターン・基準率・類似事例の専門家"
+    probability_bias: 0        # 中立
+    confidence_default: 0.80
+    weight_in_consensus: 1.0   # DebateEngineでの重み
+    memory_path: "data/memories/historian.json"
+    specialty_tags:
+      - "地政学・安全保障"
+      - "経済・金融"
+      - "テクノロジー"
+
+  scientist:
+    name: "scientist"
+    display_name: "科学者エージェント"
+    role: "scientist"
+    description: "論理・因果・証拠品質の専門家"
+    probability_bias: -3       # 保守的（証拠重視）
+    confidence_default: 0.85
+    weight_in_consensus: 1.2   # 証拠品質の高い場合に重みを増す
+    memory_path: "data/memories/scientist.json"
+    specialty_tags:
+      - "技術・AI"
+      - "科学・医療"
+
+  economist:
+    name: "economist"
+    display_name: "経済学者エージェント"
+    role: "economist"
+    description: "経済・金融・市場の専門家。Polymarket確率との乖離を分析"
+    probability_bias: 0        # 市場追従（効率的市場仮説）
+    confidence_default: 0.85   # 市場データがある場合は高い
+    weight_in_consensus: 1.3   # Polymarketデータがある場合は高い
+    memory_path: "data/memories/economist.json"
+    specialty_tags:
+      - "経済・金融"
+      - "暗号資産"
+      - "貿易・サプライチェーン"
+
+  strategist:
+    name: "strategist"
+    display_name: "戦略家エージェント"
+    role: "strategist"
+    description: "地政学・権力構造・リアルポリティクの専門家"
+    probability_bias: 5        # 強気（実行可能性重視）
+    confidence_default: 0.75
+    weight_in_consensus: 1.0
+    memory_path: "data/memories/strategist.json"
+    specialty_tags:
+      - "地政学・安全保障"
+      - "政治・選挙"
+
+  builder:
+    name: "builder"
+    display_name: "建設者エージェント"
+    role: "builder"
+    description: "実装可能性・実行障壁の専門家"
+    probability_bias: 0        # 中立（現実的評価）
+    confidence_default: 0.70
+    weight_in_consensus: 0.8   # 実装可能性の評価は参考程度
+    memory_path: "data/memories/builder.json"
+    specialty_tags:
+      - "技術・AI"
+      - "ビジネス・スタートアップ"
+
+  auditor:
+    name: "auditor"
+    display_name: "監査官エージェント"
+    role: "auditor"
+    description: "リスク評価・バイアス検出・品質管理の専門家"
+    probability_bias: -5       # 悲観的（最悪シナリオ重視）
+    confidence_default: 0.80
+    weight_in_consensus: 1.1   # バイアス検出の信頼性
+    memory_path: "data/memories/auditor.json"
+    specialty_tags:
+      - "ALL"                  # 全ジャンルに適用
+
+# コンセンサス計算設定
+consensus:
+  method: "weighted_average"   # weighted_average / median / trimmed_mean
+  min_agents_required: 3       # 最低この数のエージェントが参加すること
+  auditor_veto_threshold: "FAIL"  # AuditGradeがこれの場合は拒否権発動
+  final_clamp_min: 5
+  final_clamp_max: 95
+
+# ディベート設定
+debate:
+  queue_path: "data/debate_queue.json"
+  results_path: "data/debate_results.json"
+  max_queue_size: 100
+  max_items_per_run: 10
+  timeout_seconds: 300
+
+# エージェントメモリ設定
+memory:
+  base_path: "data/memories"
+  max_entries_per_agent: 100
+  importance_threshold: 0.5
+  similarity_threshold: 0.7   # 類似記憶の検出閾値（コサイン類似度）

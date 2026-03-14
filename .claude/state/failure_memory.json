@@ -1,0 +1,91 @@
+{
+  "_schema_version": "1.0",
+  "_description": "AI Civilization OS 失敗メモリ — 全失敗の構造化記録。mistake_patterns.json より詳細",
+  "_field_definitions": {
+    "failure_id": "F001形式の連番ID",
+    "category": "runtime_error | api_mismatch | path_mismatch | logic_error | integration_error | config_error",
+    "root_cause": "なぜ起きたか（技術的な根本原因）",
+    "symptom": "何が起きたか（表面的な症状）",
+    "trigger": "何をしたときに発生するか",
+    "affected_files": "影響を受けるファイルのリスト",
+    "prevention_rule": "次回防ぐためのルール（コードまたはチェックポイント）",
+    "required_test": "この失敗を検知するテスト",
+    "first_seen": "初回発見日時 (ISO)",
+    "last_seen": "最終発見日時 (ISO)",
+    "recurrence_count": "再発回数（初回=0, 2回目=1, ...）",
+    "severity": "critical | high | medium | low",
+    "resolved_status": "open | fixed | regressed | wont_fix"
+  },
+  "failures": [
+    {
+      "failure_id": "F001",
+      "category": "api_mismatch",
+      "root_cause": "KnowledgeStore の公開APIは .add() だが .add_fact() として実装者が誤記した",
+      "symptom": "AttributeError: 'KnowledgeStore' object has no attribute 'add_fact'",
+      "trigger": "knowledge_ingestion.py が Gemini/LLM の抽出結果を KnowledgeStore に保存しようとするとき",
+      "affected_files": [
+        "knowledge_engine/knowledge_ingestion.py",
+        "knowledge_engine/knowledge_store.py"
+      ],
+      "prevention_rule": "新しい外部モジュール呼び出しは必ず公開APIを Read ツールで確認してから実装する",
+      "required_test": "python -c \"from knowledge_engine.knowledge_store import KnowledgeStore; ks = KnowledgeStore(); print(dir(ks))\" で add が存在することを確認",
+      "first_seen": "2026-03-14T08:00:00Z",
+      "last_seen": "2026-03-14T08:00:00Z",
+      "recurrence_count": 0,
+      "severity": "high",
+      "resolved_status": "fixed"
+    },
+    {
+      "failure_id": "F002",
+      "category": "path_mismatch",
+      "root_cause": "VPS ではGhost APIが直接CMSに記事を保存するため local data/generated_articles/ には何も書かれない。ローカル前提のカウントロジックがVPSで常に0を返す",
+      "symptom": "_get_today_article_count() が常に 0 を返し、日次記事生成制限が機能しない",
+      "trigger": "article_pipeline.py が VPS 上で run_daily() を実行するとき",
+      "affected_files": [
+        "article_pipeline.py"
+      ],
+      "prevention_rule": "VPS/ローカルの環境差異を想定し、パイプラインログ（pipeline_log.json）を一次ソースとして使う",
+      "required_test": "PIPELINE_LOG_PATH に今日のエントリを入れてから _get_today_article_count() を呼び、0以外が返ることを確認",
+      "first_seen": "2026-03-14T08:00:00Z",
+      "last_seen": "2026-03-14T08:00:00Z",
+      "recurrence_count": 0,
+      "severity": "medium",
+      "resolved_status": "fixed"
+    },
+    {
+      "failure_id": "F003",
+      "category": "logic_error",
+      "root_cause": "記事タイトルに日本語・スラッシュ・特殊文字が含まれる場合、title[:30].replace(' ','_') だけではファイル名に使えない文字が残る",
+      "symptom": "OSError または UnicodeError でファイル保存に失敗。または不正なファイル名が作成される",
+      "trigger": "article_generator.py の _save() が日本語タイトルの記事を保存するとき",
+      "affected_files": [
+        "apps/nowpattern/article_generator.py"
+      ],
+      "prevention_rule": "ファイル名はかならず re.sub(r'[^\\w\\-]', '_', title[:30]) でサニタイズする",
+      "required_test": "title='米中関税/2026：テスト' で _save() を呼び、ファイルが作成されることを確認",
+      "first_seen": "2026-03-14T08:00:00Z",
+      "last_seen": "2026-03-14T08:00:00Z",
+      "recurrence_count": 0,
+      "severity": "medium",
+      "resolved_status": "fixed"
+    },
+    {
+      "failure_id": "F004",
+      "category": "api_mismatch",
+      "root_cause": "system_scheduler.py が EvolutionLoop(dry_run=True) と呼ぶが、__init__ にパラメータがなかった",
+      "symptom": "TypeError: EvolutionLoop.__init__() got an unexpected keyword argument 'dry_run'",
+      "trigger": "system_scheduler.py が EvolutionLoop を初期化するとき",
+      "affected_files": [
+        "loops/evolution_loop.py",
+        "core/system_scheduler.py"
+      ],
+      "prevention_rule": "クラスを呼び出す side と定義する side を両方確認してからシグネチャを変更する",
+      "required_test": "python -c \"from loops.evolution_loop import EvolutionLoop; e = EvolutionLoop(dry_run=True)\" でエラーなし",
+      "first_seen": "2026-03-14T08:00:00Z",
+      "last_seen": "2026-03-14T08:00:00Z",
+      "recurrence_count": 0,
+      "severity": "high",
+      "resolved_status": "fixed"
+    }
+  ]
+}

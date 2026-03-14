@@ -1,0 +1,67 @@
+# founder_memory/decisions.yaml
+# 創業者の意思決定記録 — AI組織が参照する不変の判断履歴
+# 書式: date / decision / reasoning / outcome
+# 更新: 新しい重要決定をここに追記する
+
+meta:
+  owner: Naoto
+  project: Nowpattern
+  philosophy_ref: philosophy.yaml
+  last_updated: "2026-03-14"
+
+decisions:
+  - id: D001
+    date: "2026-01-01"
+    decision: "コンテンツプラットフォームをNowpatternに一本化し、AISAブランドを廃止する"
+    reasoning: "分散投資よりシングルブランドへの集中がモートを早く作る。Nowpatternの予測トラックレコードが唯一のコピー不可能な資産"
+    outcome: "JA+EN 2言語の予測メディアとして稼働中"
+    tags: [branding, strategy, focus]
+    result: SUCCESS
+
+  - id: D002
+    date: "2026-01-15"
+    decision: "記事フォーマットをDeep Pattern v6.0（8セクション）に統一する"
+    reasoning: "13セクションは執筆コストが高すぎる。8セクションで品質を維持しながら量産可能にする"
+    outcome: "全記事 v6.0 フォーマットで運用中。np-*マーカーで品質を自動強制"
+    tags: [content, operations, quality]
+    result: SUCCESS
+
+  - id: D003
+    date: "2026-02-01"
+    decision: "Claude Max $200/月定額でNEO-ONE/NEO-TWO/ローカルCCを賄う。Anthropic API従量課金は使用しない"
+    reasoning: "コスト予測可能性が経営の安定につながる。$200固定で24時間稼働が実現できる"
+    outcome: "3エージェント並列稼働中。コスト$200/月固定"
+    tags: [cost, operations, ai]
+    result: SUCCESS
+
+  - id: D004
+    date: "2026-02-22"
+    decision: "OpenClawエージェントを8体から1体（Jarvis）に削減する"
+    reasoning: "複数エージェントの管理コストが高すぎる。Jarvisが全タスクを処理できる"
+    outcome: "Jarvis 1体で運用中"
+    tags: [operations, simplification]
+    result: SUCCESS
+
+  - id: D005
+    date: "2026-03-06"
+    decision: "バイリンガルURL標準を確立する (/en/[name]/ パターン)"
+    reasoning: "SEOと国際展開に最適。/en/ プレフィックスでGoogleが言語グループとして認識"
+    outcome: "全8ページのURL統一完了。CaddyリワイトとhreflangでEN版を正式公開"
+    tags: [seo, internationalization, technical]
+    result: SUCCESS
+
+  - id: D006
+    date: "2026-03-09"
+    decision: "Brier Scoreによる予測精度の自動計測と自己進化ループを実装する"
+    reasoning: "予測精度のトラックレコードが唯一のモート。数字で測れないものは改善できない"
+    outcome: "prediction_auto_verifier.py + evolution_loop.py で稼働中"
+    tags: [prediction, quality, evolution]
+    result: SUCCESS
+
+  - id: D007
+    date: "2026-03-14"
+    decision: "AI Organization OSからAI Civilization OSへ進化させる"
+    reasoning: "NowpatternをTruth Engine → Prediction Engine → Oracle Platformへと発展させるための基盤が必要"
+    outcome: "実装中"
+    tags: [architecture, evolution, civilization]
+    result: IN_PROGRESS

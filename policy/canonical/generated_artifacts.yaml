@@ -1,0 +1,106 @@
+# generated_artifacts.yaml
+# -----------------------------------------------------------
+# 自動生成されるファイルの唯一の機械可読定義。
+# 生成物だけを手で直して generator を放置することを防ぐ。
+# ルール: 生成物の問題は generator を直すこと。生成物の直接編集は禁止。
+# -----------------------------------------------------------
+# Generated: NO (human-edited canonical policy file)
+# Last updated: 2026-03-14
+
+format_version: "1.0"
+
+##############################################################
+# 生成物の原則
+##############################################################
+
+principles:
+  - "生成物のヘッダには '# AUTO-GENERATED' または '<!-- AUTO-GENERATED -->' を付ける"
+  - "生成物を直接編集しない。generator を直す"
+  - "generator が壊れた場合は生成物の古いバージョンを一時使用し、速やかに generator を修正する"
+  - "定期 cron がある場合は cron の状態も管理する"
+
+##############################################################
+# 生成物一覧
+##############################################################
+
+generated_artifacts:
+
+  - id: "shared_state_md"
+    output_path: "/opt/shared/SHARED_STATE.md"
+    generator:
+      script: "/opt/shared/scripts/generate_shared_state.py"
+      cron: "*/30 * * * *"
+      cron_status: "ACTIVE"
+    content: "VPS サービス状態 / 記事数 / cron 状態 / key paths"
+    header_marker: "# Shared System State"
+    edit_policy: "手動編集禁止。generator を修正すること。"
+    last_verified: "2026-03-14"
+    notes:
+      - "以前は /opt/CLAUDE.md 参照が含まれていたが修正済み (2026-03-14)"
+
+  - id: "system_briefing_md"
+    output_path: "/opt/shared/SYSTEM_BRIEFING.md"
+    generator:
+      script: "gen_system_briefing.py"
+      cron: "*/30 * * * * (SUSPENDED)"
+      cron_status: "SUSPENDED"
+    content: "セッション開始時の状況ブリーフィング"
+    edit_policy: "cron が SUSPENDED のため現在は静的ファイルとして残存。generator 復活まで手動更新も不可。"
+    status: "SUSPENDED — SHARED_STATE.md で代替中"
+    last_verified: "2026-03-14"
+    open_item: "cron 再起動か廃止かの意思決定が必要"
+
+  - id: "mistake_patterns_json"
+    output_path: "/opt/shared/mistake_patterns.json"
+    output_path_local: ".claude/hooks/state/mistake_patterns.json"
+    generator:
+      script: ".claude/hooks/auto-codifier.py"
+      trigger: "PostToolUse(Edit/Write) hook"
+      cron_status: "EVENT-DRIVEN"
+    content: "KNOWN_MISTAKES.md から抽出したパターン定義 (20パターン)"
+    edit_policy: "auto-codifier.py が KNOWN_MISTAKES.md から自動生成。直接編集しない。"
+    last_verified: "2026-03-14"
+
+  - id: "scorecard_md"
+    output_path: ".claude/hooks/state/SCORECARD.md"
+    generator:
+      script: ".claude/hooks/error-tracker.sh + task-tracker.py"
+      trigger: "PostToolUse / PostToolUseFailure hooks"
+      cron_status: "EVENT-DRIVEN"
+    content: "エージェントパフォーマンス累積スコア"
+    edit_policy: "hook が自動更新。直接編集しない。"
+
+  - id: "evolution_log_json"
+    output_path: "/opt/shared/logs/evolution_log.json"
+    generator:
+      script: "/opt/shared/scripts/evolution_loop.py"
+      cron: "毎週日曜 JST 09:00"
+      cron_status: "ACTIVE"
+    content: "Brier Score 分析 / 自己進化ログ（52週ローテーション）"
+    edit_policy: "evolution_loop.py が自動更新。直接編集しない。"
+
+  - id: "session_json"
+    output_path: ".claude/hooks/state/session.json"
+    generator:
+      script: "multiple hooks (feedback-trap, research-gate, pvqe-p-gate)"
+      trigger: "各種 hook"
+      cron_status: "EVENT-DRIVEN"
+    content: "セッション状態フラグ (research_done, task_started 等)"
+    edit_policy: "hook が自動管理。直接編集しない。"
+
+##############################################################
+# validator での検知ルール
+##############################################################
+
+validation_rules:
+  - check: "generated ファイルへの直接 Edit / Write が来た場合は警告"
+    how: "north-star-guard.py が生成物パスへの編集をチェック"
+    severity: "WARNING"
+
+  - check: "generator スクリプトが存在しない場合は ERROR"
+    how: "doctor.py がジェネレーターの存在確認を行う"
+    severity: "ERROR"
+
+  - check: "SUSPENDED cron の生成物が古くなっていないか"
+    how: "doctor.py が最終更新日時をチェック"
+    severity: "WARNING"

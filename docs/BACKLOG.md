@@ -253,25 +253,30 @@
 
 ### TIER 1（未実装 — 1ヶ月以内）
 
-- [ ] **I5: 読者Brier Score自動計算**
-  - prediction_auto_verifier.py の resolve時に reader_votes を更新
-  - `brier_score`, `resolved_at`, `outcome` カラム追加（SQLite ALTER TABLE）
-  - 計算式: `(probability/100 - outcome_int)^2`
+- [x] **I5: 読者Brier Score自動計算** (2026-03-15 ローカル実装完了 / VPSデプロイ pending)
+  - ✅ `scripts/reader_brier_calculator.py` — ローカル純粋Python計算モジュール。`calc_brier(prob, outcome)`, `calc_brier_bulk()`, `mean_brier()`, `verify_self_test()` 10/10 PASS
+  - ✅ `scripts/vps_reader_brier_migration.py` — VPS側マイグレーションスクリプト。`--dry-run/--verbose/--notify` 対応
+  - ⏳ VPSデプロイ: `scp scripts/vps_reader_brier_migration.py root@163.44.124.123:/opt/shared/scripts/` 後に `python3 /opt/shared/scripts/vps_reader_brier_migration.py --dry-run` で確認
+  - ⏳ `reader_votes` テーブルへの `brier_score REAL / resolved_at TEXT / outcome REAL` カラム追加（VPS実行後）
+  - 計算式: `(probability/100 - outcome)^2` — outcome: 的中=1.0, 外れ=0.0
 
-- [ ] **I6: 個人トラックレコードページ**
-  - `/reader-predict/my-votes/{uuid}` API既存
-  - Ghost static page `/my-predictions/` にJS埋め込み（URLパラメータでUUID）
+- [x] **I6: 個人トラックレコードページ** (2026-03-11)
+  - `/reader-predict/my-tracker/{uuid}` + `/reader-predict/my-stats/{uuid}` 追加済み
+  - Ghost page `/my-predictions/` (JA) + `/en/my-predictions/` (EN) 公開済み
+  - Caddy rewrite + redirect + hreflang 設定済み
 
-- [ ] **I7: 称号システム（基本4段階）**
-  - 🌱 見習い（初投票）/ 🎯 予測者（10件以上）/ 🔥 精度追求者（Brier<0.25）/ ⚡ Super（Brier<0.15）
-  - `/reader-predict/my-stats/{uuid}` エンドポイント追加
+- [x] **I7: 称号システム（基本5段階）** (2026-03-11)
+  - 5段階: New Forecaster / Novice / Developing / Calibrated / Expert
+  - `/reader-predict/my-stats/{uuid}` に `rank_label` 含む形で実装済み
 
-- [ ] **I8: NEO予測の自動参加**
-  - NEO-ONE/TWO が新規予測追加時に `voter_uuid="neo-one-agent"` で自動投票
-  - AI vs 人間比較のベースラインデータ収集開始
+- [x] **I8: NEO予測の自動参加** — 2026-03-11 完了
+  - `neo_ai_player.py` を `/opt/shared/scripts/` に配置
+  - `voter_uuid="neo-one-ai-player"` で242件バックフィル完了
+  - 毎時cron (`0 * * * *`) で新規予測を自動ピックアップ
 
-- [ ] **I9: 解決時Telegram通知（読者統計付き）**
-  - prediction_auto_verifier.py に「コミュニティ全体: 楽観X% 基本Y% 悲観Z%」を追加
+- [x] **I9: 解決時Telegram通知（読者統計付き）** — 2026-03-11 完了
+  - `prediction_auto_verifier.py` に `get_reader_stats()` + `format_reader_stats_block()` 追加
+  - 解決時Telegramに「👥コミュニティ予測」+「🤖NEO（AI）の予測」セクション追加
 
 ### TIER 2（未実装 — 2〜3ヶ月）
 

@@ -1,0 +1,97 @@
+# retirement_registry.yaml
+# -----------------------------------------------------------
+# 退役済み artifact の唯一の機械可読定義。
+# ここに載っているものを「current source of truth」として復活させてはならない。
+# audit_retired_refs.py がこのリストを参照して grep チェックを行う。
+# -----------------------------------------------------------
+# Generated: NO (human-edited canonical policy file)
+# Last updated: 2026-03-14
+
+format_version: "1.0"
+
+##############################################################
+# 退役手順（標準プロセス）
+##############################################################
+
+retirement_procedure:
+  steps:
+    1: "rename to tombstone (e.g., file.md → file.md.retired-YYYYMMDD)"
+    2: "retirement_registry.yaml に追記"
+    3: "repo-wide grep で旧パスの参照を検出し是正"
+    4: "影響を受ける human-facing docs に tombstone note を追加"
+    5: "generated artifact の generator 側を修正"
+    6: "rollback point (git commit) を作成"
+
+##############################################################
+# 退役済み artifacts
+##############################################################
+
+retired_artifacts:
+
+  - id: "opt-claude-md-20260314"
+    original_path: "/opt/CLAUDE.md"
+    tombstone_path: "/opt/CLAUDE.md.retired-20260314"
+    retired_date: "2026-03-14"
+    reason: "VPS共通マスター指示書として機能していたが、NEO-ONE/TWOが直接sdk_integration.pyのneo_system_promptを使う構造に移行。/opt/CLAUDE.mdは誰にも読まれていなかった。"
+    replacement:
+      neo_one: "/opt/claude-code-telegram/CLAUDE.md + sdk_integration.py:neo_system_prompt"
+      neo_two: "/opt/claude-code-telegram-neo2/CLAUDE.md + sdk_integration.py:neo_system_prompt"
+      shared_wisdom: "/opt/shared/AGENT_WISDOM.md"
+    verification:
+      vps_grep: "grep -rn '/opt/CLAUDE.md' /opt/shared/ /opt/claude-code-telegram/ /opt/claude-code-telegram-neo2/ → 0件（2026-03-14確認）"
+      local_grep: "残存参照3件（NORTH_STAR.md, infrastructure.md, execution-map.md）→ 退役注記済み"
+    affected_files_fixed:
+      - "/opt/shared/rules/NORTH_STAR.md"
+      - "/opt/shared/rules/infrastructure.md"
+      - "/opt/shared/scripts/generate_shared_state.py"
+      - "/opt/shared/scripts/agent_consistency_validator.py"
+      - "/opt/openclaw/.claude/CLAUDE.md"
+      - "/opt/shared/AGENT_WISDOM.md"
+      - ".claude/rules/NORTH_STAR.md"
+      - ".claude/rules/infrastructure.md"
+      - ".claude/rules/execution-map.md"
+    rollback:
+      cmd: "ssh root@163.44.124.123 'cp /opt/CLAUDE.md.retired-20260314 /opt/CLAUDE.md'"
+      note: "ただし復活させる正当な理由はない"
+
+  - id: "aisa-pipeline-suspended"
+    original_path: "N/A (cron jobs)"
+    tombstone_path: "N/A"
+    retired_date: "2026-02-22"
+    reason: "AISAパイプライン（19 cron jobs）をSUSPENDEDにした。AISAブランドはNowpatternに統合済み。"
+    replacement: "Nowpattern NEO パイプライン"
+    verification:
+      note: "@aisaintelアカウントも削除済み"
+    rollback:
+      note: "復活予定なし"
+
+  - id: "aisaintel-x-account"
+    original_path: "https://x.com/aisaintel"
+    tombstone_path: "N/A (deleted)"
+    retired_date: "2026-02-22"
+    reason: "Xアカウント削除済み。Nowpatternに統合。"
+    replacement: "@nowpattern (https://x.com/nowpattern)"
+    verification:
+      note: "アカウント存在しない。参照禁止。"
+
+##############################################################
+# audit_retired_refs.py が検索するパターン
+##############################################################
+
+grep_patterns:
+  - pattern: "/opt/CLAUDE.md"
+    severity: "ERROR"
+    note: "退役済みパスへの参照。tombstone pathへの参照は OK"
+    allow_pattern: "/opt/CLAUDE.md.retired"  # これはOK
+
+  - pattern: "@aisaintel"
+    severity: "ERROR"
+    note: "削除済みXアカウント。参照禁止。"
+
+  - pattern: "aisaintel"
+    severity: "WARNING"
+    note: "AISA関連の参照。AISAブランドは廃止済み。"
+
+  - pattern: "AISA パイプライン"
+    severity: "WARNING"
+    note: "廃止済みパイプライン名。"

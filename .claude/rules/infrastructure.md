@@ -64,7 +64,9 @@
 
 | パス | 用途 |
 |---|---|
-| `/opt/CLAUDE.md` | VPS上のNEO用マスター指示書 |
+| `/opt/claude-code-telegram/CLAUDE.md` | NEO-ONE 実効指示書（46KB、neocloop所有） |
+| `/opt/claude-code-telegram-neo2/CLAUDE.md` | NEO-TWO 実効指示書（38KB、neocloop所有） |
+| ~~`/opt/CLAUDE.md`~~ | 退役済み (2026-03-14) → `.retired-20260314` に移動 |
 | `/opt/shared/SHARED_STATE.md` | 30分ごと自動更新（最新状態の真実） |
 | `/opt/shared/AGENT_WISDOM.md` | 全エージェント共有知識 |
 | `/var/www/nowpattern/content/data/ghost.db` | Ghost CMS SQLite DB |

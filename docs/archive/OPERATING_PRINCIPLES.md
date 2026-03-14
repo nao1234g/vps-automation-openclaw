@@ -524,3 +524,85 @@ Local: .claude/hooks/north-star-guard.py — NORTH_STAR.md/OPERATING_PRINCIPLES.
 
 *このファイルは「原則」と「実装」の両方を記録。具体的な戦術・エラー記録は [docs/KNOWN_MISTAKES.md](KNOWN_MISTAKES.md) と [docs/AGENT_WISDOM.md](AGENT_WISDOM.md) を参照。*
 *最終更新: 2026-03-09 — 原則11 Evolutionary Ecosystem 追加。The Eternal Directives（永遠の三原則）との接続を明文化。*
+
+---
+
+## 原則12: STRUCTURAL CHANGE PROTOCOL（構造変更プロトコル）— 2026-03-14 追記
+
+> AIエージェントはシステム改善を行う権限を持つ。しかし「構造変更」は別格の手順が必要。
+
+### 構造変更の定義（これらは自動実行禁止）
+
+```
+・ディレクトリ構造変更（新規フォルダ作成・移動・削除）
+・設定ファイル変更（docker-compose.yml / Caddyfile / systemd service）
+・依存関係変更（requirements.txt / package.json の追加・削除）
+・削除操作（ファイル・データベース・コンテナの削除）
+・システムサービス変更（cron追加・削除・変更、サービス起動・停止）
+```
+
+### 構造変更の必須プロセス
+
+```
+[提案] AIがリスク・理由・代替案をTelegramで送信
+  ↓
+[承認] Naotoが明示的に「実行してよい」と回答
+  ↓
+[実行] AIが実行 → 結果をTelegramで報告
+  ↓
+[記録] KNOWN_MISTAKES.md または task-log に変更内容を永続記録
+```
+
+### 自動実行してよいもの（日常タスク）
+
+```
+✅ 記事生成・予測生成・データ更新
+✅ 既存スクリプトの実行（パラメータが既定の範囲内）
+✅ ログの読み書き・監視
+✅ prediction_db.json への新規予測追加（既存データは変更禁止）
+✅ AGENT_WISDOM.md の「## 自己学習ログ」への追記
+```
+
+**「日常タスクは速く動く。構造変更は一度立ち止まる。」**
+
+---
+
+## 原則13: PREDICTION INTEGRITY（予測の誠実性）— 2026-03-14 追記
+
+> Nowpatternの最重要価値は「予測の誠実性」である。
+
+### 誠実な予測の4条件
+
+```
+1. 事前記録   — 予測は結果が判明する前に記録する（事後改ざん禁止）
+2. 完全公開   — 的中・外れを含めて全件公開する（都合の良い予測だけ見せない）
+3. 自動検証   — prediction_auto_verifier.py が人間の介入なしに検証する
+4. 数値化     — Brier Score で精度を数値化し、比較可能にする
+```
+
+### AIが守るべき不変ルール
+
+```
+❌ 禁止: 確率を事後に変更する（our_pick_prob は登録後に変更不可）
+❌ 禁止: 外れた予測を非公開にする
+❌ 禁止: 検証基準を結果に合わせて変える（resolution_question は登録後に変更不可）
+✅ 許可: 新しい予測を追加する
+✅ 許可: 解決済み予測のステータスを更新する（auto_verifierのみ）
+```
+
+### Brier Score改善の優先度
+
+```
+現在の目標: 平均Brier Score 0.20以下（GOOD レベル）
+最終目標:   平均Brier Score 0.15以下（EXCELLENT レベル）
+
+改善手段:
+  ✅ より精度の高い確率推定（Calibration改善）
+  ✅ 外れた予測の根本原因分析（EvolutionLoop）
+  ✅ 予測対象の選別（当てやすいトピックに集中）
+  ❌ 禁止: データの選択的削除による見かけ上の改善
+```
+
+**「誠実さは最初に構築するより、後から取り戻す方が100倍難しい。」**
+
+*最終更新: 2026-03-14 — 原則12 STRUCTURAL CHANGE PROTOCOL + 原則13 PREDICTION INTEGRITY 追記。*

@@ -1,0 +1,303 @@
+{
+  "_schema_version": "1.0",
+  "_description": "AI Civilization OS タスク台帳 — 全編集の前にここにタスクを登録してから作業する",
+  "_status_flow": ["open", "in_progress", "blocked", "done", "regressed", "archived"],
+  "_rules": [
+    "doneになったタスクは削除しない — 監査証跡として残す",
+    "regressedはdoneから問題が再発したとき。再度in_progressに戻す",
+    "active_task_id.txtに現在作業中のIDを記録する",
+    "タスク登録なしのEdit/Writeはpre_edit_task_guard.pyがブロックする"
+  ],
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Phase 2A: 4つのランタイムバグ修正",
+      "rationale": "knowledge_ingestion add_fact/article_count/filename_sanitize/evolution dry_run の4バグを修正",
+      "target_files": [
+        "knowledge_engine/knowledge_ingestion.py",
+        "article_pipeline.py",
+        "apps/nowpattern/article_generator.py",
+        "loops/evolution_loop.py"
+      ],
+      "acceptance_criteria": [
+        "knowledge_ingestion.py が ks.add() を正しく呼ぶ",
+        "article_pipeline.py の記事カウントがVPSパイプラインログから読む",
+        "article_generator.py のファイル名が re.sub でサニタイズされる",
+        "evolution_loop.py の __init__ が dry_run パラメータを受け取る"
+      ],
+      "status": "done",
+      "created_at": "2026-03-14T08:00:00Z",
+      "updated_at": "2026-03-14T10:00:00Z",
+      "owner": "local-claude",
+      "related_failures": [],
+      "verification_links": []
+    },
+    {
+      "id": "T002",
+      "title": "Phase 2B: 構造化オブザーバビリティ追加",
+      "rationale": "observability/ モジュール (os_logger + pipeline_metrics) を作成し article_pipeline.py に統合",
+      "target_files": [
+        "observability/__init__.py",
+        "observability/os_logger.py",
+        "observability/pipeline_metrics.py",
+        "article_pipeline.py"
+      ],
+      "acceptance_criteria": [
+        "observability/ モジュールが import できる",
+        "article_pipeline.py が get_logger と PipelineMetrics を使う",
+        "ImportError 時は noop フォールバックで動作する",
+        "data/daily_metrics.json にステージ計測が記録される"
+      ],
+      "status": "done",
+      "created_at": "2026-03-14T10:00:00Z",
+      "updated_at": "2026-03-14T12:00:00Z",
+      "owner": "local-claude",
+      "related_failures": [],
+      "verification_links": []
+    },
+    {
+      "id": "T003",
+      "title": "Phase 1A: タスク台帳 (task_ledger.json + pre_edit_task_guard.py)",
+      "rationale": "全編集前に台帳への記録を強制する。修正する前に何を直すか必ず記述させる仕組みを構築",
+      "target_files": [
+        ".claude/state/task_ledger.json",
+        "scripts/guard/pre_edit_task_guard.py",
+        ".claude/settings.local.json"
+      ],
+      "acceptance_criteria": [
+        "task_ledger.json が id/title/rationale/target_files/acceptance_criteria/status/created_at/updated_at/owner/related_failures/verification_links スキーマを持つ",
+        "pre_edit_task_guard.py が active_task_id.txt のないEdit/Writeをブロックする",
+        "night_mode.flag がある場合はバイパスする",
+        "settings.local.json の PreToolUse に登録される"
+      ],
+      "status": "done",
+      "created_at": "2026-03-14T12:00:00Z",
+      "updated_at": "2026-03-14T13:00:00Z",
+      "owner": "local-claude",
+      "related_failures": [],
+      "verification_links": [
+        ".claude/state/task_ledger.json",
+        "scripts/guard/pre_edit_task_guard.py",
+        ".claude/settings.local.json"
+      ]
+    },
+    {
+      "id": "T004",
+      "title": "Phase 1B: 失敗メモリ (failure_memory.json + failure_capture.py)",
+      "rationale": "既存の mistake_patterns.json より詳細な失敗記録を構築。root_cause/affected_files/recurrence_count/severity を追加",
+      "target_files": [
+        ".claude/state/failure_memory.json",
+        "scripts/guard/failure_capture.py"
+      ],
+      "acceptance_criteria": [
+        "failure_memory.json が failure_id/category/root_cause/symptom/trigger/affected_files/prevention_rule/required_test/first_seen/last_seen/recurrence_count/severity/resolved_status スキーマを持つ",
+        "failure_capture.py が PostToolUseFailure で自動記録する"
+      ],
+      "status": "done",
+      "created_at": "2026-03-14T12:00:00Z",
+      "updated_at": "2026-03-14T13:30:00Z",
+      "owner": "local-claude",
+      "related_failures": ["F001", "F002", "F003", "F004"],
+      "verification_links": [
+        ".claude/state/failure_memory.json",
+        "scripts/guard/failure_capture.py"
+      ]
+    },
+    {
+      "id": "T005",
+      "title": "Phase 1C: リサーチレーダー (daily_paper_ingest.py)",
+      "rationale": "arXiv/Semantic Scholar から最新AI論文を取得し、関連度スコアで優先順位を付けてタスクに昇格",
+      "target_files": [
+        "scripts/research/daily_paper_ingest.py"
+      ],
+      "acceptance_criteria": [
+        "arXiv/Semantic Scholar から論文を取得する",
+        "source/freshness/confidence/relevance フィールドが各アイテムにある",
+        "日次ダイジェスト → task_ledger.json へのタスク昇格機能がある"
+      ],
+      "status": "done",
+      "created_at": "2026-03-14T12:00:00Z",
+      "updated_at": "2026-03-14T19:40:00Z",
+      "owner": "local-claude",
+      "related_failures": [],
+      "verification_links": [
+        "scripts/research/daily_paper_ingest.py"
+      ]
+    },
+    {
+      "id": "T006",
+      "title": "Phase 2C: 評価レイヤー (Brier スコア計算)",
+      "rationale": "prediction_registry.py の Brier スコアフィールドが存在するが未計算。実装する",
+      "target_files": [
+        "apps/nowpattern/prediction_registry.py"
+      ],
+      "acceptance_criteria": [
+        "resolved 予測に対して Brier スコアが自動計算される",
+        "記事品質メトリクスが observability 統合される"
+      ],
+      "status": "done",
+      "created_at": "2026-03-14T12:00:00Z",
+      "updated_at": "2026-03-14T19:45:00Z",
+      "owner": "local-claude",
+      "related_failures": [],
+      "verification_links": [
+        "prediction_engine/prediction_registry.py"
+      ]
+    }
+    ,
+    {
+      "id": "T007",
+      "title": "Phase 3: スコアボードに mean_brier_score 行を追加",
+      "rationale": "prediction_page_builder.py の _scoreboard_block() が Brier Score ラベルをすでに定義しているが未使用。resolved 予測の平均 Brier Score をスコアボードカード内に表示する",
+      "target_files": [
+        "scripts/prediction_page_builder.py"
+      ],
+      "acceptance_criteria": [
+        "4列グリッドの下に Brier Score サブ行が表示される（4列グリッド自体は変更しない）",
+        "mean_brier < 0.15 → 緑, 0.15〜0.25 → 黄, ≥0.25 → 赤",
+        "JA/EN 両言語で正しいラベルが出る",
+        "resolved=0 のとき Brier 行は非表示（エラーなし）"
+      ],
+      "status": "done",
+      "created_at": "2026-03-14T19:50:00Z",
+      "updated_at": "2026-03-14T20:00:00Z",
+      "owner": "local-claude",
+      "related_failures": [],
+      "verification_links": []
+    },
+    {
+      "id": "T008",
+      "title": "Phase 4: Persistent Intelligence OS — ガード完成 + リサーチ昇格 + 知識タイムライン",
+      "rationale": "post_edit_task_reconcile（タスクループ閉鎖）+ release_gate（デプロイゲート）+ daily_research_digest（日次要約）+ promote_research_to_tasks（タスク昇格）+ knowledge_timeline.json（知識履歴）を実装し、OS全レイヤーのループを閉じる",
+      "target_files": [
+        "scripts/guard/post_edit_task_reconcile.py",
+        "scripts/guard/release_gate.py",
+        "scripts/research/daily_research_digest.py",
+        "scripts/research/promote_research_to_tasks.py",
+        ".claude/state/knowledge_timeline.json"
+      ],
+      "acceptance_criteria": [
+        "post_edit_task_reconcile.py が PostToolUse(Edit|Write) でタスクステータスを自動更新する",
+        "release_gate.py が critical/high の未解決 failure があればデプロイをブロックする",
+        "daily_research_digest.py が radar.json から人間が読める要約を生成する",
+        "promote_research_to_tasks.py が relevance≥0.6 のアイテムをタスクに昇格する",
+        "knowledge_timeline.json が knowledge_ingestion の履歴を追跡する"
+      ],
+      "status": "done",
+      "created_at": "2026-03-14T20:05:00Z",
+      "updated_at": "2026-03-14T21:30:00Z",
+      "owner": "local-claude",
+      "related_failures": [],
+      "verification_links": [],
+      "completion_notes": "全5スクリプト実装完了 + 6 constitution files (PROJECT_BIBLE / APPROVAL_POLICY / FAILURE_TAXONOMY / SELF_IMPROVEMENT_LOOP / KNOWLEDGE_TIMELINE / MODEL_ROUTING_POLICY) 作成完了 + post_edit_task_reconcile.py を settings.local.json PostToolUse に登録"
+    },
+    {
+      "id": "T009",
+      "title": "Phase 5: F002回帰テスト修正 + doctor.py拡張 + I5 Brier Score実装",
+      "rationale": "article_pipeline.pyのSyntaxError修正後もF002がSKIPのためテスト自体を修正。doctor.pyにguard/research/state JSONチェックを追加。I5（読者Brier Score自動計算）のローカル計算ロジック+VPSマイグレーションスクリプトを実装。",
+      "target_files": [
+        "scripts/eval/tests/failure_regressions/test_F002.py",
+        "scripts/doctor.py",
+        "scripts/reader_brier_calculator.py",
+        "scripts/vps_reader_brier_migration.py",
+        "docs/BACKLOG.md"
+      ],
+      "acceptance_criteria": [
+        "test_F002.py が ArticlePipeline クラスの _get_today_article_count メソッドを正しく呼ぶ",
+        "run_failure_regressions.py で F002=PASS になる",
+        "doctor.py が guard scripts (4件) / research scripts (4件) / state JSON (4件) を追加チェックする",
+        "doctor.py が 56→68 以上のチェック数になる",
+        "scripts/reader_brier_calculator.py が brier_score = (prob/100 - outcome)^2 を計算する",
+        "scripts/vps_reader_brier_migration.py が reader_predictions.db に brier_score/resolved_at/outcome カラムを追加する"
+      ],
+      "status": "done",
+      "created_at": "2026-03-15T02:30:00Z",
+      "updated_at": "2026-03-15T03:30:00Z",
+      "owner": "local-claude",
+      "related_failures": ["F002"],
+      "verification_links": [
+        "scripts/eval/tests/failure_regressions/test_F002.py",
+        "scripts/doctor.py",
+        "scripts/reader_brier_calculator.py",
+        "scripts/vps_reader_brier_migration.py",
+        "docs/BACKLOG.md"
+      ],
+      "completion_notes": "F002 SKIP→PASS完了。doctor.py 56→68 PASS。I5ローカルモジュール+VPSマイグレーションスクリプト実装完了。VPSデプロイはBACKLOG I5にpending記録済み。"
+    },
+    {
+      "id": "T010",
+      "title": "hooks/settings.local.json 摩擦削減リファクタ",
+      "rationale": "defaultMode=bypassPermissions設定済みにもかかわらず、dead hook（intent-confirm/pvqe-p-gate）のレイテンシと release_gate の全Bash実行がノイズを生んでいる。intent-confirm/pvqe-p-gateを削除し、release_gateをSSH/SCP限定＋nightmode bypass＋quietモードに修正する",
+      "target_files": [
+        ".claude/settings.local.json",
+        "scripts/guard/release_gate.py"
+      ],
+      "acceptance_criteria": [
+        "intent-confirm.py が PreToolUse Edit|Write チェーンから削除されている",
+        "pvqe-p-gate.py が PreToolUse Edit|Write チェーンから削除されている",
+        "release_gate.py が VPS SSH/SCP コマンド（163.44.124.123）のみ実行する",
+        "release_gate.py が night_mode.flag 存在時はスキップする",
+        "release_gate.py が PASS 時はサイレント（出力なし）で exit 0 する",
+        "release_gate.py が BLOCKED 時のみ出力・exit 2 する"
+      ],
+      "status": "done",
+      "created_at": "2026-03-15T03:30:00Z",
+      "updated_at": "2026-03-15T04:00:00Z",
+      "owner": "local-claude",
+      "related_failures": [],
+      "verification_links": [
+        ".claude/settings.local.json",
+        "scripts/guard/release_gate.py"
+      ],
+      "completion_notes": "intent-confirm.py/pvqe-p-gate.py（両方 dead code）を PreToolUse Edit|Write チェーンから削除。release_gate.py に --ssh-only モード追加: VPS IP/SCP コマンド限定起動、night_mode bypass、PASS時サイレント exit 0、BLOCKED時のみ出力。8/8 acceptance criteria PASS。"
+    },
+    {
+      "id": "T011",
+      "title": "記憶層アーキテクチャ設計・強制記録機構実装",
+      "rationale": "6層記憶アーキテクチャを設計し、task完了時のcompletion_notes強制（task_close_memory_check.py）、failure→constitution昇格経路の整備（constitution_candidates.json）、モデル名非固定化、ルーティングルール機械可読化（memory_routing_rules.json）を実装し、記録が何も残らないままタスクが閉じる問題を根絶する",
+      "target_files": [
+        ".claude/state/task_ledger.json",
+        ".claude/hooks/state/active_task_id.txt",
+        ".claude/state/failure_regression_index.json",
+        ".claude/state/memory_routing_rules.json",
+        ".claude/state/constitution_candidates.json",
+        ".claude/state/approval_queue.json",
+        "scripts/guard/task_close_memory_check.py",
+        ".claude/hooks/state/mistake_patterns.json",
+        ".claude/rules/SYSTEM_GOVERNOR.md",
+        ".claude/SELF_IMPROVEMENT_LOOP.md",
+        ".claude/SYSTEM_MAP.md",
+        "scripts/doctor.py",
+        ".claude/settings.local.json"
+      ],
+      "acceptance_criteria": [
+        "task_close_memory_check.py が status=done の新規タスク（created_at >= 2026-03-15）に completion_notes がない場合 exit 2 でブロックする",
+        "failure_regression_index.json の F001-F004 resolved_status が failure_memory.json と一致（fixed）する",
+        "memory_routing_rules.json が L1-L6 の6層ルーティングルールを機械可読形式で定義している",
+        "constitution_candidates.json が空配列からスタートし failure 昇格経路が整備されている",
+        "approval_queue.json が SYSTEM_GOVERNOR LEVEL2 互換スキーマを持つ",
+        "SYSTEM_GOVERNOR.md / SELF_IMPROVEMENT_LOOP.md / SYSTEM_MAP.md からモデルバージョン固定表現が消えている",
+        "mistake_patterns.json にモデル固定検知パターンが追加されている",
+        "doctor.py に check_memory_layer_integrity() が追加され L1-L6 の存在確認が通る",
+        "settings.local.json PostToolUse Edit|Write に task_close_memory_check.py が追加されている",
+        "python scripts/doctor.py が 0 FAIL で完走する"
+      ],
+      "status": "done",
+      "created_at": "2026-03-15T04:00:00Z",
+      "updated_at": "2026-03-15T05:30:00Z",
+      "owner": "local-claude",
+      "related_failures": [],
+      "verification_links": [
+        ".claude/state/memory_routing_rules.json",
+        ".claude/state/constitution_candidates.json",
+        ".claude/state/approval_queue.json",
+        "scripts/guard/task_close_memory_check.py",
+        ".claude/hooks/state/mistake_patterns.json",
+        ".claude/rules/SYSTEM_GOVERNOR.md",
+        "scripts/doctor.py",
+        ".claude/settings.local.json"
+      ],
+      "completion_notes": "6層記憶アーキテクチャ（L1-L6）全実装完了。task_close_memory_check.py: done+completion_notes欠如を PostToolUse Edit|Write でブロック（grandfather 2026-03-15以降）。failure_regression_index.json: F001-F004 の resolved_status を failure_memory.json と一致（open→fixed）に修正。memory_routing_rules.json: L1-L6ルーティングルール機械可読化。constitution_candidates.json + approval_queue.json: 昇格・承認キュー新設。SYSTEM_GOVERNOR.md / SELF_IMPROVEMENT_LOOP.md / SYSTEM_MAP.md: model-agnostic化（Opus 4.6→Anthropic Claude）。mistake_patterns.json: MODEL_VERSION_FIXATION パターン追加（21パターン）。doctor.py: check_memory_layer_integrity() 追加 → run() に組み込み。settings.local.json: PostToolUse Edit|Write に task_close_memory_check.py 追加。最終検証: doctor.py 81/81 PASS（0 FAIL）。"
+    }
+  ]
+}

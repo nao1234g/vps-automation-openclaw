@@ -1,0 +1,127 @@
+{
+  "_schema_version": "1.0",
+  "_description": "6層記憶アーキテクチャ ルーティングルール。どの情報をどの記憶層に書くかを機械可読形式で定義。",
+  "_created_at": "2026-03-15T04:00:00Z",
+  "_updated_at": "2026-03-15T04:00:00Z",
+  "layers": [
+    {
+      "id": "L1",
+      "name": "Constitution",
+      "files": [
+        ".claude/rules/NORTH_STAR.md",
+        ".claude/rules/SYSTEM_GOVERNOR.md"
+      ],
+      "description": "変更不可のミッション・三原則・統治ルール。AIによる自律書き換え禁止。",
+      "write_conditions": [
+        "recurrence_count >= 3 かつ severity = critical の failure が constitution_candidates.json に蓄積されている",
+        "Naoto の明示的承認が pending_approvals.json に記録されている"
+      ],
+      "who_can_write": ["Naoto (human only)"],
+      "auto_write_allowed": false,
+      "guard": "north-star-guard.py"
+    },
+    {
+      "id": "L2",
+      "name": "Operating Rules",
+      "files": [
+        ".claude/CLAUDE.md",
+        ".claude/rules/agent-instructions.md",
+        ".claude/rules/infrastructure.md",
+        ".claude/rules/content-rules.md",
+        ".claude/rules/execution-map.md",
+        ".claude/rules/prediction-design-system.md"
+      ],
+      "description": "毎セッション読み込まれる運用ルール。フック・スクリプト対応表。確認済みパターンを書く。",
+      "write_conditions": [
+        "複数セッションを跨いで確認されたパターン",
+        "コードで強制済みのルール（ドキュメントは実装の説明のみ）"
+      ],
+      "who_can_write": ["local-claude (LEVEL2 approval)", "Naoto"],
+      "auto_write_allowed": false,
+      "guard": null
+    },
+    {
+      "id": "L3",
+      "name": "Failure Memory",
+      "files": [
+        ".claude/state/failure_memory.json",
+        ".claude/hooks/state/mistake_patterns.json",
+        ".claude/state/failure_regression_index.json"
+      ],
+      "description": "失敗・エラーの記録。根本原因・症状・防止策・再発回数を追跡。",
+      "write_conditions": [
+        "ツール失敗 (PostToolUseFailure) が発生したとき → failure_capture.py が自動記録",
+        "同一パターンが mistake_patterns.json に未登録のとき → auto-codifier.py が追加",
+        "regression test を PASS させたとき → failure_regression_index.json の last_result を更新"
+      ],
+      "who_can_write": ["failure_capture.py (auto)", "auto-codifier.py (auto)", "local-claude (manual)"],
+      "auto_write_allowed": true,
+      "guard": "failure_capture.py"
+    },
+    {
+      "id": "L4",
+      "name": "Learning Memory",
+      "files": [
+        "/opt/shared/AGENT_WISDOM.md",
+        ".claude/KNOWLEDGE_TIMELINE.md",
+        ".claude/state/knowledge_timeline.json"
+      ],
+      "description": "セッション終了時の学習・エージェント知識共有。Evolution Loop の Brier 分析結果。",
+      "write_conditions": [
+        "セッション終了時 (session-end.sh) → AGENT_WISDOM.md に書き込み",
+        "weekly evolution_loop.py 実行後 → 自己学習ログセクションに追記",
+        "knowledge_ingestion.py が新知識を ingestion したとき"
+      ],
+      "who_can_write": ["session-end.sh (auto)", "evolution_loop.py (auto)", "knowledge_ingestion.py (auto)"],
+      "auto_write_allowed": true,
+      "guard": null
+    },
+    {
+      "id": "L5",
+      "name": "Execution State",
+      "files": [
+        ".claude/state/task_ledger.json",
+        ".claude/hooks/state/active_task_id.txt",
+        ".claude/hooks/state/night_mode.flag"
+      ],
+      "description": "現在進行中のタスク状態。タスクの開始・完了・ブロック状態を追跡。",
+      "write_conditions": [
+        "新タスク開始前 → task_ledger.json に登録し active_task_id.txt を更新",
+        "タスク完了時 → status='done' + completion_notes を必ず記録（task_close_memory_check.py が強制）",
+        "夜間モード → night_mode.flag の存在有無で制御"
+      ],
+      "who_can_write": ["local-claude (manual required)", "post_edit_task_reconcile.py (auto transitions)"],
+      "auto_write_allowed": false,
+      "guard": "task_close_memory_check.py"
+    },
+    {
+      "id": "L6",
+      "name": "Approval Queue",
+      "files": [
+        ".claude/state/approval_queue.json",
+        ".claude/state/constitution_candidates.json"
+      ],
+      "description": "LEVEL2/3 承認待ちキュー。failure が再発して constitution 昇格候補になったものを追跡。",
+      "write_conditions": [
+        "LEVEL2 操作が必要なとき → approval_queue.json に pending で追加",
+        "failure_memory.json の recurrence_count >= 3 かつ severity in [critical, high] → constitution_candidates.json に昇格候補として追加"
+      ],
+      "who_can_write": ["local-claude (manual)", "failure_capture.py (auto escalation check)"],
+      "auto_write_allowed": true,
+      "guard": null
+    }
+  ],
+  "routing_decision_tree": {
+    "description": "情報タイプごとの書き先",
+    "rules": [
+      {"trigger": "ツール失敗・エラー発生", "write_to": ["L3"], "auto": true},
+      {"trigger": "同じミスの再発（2回目以上）", "write_to": ["L3", "L3.mistake_patterns"], "auto": true},
+      {"trigger": "recurrence_count >= 3 AND severity critical/high", "write_to": ["L6.constitution_candidates"], "auto": "check on failure_capture"},
+      {"trigger": "タスク完了", "write_to": ["L5.task_ledger completion_notes"], "auto": false, "guard": "task_close_memory_check.py blocks if missing"},
+      {"trigger": "セッション終了", "write_to": ["L4.AGENT_WISDOM"], "auto": true},
+      {"trigger": "weekly Brier analysis", "write_to": ["L4.AGENT_WISDOM 自己学習ログ"], "auto": true},
+      {"trigger": "LEVEL2 承認要求", "write_to": ["L6.approval_queue"], "auto": false},
+      {"trigger": "構造変更・ミッション変更", "write_to": ["L1"], "auto": false, "guard": "north-star-guard.py blocks without Naoto approval"}
+    ]
+  }
+}

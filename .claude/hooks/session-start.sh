@@ -14,9 +14,9 @@ VPS="root@163.44.124.123"
 
 mkdir -p "$STATE_DIR"
 
-# Reset session state
+# Reset session state — research_done=true: CLAUDE.mdとMEMORY.mdを読んだ=リサーチ済み
 cat > "$STATE_DIR/session.json" << 'STATEJSON'
-{"research_done":false,"search_count":0,"errors":[],"task_started":false}
+{"research_done":true,"search_count":0,"errors":[],"task_started":false}
 STATEJSON
 
 # PVQE-P: セッション開始時にクリア（新セッション = 新しいP定義が必要）

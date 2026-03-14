@@ -275,7 +275,7 @@ try:
         if os.path.exists(cookie_path):
             client.load_cookies(cookie_path)
             r = await client.create_tweet(tweet_text)
-            print(f"OK: Posted to X -> https://x.com/aisaintel/status/{r.id}")
+            print(f"OK: Posted to X -> https://x.com/nowpattern/status/{r.id}")
         else:
             print("ERROR: X cookies not found at " + cookie_path)
 

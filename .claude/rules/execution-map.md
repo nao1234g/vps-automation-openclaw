@@ -110,7 +110,7 @@
 ✅ 完了: Alert Triage — send_telegram(level="info"|"alert") QA PASS→ログのみ, QA FAIL→Telegram (2026-03-09)
 ✅ 完了: Dev-Time Approval Queue — pending_approvals.json + approval_utils.py + session-start.sh自動表示 (2026-03-09)
 ✅ 完了: SOTA & ROI Watcher — model_intel_bot.py 週1回cron(月曜JST09:00) + pending_approvals.jsonにエンキュー (2026-03-09)
-✅ 完了: Prime Directive 刻印 — AGENT_WISDOM.md + /opt/CLAUDE.md 最上段にROI最大化原則 (2026-03-09)
+✅ 完了: Prime Directive 刻印 — AGENT_WISDOM.md + /opt/CLAUDE.md 最上段にROI最大化原則 (2026-03-09)（※ /opt/CLAUDE.md は 2026-03-14 退役済み → AGENT_WISDOM.mdへの刻印は現存）
 ✅ 完了: NEO Queue Dispatcher — neo_queue_dispatcher.py 15分cron + slug単位でNEO-ONE/TWO交互割当 + 88件Pending解消 (2026-03-09)
 ✅ 完了: AI Red-Teaming 全稼働 — redteam_backfill.py 103件np-oracle記事に一括登録 + Dispatcherが15分ごと配送 (2026-03-09)
 ✅ 完了: Self-Evolving Architecture — evolution_loop.py 毎週日曜JST09:00 + Gemini Brier分析 + AGENT_WISDOM.md自己書き換え初回実証済み (2026-03-09)

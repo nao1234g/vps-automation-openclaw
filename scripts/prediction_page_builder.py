@@ -826,12 +826,20 @@ def _scoreboard_block(rows, lang):
     )
     hit_pct = round(hits / (hits + misses) * 100) if (hits + misses) > 0 else 0
 
+    # Mean Brier Score across resolved predictions (lower = better)
+    brier_vals = [r["brier"] for r in resolved if r.get("brier") is not None]
+    mean_brier = round(sum(brier_vals) / len(brier_vals), 4) if brier_vals else None
+
     if lang == "ja":
         header_label = "Nowpatternの予測精度 — 2026年実績（自動更新）"
         total_label = "総予測数"
         hit_label = "✅ 的中"
         miss_label = "❌ 外れ"
         acc_label = "的中率"
+        brier_label = "平均 Brier Score"
+        brier_note_good = "（上位10%水準）"
+        brier_note_ok = "（標準水準）"
+        brier_note_bad = "（改善余地あり）"
         # Comparison bar removed — market accuracy reference not needed
     else:
         header_label = "Nowpattern Prediction Accuracy — 2026 Track Record (auto-updated)"
@@ -839,6 +847,10 @@ def _scoreboard_block(rows, lang):
         hit_label = "✅ Accurate"
         miss_label = "❌ Missed"
         acc_label = "Accuracy"
+        brier_label = "Mean Brier Score"
+        brier_note_good = "(top 10% level)"
+        brier_note_ok = "(standard level)"
+        brier_note_bad = "(room for improvement)"
         # Comparison bar removed — market accuracy reference not needed
 
     # 0件時のempty state
@@ -900,7 +912,23 @@ def _scoreboard_block(rows, lang):
         f'<div style="font-size:0.78em;color:#888;margin-top:4px">{acc_label}</div>'
         '</div>'
         '</div>'
-        '</div>'
+        + (
+            (
+                '<div style="margin-top:10px;padding-top:10px;border-top:1px solid #eee;'
+                'display:flex;align-items:center;gap:8px">'
+                f'<span style="font-size:0.75em;color:#888;letter-spacing:.06em;text-transform:uppercase">'
+                f'{brier_label}</span>'
+                f'<strong style="font-size:1.4em;font-weight:700;color:'
+                + ("#16a34a" if mean_brier < 0.15 else ("#f59e0b" if mean_brier < 0.25 else "#dc2626"))
+                + f'">{mean_brier:.3f}</strong>'
+                f'<span style="font-size:0.78em;color:#aaa">'
+                + (brier_note_good if mean_brier < 0.15 else (brier_note_ok if mean_brier < 0.25 else brier_note_bad))
+                + '</span>'
+                '</div>'
+            )
+            if mean_brier is not None else ""
+        )
+        + '</div>'
     )
 
 
@@ -1734,7 +1762,7 @@ def _build_resolved_card(r, lang):
         result_bg = "#fff0f0"
         result_border = "border:1px solid #fca5a5"
 
-    outcome_en = outcome_map.get(outcome, outcome)
+    outcome_en = outcome_map.get(outcome, outcome) or ""
     result_text = "✅ " + outcome_en + outcome_suffix_hit if is_hit else "❌ " + outcome_en + outcome_suffix_miss
 
     # Collapsed outcome chips

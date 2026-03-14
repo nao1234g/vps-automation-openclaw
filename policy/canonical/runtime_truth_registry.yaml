@@ -1,0 +1,181 @@
+# runtime_truth_registry.yaml
+# -----------------------------------------------------------
+# 「実際に読まれているもの」の唯一の機械可読定義。
+# これが正しい。他のドキュメントが矛盾する場合、このファイルが勝つ。
+# 更新ルール: artifact を追加/変更する場合は必ずこのファイルも更新する。
+# -----------------------------------------------------------
+# Generated: NO (human-edited canonical policy file)
+# Last updated: 2026-03-14
+
+format_version: "1.0"
+
+##############################################################
+# NEO エージェント実効読み込み経路
+##############################################################
+
+neo_agents:
+  neo_one:
+    name: "NEO-ONE"
+    bot_handle: "@claude_brain_nn_bot"
+    systemd_service: "neo-telegram.service"
+    workdir: "/opt/claude-code-telegram"
+
+    # 実効 system prompt source（起動時に ClaudeAgentOptions(system_prompt=...) で注入）
+    runtime_prompt_source:
+      file: "/opt/claude-code-telegram/src/sdk_integration.py"
+      variable: "neo_system_prompt"
+      injection_method: "ClaudeAgentOptions(system_prompt=neo_system_prompt)"
+      confirmed: "2026-03-14"
+
+    # 作業指示書（session ごとに再読み込み）
+    working_instructions:
+      file: "/opt/claude-code-telegram/CLAUDE.md"
+      note: "NEO-ONE の ACTUAL working CLAUDE.md"
+
+    # 退役済み（参照禁止）
+    retired_refs:
+      - path: "/opt/CLAUDE.md"
+        retired_date: "2026-03-14"
+        tombstone: "/opt/CLAUDE.md.retired-20260314"
+
+  neo_two:
+    name: "NEO-TWO"
+    bot_handle: "@neo_two_nn2026_bot"
+    systemd_service: "neo2-telegram.service"
+    workdir: "/opt/claude-code-telegram-neo2"
+
+    runtime_prompt_source:
+      file: "/opt/claude-code-telegram-neo2/src/sdk_integration.py"
+      variable: "neo_system_prompt"
+      injection_method: "ClaudeAgentOptions(system_prompt=neo_system_prompt)"
+      confirmed: "2026-03-14"
+
+    working_instructions:
+      file: "/opt/claude-code-telegram-neo2/CLAUDE.md"
+      note: "NEO-TWO の ACTUAL working CLAUDE.md"
+
+    retired_refs:
+      - path: "/opt/CLAUDE.md"
+        retired_date: "2026-03-14"
+        tombstone: "/opt/CLAUDE.md.retired-20260314"
+
+  neo_gpt:
+    name: "NEO-GPT"
+    backend: "OpenAI Codex CLI"
+    systemd_service: "neo3-telegram.service"
+    workdir: "/opt/neo3-codex"
+    role: "NEO-ONE/TWO のバックアップ。翻訳には使わない。"
+
+##############################################################
+# VPS 共有ドキュメント
+##############################################################
+
+vps_shared_docs:
+  shared_state:
+    path: "/opt/shared/SHARED_STATE.md"
+    type: "generated"
+    generator: "/opt/shared/scripts/generate_shared_state.py"
+    cron: "*/30 * * * *"
+    note: "30分ごと自動再生成。手動編集禁止。"
+
+  agent_wisdom:
+    path: "/opt/shared/AGENT_WISDOM.md"
+    type: "human-edited + auto-appended"
+    role: "全エージェント共有知識ゲートウェイ。doctrine への入口。doctrine 原本ではない。"
+    auto_append_sections:
+      - "## 自己学習ログ"  # evolution_loop.py が毎週日曜に追記
+
+  north_star_vps:
+    path: "/opt/shared/rules/NORTH_STAR.md"
+    type: "synced from local"
+    local_canonical: ".claude/rules/NORTH_STAR.md"
+    note: "/opt/CLAUDE.md 退役に伴う修正済み (2026-03-14)"
+
+  infrastructure_vps:
+    path: "/opt/shared/rules/infrastructure.md"
+    type: "synced from local"
+    local_canonical: ".claude/rules/infrastructure.md"
+    note: "誤参照修正済み (2026-03-14)"
+
+  system_briefing:
+    path: "/opt/shared/SYSTEM_BRIEFING.md"
+    type: "generated"
+    generator: "gen_system_briefing.py"
+    cron_status: "SUSPENDED"
+    note: "cron が停止中。SHARED_STATE.md で代替されている。"
+
+##############################################################
+# ローカル repo ドキュメント
+##############################################################
+
+local_repo:
+  north_star:
+    path: ".claude/rules/NORTH_STAR.md"
+    type: "human-edited canonical"
+    role: "ミッション / Eternal Directives / 経営者OS 最上位文書"
+    ai_write_protected: true
+    note: "north-star-guard.py が書き換えを物理ブロック"
+
+  agent_instructions:
+    path: ".claude/rules/agent-instructions.md"
+    type: "human-edited"
+    role: "AI行動原則・判断フレーム"
+
+  content_rules:
+    path: ".claude/rules/content-rules.md"
+    type: "human-edited"
+    role: "コンテンツ・タグ・X投稿ルール"
+
+  execution_map:
+    path: ".claude/rules/execution-map.md"
+    type: "human-edited"
+    role: "原則→実装対応表・強制タイプ定義"
+
+  infrastructure_local:
+    path: ".claude/rules/infrastructure.md"
+    type: "human-edited"
+    role: "NEO/Docker/HeyLoop インフラ定義"
+
+  prediction_design:
+    path: ".claude/rules/prediction-design-system.md"
+    type: "human-edited canonical"
+    role: "予測ページ凍結デザインシステム"
+    ai_write_protected: true
+
+  claude_md:
+    path: ".claude/CLAUDE.md"
+    type: "human-edited"
+    role: "ローカル Claude Code セッション用マスター指示書 (NORTH_STAR をインポート)"
+
+##############################################################
+# 重要スクリプト・サービス（VPS）
+##############################################################
+
+vps_services:
+  ghost_cms:
+    service: "ghost-nowpattern.service"
+    url: "https://nowpattern.com"
+    db: "/var/www/nowpattern/content/data/ghost.db"
+
+  reader_prediction_api:
+    path: "/opt/shared/scripts/reader_prediction_api.py"
+    port: 8766
+    caddy_prefix: "/reader-predict/*"
+    db: "/opt/shared/reader_predictions.db"
+    note: "ポート8766は専用。他用途に転用禁止。"
+
+  ghost_page_guardian:
+    service: "ghost-page-guardian.service"
+    path: "/opt/shared/scripts/ghost_page_guardian.py"
+    port: 8769
+    note: "記事公開 0.1秒後に QA 自動実行"
+
+  prediction_page_builder:
+    path: "/opt/shared/scripts/prediction_page_builder.py"
+    cron: "毎日 JST 07:00"
+    note: "FileLock + コンテンツハッシュチェック実装済み (2026-03-04)"
+
+  evolution_loop:
+    path: "/opt/shared/scripts/evolution_loop.py"
+    cron: "毎週日曜 JST 09:00"
+    note: "Brier Score → Gemini分析 → AGENT_WISDOM.md 自動追記"
