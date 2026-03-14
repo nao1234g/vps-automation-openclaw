@@ -654,6 +654,256 @@ def search_markets(keyword: str, limit: int = 20):
         print()
 
 
+# ── 自動リンク（--auto-link） ────────────────────────────────────────
+
+import re as _re
+
+# キーワード抽出用ストップワード
+_STOPWORDS = {
+    "the", "a", "an", "is", "are", "was", "were", "to", "of", "in",
+    "for", "on", "with", "at", "by", "from", "and", "but", "or", "it",
+    "will", "would", "can", "has", "have", "not", "this", "that", "all",
+    "be", "been", "do", "does", "did", "how", "what", "which", "when",
+    "where", "who", "why", "if", "than", "its", "more", "most", "some",
+    "の", "は", "が", "を", "に", "で", "と", "も", "する", "した",
+    "い", "ない", "ある", "いる", "こと", "これ", "それ", "この",
+    "その", "あの", "という", "への", "から", "まで", "として",
+    "による", "について", "における", "deep", "pattern", "analysis",
+}
+
+
+def _extract_keywords(text: str, min_len: int = 2) -> set:
+    """テキストからキーワードを抽出（ストップワード除去）"""
+    if not text:
+        return set()
+    words = set()
+    # 英数字+日本語単語を抽出
+    for w in _re.findall(r'[A-Za-z0-9]{2,}|[\u3040-\u9fff]{2,}', text):
+        w_lower = w.lower()
+        if w_lower not in _STOPWORDS and len(w) >= min_len:
+            words.add(w_lower)
+    return words
+
+
+def _score_market_match(pred_keywords: set, market_question: str, market_event: str) -> float:
+    """予測のキーワードと市場の質問/イベント名のマッチスコアを計算"""
+    market_text = f"{market_question} {market_event or ''}".lower()
+    if not pred_keywords:
+        return 0.0
+    matches = sum(1 for kw in pred_keywords if kw in market_text)
+    return matches / len(pred_keywords) if pred_keywords else 0.0
+
+
+def _infer_resolution_direction(scenarios: list) -> str:
+    """シナリオ構造からresolution_directionを推定。
+    - 楽観シナリオの確率 > 悲観 → YESが起きたら楽観 = 'optimistic'
+    - 悲観シナリオの確率 > 楽観 → YESが起きたら悲観 = 'pessimistic'
+    - デフォルト: 'pessimistic'（YESが悲観的事象を示す市場が多い）
+    """
+    opt_prob = 0.0
+    pes_prob = 0.0
+    for s in scenarios:
+        label = s.get("label", "")
+        prob = s.get("probability", 0)
+        if "楽観" in label or "optimistic" in label.lower():
+            opt_prob = prob
+        elif "悲観" in label or "pessimistic" in label.lower():
+            pes_prob = prob
+    # 悲観の確率が低い（稀な事象）→ 市場のYESはその稀な事象 = pessimistic
+    # 楽観の確率が低い（稀な事象）→ 市場のYESはその稀な事象 = optimistic
+    if pes_prob < opt_prob:
+        return "pessimistic"
+    return "optimistic"
+
+
+def _generate_resolution_question(pred: dict) -> tuple:
+    """予測からresolution_question（JA + EN）を自動生成。
+    returns: (question_ja, question_en)
+    """
+    title = pred.get("article_title", "")
+    triggers = pred.get("triggers", [])
+    open_loop = pred.get("open_loop_trigger", "")
+
+    # トリガーから最初の期限と名前を取得
+    trigger_name = ""
+    trigger_date = ""
+    if triggers:
+        t = triggers[0]
+        if isinstance(t, dict):
+            trigger_name = t.get("name", "")
+            trigger_date = t.get("date", "")
+        elif isinstance(t, (list, tuple)) and len(t) >= 2:
+            trigger_name = t[0]
+            trigger_date = t[1]
+
+    # JA: トリガー名をベースに質問を構築
+    if trigger_name:
+        question_ja = f"{trigger_name}は実現するか？"
+    elif open_loop:
+        question_ja = f"{open_loop}の結果はどうなるか？"
+    else:
+        # タイトルから生成
+        question_ja = f"{title[:60]}の予測は的中するか？"
+
+    # EN: シンプルな翻訳パターン
+    question_en = f"Will the prediction about '{title[:60]}' come true?"
+
+    return question_ja, question_en
+
+
+def auto_link_predictions(dry_run: bool = False):
+    """
+    未リンクの予測を market_history.db のマーケットと自動マッチングし、
+    nowpattern_links を作成する。さらに resolution_question / resolution_direction を
+    prediction_db.json に自動追記する。
+
+    --auto-link で呼ばれる。
+    """
+    print(f"=== Auto-Link Predictions {'[DRY RUN]' if dry_run else ''} ===")
+    print(f"時刻: {datetime.now().strftime('%Y-%m-%d %H:%M JST')}")
+
+    db = get_db()
+    cur = db.cursor()
+
+    # 既存リンクの prediction_id 一覧
+    cur.execute("SELECT DISTINCT prediction_id FROM nowpattern_links")
+    linked_ids = {row["prediction_id"] for row in cur.fetchall()}
+
+    # prediction_db.json を読む
+    data = load_prediction_db()
+    predictions = data.get("predictions", [])
+    open_preds = [p for p in predictions if p.get("status") == "open"]
+
+    print(f"  予測総数: {len(predictions)} | 未判定: {len(open_preds)} | リンク済み: {len(linked_ids)}")
+
+    # 全マーケットを取得（未解決のものを優先）
+    cur.execute("""
+        SELECT m.id, m.source, m.external_id, m.question, m.event_title,
+               m.close_date, m.resolved,
+               ps.yes_prob, ps.snapshot_date
+        FROM markets m
+        LEFT JOIN (
+            SELECT market_id, yes_prob, snapshot_date,
+                   ROW_NUMBER() OVER (PARTITION BY market_id ORDER BY snapshot_date DESC) as rn
+            FROM probability_snapshots
+        ) ps ON m.id = ps.market_id AND ps.rn = 1
+        WHERE m.resolved = 0
+        ORDER BY m.last_updated DESC
+    """)
+    all_markets = cur.fetchall()
+    print(f"  利用可能マーケット: {len(all_markets)} 件")
+
+    linked_count = 0
+    enriched_count = 0
+
+    for pred in open_preds:
+        pid = pred["prediction_id"]
+
+        # --- Step A: resolution_question / resolution_direction が未設定なら自動生成 ---
+        if not pred.get("resolution_question") or not pred.get("resolution_direction"):
+            q_ja, q_en = _generate_resolution_question(pred)
+            direction = _infer_resolution_direction(pred.get("scenarios", []))
+
+            if not dry_run:
+                pred["resolution_question"] = q_ja
+                pred["resolution_question_en"] = q_en
+                pred["resolution_direction"] = direction
+                # our_pick: 基本シナリオの確率が最高 → そのまま、それ以外は最高確率シナリオ
+                scenarios = pred.get("scenarios", [])
+                if scenarios:
+                    best = max(scenarios, key=lambda s: s.get("probability", 0))
+                    pred["our_pick"] = best.get("label", "基本シナリオ")
+                    pred["our_pick_prob"] = int(best.get("probability", 0) * 100)
+
+            enriched_count += 1
+            print(f"  📝 {pid}: resolution_question 生成 → {q_ja[:50]}...")
+
+        # --- Step B: nowpattern_links が未設定ならマーケットを検索してリンク ---
+        if pid in linked_ids:
+            continue
+
+        # キーワード抽出（タイトル + トリガー名 + open_loop）
+        title = pred.get("article_title", "")
+        trigger_names = ""
+        for t in pred.get("triggers", []):
+            if isinstance(t, dict):
+                trigger_names += " " + t.get("name", "")
+            elif isinstance(t, (list, tuple)):
+                trigger_names += " " + str(t[0])
+        open_loop = pred.get("open_loop_trigger", "")
+        search_text = f"{title} {trigger_names} {open_loop}"
+        keywords = _extract_keywords(search_text)
+
+        if not keywords:
+            print(f"  [SKIP] {pid}: キーワード抽出失敗")
+            continue
+
+        # マーケットのスコアリング
+        best_match = None
+        best_score = 0.0
+        MATCH_THRESHOLD = 0.2  # 最低20%のキーワード一致
+
+        for market in all_markets:
+            score = _score_market_match(
+                keywords,
+                market["question"],
+                market["event_title"]
+            )
+            if score > best_score:
+                best_score = score
+                best_match = market
+
+        if best_match and best_score >= MATCH_THRESHOLD:
+            direction = pred.get("resolution_direction") or \
+                _infer_resolution_direction(pred.get("scenarios", []))
+
+            print(f"  🔗 {pid} → market_id={best_match['id']} "
+                  f"(score={best_score:.2f}): {best_match['question'][:50]}...")
+
+            if not dry_run:
+                now_str = datetime.now(timezone.utc).isoformat()
+                try:
+                    cur.execute("""
+                        INSERT OR IGNORE INTO nowpattern_links
+                        (prediction_id, market_id, source, external_market_id,
+                         resolution_direction, notes, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        pid, best_match["id"], best_match["source"],
+                        best_match["external_id"], direction,
+                        f"auto-link score={best_score:.2f}", now_str
+                    ))
+                    db.commit()
+                    linked_count += 1
+
+                    # market_consensus を prediction_db に追記
+                    if best_match["yes_prob"] is not None:
+                        pred["market_consensus"] = {
+                            "question": best_match["question"],
+                            "probability": round(best_match["yes_prob"] * 100, 1),
+                            "source": best_match["source"],
+                            "market_id": best_match["id"],
+                            "snapshot_date": best_match["snapshot_date"],
+                        }
+                except Exception as e:
+                    print(f"  [ERROR] {pid}: リンク追加失敗 — {e}")
+            else:
+                linked_count += 1
+        else:
+            print(f"  [NO MATCH] {pid}: 最高スコア={best_score:.2f} (閾値={MATCH_THRESHOLD})")
+
+    db.close()
+
+    # prediction_db.json を保存
+    if not dry_run and (enriched_count > 0 or linked_count > 0):
+        save_prediction_db(data)
+
+    print(f"\n=== Auto-Link 完了 ===")
+    print(f"  resolution_question 生成: {enriched_count} 件")
+    print(f"  新規リンク作成: {linked_count} 件")
+    return linked_count
+
+
 # ── CLI ───────────────────────────────────────────────────────────────
 
 def main():
@@ -669,6 +919,8 @@ def main():
     parser.add_argument("--notes", default="", help="メモ")
     parser.add_argument("--search", help="キーワードで market を検索")
     parser.add_argument("--limit", type=int, default=20, help="検索結果の最大件数")
+    parser.add_argument("--auto-link", action="store_true",
+                        help="未リンクの予測をマーケットと自動マッチング")
     args = parser.parse_args()
 
     if args.status:
@@ -681,6 +933,8 @@ def main():
         add_link(args.prediction_id, args.market_id, args.direction, args.notes)
     elif args.search:
         search_markets(args.search, args.limit)
+    elif args.auto_link:
+        auto_link_predictions(dry_run=args.dry_run)
     else:
         run_resolver(dry_run=args.dry_run)
 

@@ -81,8 +81,6 @@ STOPWORDS = {
 }
 
 # ── UI constants ───────────────────────────────────────────────
-MARKET_ACCURACY_PCT = 68  # TODO: auto-fetch from Manifold aggregate
-
 CATEGORY_LABELS = {
     "ja": [("all", "全て"), ("economy", "経済・貿易"), ("geopolitics", "地政学"),
            ("technology", "テクノロジー"), ("finance", "金融")],
