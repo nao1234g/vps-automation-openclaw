@@ -168,6 +168,7 @@ EN版: nowpattern.com/en/[name]/    ← Ghostスラッグ: en-[name]（内部名
 > 以下のファイルはClaude Codeが自動的に読み込む。テーブルではなく行単位で記述すること。
 
 @.claude/rules/NORTH_STAR.md
+@.claude/rules/OPERATING_PRINCIPLES.md
 @.claude/rules/execution-map.md
 @.claude/rules/agent-instructions.md
 @.claude/rules/infrastructure.md

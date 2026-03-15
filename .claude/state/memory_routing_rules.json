@@ -2,16 +2,17 @@
   "_schema_version": "1.0",
   "_description": "6層記憶アーキテクチャ ルーティングルール。どの情報をどの記憶層に書くかを機械可読形式で定義。",
   "_created_at": "2026-03-15T04:00:00Z",
-  "_updated_at": "2026-03-15T04:00:00Z",
+  "_updated_at": "2026-03-15T06:30:00Z",
+  "_changelog": "T012(2026-03-15): L1にOPERATING_PRINCIPLES.md追加。SYSTEM_GOVERNORをL1→L2に移動。三層階層（NORTH_STAR→OPERATING_PRINCIPLES→SYSTEM_GOVERNOR）を反映。",
   "layers": [
     {
       "id": "L1",
       "name": "Constitution",
       "files": [
         ".claude/rules/NORTH_STAR.md",
-        ".claude/rules/SYSTEM_GOVERNOR.md"
+        ".claude/rules/OPERATING_PRINCIPLES.md"
       ],
-      "description": "変更不可のミッション・三原則・統治ルール。AIによる自律書き換え禁止。",
+      "description": "変更不可のミッション・三原則・行動原則（why: 価値とwhat: 原則）。AIによる自律書き換え禁止。north-star-guard.pyが物理ブロック。",
       "write_conditions": [
         "recurrence_count >= 3 かつ severity = critical の failure が constitution_candidates.json に蓄積されている",
         "Naoto の明示的承認が pending_approvals.json に記録されている"
@@ -25,6 +26,7 @@
       "name": "Operating Rules",
       "files": [
         ".claude/CLAUDE.md",
+        ".claude/rules/SYSTEM_GOVERNOR.md",
         ".claude/rules/agent-instructions.md",
         ".claude/rules/infrastructure.md",
         ".claude/rules/content-rules.md",

@@ -1,0 +1,92 @@
+{
+  "_comment": "このファイルは .claude/settings.local.json のテンプレート。settings.local.json は gitignore 済み。",
+  "_profiles": "safe / balanced(推奨) / automation の3プロファイルを下に定義。用途に応じて選ぶ。",
+
+  "_PROFILE_safe": {
+    "_use_case": "共有PC・初回セットアップ・見知らぬrepo",
+    "defaultMode": "default",
+    "permissions": {
+      "deny": [
+        "Read(**/.env)", "Read(**/.env.*)",
+        "Read(**/*credentials*)", "Read(**/*secret*)",
+        "Read(**/*private_key*)", "Read(**/*.pem)", "Read(**/*.key)",
+        "Write(**/.env)", "Write(**/.env.*)",
+        "Bash(*rm -rf /*)", "Bash(*dd if=*)"
+      ]
+    }
+  },
+
+  "_PROFILE_balanced_RECOMMENDED": {
+    "_use_case": "日常開発・このrepoの標準運用（推奨）",
+    "defaultMode": "acceptEdits",
+    "permissions": {
+      "allow": [
+        "Bash(git status)", "Bash(git diff*)", "Bash(git log*)",
+        "Bash(git add*)", "Bash(git show*)", "Bash(git branch*)",
+        "Bash(ssh root@163.44.124.123 *cat*)",
+        "Bash(ssh root@163.44.124.123 *ls*)",
+        "Bash(ssh root@163.44.124.123 *systemctl status*)",
+        "Bash(python *doctor.py*)", "Bash(python *audit_retired_refs.py*)"
+      ],
+      "deny": [
+        "Read(**/.env)", "Read(**/.env.*)",
+        "Read(**/*credentials*)", "Read(**/*secret*)",
+        "Read(**/*private_key*)", "Read(**/*.pem)", "Read(**/*.key)",
+        "Write(**/.env)", "Write(**/.env.*)",
+        "Bash(*rm -rf /*)", "Bash(*rm -rf ~*)",
+        "Bash(*dd if=*)", "Bash(*mkfs*)"
+      ]
+    }
+  },
+
+  "_PROFILE_automation": {
+    "_use_case": "信頼済みrepo・Night Mode・CI/CD（危険あり、自己責任）",
+    "_warning": "bypassPermissions は deny を含む全チェックを無効にする。慎重に使うこと。",
+    "defaultMode": "bypassPermissions",
+    "permissions": {
+      "deny": [
+        "Read(**/.env)", "Read(**/.env.*)",
+        "Read(**/*credentials*)", "Read(**/*secret*)",
+        "Read(**/*private_key*)", "Read(**/*.pem)", "Read(**/*.key)",
+        "Write(**/.env)", "Write(**/.env.*)"
+      ]
+    }
+  },
+
+  "_ACTUAL_CONFIG_BELOW": "↓ここから実際の設定（使うプロファイルを貼り替える）",
+
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "ANTHROPIC_MODEL": "claude-opus-4-6",
+    "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1"
+  },
+  "defaultMode": "acceptEdits",
+  "permissions": {
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*credentials*)",
+      "Read(**/*secret*)",
+      "Read(**/*private_key*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Write(**/.env)",
+      "Write(**/.env.*)",
+      "Write(**/*credentials*)",
+      "Write(**/*private_key*)"
+    ],
+    "allow": [
+      "Bash(git status)", "Bash(git diff*)", "Bash(git log*)",
+      "Bash(git add*)", "Bash(git show*)", "Bash(git branch*)",
+      "Bash(python *doctor.py*)", "Bash(python *audit_retired_refs.py*)",
+      "Bash(ssh root@163.44.124.123 *cat /opt/shared/SHARED_STATE.md*)",
+      "Bash(ssh root@163.44.124.123 *systemctl status*)"
+    ],
+    "additionalDirectories": [
+      "\\tmp",
+      "c:\\tmp",
+      "C:\\Users\\user\\AppData\\Roaming\\Code\\User"
+    ]
+  },
+  "model": "claude-opus-4-6"
+}

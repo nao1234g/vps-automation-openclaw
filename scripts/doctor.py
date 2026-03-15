@@ -153,6 +153,92 @@ class Doctor:
             self.check("NORTH_STAR.md (Yanai-Geneen OS)", "WARN",
                        "Yanai-Geneen Executive OS セクションが見当たらない", "WARNING")
 
+    def check_three_layer_constitution(self):
+        """三層憲法ヒエラルキー整合性チェック
+        NORTH_STAR（価値）→ OPERATING_PRINCIPLES（原則）→ SYSTEM_GOVERNOR（統治）
+        """
+        rules_dir = REPO_ROOT / ".claude" / "rules"
+        claude_md = REPO_ROOT / ".claude" / "CLAUDE.md"
+        guard = REPO_ROOT / ".claude" / "hooks" / "north-star-guard.py"
+        routing = REPO_ROOT / ".claude" / "state" / "memory_routing_rules.json"
+
+        # 1. L1: NORTH_STAR.md 存在
+        p_ns = rules_dir / "NORTH_STAR.md"
+        self.check("3layer-L1: NORTH_STAR.md 存在",
+                   "PASS" if p_ns.exists() else "FAIL",
+                   "" if p_ns.exists() else f"NORTH_STAR.md が存在しない: {p_ns}",
+                   "ERROR" if not p_ns.exists() else "INFO")
+
+        # 2. L1: OPERATING_PRINCIPLES.md 存在（正式復活確認）
+        p_op = rules_dir / "OPERATING_PRINCIPLES.md"
+        self.check("3layer-L1: OPERATING_PRINCIPLES.md 存在 (.claude/rules/)",
+                   "PASS" if p_op.exists() else "FAIL",
+                   "" if p_op.exists() else f"OPERATING_PRINCIPLES.md が .claude/rules/ に存在しない — T012 要件未充足",
+                   "ERROR" if not p_op.exists() else "INFO")
+
+        # 3. CLAUDE.md が OPERATING_PRINCIPLES.md を @import しているか
+        if claude_md.exists():
+            claude_content = claude_md.read_text(encoding="utf-8")
+            has_op_import = "@.claude/rules/OPERATING_PRINCIPLES.md" in claude_content
+            self.check("3layer: CLAUDE.md @import OPERATING_PRINCIPLES.md",
+                       "PASS" if has_op_import else "FAIL",
+                       "" if has_op_import else "CLAUDE.md が @.claude/rules/OPERATING_PRINCIPLES.md を import していない",
+                       "ERROR" if not has_op_import else "INFO")
+        else:
+            self.check("3layer: CLAUDE.md @import", "FAIL", "CLAUDE.md が存在しない", "ERROR")
+
+        # 4. north-star-guard.py が新パスを保護しているか
+        if guard.exists():
+            guard_content = guard.read_text(encoding="utf-8")
+            has_new_path = "/.claude/rules/operating_principles.md" in guard_content
+            has_old_path = "/docs/archive/operating_principles.md" in guard_content
+            if has_new_path and not has_old_path:
+                self.check("3layer: north-star-guard.py パス更新", "PASS",
+                           "/.claude/rules/operating_principles.md を保護")
+            elif has_old_path:
+                self.check("3layer: north-star-guard.py パス更新", "FAIL",
+                           "古いパス /docs/archive/operating_principles.md が残存 — 更新が必要",
+                           "ERROR")
+            else:
+                self.check("3layer: north-star-guard.py パス更新", "WARN",
+                           "OPERATING_PRINCIPLES.md の保護パスが見当たらない", "WARNING")
+        else:
+            self.check("3layer: north-star-guard.py 存在", "FAIL",
+                       f"north-star-guard.py が存在しない: {guard}", "ERROR")
+
+        # 5. memory_routing_rules.json の L1 に OPERATING_PRINCIPLES.md が含まれるか
+        if routing.exists():
+            try:
+                rdata = json.loads(routing.read_text(encoding="utf-8"))
+                l1 = next((l for l in rdata.get("layers", []) if l.get("id") == "L1"), None)
+                l2 = next((l for l in rdata.get("layers", []) if l.get("id") == "L2"), None)
+                if l1:
+                    l1_files = l1.get("files", [])
+                    has_op_l1 = any("OPERATING_PRINCIPLES" in f for f in l1_files)
+                    sg_in_l1 = any("SYSTEM_GOVERNOR" in f for f in l1_files)
+                    self.check("3layer: memory_routing_rules L1 OPERATING_PRINCIPLES",
+                               "PASS" if has_op_l1 else "FAIL",
+                               "" if has_op_l1 else "L1 に OPERATING_PRINCIPLES.md が含まれていない",
+                               "ERROR" if not has_op_l1 else "INFO")
+                    if sg_in_l1:
+                        self.check("3layer: memory_routing_rules SYSTEM_GOVERNOR L1誤配置",
+                                   "FAIL", "SYSTEM_GOVERNOR.md が L1 に残存 — L2 に移動が必要", "ERROR")
+                    else:
+                        self.check("3layer: memory_routing_rules SYSTEM_GOVERNOR L1から除去", "PASS")
+                if l2:
+                    l2_files = l2.get("files", [])
+                    sg_in_l2 = any("SYSTEM_GOVERNOR" in f for f in l2_files)
+                    self.check("3layer: memory_routing_rules L2 SYSTEM_GOVERNOR",
+                               "PASS" if sg_in_l2 else "WARN",
+                               "" if sg_in_l2 else "L2 に SYSTEM_GOVERNOR.md が含まれていない（推奨）",
+                               "WARNING" if not sg_in_l2 else "INFO")
+            except Exception as e:
+                self.check("3layer: memory_routing_rules.json パース", "WARN",
+                           f"パースエラー: {e}", "WARNING")
+        else:
+            self.check("3layer: memory_routing_rules.json 存在", "FAIL",
+                       f"memory_routing_rules.json が存在しない: {routing}", "ERROR")
+
     def check_hooks(self):
         """重要 hooks の存在確認"""
         critical_hooks = [
@@ -386,8 +472,8 @@ class Doctor:
         state_dir = REPO_ROOT / ".claude" / "state"
         rules_dir = REPO_ROOT / ".claude" / "rules"
 
-        # L1: Constitution
-        for fname in ["NORTH_STAR.md", "SYSTEM_GOVERNOR.md"]:
+        # L1: Constitution（NORTH_STAR + OPERATING_PRINCIPLES）
+        for fname in ["NORTH_STAR.md", "OPERATING_PRINCIPLES.md"]:
             p = rules_dir / fname
             self.check(
                 f"memory-L1: {fname}",
@@ -395,6 +481,21 @@ class Doctor:
                 "" if p.exists() else f"L1 Constitution ファイルが存在しない: {p}",
                 "ERROR" if not p.exists() else "INFO",
             )
+
+        # L1→L2 整合性: SYSTEM_GOVERNOR.md は L1 ではなく L2（Operating Rules）
+        p_sg = rules_dir / "SYSTEM_GOVERNOR.md"
+        if p_sg.exists():
+            content_sg = p_sg.read_text(encoding="utf-8")
+            if "このファイルは `.claude/rules/OPERATING_PRINCIPLES.md` の実装統治仕様です" in content_sg:
+                self.check("memory-L1→L2: SYSTEM_GOVERNOR配置宣言", "PASS",
+                           "SYSTEM_GOVERNOR.md に OPERATING_PRINCIPLES の実装統治仕様であることが宣言済み")
+            else:
+                self.check("memory-L1→L2: SYSTEM_GOVERNOR配置宣言", "FAIL",
+                           "SYSTEM_GOVERNOR.md の冒頭に実装統治仕様宣言がない — T012要件未充足",
+                           "ERROR")
+        else:
+            self.check("memory-L1→L2: SYSTEM_GOVERNOR.md 存在", "FAIL",
+                       f"SYSTEM_GOVERNOR.md が存在しない: {p_sg}", "ERROR")
 
         # L2: Operating Rules — CLAUDE.md
         p_claude = REPO_ROOT / ".claude" / "CLAUDE.md"
@@ -493,6 +594,251 @@ class Doctor:
                     "memory-L3: regression_index vs failure_memory 整合性",
                     "WARN", f"チェックエラー: {e}", "WARNING"
                 )
+
+    def check_state_integrity(self):
+        """承認キュー・Constitution候補・active_task_id の陳腐化チェック"""
+        state_dir = REPO_ROOT / ".claude" / "state"
+        now = datetime.now(timezone.utc)
+
+        # approval_queue.json の陳腐化チェック
+        p_aq = state_dir / "approval_queue.json"
+        if p_aq.exists():
+            try:
+                aq = json.loads(p_aq.read_text(encoding="utf-8"))
+                stale_7 = []
+                stale_30 = []
+                for item in aq.get("queue", []):
+                    if item.get("status") != "pending":
+                        continue
+                    ts_str = item.get("created_at") or item.get("proposed_at", "")
+                    if not ts_str:
+                        continue
+                    try:
+                        ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                        age_days = (now - ts).days
+                        label = f"[{item.get('id','?')}] {item.get('title','')[:50]}"
+                        if age_days > 30:
+                            stale_30.append(f"{label} ({age_days}d)")
+                        elif age_days > 7:
+                            stale_7.append(f"{label} ({age_days}d)")
+                    except Exception:
+                        pass
+                if stale_30:
+                    self.check("state: approval_queue staleness >30d", "FAIL",
+                               f"30日以上放置の承認待ち: {stale_30[:3]}", "ERROR")
+                elif stale_7:
+                    self.check("state: approval_queue staleness >7d", "WARN",
+                               f"7日以上放置の承認待ち: {stale_7[:3]}", "WARNING")
+                else:
+                    self.check("state: approval_queue staleness", "PASS")
+            except Exception as e:
+                self.check("state: approval_queue staleness", "WARN",
+                           f"チェックエラー: {e}", "WARNING")
+        else:
+            self.check("state: approval_queue staleness", "WARN",
+                       "approval_queue.json が存在しない", "WARNING")
+
+        # constitution_candidates.json の open 候補陳腐化チェック（30日超 WARN）
+        p_cc = state_dir / "constitution_candidates.json"
+        if p_cc.exists():
+            try:
+                cc = json.loads(p_cc.read_text(encoding="utf-8"))
+                stale_cc = []
+                for c in cc.get("candidates", []):
+                    if c.get("status") != "open":
+                        continue
+                    ts_str = c.get("escalated_at", "")
+                    if not ts_str:
+                        continue
+                    try:
+                        ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                        age_days = (now - ts).days
+                        if age_days > 30:
+                            label = f"[{c.get('candidate_id','?')}] {c.get('title','')[:50]}"
+                            stale_cc.append(f"{label} ({age_days}d)")
+                    except Exception:
+                        pass
+                if stale_cc:
+                    self.check("state: constitution_candidates staleness", "WARN",
+                               f"30日以上 open の候補: {stale_cc[:3]}", "WARNING")
+                else:
+                    self.check("state: constitution_candidates staleness", "PASS")
+            except Exception as e:
+                self.check("state: constitution_candidates staleness", "WARN",
+                           f"チェックエラー: {e}", "WARNING")
+        else:
+            self.check("state: constitution_candidates staleness", "WARN",
+                       "constitution_candidates.json が存在しない", "WARNING")
+
+        # active_task_id.txt が done/archived を指していないかチェック
+        p_active = REPO_ROOT / ".claude" / "hooks" / "state" / "active_task_id.txt"
+        p_ledger = state_dir / "task_ledger.json"
+        if p_active.exists() and p_ledger.exists():
+            try:
+                active_id = p_active.read_text(encoding="utf-8").strip()
+                if active_id:
+                    ledger = json.loads(p_ledger.read_text(encoding="utf-8"))
+                    task_map = {t["id"]: t for t in ledger.get("tasks", [])}
+                    task = task_map.get(active_id)
+                    if task is None:
+                        self.check("state: active_task_id validity", "WARN",
+                                   f"active_task_id='{active_id}' が台帳に存在しない", "WARNING")
+                    elif task.get("status") in ("done", "archived"):
+                        self.check("state: active_task_id validity", "FAIL",
+                                   f"active_task_id='{active_id}' は完了済み "
+                                   f"(status={task.get('status')}) — 更新必要", "ERROR")
+                    else:
+                        self.check("state: active_task_id validity", "PASS",
+                                   f"{active_id} status={task.get('status')}")
+                else:
+                    self.check("state: active_task_id validity", "PASS",
+                               "active_task_id 空（タスク未設定）")
+            except Exception as e:
+                self.check("state: active_task_id validity", "WARN",
+                           f"チェックエラー: {e}", "WARNING")
+
+    def check_model_fixation_in_principles(self):
+        """rules/ ガバナンスファイルにモデルバージョン文字列が埋め込まれていないか検証
+
+        モデル名（claude-opus-4-6 等）は compute layer のみ許可:
+          - MODEL_ROUTING_POLICY.md
+          - settings*.json / settings*.local.json
+        L1/L2 principles（NORTH_STAR.md 等）に書かれているとモデル固定化バイアスになる。
+        """
+        rules_dir = REPO_ROOT / ".claude" / "rules"
+        # 許可ファイル: compute layer
+        allowed_files = {"MODEL_ROUTING_POLICY.md"}
+        # 検出するモデルバージョンパターン
+        model_patterns = [
+            "claude-opus-", "claude-sonnet-", "claude-haiku-",
+            "claude-3-", "claude-4-",
+            "gpt-4", "gpt-3.5", "gemini-pro", "gemini-flash",
+        ]
+
+        violations = []
+        if rules_dir.exists():
+            for md_file in rules_dir.glob("*.md"):
+                if md_file.name in allowed_files:
+                    continue
+                try:
+                    content = md_file.read_text(encoding="utf-8", errors="replace")
+                    found = [p for p in model_patterns if p in content]
+                    if found:
+                        violations.append(f"{md_file.name}: {found}")
+                except Exception:
+                    pass
+
+        if violations:
+            self.check("principles: model-fixation check", "WARN",
+                       f"ガバナンスファイルにモデル名が埋め込まれています "
+                       f"(MODEL_ROUTING_POLICY.md のみ許可):\n"
+                       + "\n".join(f"  - {v}" for v in violations[:5]),
+                       "WARNING")
+        else:
+            self.check("principles: model-fixation check", "PASS",
+                       "ガバナンスファイルにモデルバージョン文字列なし")
+
+    # ─── Runtime Packet チェック ──────────────────────────────
+
+    def check_runtime_packet(self):
+        """RUNTIME_EXECUTION_PACKET.md の存在・鮮度・整合性チェック（4チェック）"""
+        packet_path = REPO_ROOT / ".claude" / "RUNTIME_EXECUTION_PACKET.md"
+        ssot_paths = [
+            REPO_ROOT / ".claude" / "rules" / "NORTH_STAR.md",
+            REPO_ROOT / ".claude" / "rules" / "OPERATING_PRINCIPLES.md",
+            REPO_ROOT / ".claude" / "rules" / "SYSTEM_GOVERNOR.md",
+        ]
+        active_id_path = REPO_ROOT / ".claude" / "hooks" / "state" / "active_task_id.txt"
+
+        # Check 1: packet exists
+        if not packet_path.exists():
+            self.check("runtime-packet: exists", "FAIL",
+                       f"RUNTIME_EXECUTION_PACKET.md が見つかりません\n"
+                       f"  実行: python scripts/build_runtime_execution_packet.py",
+                       "ERROR")
+            # remaining checks meaningless without file
+            self.check("runtime-packet: freshness", "FAIL",
+                       "パケット未生成のためスキップ", "ERROR")
+            self.check("runtime-packet: task-id match", "FAIL",
+                       "パケット未生成のためスキップ", "ERROR")
+            self.check("runtime-packet: SSOTs exist", "FAIL",
+                       "パケット未生成のためスキップ", "ERROR")
+            return
+
+        self.check("runtime-packet: exists", "PASS",
+                   str(packet_path.relative_to(REPO_ROOT)))
+
+        # Check 2: freshness (<24h)
+        content = ""
+        try:
+            content = packet_path.read_text(encoding="utf-8", errors="replace")
+            generated_at = None
+            for line in content.splitlines():
+                if "**generated_at**:" in line:
+                    val = line.split(":", 1)[1].strip()
+                    try:
+                        generated_at = datetime.fromisoformat(val)
+                    except ValueError:
+                        pass
+                    break
+
+            if generated_at is None:
+                self.check("runtime-packet: freshness", "WARN",
+                           "generated_at が読み取れません。パケットを再生成してください。",
+                           "WARNING")
+            else:
+                now = datetime.now(timezone.utc)
+                if generated_at.tzinfo is None:
+                    generated_at = generated_at.replace(tzinfo=timezone.utc)
+                age_sec = (now - generated_at).total_seconds()
+                if age_sec > 24 * 3600:
+                    self.check("runtime-packet: freshness", "WARN",
+                               f"パケットが {int(age_sec/3600)}h 前のものです（閾値: 24h）。"
+                               f"python scripts/build_runtime_execution_packet.py で再生成推奨。",
+                               "WARNING")
+                else:
+                    self.check("runtime-packet: freshness", "PASS",
+                               f"{int(age_sec/60)} 分前に生成済み")
+        except Exception as e:
+            self.check("runtime-packet: freshness", "WARN",
+                       f"鮮度チェック中にエラー: {e}", "WARNING")
+
+        # Check 3: active_task_id match
+        try:
+            packet_task_id = None
+            for line in content.splitlines():
+                if "**active_task_id**:" in line:
+                    packet_task_id = line.split(":", 1)[1].strip()
+                    break
+
+            current_task_id = ""
+            if active_id_path.exists():
+                current_task_id = active_id_path.read_text(
+                    encoding="utf-8", errors="replace").strip()
+
+            # "(none)" と "" は両方「アクティブタスクなし」として一致扱い
+            _normalize = lambda v: "" if v in (None, "(none)") else v
+            if _normalize(packet_task_id) != _normalize(current_task_id):
+                self.check("runtime-packet: task-id match", "FAIL",
+                           f"packet の task_id ({packet_task_id!r}) と "
+                           f"active_task_id.txt ({current_task_id!r}) が不一致\n"
+                           f"  実行: python scripts/build_runtime_execution_packet.py",
+                           "ERROR")
+            else:
+                self.check("runtime-packet: task-id match", "PASS",
+                           f"active_task_id = {current_task_id!r}")
+        except Exception as e:
+            self.check("runtime-packet: task-id match", "WARN",
+                       f"task-id 整合チェック中にエラー: {e}", "WARNING")
+
+        # Check 4: SSOTs exist
+        missing = [str(p.relative_to(REPO_ROOT)) for p in ssot_paths if not p.exists()]
+        if missing:
+            self.check("runtime-packet: SSOTs exist", "FAIL",
+                       f"ソース SSOT が見つかりません: {missing}", "ERROR")
+        else:
+            self.check("runtime-packet: SSOTs exist", "PASS",
+                       f"{len(ssot_paths)} 件の SSOT ファイルすべて存在")
 
     # ─── VPS チェック ─────────────────────────────────────
 
@@ -595,6 +941,10 @@ class Doctor:
         self.check_north_star()
 
         if not self.json_output:
+            print(c('bold', "\n[Three-Layer Constitution]"))
+        self.check_three_layer_constitution()
+
+        if not self.json_output:
             print(c('bold', "\n[Hooks]"))
         self.check_hooks()
 
@@ -625,6 +975,18 @@ class Doctor:
         if not self.json_output:
             print(c('bold', "\n[Memory Layer Integrity]"))
         self.check_memory_layer_integrity()
+
+        if not self.json_output:
+            print(c('bold', "\n[State Integrity]"))
+        self.check_state_integrity()
+
+        if not self.json_output:
+            print(c('bold', "\n[Model Fixation Check]"))
+        self.check_model_fixation_in_principles()
+
+        if not self.json_output:
+            print(c('bold', "\n[Runtime Packet]"))
+        self.check_runtime_packet()
 
         if self.include_vps:
             if not self.json_output:

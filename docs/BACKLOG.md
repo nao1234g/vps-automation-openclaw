@@ -330,4 +330,46 @@
 
 ---
 
-*最終更新: 2026-03-07 — I1〜I4完了（TIER 0全項目）。次のマイルストーン: I5（Brier Score自動計算）*
+## J: 戦略的成長提案 (2026-03-15〜)
+
+> **詳細**: `docs/NOWPATTERN_STRATEGIC_PROPOSALS.md`（37提案フル版）
+> これらは「承認不要・今日着手可能」に分類されたもの。工数小〜中・可逆的変更のみ。
+
+- [ ] **J1 (A2): 記事品質スコアリング自動化**
+  - 各記事にBrier/engagement/誤情報リスクの3指標スコアを付与
+  - article_validator.py を拡張して `quality_score` フィールドを追加
+  - 目標: スコア70点未満は自動でDRAFT降格
+
+- [ ] **J2 (B1): hreflang + JSON-LD 構造化データ強化**
+  - JA/EN両ページのcodeinjection_headにArticle + BreadcrumbList JSON-LDを注入
+  - hreflang属性の再確認・欠落補完（現在8ページ設定済み、全記事に拡張）
+  - 目標: Google検索流入 +20〜40%
+
+- [ ] **J3 (B2): X引用リポスト品質フィルタ強化**
+  - x_swarm_dispatcher.pyにQuality Scoreフィルタ追加
+  - エンゲージメント率<0.5%の記事はREPLY/QRT対象外に除外
+  - 目標: 低品質投稿をゼロにしてエンゲージメント品質向上
+
+- [ ] **J4 (B3): Substack週次テンプレート統一**
+  - Substack配信記事のテンプレートを「予測要約+コミュニティ統計」形式に標準化
+  - weekly_prediction_summary.py から自動生成
+  - 目標: 解除率 -30%（テンプレート統一で読者の期待値を固定）
+
+- [ ] **J5 (C2): 予測DB品質基盤強化**
+  - prediction_db.jsonの全168件を品質監査（resolution_question・our_pick・確率の整合性チェック）
+  - 空フィールド・矛盾データを検出してTelegram通知する audit_prediction_db.py 作成
+  - 目標: Moat基盤の信頼性を100%に維持
+
+- [ ] **J6 (C4): 予測パフォーマンス内部統計トラッキング**
+  - カテゴリ別・トピック別・時期別のBrier Score分析ダッシュボードをTelegramレポート化
+  - evolution_log.jsonのデータを集計してweakspot_tracker.py作成
+  - 目標: 弱点トピック（Brier>0.25）を毎週特定して改善
+
+- [ ] **J7 (I-プラットフォームI: 読者投票UIモバイル最適化)**
+  - 現在の投票ウィジェットをモバイル（iPhone/Android）でテストし、タップ領域・フォントサイズを調整
+  - Ghost codeinjection_foot のJSを更新（CSSメディアクエリ強化）
+  - 目標: モバイル投票完了率 +30%
+
+---
+
+*最終更新: 2026-03-15 — J1〜J7 追加（戦略的成長提案 backlog-ready 7件 / T017）。I1〜I9完了（TIER 0+1全項目）*

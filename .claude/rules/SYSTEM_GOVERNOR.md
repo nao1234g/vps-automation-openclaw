@@ -1,8 +1,12 @@
 # SYSTEM GOVERNOR — AI Civilization OS 統治層
 
-> **AIエージェントが自律的に行動しながら、システムを破壊しないようにする憲法。**
-> このファイルは `.claude/rules/NORTH_STAR.md` の下位に位置し、
-> NORTH_STAR の「永遠の三原則」を守りながら OS を安全に進化させる。
+> **このファイルは `.claude/rules/OPERATING_PRINCIPLES.md` の実装統治仕様です。**
+> OPERATING_PRINCIPLES の「なぜそうすべきか（原則）」を「どう強制するか（統治）」に変換する。
+> 三層階層: NORTH_STAR（価値・ミッション） → OPERATING_PRINCIPLES（行動原則） → SYSTEM_GOVERNOR（実装統治）
+>
+> **AIエージェントが自律的に行動しながら、システムを破壊しないようにする統治仕様。**
+> このファイルは `.claude/rules/NORTH_STAR.md` および `.claude/rules/OPERATING_PRINCIPLES.md` の下位に位置し、
+> NORTH_STAR の「永遠の三原則」と OPERATING_PRINCIPLES の「13の行動原則」を守りながら OS を安全に進化させる。
 >
 > **更新ルール**: NORTH_STAR 同様、変更時は末尾 CHANGELOG に日付+変更内容を追記すること。
 > **AI自律書き換え禁止** — north-star-guard.py が物理ブロック。
@@ -304,6 +308,7 @@ SYSTEM GOVERNOR が守る最終的な目標:
 |------|---------|
 | 2026-03-14 | 初版。AI Civilization OS 完成に伴い統治層として新設。LEVEL 1〜3 統治レベル・禁止操作・INVARIANTS・緊急停止プロトコル・優先順位を定義 |
 | 2026-03-15 | model-agnostic化: NEO-ONE/TWO の役割分担表から "Claude Opus 4.6" を "Anthropic Claude" に変更。モデルバージョン固定表現は settings.local.json / MODEL_ROUTING_POLICY.md のみに限定する原則を確立。6層記憶アーキテクチャ（L1-L6）・task_close_memory_check.py・constitution_candidates.json・approval_queue.json・memory_routing_rules.json を T011 で追加 |
+| 2026-03-15 | T012: 冒頭に「このファイルは OPERATING_PRINCIPLES.md の実装統治仕様」明示。三層階層（NORTH_STAR→OPERATING_PRINCIPLES→SYSTEM_GOVERNOR）を冒頭に宣言。OPERATING_PRINCIPLES.md が .claude/rules/ に正式復活し、CLAUDE.md @import チェーンに追加されたことに伴い、本ファイルの位置付けを L2（Operating Rules）に再配置。 |
 
 ---
 

@@ -38,7 +38,13 @@ _PROJECT_ROOT = os.environ.get(
 )
 _STATE_DIR = os.path.join(_PROJECT_ROOT, ".claude", "hooks", "state")
 _FAILURE_MEMORY_PATH = os.path.join(_PROJECT_ROOT, ".claude", "state", "failure_memory.json")
+_CONSTITUTION_CANDIDATES_PATH = os.path.join(_PROJECT_ROOT, ".claude", "state", "constitution_candidates.json")
 _ACTIVE_ID_PATH = os.path.join(_STATE_DIR, "active_task_id.txt")
+
+# constitution_candidates 昇格条件
+_ESCALATION_RECURRENCE_THRESHOLD = 3
+_ESCALATION_SEVERITIES = {"critical", "high"}
+_ESCALATION_STATUSES = {"open", "regressed"}
 
 # ── ユーティリティ ────────────────────────────────────────────────────
 
@@ -61,6 +67,68 @@ def _load_failure_memory() -> dict:
         return json.load(open(_FAILURE_MEMORY_PATH, encoding="utf-8"))
     except Exception:
         return {"_schema_version": "1.0", "failures": []}
+
+def _load_constitution_candidates() -> dict:
+    if not os.path.exists(_CONSTITUTION_CANDIDATES_PATH):
+        return {
+            "_schema_version": "1.0",
+            "_description": "failure_memory.json から自動昇格された constitution 候補",
+            "candidates": []
+        }
+    try:
+        return json.load(open(_CONSTITUTION_CANDIDATES_PATH, encoding="utf-8"))
+    except Exception:
+        return {"_schema_version": "1.0", "candidates": []}
+
+
+def _escalate_to_constitution(failure: dict):
+    """recurrence >= 3 かつ severity high/critical の失敗を constitution_candidates に昇格する"""
+    doc = _load_constitution_candidates()
+    candidates = doc.get("candidates", [])
+
+    # 重複チェック（同一 failure_id はスキップ）
+    existing_ids = {c.get("source_failure_id") for c in candidates}
+    fid = failure.get("failure_id", "")
+    if fid in existing_ids:
+        return  # すでに昇格済み
+
+    now_iso = datetime.now(timezone.utc).isoformat()
+    candidate = {
+        "candidate_id": f"CC{len(candidates) + 1:03d}",
+        "source_failure_id": fid,
+        "title": f"[自動昇格] {failure.get('category', 'unknown')} — {failure.get('symptom', '')[:80]}",
+        "severity": failure.get("severity", ""),
+        "recurrence_count": failure.get("recurrence_count", 0),
+        "resolved_status": failure.get("resolved_status", ""),
+        "escalated_at": now_iso,
+        "status": "open",
+        "proposed_rule": f"[未記入] failure_id={fid} の根本原因に基づきルールを追記する",
+        "naoto_approval": "pending"
+    }
+    candidates.append(candidate)
+    doc["candidates"] = candidates
+
+    os.makedirs(os.path.dirname(_CONSTITUTION_CANDIDATES_PATH), exist_ok=True)
+    try:
+        with open(_CONSTITUTION_CANDIDATES_PATH, "w", encoding="utf-8") as f:
+            json.dump(doc, f, ensure_ascii=False, indent=2)
+        print(
+            f"[FAILURE CAPTURE] 🔺 Constitution昇格: {candidate['candidate_id']} "
+            f"← {fid} (recurrence={failure.get('recurrence_count')}, "
+            f"severity={failure.get('severity')})",
+            file=sys.stderr
+        )
+    except Exception as e:
+        print(f"[FAILURE CAPTURE] constitution_candidates 保存エラー: {e}", file=sys.stderr)
+
+
+def _check_and_escalate(failure: dict):
+    """昇格条件を満たすか判定して constitution_candidates に追加する"""
+    if (failure.get("recurrence_count", 0) >= _ESCALATION_RECURRENCE_THRESHOLD
+            and failure.get("severity", "") in _ESCALATION_SEVERITIES
+            and failure.get("resolved_status", "") in _ESCALATION_STATUSES):
+        _escalate_to_constitution(failure)
+
 
 def _next_failure_id(failures: list) -> str:
     """既存の最大IDの次のIDを生成する"""
@@ -127,6 +195,8 @@ def main():
                 existing["resolved_status"] = "regressed"
                 print(f"[FAILURE CAPTURE] ⚠️ 再発検知: {existing['failure_id']} — {error_short[:80]}", file=sys.stderr)
             _save_memory(memory)
+            # 昇格条件チェック（recurrence更新後に評価）
+            _check_and_escalate(existing)
             sys.exit(0)
 
     # 新規エントリを追加

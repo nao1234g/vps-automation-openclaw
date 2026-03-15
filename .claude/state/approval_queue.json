@@ -13,5 +13,72 @@
     "reversible": "true|false",
     "status": "pending|approved|rejected|completed"
   },
-  "queue": []
+  "queue": [
+    {
+      "id": "prop-t017-g1",
+      "ts": "2026-03-15T06:00:00Z",
+      "proposer": "local-claude",
+      "title": "Umami Analytics詳細設定 — 意思決定基盤の整備",
+      "description": "既存のopenclaw-umamiコンテナ（稼働中）に対して、予測ページ・投票ウィジェット・Xクリックをトラッキングするカスタムイベントを設定。月次KPIレポートを自動生成してTelegramに送信する weekly_umami_report.py を作成する（コスト$0、設定変更のみ）。",
+      "expected_roi": "月次データ根拠の戦略決定が可能になる。現状は感覚のみで戦略を判断しておりROI計算不可",
+      "risk_level": "low",
+      "reversible": true,
+      "status": "pending",
+      "source_proposal": "G1",
+      "effort": "S（1〜2日）"
+    },
+    {
+      "id": "prop-t017-d1",
+      "ts": "2026-03-15T06:00:00Z",
+      "proposer": "local-claude",
+      "title": "Ghost Members有料化（$9〜19/月）— Phase 2収益化",
+      "description": "Ghost built-in Members機能（Stripe連携済み）を有効化し、有料層（個人トラックレコード・Brier Score履歴・解決時メール通知）を設定する。TIER 1完了（I5〜I9）後の自然なタイミング。読者獲得→有料転換の最初のマネタイズフェーズ。",
+      "expected_roi": "月+$500〜（有料読者50名×$10/月で達成。Stripe手数料2.9%+30¢控除後）",
+      "risk_level": "medium",
+      "reversible": true,
+      "status": "pending",
+      "source_proposal": "D1",
+      "effort": "M（3〜5日）"
+    },
+    {
+      "id": "prop-t017-e1",
+      "ts": "2026-03-15T06:00:00Z",
+      "proposer": "local-claude",
+      "title": "リーダーボード公開ページ（BACKLOG I10相当）",
+      "description": "Brier Score上位20名（匿名UUID short形式）を /predictions/ ページ内に表示。現在 reader_prediction_api.py の GET /leaderboard エンドポイントは実装済み。prediction_page_builder.py にリーダーボードセクションを追加するだけで完成する（UIレイアウト変更→prediction-design-system.md承認フロー必須）。",
+      "expected_roi": "読者リテンション向上（順位競争→継続参加動機）。コミュニティ感醸成でバイラル効果",
+      "risk_level": "low",
+      "reversible": true,
+      "status": "pending",
+      "source_proposal": "E1",
+      "effort": "S（1〜2日）",
+      "note": "UIレイアウト変更のため prediction-design-system.md の承認フローが別途必要"
+    },
+    {
+      "id": "prop-t017-h1",
+      "ts": "2026-03-15T06:00:00Z",
+      "proposer": "local-claude",
+      "title": "英語Substack独立メルマガ — EN読者獲得",
+      "description": "現在の openclaw-substack-api コンテナ（稼働中）を使い、既存JA配信に加えてEN版Substackを独立運営する。EN記事（107件）を週次でキュレーションしてEN読者向けに配信。URLは substack.com/@nowpattern-en 等の新スタック。",
+      "expected_roi": "EN読者数+100〜500名/月（既存EN記事の再活用。追加コストなし）",
+      "risk_level": "low",
+      "reversible": true,
+      "status": "pending",
+      "source_proposal": "H1",
+      "effort": "M（3〜5日）"
+    },
+    {
+      "id": "prop-t017-f3",
+      "ts": "2026-03-15T06:00:00Z",
+      "proposer": "local-claude",
+      "title": "VPSバックアップ自動化強化 — prediction_db.json毎日S3保存",
+      "description": "prediction_db.json（Moatの核心）を毎日深夜にS3互換ストレージ（Backblaze B2 or ConoHa Object Storage）に自動バックアップ。現在バックアップはローカルのみ。VPS障害時にデータを失うリスクが存在する。スクリプト1本（backup_to_s3.py）と cron 追加のみ。",
+      "expected_roi": "3年分のトラックレコード喪失リスクをゼロに。保存コスト: $0.001/GB/月（5MB×12ヶ月≈$0.01/年）",
+      "risk_level": "low",
+      "reversible": true,
+      "status": "pending",
+      "source_proposal": "F3",
+      "effort": "S（半日〜1日）"
+    }
+  ]
 }

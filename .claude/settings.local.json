@@ -230,6 +230,16 @@
         ]
       },
       {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/guard/task_state_integrity_check.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
         "matcher": "Edit|Write|WebSearch|WebFetch|Read",
         "hooks": [
           {
@@ -312,6 +322,11 @@
           {
             "type": "command",
             "command": "python \"$CLAUDE_PROJECT_DIR/scripts/guard/task_close_memory_check.py\"",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/guard/task_state_integrity_check.py\"",
             "timeout": 5
           }
         ]

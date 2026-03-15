@@ -1,0 +1,29 @@
+{
+  "defaultMode": "acceptEdits",
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Glob(**)",
+      "Grep(**)",
+      "WebSearch",
+      "TodoWrite",
+      "TodoRead"
+    ],
+    "deny": [
+      "Bash(* rm -rf /*)",
+      "Bash(* rm -rf ~*)",
+      "Bash(* dd if=*)",
+      "Bash(* mkfs*)",
+      "Bash(* fdisk*)",
+      "Bash(* DROP TABLE*)",
+      "Bash(* DROP DATABASE*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*credentials*)",
+      "Read(**/*secret*)",
+      "Read(**/*private_key*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)"
+    ]
+  }
+}

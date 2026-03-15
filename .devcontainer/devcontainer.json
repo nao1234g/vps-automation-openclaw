@@ -1,38 +1,39 @@
 {
   "name": "OpenClaw VPS Automation",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-  
-  // Codespaces専用の拡張機能設定（設定同期より優先される）
+
+  // Claude Code拡張設定（T019: Lane B devcontainer用）
   "customizations": {
     "vscode": {
       "extensions": [
-        // 最新バージョン（GPT-5.3対応）
-        "openai.chatgpt"
+        // Claude Code VS Code拡張機能
+        // 拡張機能ID: anthropic.claude-code (VS Code Marketplace要確認)
+        "anthropic.claude-code"
       ],
       "settings": {
-        // OpenAI ChatGPT設定
-        "chatgpt.gpt3.modelName": "gpt-5.3-turbo",
-        "chatgpt.gpt3.maxTokens": 4096,
-        "chatgpt.gpt3.temperature": 0.7,
-        "chatgpt.gpt3.apiKey": "${env:OPENAI_API_KEY}",
-        
-        // 拡張機能の自動更新を有効化（最新機能を取得）
-        "extensions.autoUpdate": true,
-        "extensions.autoCheckUpdates": true
+        // ⚠️ 重要: bypassPermissionsはここでは設定できない。
+        //   devcontainer内ではsettings.local.json（gitignored）が存在しない。
+        //   Lane B devcontainerで自律実行する場合は
+        //   .claude/settings.json の defaultMode を bypassPermissions にすること。
+        //   または lane-b-devcontainer.sh の[2/4]警告を確認してから実行。
+        "extensions.autoUpdate": true
       }
     }
   },
-  
+
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    // Node.js: claude CLI (npm install -g @anthropic-ai/claude-code) に必要
+    "ghcr.io/devcontainers/features/node:1": {}
   },
-  
-  // Codespacesのポートフォワーディング
+
+  // ポートフォワーディング
   "forwardPorts": [3000, 5432, 5678, 8080],
-  
-  // Codespaces起動時のコマンド
-  "postCreateCommand": "echo 'Codespace ready with Codex 5.3 support!'",
-  
+
+  // Claude Code CLIインストール
+  // Lane B devcontainer起動後、devcontainer内ターミナルで `claude` コマンドが使える
+  "postCreateCommand": "npm install -g @anthropic-ai/claude-code && echo 'Claude Code CLI installed. IMPORTANT: check .claude/settings.json defaultMode for bypassPermissions before autonomous work.'",
+
   "remoteUser": "root"
 }

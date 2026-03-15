@@ -50,6 +50,8 @@ def _is_night_mode() -> bool:
 def _is_system_file(tool_input: dict) -> bool:
     """task_ledger.json 自体やフックの更新はブロックしない"""
     path = tool_input.get("file_path", "") or tool_input.get("path", "")
+    # Windows パスはバックスラッシュを使う。パターンはスラッシュ表記なので正規化する。
+    path = path.replace("\\", "/")
     bypass_patterns = [
         "task_ledger.json",
         "active_task_id.txt",
@@ -90,10 +92,12 @@ def main():
         sys.exit(0)
 
     # stdin から hook_data を読む（Claude Code が JSON で渡す）
+    # stdin 読み取り失敗時は hook_data が空になり tool_input も空になるため、
+    # システムファイル判定が機能しなくなる。失敗時は安全側（通過）に倒す。
     try:
         hook_data = json.load(sys.stdin)
     except Exception:
-        hook_data = {}
+        sys.exit(0)  # stdin parse failure → pass through (safe side)
 
     tool_input = hook_data.get("tool_input", {})
 

@@ -50,7 +50,7 @@ if tool_name == "Write":
     # ── 永遠の三原則 保護: NORTH_STAR.md / OPERATING_PRINCIPLES.md を Write でブロック ──
     PROTECTED_FILES = [
         "/.claude/rules/north_star.md",
-        "/docs/archive/operating_principles.md",
+        "/.claude/rules/operating_principles.md",
     ]
     for pf in PROTECTED_FILES:
         if normalized.endswith(pf.lstrip("/")):
@@ -140,38 +140,49 @@ if tool_name == "Edit" and hook_event == "PreToolUse":
                 )
                 sys.exit(2)
 
-# ── [PostToolUse] Edit: NORTH_STAR.md の CHANGELOG 未更新をブロック ───────
+# ── [PostToolUse] Edit: CHANGELOG 未更新をブロック（NORTH_STAR.md / OPERATING_PRINCIPLES.md）───
 if tool_name == "Edit" and hook_event == "PostToolUse":
     file_path = tool_input.get("file_path", "")
     normalized = file_path.replace("\\", "/")
 
-    # NORTH_STAR.md の編集か？
-    if not normalized.endswith("NORTH_STAR.md"):
+    # CHANGELOG強制対象ファイル（小文字で照合）
+    CHANGELOG_FILES = {
+        "north_star.md": PROJECT_DIR / ".claude" / "rules" / "NORTH_STAR.md",
+        "operating_principles.md": PROJECT_DIR / ".claude" / "rules" / "OPERATING_PRINCIPLES.md",
+    }
+
+    # 対象ファイルか確認
+    target_path = None
+    for key, path in CHANGELOG_FILES.items():
+        if normalized.lower().endswith(key):
+            target_path = path
+            break
+
+    if target_path is None:
         sys.exit(0)
 
-    # ファイルを読んで CHANGELOG セクションに今日の日付があるか確認
-    north_star_path = PROJECT_DIR / ".claude" / "rules" / "NORTH_STAR.md"
-    if not north_star_path.exists():
+    if not target_path.exists():
         sys.exit(0)
 
     today = date.today().strftime("%Y-%m-%d")
-    content = north_star_path.read_text(encoding="utf-8")
+    content = target_path.read_text(encoding="utf-8")
 
     # CHANGELOGセクションを探す
     changelog_section = ""
     if "## CHANGELOG" in content:
         changelog_section = content[content.index("## CHANGELOG"):]
 
+    target_display = target_path.name
     if today not in changelog_section:
         print(
             "\n"
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             "⚠️  [NORTH STAR GUARD] CHANGELOG の更新が必要です\n"
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"  NORTH_STAR.md を編集しましたが、今日（{today}）の\n"
+            f"  {target_display} を編集しましたが、今日（{today}）の\n"
             "  CHANGELOG エントリが見つかりません。\n"
             "\n"
-            "  ✅ NORTH_STAR.md の末尾 CHANGELOG に以下の形式で追記してください:\n"
+            f"  ✅ {target_display} の末尾 CHANGELOG に以下の形式で追記してください:\n"
             f"  | {today} | （変更内容を一行で記述） |\n"
             "\n"
             "  なぜ必要か:\n"
