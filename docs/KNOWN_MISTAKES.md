@@ -1713,3 +1713,20 @@ Traceback (most recent call last):
 - **検知時刻**: 2026-03-11 20:00 JST
 - **自動記録**: vps-error-capture.py
 
+
+
+### 2026-03-17: prediction-verifier エラー検知 (sig: cd069782)
+- **スクリプト**: prediction-verifier
+- **ログ**: /var/log/prediction-verifier.log
+- **エラー**:
+```
+  File "/opt/shared/scripts/prediction_auto_verifier.py", line 916, in <module>
+    main()
+  File "/opt/shared/scripts/prediction_auto_verifier.py", line 907, in main
+    regenerate_predictions_page()
+  File "/opt/shared/scripts/prediction_auto_verifier.py", line 600, in regenerate_predictions_page
+
+```
+- **検知時刻**: 2026-03-17 01:00 JST
+- **自動記録**: vps-error-capture.py
+
