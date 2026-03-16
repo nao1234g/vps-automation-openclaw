@@ -920,6 +920,38 @@ class Doctor:
                 self.check(f"VPS: {name} runtime prompt source", "WARN",
                            f"SSH 失敗: {e}", "WARNING")
 
+    def check_vps_prediction_links(self):
+        """prediction_db.json の循環リンク（/predictions/）ゼロ確認"""
+        try:
+            result = subprocess.run(
+                ["ssh", "-o", "ConnectTimeout=5", VPS_HOST,
+                 "python3 -c \""
+                 "import json;"
+                 "d=json.load(open('/opt/shared/scripts/prediction_db.json'));"
+                 "circular=[p['prediction_id'] for p in d['predictions'] if p.get('ghost_url','').rstrip('/')=='/predictions'.rstrip('/') or p.get('ghost_url','').endswith('/predictions/')];"
+                 "print('CIRCULAR:'+str(len(circular)));"
+                 "print(','.join(circular[:5]) if circular else 'none')"
+                 "\""],
+                capture_output=True, text=True, timeout=15
+            )
+            out = result.stdout.strip()
+            lines = out.splitlines()
+            count_line = next((l for l in lines if l.startswith("CIRCULAR:")), "CIRCULAR:?")
+            count = int(count_line.split(":")[1]) if ":" in count_line else -1
+            if count == 0:
+                self.check("VPS: prediction_db 循環リンク(/predictions/)ゼロ確認", "PASS",
+                           "循環リンクなし ✓")
+            elif count > 0:
+                ids_line = lines[1] if len(lines) > 1 else ""
+                self.check("VPS: prediction_db 循環リンク(/predictions/)ゼロ確認", "FAIL",
+                           f"{count} 件の循環リンクあり: {ids_line}", "ERROR")
+            else:
+                self.check("VPS: prediction_db 循環リンク(/predictions/)ゼロ確認", "WARN",
+                           f"確認結果不明: {out}", "WARNING")
+        except Exception as e:
+            self.check("VPS: prediction_db 循環リンク(/predictions/)ゼロ確認", "WARN",
+                       f"SSH 失敗: {e}", "WARNING")
+
     # ─── メイン ───────────────────────────────────────────
 
     def run(self):
@@ -995,6 +1027,7 @@ class Doctor:
             self.check_vps_retired_artifact()
             self.check_vps_tombstone()
             self.check_vps_neo_reading_path()
+            self.check_vps_prediction_links()
 
         # ─── Summary ───────────────────────────────────────
         total = len(self.results)
