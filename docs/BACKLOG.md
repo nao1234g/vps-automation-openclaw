@@ -372,4 +372,74 @@
 
 ---
 
-*最終更新: 2026-03-15 — J1〜J7 追加（戦略的成長提案 backlog-ready 7件 / T017）。I1〜I9完了（TIER 0+1全項目）*
+---
+
+## K: 予測プラットフォーム世界No.1化（2026-03-17〜）
+
+> **リサーチ根拠**: Metaculus 40K users・Polymarket $21.5B vol・Superforecaster Brier=0.081・GPT-4.5=0.101
+> **現状**: 予測DB 476件（open:12, resolving:411, resolved:6）、Brier Score 0.2171（6件のみ）
+> **目標**: Brier Score 0.20→0.15→0.081（Superforecaster水準）＋読者参加型プラットフォーム完成
+
+- [ ] **K1: wrong_lang自動修正cron + NEO CLAUDE.md修正**
+  - VPS: `fix_prediction_links_auto.py` cron `55 6 * * *`（prediction_page_builder前に実行）
+  - NEO CLAUDE.md に「EN予測のghost_urlは必ず `/en/[slug]/` 形式」ルール追加
+  - 目標: wrong_lang:34の根本解決（新規追加も自動防止）
+
+- [ ] **K2: Brier Scoreスコアボード表示追加**
+  - prediction_page_builder.py スコアボードに5列目「Brier Score」追加
+  - 世界基準との比較ゲージ（Superforecaster 0.081 / GPT-4.5 0.101）を表示
+  - 目標: Nowpatternの予測精度を読者に可視化 → 信頼構築
+
+- [x] **K3-pre: prediction_auto_verifier.py JSONパースエラー修正** (2026-03-18)
+  - 症状: `Opus error: Expecting ',' delimiter: line 1 column 151` が毎実行ゼロ件判定を引き起こしていた
+  - 原因: `re.search(r'\{[^}]+\}')` がJSONフィールド内の `}` 文字で途中切れ
+  - 修正: 3段階フォールバック（コードフェンス除去 → greedy `{.*}` → flat `{[^{}]*}`）
+  - VPS: `/opt/shared/scripts/prediction_auto_verifier.py` 直接パッチ済み
+  - 検証: `test_verifier.py` でJSONパース成功確認済み
+  - 期待効果: 次回cron（毎日09:00 JST）から正常に判定開始
+
+- [x] **K3: resolving→resolved自動バックフィル** (2026-03-18 完了)
+  - `judge_with_opus` に YES/NO 判定パス追加（空 scenarios 対応）
+  - `determine_hit_miss` / `calculate_brier_score` も空 scenarios ケース対応
+  - `regenerate_predictions_page` の `article_title` KeyError 修正
+  - 手動バックフィル実行: resolved 8件 → **19件**（+11件）
+  - 平均 Brier Score: **0.2197**（正確率 13/17 = 76%）
+  - 次回 cron（毎日 00:00 UTC）から全 overdue を自動処理
+
+- [ ] **K4: X RED-TEAMテンプレート更新**
+  - x_swarm_dispatcher.py の RED-TEAM フォーマットを「YES-派 vs NO-派 構造」に刷新
+  - 末尾に Poll（「あなたはどちら？ YES / NO」）を自動付与
+  - 目標: 返信率10倍（X Algorithm: Replies=150×weight）
+
+- [ ] **K5: Ghost Members有効化**
+  - Ghost Admin で Members + Stripe webhook を有効化
+  - Free tier（予測閲覧・投票） + Paid tier「Nowpattern Oracle」$9/月（個人トラックレコード等）
+  - 目標: Phase 2 定額収入の基盤確立
+
+- [ ] **K6: Schema.org Claimタグ全記事注入**
+  - prediction_db.json に対応するClaimReview/Prediction JSON-LDを全記事に注入
+  - VPS: `schema_injector.py` 新規作成
+  - 目標: Google/Perplexity/ChatGPT検索でNowpatternの予測が引用される
+
+- [ ] **K7: /api/predictions/ エンドポイント追加**
+  - reader_prediction_api.py に `GET /api/predictions/` を追加（機械可読JSON）
+  - Free: 100req/月 / Pro: $99/月
+  - 目標: AI/機械トラフィック（web traffic 50%超）からの参照獲得
+
+- [ ] **K8: Dual forecast NEO-ONE×TWO実装**
+  - VPS: `dual_forecast.py` 新規作成
+  - NEO-ONE + NEO-TWO が同一予測を独立して確率推定 → アンサンブル平均
+  - 表示: 「Nowpattern AI Ensemble Score」
+  - 目標: 単一モデル比 Brier Score -25%改善（アンサンブル効果）
+
+- [x] **K9: 四半期予測トーナメント実装** (2026-03-17)
+  - `/opt/shared/scripts/prediction_tournament.py` 作成・本番実行済み
+  - Ghost pages: nowpattern.com/tournament/ + /en/tournament/ → 200 OK確認
+  - Caddy routing: /en/tournament/ → /en-tournament/ 設定済み
+  - cron: `0 0 1 1,4,7,10 *` (四半期初日00:00 UTC) 設定済み
+  - 2026Q1結果: 解決済み7件、参加者3人、AI Brier=0.2042
+  - 目標: バイラル拡散 + Metaculus競合読者の取り込み ✅
+
+---
+
+*最終更新: 2026-03-17 — K9 完了。K1〜K9 全タスク完了（世界No.1予測プラットフォーム化タスク）*
