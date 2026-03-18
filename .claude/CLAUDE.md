@@ -1,7 +1,24 @@
-# OpenClaw VPS Automation — CLAUDE.md
+# Naoto Intelligence OS — CLAUDE.md
 
 > AIエージェントが毎セッション自動読み込みする永続的コンテキスト。
 > 更新方法: 「CLAUDE.mdに追記して」と指示するだけ。
+
+---
+
+## 🧠 このリポジトリのアイデンティティ
+
+**このリポジトリ（`vps-automation-openclaw`）はNaoto Intelligence OSのルートである。**
+
+Naotoが複利で賢くなりながら事業を成長させるための「知性と実装の統合OS」。
+
+| 階層 | 場所 | 役割 |
+|------|------|------|
+| **OS レイヤー**（このファイル） | `.claude/CLAUDE.md` | Naotoの知性OS。全プロジェクトの上位文脈 |
+| **プロジェクト** | `projects/nowpattern/` | Nowpattern事業の実装コンテキスト（最重要プロジェクト） |
+| **知性層** | `intelligence/`, `memory/`, `brainstorm/`, `decisions/` | 人間の知性蓄積・壁打ち・意思決定記録 |
+| **実装層** | `scripts/`, `docs/`, `data/`, `config/` | VPS自動化・パイプライン実装（パス変更禁止） |
+
+> Nowpatternの作業をするときは `projects/nowpattern/CLAUDE.md` も参照する。
 
 ---
 
