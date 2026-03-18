@@ -1730,3 +1730,41 @@ Traceback (most recent call last):
 - **検知時刻**: 2026-03-17 01:00 JST
 - **自動記録**: vps-error-capture.py
 
+
+
+### 2026-03-18: prediction-page-builder エラー検知 (sig: 60f25fc9)
+- **スクリプト**: prediction-page-builder
+- **ログ**: /opt/shared/polymarket/prediction_page.log
+- **エラー**:
+```
+-1")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/socket.py", line 707, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/ssl.py", line 1252, in recv_into
+    return self.read(nbytes, buffer)
+           ^^^^^^^^
+```
+- **検知時刻**: 2026-03-18 23:00 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-18: prediction-page-builder エラー検知 (sig: b169f9cc)
+- **スクリプト**: prediction-page-builder
+- **ログ**: /opt/shared/polymarket/prediction_page.log
+- **エラー**:
+```
+ self.parent.error(
+               ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 559, in error
+    return self._call_chain(*args)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 492, in _call_chain
+    result = func(*args)
+           
+```
+- **検知時刻**: 2026-03-18 23:00 JST
+- **自動記録**: vps-error-capture.py
+
