@@ -1,4 +1,5 @@
 # インフラ構成（NEO / Docker / Hey Loop 統合）
+<!-- [Nowpattern固有] — VPS・NEO・Dockerの具体的構成。Nowpatternプロジェクト層のインフラ仕様。 -->
 
 ## VPS・Docker
 

@@ -1,4 +1,5 @@
 # 予測ページ デザインシステム（凍結ベースライン）
+<!-- [Nowpattern固有] — prediction_page_builder.py のUI仕様。Nowpatternプロジェクト層のデザイン仕様。 -->
 
 > **このファイルが prediction_page_builder.py の「見た目の真実」。**
 > Vibe Code Tip #4: デザインシステムを先に定義し、それ以外の変更を禁止する。

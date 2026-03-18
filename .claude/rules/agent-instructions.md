@@ -1,4 +1,5 @@
 # エージェント行動指針（agent-instructions + autonomous-decision 統合版）
+<!-- [OS固有] — Naoto Intelligence OS 全エージェントに適用。Nowpattern専用ではない。 -->
 
 ## オーナーについて（最重要）
 - **非エンジニアです** — 専門用語ではなく比喩と日本語で説明する
