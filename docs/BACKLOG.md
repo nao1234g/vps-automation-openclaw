@@ -32,6 +32,7 @@
 - [x] **A2: generate.py AttributeError修正** (2026-03-04)
   - `dynamics_sections`/`scenarios`ループに`isinstance(s, dict)`チェック追加
   - `grep -c 'isinstance(s, dict)'` → 3件確認済み
+  - ⚠️ 2026-03-19監査: `generate.py` はVPS上に現存しない（統合または名称変更済み）
 
 - [x] **A3/F1: self-healer.py作成（自律修復エンジン）** (2026-03-04)
   - VPS: `/opt/shared/scripts/self-healer.py`
@@ -60,6 +61,7 @@
 - [x] **B2: VPS上のfact-checker相当機能** (2026-03-04)
   - `/opt/CLAUDE.md`に4段階検証ルール追記（Python SCP方式で書き込み）
   - STEP 1: 確認 / STEP 2: 既知ミス確認 / STEP 3: 変更後検証 / STEP 4: ミス記録
+  - ⚠️ 2026-03-19監査: `/opt/CLAUDE.md` は2026-03-14に退役済み（→ `.retired-20260314`）。各NEOエージェント個別のCLAUDE.mdに継承。
 
 - [x] **B3: 文字数・セクション自動監査** (2026-03-04)
   - content-quality-monitor.py に統合
@@ -253,7 +255,7 @@
 
 ### TIER 1（未実装 — 1ヶ月以内）
 
-- [x] **I5: 読者Brier Score自動計算** (2026-03-15 ローカル実装完了 / VPSデプロイ pending)
+- [ ] **I5: 読者Brier Score自動計算** (ローカル実装済み / VPSデプロイ未完了)
   - ✅ `scripts/reader_brier_calculator.py` — ローカル純粋Python計算モジュール。`calc_brier(prob, outcome)`, `calc_brier_bulk()`, `mean_brier()`, `verify_self_test()` 10/10 PASS
   - ✅ `scripts/vps_reader_brier_migration.py` — VPS側マイグレーションスクリプト。`--dry-run/--verbose/--notify` 対応
   - ⏳ VPSデプロイ: `scp scripts/vps_reader_brier_migration.py root@163.44.124.123:/opt/shared/scripts/` 後に `python3 /opt/shared/scripts/vps_reader_brier_migration.py --dry-run` で確認
@@ -441,4 +443,4 @@
 
 ---
 
-*最終更新: 2026-03-18 — K1〜K9 全タスク完了確認。K6: 予測記事578件すべてにClaimReview注入済み。*
+*最終更新: 2026-03-19 — SSOT監査完了。I5を[x]→[ ]修正（VPSデプロイ未完了）。B2: /opt/CLAUDE.md退役注記追加。A2: generate.py VPS不在注記追加。J1-J7・I10-I21の[ ]タスク全件VPS実態で確認済み。*
