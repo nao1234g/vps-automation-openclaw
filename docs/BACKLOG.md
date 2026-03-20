@@ -210,6 +210,7 @@
   - session-end.py がhandoff.json保存（current_state.jsonから）
   - session-start.sh がhandoff.jsonを読み込んで表示
   - 保存先: `.claude/hooks/state/handoff.json`
+  - ⚠️ 2026-03-20再監査: handoff.json は **runtime artifact**（TodoWriteアクティブタスクあり+セッション終了時のみ生成）。コードは実装済み（session-end.py:168-179）だが、アクティブなTodoがないセッションでは生成されない。[x]は「実装済み」として正当。
 
 ---
 
@@ -405,8 +406,9 @@
   - `determine_hit_miss` / `calculate_brier_score` も空 scenarios ケース対応
   - `regenerate_predictions_page` の `article_title` KeyError 修正
   - 手動バックフィル実行: resolved 8件 → **19件**（+11件）
-  - 平均 Brier Score: **0.2197**（正確率 13/17 = 76%）
+  - 完了時点（2026-03-18）の平均 Brier Score: **0.2197**（正確率 13/17 = 76%）
   - 次回 cron（毎日 00:00 UTC）から全 overdue を自動処理
+  - ⚠️ 2026-03-20再監査: 2026-03-19に3件追加解決（avg Brier=0.9546 — 悪化判定）。現在 resolved **22件**、avg Brier **0.3199**（K3完了後に劣化）。evolution_loop.py の週次分析対象。
 
 - [x] **K4: X RED-TEAMテンプレート更新** (2026-03-18 確認済)
   - x_swarm_dispatcher.py の RED-TEAM フォーマットを「YES-派/NO-派 構造」に刷新済み
@@ -443,4 +445,4 @@
 
 ---
 
-*最終更新: 2026-03-20 — 包括的SSOT監査完了（A〜H全カテゴリ + I1-I9 + K1-K9 VPS SSH実証確認）。スクリプト存在・cron稼働・サービス状態・APIエンドポイント・Ghost DB・Caddy設定を全件照合。訂正: I5→[ ]（唯一の[x]誤記）、A2/B2に運用注記追加。他全[x]は実態と一致。*
+*最終更新: 2026-03-20 — 包括的SSOT監査完了 + 再監査完了。A〜H全カテゴリ + I1-I9 + K1-K9をVPS SSH・Ghost DB・systemd・crontab・APIエンドポイント・Caddy設定で全件照合。訂正: I5→[ ]（唯一の[x]誤記）、A2/B2に運用注記追加、H3にruntime artifact注記追加、K3に2026-03-19 Brier劣化記録追加。他全[x]は実装・配線・本文記述が一致。NEO-TWO DOWN状態も実態と一致（SHARED_STATE.md 整合）。*
