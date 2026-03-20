@@ -207,10 +207,10 @@
   - `grep -c "^- \[ \]"` でカウント → 全件リストアップ
 
 - [x] **H3: セッション間タスク引き継ぎプロトコル** (2026-03-04)
-  - session-end.py がhandoff.json保存（current_state.jsonから）
-  - session-start.sh がhandoff.jsonを読み込んで表示
-  - 保存先: `.claude/hooks/state/handoff.json`
-  - ⚠️ 2026-03-20再監査: handoff.json は **runtime artifact**（TodoWriteアクティブタスクあり+セッション終了時のみ生成）。コードは実装済み（session-end.py:168-179）だが、アクティブなTodoがないセッションでは生成されない。[x]は「実装済み」として正当。
+  - session-end.py がhandoff.json保存（current_state.json存在かつアクティブなTodo存在時のみ、lines 168-179）
+  - session-start.sh がhandoff.json読み込みと表示（handoff.json存在時のみ、lines 112-135）
+  - 保存先: `.claude/hooks/state/handoff.json`（runtime artifact — 条件付き生成）
+  - ⚠️ 2026-03-20再監査: 保存ロジック（session-end.py:168-179）・読み込みロジック（session-start.sh:112-135）ともに実装済み。handoff.jsonはruntime artifact — 前セッション終了時にアクティブなTodoがない場合は生成されない。[x]は「ロジック実装済み」として正当。
 
 ---
 
@@ -408,7 +408,7 @@
   - 手動バックフィル実行: resolved 8件 → **19件**（+11件）
   - 完了時点（2026-03-18）の平均 Brier Score: **0.2197**（正確率 13/17 = 76%）
   - 次回 cron（毎日 00:00 UTC）から全 overdue を自動処理
-  - ⚠️ 2026-03-20再監査: 2026-03-19に3件追加解決（avg Brier=0.9546 — 悪化判定）。現在 resolved **22件**、avg Brier **0.3199**（K3完了後に劣化）。evolution_loop.py の週次分析対象。
+  - ⚠️ 2026-03-20再監査: K3実装は正常稼働中。2026-03-19に自動verifier cronが3件を追加解決したが全てMISS（avg Brier=0.9546）。Brier悪化はK3完了後の運用上の新規解決による変化であり、K3実装の問題ではない。現在 resolved **22件**、avg Brier **0.3199**。evolution_loop.py の週次分析対象。
 
 - [x] **K4: X RED-TEAMテンプレート更新** (2026-03-18 確認済)
   - x_swarm_dispatcher.py の RED-TEAM フォーマットを「YES-派/NO-派 構造」に刷新済み
