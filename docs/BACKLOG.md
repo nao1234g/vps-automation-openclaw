@@ -256,11 +256,12 @@
 
 ### TIER 1（未実装 — 1ヶ月以内）
 
-- [ ] **I5: 読者Brier Score自動計算** (ローカル実装済み / VPSデプロイ未完了)
+- [ ] **I5: 読者Brier Score自動計算** (スキーマ済み / 計算ロジックにバグあり)
   - ✅ `scripts/reader_brier_calculator.py` — ローカル純粋Python計算モジュール。`calc_brier(prob, outcome)`, `calc_brier_bulk()`, `mean_brier()`, `verify_self_test()` 10/10 PASS
-  - ✅ `scripts/vps_reader_brier_migration.py` — VPS側マイグレーションスクリプト。`--dry-run/--verbose/--notify` 対応
-  - ⏳ VPSデプロイ: `scp scripts/vps_reader_brier_migration.py root@163.44.124.123:/opt/shared/scripts/` 後に `python3 /opt/shared/scripts/vps_reader_brier_migration.py --dry-run` で確認
-  - ⏳ `reader_votes` テーブルへの `brier_score REAL / resolved_at TEXT / outcome REAL` カラム追加（VPS実行後）
+  - ✅ `scripts/vps_reader_brier_migration.py` — VPS側マイグレーションスクリプト（VPSにSCP済み）
+  - ✅ `reader_votes` テーブルに `brier_score REAL / resolved_at TEXT / outcome REAL` カラム追加済み（2026-03-21確認）
+  - ⚠️ **バグ**: `reader_prediction_api.py` の `/reader-predict/my-stats/{uuid}` が `status == "hit"` でフィルタしているが、実際の解決済み予測はすべて `status == "resolved"` + `hit_miss == "correct"/"incorrect"` フィールドを使用 → 計算結果が0件になる
+  - 🔧 **修正方法**: `reader_prediction_api.py` の Brier 計算ロジックを `hit_miss == "correct"` でフィルタするように変更
   - 計算式: `(probability/100 - outcome)^2` — outcome: 的中=1.0, 外れ=0.0
 
 - [x] **I6: 個人トラックレコードページ** (2026-03-11)
@@ -445,4 +446,4 @@
 
 ---
 
-*最終更新: 2026-03-20 — 包括的SSOT監査完了 + 再監査完了。A〜H全カテゴリ + I1-I9 + K1-K9をVPS SSH・Ghost DB・systemd・crontab・APIエンドポイント・Caddy設定で全件照合。訂正: I5→[ ]（唯一の[x]誤記）、A2/B2に運用注記追加、H3にruntime artifact注記追加、K3に2026-03-19 Brier劣化記録追加。他全[x]は実装・配線・本文記述が一致。NEO-TWO DOWN状態も実態と一致（SHARED_STATE.md 整合）。*
+*最終更新: 2026-03-21 — I5エントリ更新: reader_votesスキーマ済み（brier_score/resolved_at/outcomeカラム確認済み）、reader_prediction_api.pyのBrier計算バグ（status=="hit"→hit_miss=="correct"）を記録。prediction_page_builder.py 502修正（timeout 120s + _page_id guard）・_validate_market_consensus resolved予測スキップ修正・substack-api healthcheckバグ修正（/health→/）を実施。*
