@@ -256,12 +256,14 @@
 
 ### TIER 1（未実装 — 1ヶ月以内）
 
-- [ ] **I5: 読者Brier Score自動計算** (スキーマ済み / 計算ロジックにバグあり)
-  - ✅ `scripts/reader_brier_calculator.py` — ローカル純粋Python計算モジュール。`calc_brier(prob, outcome)`, `calc_brier_bulk()`, `mean_brier()`, `verify_self_test()` 10/10 PASS
-  - ✅ `scripts/vps_reader_brier_migration.py` — VPS側マイグレーションスクリプト（VPSにSCP済み）
-  - ✅ `reader_votes` テーブルに `brier_score REAL / resolved_at TEXT / outcome REAL` カラム追加済み（2026-03-21確認）
-  - ⚠️ **バグ**: `reader_prediction_api.py` の `/reader-predict/my-stats/{uuid}` が `status == "hit"` でフィルタしているが、実際の解決済み予測はすべて `status == "resolved"` + `hit_miss == "correct"/"incorrect"` フィールドを使用 → 計算結果が0件になる
-  - 🔧 **修正方法**: `reader_prediction_api.py` の Brier 計算ロジックを `hit_miss == "correct"` でフィルタするように変更
+- [x] **I5: 読者Brier Score自動計算** (2026-03-21)
+  - ✅ `scripts/reader_brier_calculator.py` — ローカル純粋Python計算モジュール
+  - ✅ `scripts/vps_reader_brier_migration.py` — VPS側マイグレーションスクリプト
+  - ✅ `reader_votes` テーブルに `brier_score REAL / resolved_at TEXT / outcome REAL` カラム追加済み
+  - ✅ **計算ロジック修正完了**: `reader_prediction_api.py` に `_reader_outcome()` ヘルパー追加。`status == "resolved"` + `outcome` フィールドのシナリオマッピング（楽観/YES→optimistic, 基本→base, 悲観/NO→pessimistic）で正確なBrier計算
+  - ✅ `/my-stats`: `resolved_count=21, correct_count=19, accuracy_pct=90.5, avg_brier_score=0.3552`
+  - ✅ `/leaderboard`: AI `avg_brier_score=0.3199` / 読者 `avg_brier_score=0.3701`, `data_status="live"`
+  - ✅ `/my-tracker`: `is_resolved=true, is_correct=true/false` 正常動作確認
   - 計算式: `(probability/100 - outcome)^2` — outcome: 的中=1.0, 外れ=0.0
 
 - [x] **I6: 個人トラックレコードページ** (2026-03-11)
