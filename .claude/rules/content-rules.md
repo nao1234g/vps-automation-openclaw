@@ -152,7 +152,7 @@ Nowpatternの予測: [our_pick] — [our_pick_prob]%確率
 市場の予測（Polymarket）: [market_consensus.probability]%（[市場の質問]）
 判定日: [triggers[0].date]
 的中条件: [hit_condition_ja]
-↳ 予測一覧: nowpattern.com/predictions/
+↳ この予測を追跡: nowpattern.com/predictions/#[prediction_id]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -166,9 +166,22 @@ Nowpatternの予測: [our_pick] — [our_pick_prob]%確率
 | `market_consensus.probability` | prediction_db の `market_consensus.probability` |
 | `triggers[0].date` | prediction_db の `triggers[0].date` |
 | `hit_condition_ja` | prediction_db の `hit_condition` 日本語フィールド |
+| `prediction_id` | prediction_db の `prediction_id`（例: NP-2026-0042） |
+
+**⚠️ 必須ルール（このルールを破ると読者が迷子になる）:**
+- リンクは必ず `nowpattern.com/predictions/#[prediction_id]` の形式にする
+- `prediction_id` は prediction_db.json の該当エントリから取得（例: `NP-2026-0042`）
+- ❌ 禁止: `nowpattern.com/predictions/` のみ（ページトップに飛ぶだけで何も見つからない）
+- ❌ 禁止: `prediction_id` を省略または推測で書く
 
 **Polymarket情報がない場合:** 「市場の予測（Polymarket）: 未取得」と書く。
-**複数予測がある場合:** ボックスを複数並べる。
+**複数予測がある場合:** ボックスを複数並べる（それぞれ異なる prediction_id を使う）。
+
+**prediction_id の確認方法:**
+```bash
+# VPSで実行
+python3 -c "import json; db=json.load(open('/opt/shared/scripts/prediction_db.json')); [print(p['prediction_id'], p.get('title','')[:40]) for p in db['predictions'][-10:]]"
+```
 
 ---
 

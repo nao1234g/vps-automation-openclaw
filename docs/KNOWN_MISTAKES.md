@@ -1768,3 +1768,22 @@ Traceback (most recent call last):
 - **検知時刻**: 2026-03-18 23:00 JST
 - **自動記録**: vps-error-capture.py
 
+
+
+### 2026-03-21: 記事↔予測の双方向リンク未整備（根本原因と再発防止）
+- **症状**: 
+  1. 749/761件の予測に `ghost_url`（記事リンク）がない（→ カードに "記事なし" 表示）
+  2. 記事のORACLE STATEMENTが `/predictions/` トップに飛ぶだけで、該当カードに飛ばない
+- **根本原因（3層）**:
+  1. プロセス欠如: ghost_url フィールドを埋める習慣がなかった（记事作成時に登録しない）
+  2. テンプレートの誤り: ORACLE STATEMENTの「予測一覧」リンクにアンカーID（#NP-2026-XXXX）が含まれていなかった
+  3. HTML構造の欠如: prediction_page_builder.py のカード（`<details>`タグ）に `id` 属性がなく、アンカーリンクが機能しない構造だった
+- **正しい解決策**:
+  - `prediction_page_builder.py`: `_build_tracking_card` と `_build_resolved_card` の `<details>` タグに `id="{prediction_id}"` を追加
+  - ORACLE STATEMENTテンプレート: `/predictions/#[prediction_id]` 形式に変更（content-rules.md更新）
+  - NEO-ONE/TWO CLAUDE.md: アンカーリンクルールを追記
+- **教訓**: 記事と予測を登録する際、必ず prediction_id を確認し ghost_url を設定すること。ORACLE STATEMENTは必ず `#NP-ID` アンカー付きで書くこと
+- **再発防止コード**:
+  - `prediction_page_builder.py` の build_tracking_rows() に ghost_url 欠損時の `⚠️ NO ARTICLE` 警告を追加
+  - `content-rules.md` §12 に `/predictions/` のみのリンクを **❌ 禁止** として明記
+  - NEO-ONE/TWO CLAUDE.md に「ORACLE STATEMENT リンクルール」セクションを追加（2026-03-21）
