@@ -13,7 +13,8 @@
 
 $VPS_HOST = "root@163.44.124.123"
 $LOCAL_CRED = "$env:USERPROFILE\.claude\.credentials.json"
-$REMOTE_CRED = "/root/.claude/.credentials.json"
+# NEO-ONE/TWO run as neocloop user — copy to neocloop home (not /root)
+$REMOTE_CRED = "/home/neocloop/.claude/.credentials.json"
 $LOG_FILE = "$env:USERPROFILE\.claude\neo-token-sync.log"
 
 function Write-Log {
@@ -72,7 +73,7 @@ Write-Log "Token copied to VPS successfully"
 
 # 4. VPS上でトークン確認 + NEOサービス管理
 Write-Log "Checking NEO services on VPS..."
-$sshResult = ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -o BatchMode=yes $VPS_HOST "bash /opt/scripts/check-neo-token.sh; N1=`$(systemctl is-active neo-telegram); N2=`$(systemctl is-active neo2-telegram); echo NEO-ONE:`$N1 NEO-TWO:`$N2; if [ `$N1 != active ]; then systemctl restart neo-telegram; echo NEO-ONE-restarted; fi; if [ `$N2 != active ]; then systemctl restart neo2-telegram; echo NEO-TWO-restarted; fi" 2>&1
+$sshResult = ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -o BatchMode=yes $VPS_HOST "chown neocloop:neocloop /home/neocloop/.claude/.credentials.json; chmod 600 /home/neocloop/.claude/.credentials.json; N1=`$(systemctl is-active neo-telegram); N2=`$(systemctl is-active neo2-telegram); echo NEO-ONE:`$N1 NEO-TWO:`$N2; if [ `$N1 != active ]; then systemctl restart neo-telegram; echo NEO-ONE-restarted; fi; if [ `$N2 != active ]; then systemctl restart neo2-telegram; echo NEO-TWO-restarted; fi" 2>&1
 
 Write-Log $sshResult
 Write-Log "=== NEO Token Sync Complete ==="

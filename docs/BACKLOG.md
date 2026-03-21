@@ -264,6 +264,7 @@
   - ✅ `/my-stats`: `resolved_count=21, correct_count=19, accuracy_pct=90.5, avg_brier_score=0.3552`
   - ✅ `/leaderboard`: AI `avg_brier_score=0.3199` / 読者 `avg_brier_score=0.3701`, `data_status="live"`
   - ✅ `/my-tracker`: `is_resolved=true, is_correct=true/false` 正常動作確認
+  - ✅ `/top-forecasters`: 匿名UUID短縮表示・Brier Score降順ランキング（3名確認: AI Brier=0.4401, 読者2名）
   - 計算式: `(probability/100 - outcome)^2` — outcome: 的中=1.0, 外れ=0.0
 
 - [x] **I6: 個人トラックレコードページ** (2026-03-11)
@@ -448,4 +449,4 @@
 
 ---
 
-*最終更新: 2026-03-21 — I5エントリ更新: reader_votesスキーマ済み（brier_score/resolved_at/outcomeカラム確認済み）、reader_prediction_api.pyのBrier計算バグ（status=="hit"→hit_miss=="correct"）を記録。prediction_page_builder.py 502修正（timeout 120s + _page_id guard）・_validate_market_consensus resolved予測スキップ修正・substack-api healthcheckバグ修正（/health→/）を実施。*
+*最終更新: 2026-03-21 — I5エントリ更新: reader_votesスキーマ済み（brier_score/resolved_at/outcomeカラム確認済み）、reader_prediction_api.pyのBrier計算バグ（status=="hit"→hit_miss=="correct"）を記録。prediction_page_builder.py 502修正（timeout 120s + _page_id guard）・_validate_market_consensus resolved予測スキップ修正・substack-api healthcheckバグ修正（/health→/）を実施。/top-forecasters エンドポイント追加。NEO-TWO OAuthトークン失効（15日間）→ /home/neocloop/.claude/.credentials.json 更新・復旧完了。sync-neo-token.ps1 のREMOTE_CRED パス誤り（/root/ → /home/neocloop/）修正。FileLock+Ghost Webhook既実装確認（prediction_page_builder.py:2380-2386 + ghost-page-guardian.service 2026-03-10〜稼働）。*
