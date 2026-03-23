@@ -776,8 +776,10 @@ def save_history(result: dict):
     history.setdefault("nowpattern", []).append({
         "timestamp": result["timestamp"],
         "overall_level": result["overall_level"],
+        "overall_confidence": result.get("overall_confidence"),
         "axes": {a["axis"]: a["level"] for a in result["axes"]},
         "world_gap": result["world_gap"],
+        "critical_issues": [ci.get("issue", str(ci)) for ci in result.get("critical_issues", [])],
     })
     # 最新52件保持
     history["nowpattern"] = history["nowpattern"][-52:]

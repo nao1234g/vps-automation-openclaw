@@ -218,10 +218,10 @@
       "hit_condition_en": "Trump signs crypto-friendly legislation by end of 2026 — Nowpattern wins",
       "market_consensus": {
         "pick": "NO",
-        "probability": 6,
+        "probability": 5,
         "question": "Trump eliminates capital gains tax on crypto before 2027?",
         "close_date": "2025-12-31",
-        "updated_at": "2026-03-23"
+        "updated_at": "2026-03-24"
       },
       "article_title_en": "Trump Family Crypto Summit: From Goldman CEO to Nicki Minaj — The Completed Form of 'Regulatory Capture'",
       "dynamics_tags_en": "Regulatory Capture × Institutionalized Conflicts of Interest",
@@ -485,10 +485,10 @@
       "hit_condition_en": "BTC fails to break $80K by end of June 2026 — Nowpattern wins",
       "market_consensus": {
         "pick": "YES",
-        "probability": 74,
+        "probability": 77,
         "question": "Will Bitcoin reach $80,000 by December 31, 2026?",
         "close_date": "2027-01-01",
-        "updated_at": "2026-03-23"
+        "updated_at": "2026-03-24"
       },
       "hit_miss": "wrong",
       "article_title_en": "Supreme Court Tariff Ruling Briefly Sends BTC to $68K — The Vanishing Rally Exposes the Truth Behind 'Digital Gold'",
@@ -2335,10 +2335,10 @@
       "brier_score": null,
       "market_consensus": {
         "pick": "NO",
-        "probability": 34,
+        "probability": 36,
         "question": "Russia x Ukraine ceasefire by end of 2026?",
         "close_date": "2026-12-31",
-        "updated_at": "2026-03-23"
+        "updated_at": "2026-03-24"
       },
       "resolution_date": null,
       "resolution_question": "Will a formal ceasefire agreement between Ukraine and Russia be signed by December 31, 2026?",
@@ -2858,7 +2858,7 @@
         "probability": 100,
         "question": "Will there be no change in Fed interest rates after the March 2026 meeting?",
         "close_date": "2026-03-18",
-        "updated_at": "2026-03-23"
+        "updated_at": "2026-03-24"
       },
       "source": "prediction_db",
       "base_rate": {
@@ -3007,10 +3007,10 @@
       "rebuttals": [],
       "market_consensus": {
         "pick": "YES",
-        "probability": 50,
+        "probability": 52,
         "question": "Will Bitcoin reach $90,000 by December 31, 2026?",
         "close_date": "2027-01-01",
-        "updated_at": "2026-03-23"
+        "updated_at": "2026-03-24"
       },
       "source": "prediction_db",
       "base_rate": {
@@ -3132,10 +3132,10 @@
       "rebuttals": [],
       "market_consensus": {
         "pick": "YES",
-        "probability": 97,
+        "probability": 98,
         "question": "Will a 10% US blanket tariff be in effect on March 31?",
         "close_date": "2026-03-31",
-        "updated_at": "2026-03-23"
+        "updated_at": "2026-03-24"
       },
       "source": "prediction_db",
       "base_rate": {
@@ -3690,7 +3690,7 @@
         "probability": 100,
         "question": "Will Bitcoin reach $70,000 by December 31, 2026?",
         "close_date": "2027-01-01",
-        "updated_at": "2026-03-23"
+        "updated_at": "2026-03-24"
       },
       "source": "prediction_db",
       "base_rate": {
@@ -6712,7 +6712,7 @@
       "title": "US-Israel Strike Iran — The Escalation Spiral That Reshapes the Middle East Order",
       "ghost_url": "https://nowpattern.com/en/us-israel-strike-iran-the-escalation-spiral-that-reshapes-the-middle-east-order/",
       "lang": "en",
-      "status": "resolving",
+      "status": "resolved",
       "our_pick": "YES",
       "our_pick_prob": 96,
       "our_pick_prob_raw": 78,
@@ -6740,7 +6740,21 @@
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-07T03:40:36.714925+00:00",
       "our_stance": null,
-      "rebuttals": []
+      "rebuttals": [],
+      "outcome": "NO",
+      "resolved_at": "2026-03-23T15:23:45.312791+00:00",
+      "brier_score": 0.9216,
+      "resolution_note": "判定期限の2026年3月15日は既に経過している。イランによるイスラエルへの弾道ミサイル直接攻撃が発生していれば世界的大ニュースとなるが、そのような報道の証拠は提供されていない。また予測の前提となる2月28日の米イスラエル共同攻撃自体の存在も未確認である。 [Evidence: 判定期限を過ぎた現時点で、イランによるイスラエルへの弾道ミサイル攻撃を示す証拠が一切提供されていない。]",
+      "hit_miss": "incorrect",
+      "resolution_evidence": {
+        "outcome": "NO",
+        "confidence": "medium",
+        "reasoning": "判定期限の2026年3月15日は既に経過している。イランによるイスラエルへの弾道ミサイル直接攻撃が発生していれば世界的大ニュースとなるが、そのような報道の証拠は提供されていない。また予測の前提となる2月28日の米イスラエル共同攻撃自体の存在も未確認である。",
+        "key_evidence_text": "判定期限を過ぎた現時点で、イランによるイスラエルへの弾道ミサイル攻撃を示す証拠が一切提供されていない。",
+        "recorded_at": "2026-03-23T15:23:45.321687+00:00"
+      },
+      "integrity_hash": "4309a3112fd91aac56d4286b2613f19bc11cffdfad0734d5b8f5872d9447a654",
+      "updated_in_article": true
     },
     {
       "prediction_id": "NP-2026-0101",
@@ -23718,7 +23732,7 @@
       "title": "日米首脳会談2026年3月 — 関税圧力下の同盟再交渉と経路依存の罠",
       "ghost_url": "https://nowpattern.com/en/en-ri-mi-shou-noy-hui-tan-2026nian-3yue-guan-shui-ya-li-xia-notong-meng-zai-jiao-she-tojing-lu-yi-cun-nomin/",
       "lang": "ja",
-      "status": "resolving",
+      "status": "resolved",
       "our_pick": "NO",
       "our_pick_prob": 6,
       "our_pick_prob_raw": 25,
@@ -23746,7 +23760,21 @@
       "resolution_question_ja": "2026年3月19日の日米首脳会談後、30日以内（2026年4月18日まで）に、米国が日本車に対して25%以上の追加関税を正式に発動するか？",
       "_future_gate_flagged": "2026-03-18",
       "our_stance": null,
-      "rebuttals": []
+      "rebuttals": [],
+      "outcome": "YES",
+      "resolved_at": "2026-03-23T15:25:10.286530+00:00",
+      "brier_score": 0.8836,
+      "resolution_note": "米国は2025年4月3日に自動車輸入に対する25%関税を発動済みであり、日本車も対象に含まれている。2026年3月時点でこの関税は継続施行中と考えられ、日米首脳会談後も撤回された証拠はない。ただし質問が「既存関税の継続」ではなく「新たな追加関税の発動」を意味する場合はNOとなる可能性がある。 [Evidence: トランプ政権は2025年4月に全輸入自動車に25%関税を発動しており、日本車は既にこの関税の対象下にある。]",
+      "hit_miss": "incorrect",
+      "resolution_evidence": {
+        "outcome": "YES",
+        "confidence": "medium",
+        "reasoning": "米国は2025年4月3日に自動車輸入に対する25%関税を発動済みであり、日本車も対象に含まれている。2026年3月時点でこの関税は継続施行中と考えられ、日米首脳会談後も撤回された証拠はない。ただし質問が「既存関税の継続」ではなく「新たな追加関税の発動」を意味する場合はNOとなる可能性がある。",
+        "key_evidence_text": "トランプ政権は2025年4月に全輸入自動車に25%関税を発動しており、日本車は既にこの関税の対象下にある。",
+        "recorded_at": "2026-03-23T15:25:10.293650+00:00"
+      },
+      "integrity_hash": "0539cab24e67b5df88522e4c815903a782e1b4b2058f0c942fb8d9377475222e",
+      "updated_in_article": true
     },
     {
       "prediction_id": "NP-2026-0548",
@@ -29986,7 +30014,7 @@
     {
       "prediction_id": "NP-2026-0727",
       "title": "日本DeFi規制強化 ― 「規制の捕獲」が暗号資産イノベーションを飲み込む構造",
-      "ghost_url": "https://nowpattern.com/ri-ben-defigui-zhi-qiang-hua-gui-zhi-nobu-huo-gaan-hao-zi-chan-inobesiyonwoyin-miip-mugou-zao/",
+      "ghost_url": "https://nowpattern.com/en/en-ri-ben-defigui-zhi-qiang-hua-gui-zhi-nobu-huo-gaan-hao-zi-chan-inobesiyonwoyin-miip-mugou-zao/",
       "lang": "ja",
       "status": "active",
       "our_pick": "NO",
@@ -30122,7 +30150,7 @@
     {
       "prediction_id": "NP-2026-0731",
       "title": "ビットコイン20万ドル突破予測 — 機関投資家の参入が変える暗号資産の構造的転換点",
-      "ghost_url": "https://nowpattern.com/bitutokoin20mo-dorutu-po-yu-ce-ji-guan-tou-zi-jia-nocan-ru-gabian-eruan-hao-zi-chan-nogou-zao-de-zhuan-huan-dian/",
+      "ghost_url": "https://nowpattern.com/en/en-bitutokoin20mo-dorutu-po-yu-ce-ji-guan-tou-zi-jia-nocan-ru-gabian-eruan-hao-zi-chan-nogou-zao-de-zhuan-huan-dian/",
       "lang": "ja",
       "status": "active",
       "our_pick": "NO",
@@ -30523,7 +30551,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0742_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:07.451987+00:00",
-      "resolution_question_ja": "2026年3月の情勢悪化を受け、当初2026年4月に予定されていた国連仲介によるイエメン和平協議は、正式に2026年5月以降に延期されるのだろうか？"
+      "resolution_question_ja": "2026年3月の情勢悪化を受け、当初2026年4月に予定されていた国連仲介によるイエメン和平協議は、正式に2026年5月以降に延期されるのだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0743",
@@ -30555,7 +30585,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0743_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:11.487035+00:00",
-      "resolution_question_ja": "NATOのバルト諸国への部隊展開を受けて、ロシアは2026年3月28日までに西部国境（カリーニングラード、プスコフ、またはレニングラード軍管区）に追加の軍事部隊を配備するだろうか？"
+      "resolution_question_ja": "NATOのバルト諸国への部隊展開を受けて、ロシアは2026年3月28日までに西部国境（カリーニングラード、プスコフ、またはレニングラード軍管区）に追加の軍事部隊を配備するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0744",
@@ -30587,7 +30619,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0744_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T09:03:34.394902+00:00",
-      "resolution_question_ja": "連邦準備制度、ピュー・リサーチ、または同等の全国調査データで測定した場合、2027年12月31日までに、暗号資産を所有または使用する米国成人の割合は25%を超えるか？"
+      "resolution_question_ja": "連邦準備制度、ピュー・リサーチ、または同等の全国調査データで測定した場合、2027年12月31日までに、暗号資産を所有または使用する米国成人の割合は25%を超えるか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0745",
@@ -30619,7 +30653,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0745_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T09:03:38.102708+00:00",
-      "resolution_question_ja": "中国は、台湾海峡におけるドローン迎撃に関して、2026年3月23日までに正式な外交抗議（米国大使の召喚や、中国外務省による公式な非難声明の発表を含む）を行うだろうか？"
+      "resolution_question_ja": "中国は、台湾海峡におけるドローン迎撃に関して、2026年3月23日までに正式な外交抗議（米国大使の召喚や、中国外務省による公式な非難声明の発表を含む）を行うだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0746",
@@ -30651,7 +30687,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0746_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T09:03:41.843233+00:00",
-      "resolution_question_ja": "2027年3月21日までに、アメリカ、EU、イギリス、中国といった国または超国家的な政府が、DeepMindのAGIプロトタイプの展開に対して、正式な規制による禁止または義務的な一時停止を課す可能性はあるか？"
+      "resolution_question_ja": "2027年3月21日までに、アメリカ、EU、イギリス、中国といった国または超国家的な政府が、DeepMindのAGIプロトタイプの展開に対して、正式な規制による禁止または義務的な一時停止を課す可能性はあるか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0747",
@@ -30683,7 +30721,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0747_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:14.805483+00:00",
-      "resolution_question_ja": "2027年3月31日までに、少なくとも3社のフォーチュン100企業が、GPT-5を重要な意思決定（医療診断、法務分析、または金融リスク評価など）のために、本番環境のワークフローに公に導入するだろうか？"
+      "resolution_question_ja": "2027年3月31日までに、少なくとも3社のフォーチュン100企業が、GPT-5を重要な意思決定（医療診断、法務分析、または金融リスク評価など）のために、本番環境のワークフローに公に導入するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0748",
@@ -30715,7 +30755,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0748_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:18.761398+00:00",
-      "resolution_question_ja": "2026年9月30日までに、フランス以外のヨーロッパのNATO加盟国が少なくとも1か国、ロシアの影の船団の船舶に対して実際に臨検または拿捕を行うだろうか？"
+      "resolution_question_ja": "2026年9月30日までに、フランス以外のヨーロッパのNATO加盟国が少なくとも1か国、ロシアの影の船団の船舶に対して実際に臨検または拿捕を行うだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0749",
@@ -30747,7 +30789,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0749_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:22.670389+00:00",
-      "resolution_question_ja": "2026年のグローバルAI規制サミットで策定される新たなAI安全基準は、2028年12月31日までに50カ国以上で正式に採用されるだろうか？"
+      "resolution_question_ja": "2026年のグローバルAI規制サミットで策定される新たなAI安全基準は、2028年12月31日までに50カ国以上で正式に採用されるだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0750",
@@ -30779,7 +30823,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0750_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:26.670392+00:00",
-      "resolution_question_ja": "アメリカ合衆国は、2026年6月30日までにイランの主権領域内に地上戦闘部隊を派遣するだろうか？"
+      "resolution_question_ja": "アメリカ合衆国は、2026年6月30日までにイランの主権領域内に地上戦闘部隊を派遣するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0751",
@@ -30811,7 +30857,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0751_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:30.628275+00:00",
-      "resolution_question_ja": "トランプ氏が支持する厳格な有権者ID法案は、2026年9月30日までに上院本会議で採決（手続き採決または最終採決）にかけられるか？"
+      "resolution_question_ja": "トランプ氏が支持する厳格な有権者ID法案は、2026年9月30日までに上院本会議で採決（手続き採決または最終採決）にかけられるか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0752",
@@ -30843,7 +30891,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0752_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:34.690159+00:00",
-      "resolution_question_ja": "イギリス政府は、2026年6月30日までに、高速道路の制限速度を正式に引き下げる（70mph未満に）ことを実施するだろうか？"
+      "resolution_question_ja": "イギリス政府は、2026年6月30日までに、高速道路の制限速度を正式に引き下げる（70mph未満に）ことを実施するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0753",
@@ -30875,7 +30925,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0753_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:37.835224+00:00",
-      "resolution_question_ja": "トランプ政権下で承認された、イランの滞留石油販売に関する財務省の許可は、2026年7月1日までに更新または当初の期間を超えて拡大されるだろうか？"
+      "resolution_question_ja": "トランプ政権下で承認された、イランの滞留石油販売に関する財務省の許可は、2026年7月1日までに更新または当初の期間を超えて拡大されるだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0754",
@@ -30907,7 +30959,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0754_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:40.829109+00:00",
-      "resolution_question_ja": "ウクライナは、2026年9月30日までに少なくとも3つの湾岸諸国に、活発な対ドローン軍事部隊を配備しているだろうか？"
+      "resolution_question_ja": "ウクライナは、2026年9月30日までに少なくとも3つの湾岸諸国に、活発な対ドローン軍事部隊を配備しているだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0755",
@@ -30939,7 +30993,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0755_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:43.840734+00:00",
-      "resolution_question_ja": "2026年6月30日までに、ヨーロッパのNATO加盟国は、ホルムズ海峡地域に警備任務で海軍戦闘艦艇を派遣するだろうか？"
+      "resolution_question_ja": "2026年6月30日までに、ヨーロッパのNATO加盟国は、ホルムズ海峡地域に警備任務で海軍戦闘艦艇を派遣するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0756",
@@ -30971,7 +31027,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0756_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:46.894849+00:00",
-      "resolution_question_ja": "2026年6月30日に、ビットコインの価格は10万ドル以上を維持しているだろうか？"
+      "resolution_question_ja": "2026年6月30日に、ビットコインの価格は10万ドル以上を維持しているだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0757",
@@ -31003,7 +31061,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0757_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:49.893108+00:00",
-      "resolution_question_ja": "2026年6月20日までに、ホルムズ海峡で大規模な輸送障害（閉鎖、機雷敷設、または商船に対する軍事攻撃）が発生するでしょうか？"
+      "resolution_question_ja": "2026年6月20日までに、ホルムズ海峡で大規模な輸送障害（閉鎖、機雷敷設、または商船に対する軍事攻撃）が発生するでしょうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0758",
@@ -31035,7 +31095,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0758_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:53.681977+00:00",
-      "resolution_question_ja": "2026年12月31日までに、GCC（湾岸協力会議）加盟国のいずれかが、外国人労働者を対象とした法的拘束力のある緊急避難プロトコルを導入するだろうか？"
+      "resolution_question_ja": "2026年12月31日までに、GCC（湾岸協力会議）加盟国のいずれかが、外国人労働者を対象とした法的拘束力のある緊急避難プロトコルを導入するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0759",
@@ -31067,7 +31129,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0759_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:00:56.909617+00:00",
-      "resolution_question_ja": "2026年9月30日までに、イーサリアムの価格は7,000ドルを超えるだろうか？"
+      "resolution_question_ja": "2026年9月30日までに、イーサリアムの価格は7,000ドルを超えるだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0760",
@@ -31099,7 +31163,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0760_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:01:00.148785+00:00",
-      "resolution_question_ja": "2026年12月31日までに、日本政府は台湾有事を想定した「存立危機事態」の認定基準または適用条件を具体的に策定し、公式に発表するか？"
+      "resolution_question_ja": "2026年12月31日までに、日本政府は台湾有事を想定した「存立危機事態」の認定基準または適用条件を具体的に策定し、公式に発表するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0761",
@@ -31131,7 +31197,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0761_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T10:01:03.765212+00:00",
-      "resolution_question_ja": "2026年12月31日までに、自衛隊の海外派遣に関する基準を緩和する法案が、原案または修正案の形で日本の国会で可決・成立するか？"
+      "resolution_question_ja": "2026年12月31日までに、自衛隊の海外派遣に関する基準を緩和する法案が、原案または修正案の形で日本の国会で可決・成立するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0762",
@@ -31163,7 +31231,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0762_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T11:00:08.534199+00:00",
-      "resolution_question_ja": "2026年12月31日までに、日本の国会は自衛隊の海外派遣権限を拡大する法案を可決するだろうか？"
+      "resolution_question_ja": "2026年12月31日までに、日本の国会は自衛隊の海外派遣権限を拡大する法案を可決するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0763",
@@ -31195,7 +31265,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0763_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T15:00:11.186576+00:00",
-      "resolution_question_ja": "2026年12月31日までに南シナ海で、米中間で実弾の使用や死傷者を伴う軍事衝突は発生するか？"
+      "resolution_question_ja": "2026年12月31日までに南シナ海で、米中間で実弾の使用や死傷者を伴う軍事衝突は発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0764",
@@ -31227,7 +31299,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0764_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T15:00:16.683013+00:00",
-      "resolution_question_ja": "NATOのバルト諸国への部隊展開を受けて、ロシアは2026年4月4日までに西部軍管区またはカリーニングラード州に追加の軍事部隊（大隊規模以上、約500名以上）を配備するか？"
+      "resolution_question_ja": "NATOのバルト諸国への部隊展開を受けて、ロシアは2026年4月4日までに西部軍管区またはカリーニングラード州に追加の軍事部隊（大隊規模以上、約500名以上）を配備するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0765",
@@ -31259,7 +31333,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0765_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T15:00:21.306960+00:00",
-      "resolution_question_ja": "2026年12月31日までに、南シナ海において米軍と中国軍の間で直接的な軍事衝突（銃撃戦、意図的な体当たり、または死傷者を伴う衝突）は発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、南シナ海において米軍と中国軍の間で直接的な軍事衝突（銃撃戦、意図的な体当たり、または死傷者を伴う衝突）は発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0766",
@@ -31291,7 +31367,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0766_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T15:00:25.643460+00:00",
-      "resolution_question_ja": "中国は、2026年3月23日までに、台湾海峡におけるアメリカによるドローン妨害に関して、アメリカに対して正式な外交抗議（外交的申し入れまたは外務省からの公式声明）を行うだろうか？"
+      "resolution_question_ja": "中国は、2026年3月23日までに、台湾海峡におけるアメリカによるドローン妨害に関して、アメリカに対して正式な外交抗議（外交的申し入れまたは外務省からの公式声明）を行うだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0767",
@@ -31323,7 +31401,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0767_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T15:00:29.587806+00:00",
-      "resolution_question_ja": "GPT-5は、2027年6月30日までに、アメリカ国内の500床以上の病床を持つ3つ以上の病院システムにおいて、試験運用ではなく、実際の臨床判断に導入されるか？"
+      "resolution_question_ja": "GPT-5は、2027年6月30日までに、アメリカ国内の500床以上の病床を持つ3つ以上の病院システムにおいて、試験運用ではなく、実際の臨床判断に導入されるか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0768",
@@ -31355,7 +31435,9 @@
       "timestamp_sha256": "405267461460501c7f17a39504ecf3fda19c2e54152e24401f37dc40ec3b5b1d",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0768_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-21T16:00:06.882970+00:00"
+      "timestamp_created_at": "2026-03-21T16:00:06.882970+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0769",
@@ -31387,7 +31469,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0769_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T16:00:10.252871+00:00",
-      "resolution_question_ja": "アメリカ合衆国は、2026年6月30日までにイランの主権領域内に（助言的な役割ではなく、戦闘任務を想定した）地上部隊を派遣するだろうか？"
+      "resolution_question_ja": "アメリカ合衆国は、2026年6月30日までにイランの主権領域内に（助言的な役割ではなく、戦闘任務を想定した）地上部隊を派遣するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0770",
@@ -31419,7 +31503,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0770_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T16:00:13.850533+00:00",
-      "resolution_question_ja": "イギリス政府は、石油需要削減策として、2026年9月30日までに、全国の高速道路で制限速度を正式に引き下げる（70mph未満に）ことを実施するだろうか？"
+      "resolution_question_ja": "イギリス政府は、石油需要削減策として、2026年9月30日までに、全国の高速道路で制限速度を正式に引き下げる（70mph未満に）ことを実施するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0771",
@@ -31451,7 +31537,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0771_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T16:00:17.255793+00:00",
-      "resolution_question_ja": "アメリカ合衆国財務省は、2026年9月30日までに、イラン産原油に対する制裁に関する追加の許可（最初の2026年3月の許可に加えて）を少なくとも1件発行するだろうか？"
+      "resolution_question_ja": "アメリカ合衆国財務省は、2026年9月30日までに、イラン産原油に対する制裁に関する追加の許可（最初の2026年3月の許可に加えて）を少なくとも1件発行するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0772",
@@ -31483,7 +31571,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0772_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T16:00:20.871958+00:00",
-      "resolution_question_ja": "2026年6月30日までに、ヨーロッパのNATO加盟国はホルムズ海峡地域に追加の海軍戦力を展開するだろうか？"
+      "resolution_question_ja": "2026年6月30日までに、ヨーロッパのNATO加盟国はホルムズ海峡地域に追加の海軍戦力を展開するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0773",
@@ -31515,7 +31605,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0773_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T16:00:24.556612+00:00",
-      "resolution_question_ja": "2026年6月30日までに、ホルムズ海峡において重大な混乱（閉鎖、または通過量を25%以上減少させる継続的な攻撃）が発生するだろうか？"
+      "resolution_question_ja": "2026年6月30日までに、ホルムズ海峡において重大な混乱（閉鎖、または通過量を25%以上減少させる継続的な攻撃）が発生するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0774",
@@ -31547,7 +31639,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0774_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T16:00:28.300808+00:00",
-      "resolution_question_ja": "イーサリアムの価格は2026年第3四半期末（2026年9月30日）までに7,000ドルを超えるだろうか？"
+      "resolution_question_ja": "イーサリアムの価格は2026年第3四半期末（2026年9月30日）までに7,000ドルを超えるだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0775",
@@ -31579,7 +31673,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0775_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T18:00:07.780496+00:00",
-      "resolution_question_ja": "NATOは、ロシアの戦術核兵器配備に直接対応して、2026年4月5日までに東ヨーロッパ（ポーランド、バルト三国、またはルーマニア）への部隊増強を発表するだろうか？"
+      "resolution_question_ja": "NATOは、ロシアの戦術核兵器配備に直接対応して、2026年4月5日までに東ヨーロッパ（ポーランド、バルト三国、またはルーマニア）への部隊増強を発表するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0776",
@@ -31611,7 +31707,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0776_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T18:00:11.023911+00:00",
-      "resolution_question_ja": "アメリカは、ドローン迎撃事件に直接対応して、2026年4月22日までに台湾海峡で正式な軍事的航行の自由作戦（軍艦の通過または複数の資産を用いた軍事演習）を実施するだろうか？"
+      "resolution_question_ja": "アメリカは、ドローン迎撃事件に直接対応して、2026年4月22日までに台湾海峡で正式な軍事的航行の自由作戦（軍艦の通過または複数の資産を用いた軍事演習）を実施するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0777",
@@ -31643,7 +31741,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0777_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T18:00:14.255801+00:00",
-      "resolution_question_ja": "GPT-6は、2026年7月1日までに、第三者による評価において、GPQA Diamondのエキスパートレベルベンチマークで90%以上の精度を達成するだろうか？"
+      "resolution_question_ja": "GPT-6は、2026年7月1日までに、第三者による評価において、GPQA Diamondのエキスパートレベルベンチマークで90%以上の精度を達成するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0778",
@@ -31675,7 +31775,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0778_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T18:00:17.791231+00:00",
-      "resolution_question_ja": "イランは、2026年4月21日までに、2026年のサイバー攻撃への報復として、イスラエル領土に対し直接的な軍事攻撃（ミサイルまたはドローン）を行うか？"
+      "resolution_question_ja": "イランは、2026年4月21日までに、2026年のサイバー攻撃への報復として、イスラエル領土に対し直接的な軍事攻撃（ミサイルまたはドローン）を行うか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0779",
@@ -31707,7 +31809,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0779_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T18:00:21.271322+00:00",
-      "resolution_question_ja": "2026年6月30日までに、イーサリアムのベースステーキング利回りは年利4%を超えて回復するでしょうか？"
+      "resolution_question_ja": "2026年6月30日までに、イーサリアムのベースステーキング利回りは年利4%を超えて回復するでしょうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0780",
@@ -31739,7 +31843,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0780_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T18:00:24.846016+00:00",
-      "resolution_question_ja": "2026年12月31日時点で、USDTのステーブルコイン市場全体の時価総額に占める割合は50%を超えるでしょうか？"
+      "resolution_question_ja": "2026年12月31日時点で、USDTのステーブルコイン市場全体の時価総額に占める割合は50%を超えるでしょうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0781",
@@ -31771,7 +31877,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0781_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T18:00:27.854569+00:00",
-      "resolution_question_ja": "2026年9月30日までに、少なくとも30か国が署名し、最先端AIモデルに対する義務的な遵守要件を含む、拘束力のある国際的なAI安全フレームワークが、2026年のジュネーブAI規制サミットで策定されるだろうか？"
+      "resolution_question_ja": "2026年9月30日までに、少なくとも30か国が署名し、最先端AIモデルに対する義務的な遵守要件を含む、拘束力のある国際的なAI安全フレームワークが、2026年のジュネーブAI規制サミットで策定されるだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0782",
@@ -31803,7 +31911,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0782_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T19:00:07.097244+00:00",
-      "resolution_question_ja": "2026年3月31日までに、日本の主要な取引所におけるビットコインの終値（円建て）が1BTCあたり1500万円を超えるか？"
+      "resolution_question_ja": "2026年3月31日までに、日本の主要な取引所におけるビットコインの終値（円建て）が1BTCあたり1500万円を超えるか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0783",
@@ -31835,7 +31945,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0783_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T19:00:10.594139+00:00",
-      "resolution_question_ja": "2026年12月31日までに、少なくとも一つの国または超国家政府（米国、EU、英国、または中国）が、AGI（汎用人工知能）能力を持つAIシステムを明確に標的とした拘束力のある法律または規制を正式に提案するだろうか？"
+      "resolution_question_ja": "2026年12月31日までに、少なくとも一つの国または超国家政府（米国、EU、英国、または中国）が、AGI（汎用人工知能）能力を持つAIシステムを明確に標的とした拘束力のある法律または規制を正式に提案するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0784",
@@ -31867,7 +31979,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0784_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T19:00:14.125709+00:00",
-      "resolution_question_ja": "2026年3月31日までに、ビットコインの価格は1BTCあたり1500万円を超えることはあるだろうか？"
+      "resolution_question_ja": "2026年3月31日までに、ビットコインの価格は1BTCあたり1500万円を超えることはあるだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0785",
@@ -31899,7 +32013,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0785_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T19:00:17.647940+00:00",
-      "resolution_question_ja": "2026年12月31日までに、南シナ海で米中の軍艦または軍用機が直接交戦（実弾を伴う衝突）する事態は発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、南シナ海で米中の軍艦または軍用機が直接交戦（実弾を伴う衝突）する事態は発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0786",
@@ -31931,7 +32047,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0786_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T19:00:21.175358+00:00",
-      "resolution_question_ja": "2026年12月31日までに南シナ海で、米中間で軍事衝突（軍用機や軍艦の物理的な接触、発砲、撃墜などを含む）は発生するか？"
+      "resolution_question_ja": "2026年12月31日までに南シナ海で、米中間で軍事衝突（軍用機や軍艦の物理的な接触、発砲、撃墜などを含む）は発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0787",
@@ -31963,7 +32081,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0787_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T19:00:25.648877+00:00",
-      "resolution_question_ja": "2026年12月31日までに、南シナ海において米軍と中国軍の間で直接的な軍事的な交戦（警告射撃、ミサイル発射、武器の発砲を含む）が発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、南シナ海において米軍と中国軍の間で直接的な軍事的な交戦（警告射撃、ミサイル発射、武器の発砲を含む）が発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0788",
@@ -31995,7 +32115,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0788_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T19:00:29.230649+00:00",
-      "resolution_question_ja": "2026年12月31日までに、南シナ海において、アメリカまたは中国の軍艦もしくは航空機が関与する、物的損害または死傷者を伴う事故は発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、南シナ海において、アメリカまたは中国の軍艦もしくは航空機が関与する、物的損害または死傷者を伴う事故は発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0789",
@@ -32027,7 +32149,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0789_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T19:00:32.690335+00:00",
-      "resolution_question_ja": "2026年12月31日までに、ウクライナ戦争において、両政府が署名する正式な停戦合意が成立するか？"
+      "resolution_question_ja": "2026年12月31日までに、ウクライナ戦争において、両政府が署名する正式な停戦合意が成立するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0790",
@@ -32059,7 +32183,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0790_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T19:00:36.254325+00:00",
-      "resolution_question_ja": "2026年12月31日までに、台湾海峡で中国軍と米軍または自衛隊との間で、死者を伴う軍事衝突は発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、台湾海峡で中国軍と米軍または自衛隊との間で、死者を伴う軍事衝突は発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0791",
@@ -32091,7 +32217,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0791_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T19:00:39.720776+00:00",
-      "resolution_question_ja": "2026年12月31日までに、台湾海峡で中国軍と台湾軍（または米軍）との間で、死傷者を伴う軍事衝突は発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、台湾海峡で中国軍と台湾軍（または米軍）との間で、死傷者を伴う軍事衝突は発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0792",
@@ -32123,7 +32251,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0792_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T19:00:43.280242+00:00",
-      "resolution_question_ja": "2026年12月31日までに、台湾海峡において中国人民解放軍とアメリカ、日本、または台湾の軍隊との間で、直接的な軍事衝突（銃撃戦や実力行使を伴う交戦）は発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、台湾海峡において中国人民解放軍とアメリカ、日本、または台湾の軍隊との間で、直接的な軍事衝突（銃撃戦や実力行使を伴う交戦）は発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0793",
@@ -32155,7 +32285,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0793_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-21T19:00:46.733244+00:00",
-      "resolution_question_ja": "2026年12月31日までに、台湾海峡で中国人民解放軍と台湾、アメリカ、または日本の軍隊との間で直接的な軍事衝突（銃撃戦や実力行使）が発生するだろうか？"
+      "resolution_question_ja": "2026年12月31日までに、台湾海峡で中国人民解放軍と台湾、アメリカ、または日本の軍隊との間で直接的な軍事衝突（銃撃戦や実力行使）が発生するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0794",
@@ -32187,7 +32319,9 @@
       "timestamp_sha256": "f2b78b136ec1b6168b1c7f91615be15bffef5f07823ec886a42344f2aed553ff",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0794_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:02.851067+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:02.851067+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0795",
@@ -32221,7 +32355,9 @@
       "timestamp_sha256": "ea21051fc453e6a0bf7b6fd0fabbb620fd499f0cf3396183447fb75e97b90a22",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0795_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:04.359106+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:04.359106+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0796",
@@ -32255,7 +32391,9 @@
       "timestamp_sha256": "b39c51727e2c4386cbc69fbd6911a128c9c73a404f3af50a2b9b7a76eb9cd651",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0796_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:05.860673+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:05.860673+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0797",
@@ -32289,7 +32427,9 @@
       "timestamp_sha256": "2797c8ad0f05c0ecd4cd89e2dc70587e0b299772941c0cfbdc5b0269adb0d1e7",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0797_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:07.362417+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:07.362417+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0798",
@@ -32323,7 +32463,9 @@
       "timestamp_sha256": "6e8a2bd5f2f4789ef3fcb880c195b22e0a8e4b212c1e5457e5809f76f0787002",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0798_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:08.863363+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:08.863363+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0799",
@@ -32357,7 +32499,9 @@
       "timestamp_sha256": "ce2b1d54a2439f1b782f685691fa66b3bf9ab3d2a2c3fb76093d94eab0e84e97",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0799_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:10.364692+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:10.364692+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0800",
@@ -32391,7 +32535,9 @@
       "timestamp_sha256": "7faf4d97b731c85c3324ddbc5e706d3e135eede8a193fe80ceedc419a3d01bd2",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0800_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:11.866443+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:11.866443+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0801",
@@ -32425,7 +32571,9 @@
       "timestamp_sha256": "39bcb4af308e99838d46c39792aedb3eaaa733db608a144258f3327fd4bb8002",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0801_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:17.208896+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:17.208896+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0802",
@@ -32459,7 +32607,9 @@
       "timestamp_sha256": "996d4f049ddec455347d47b09b43703b090a1efe35cdc7564102ff28233fbf11",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0802_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:20.339115+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:20.339115+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0803",
@@ -32493,7 +32643,9 @@
       "timestamp_sha256": "a973f0f4f761702f6c25b8866f5985f91a41bd4caaa668d92de95b5df1da9af8",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0803_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:24.206320+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:24.206320+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0804",
@@ -32527,7 +32679,9 @@
       "timestamp_sha256": "35ff12b440636f32de7654994fdabb3037ec581b92fa43bb7aa57c7157681cd7",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0804_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:28.030148+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:28.030148+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0805",
@@ -32561,7 +32715,9 @@
       "timestamp_sha256": "5d472c227fb34dcb8f8862040f083b39b4d1cb15f28f2b56fb972afd49d1ebb0",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0805_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:31.351064+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:31.351064+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0806",
@@ -32593,7 +32749,9 @@
       "timestamp_sha256": "a57743131d27f2858449f55bf1f1d52bc500010f0268bcc71e352a86a5d0ec62",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0806_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:34.390898+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:34.390898+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0807",
@@ -32625,7 +32783,9 @@
       "timestamp_sha256": "3563f6aed85d376d6e6769fc94a12befc3dd0148f21412ae23f4f06dac32c916",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0807_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:37.395531+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:37.395531+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0808",
@@ -32659,7 +32819,9 @@
       "timestamp_sha256": "6038c807381e749539c3760baee07ff47f90ddb3b4d53ee96d79f6a577bfb48f",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0808_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:40.385539+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:40.385539+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0809",
@@ -32691,7 +32853,9 @@
       "timestamp_sha256": "0aff1c4ae60e8f8951ce27ddc2e21e7f9824d9543bef1839a884048775d51938",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0809_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:43.391717+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:43.391717+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0810",
@@ -32724,7 +32888,9 @@
       "timestamp_sha256": "a01dd938961da005e0c8378bade003798beda9459a2f8567215477c95ebc027f",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0810_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:46.420247+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:46.420247+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0811",
@@ -32757,7 +32923,9 @@
       "timestamp_sha256": "1db728d50cbef5cb86bc8581bf3866411bf236a465f29301332c9f70951c7428",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0811_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:49.450303+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:49.450303+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0812",
@@ -32789,7 +32957,9 @@
       "timestamp_sha256": "7bbe169e778eedbe97f87c117d70cc78666627a46f93c663f5978b002e4a5bbd",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0812_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:52.484925+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:52.484925+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0813",
@@ -32821,7 +32991,9 @@
       "timestamp_sha256": "a9a523412ea99cde55a4f07837c7bb51a6526ec2b7af310c40bd1661c5548658",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0813_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:55.580727+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:55.580727+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0814",
@@ -32853,7 +33025,9 @@
       "timestamp_sha256": "919eed8d31338823cc1499c2ce05a9172a778988e36a61a48316453c73d97039",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0814_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T10:00:59.116413+00:00"
+      "timestamp_created_at": "2026-03-22T10:00:59.116413+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0815",
@@ -32885,7 +33059,9 @@
       "timestamp_sha256": "ce2005c8aa45207bea7883f1275cc85e3caf518f0ab3235a098be4e4085d46c9",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0815_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T11:00:07.029283+00:00"
+      "timestamp_created_at": "2026-03-22T11:00:07.029283+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0816",
@@ -32917,7 +33093,9 @@
       "timestamp_sha256": "3497927bcb6da46b0e607cd59762300e57010c7a6e6ea5a4f21adcbd60ddcc47",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0816_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T11:00:10.272170+00:00"
+      "timestamp_created_at": "2026-03-22T11:00:10.272170+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0817",
@@ -32949,7 +33127,9 @@
       "timestamp_sha256": "461eefa55af09465b52d6191ae7899aaeef31dc41129097cbbc8e8ce4edb18f9",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0817_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T16:00:03.300992+00:00"
+      "timestamp_created_at": "2026-03-22T16:00:03.300992+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0818",
@@ -32981,7 +33161,9 @@
       "timestamp_sha256": "4b56932013d7751b47ba49f6eb3c203ae2b6cd59c664d59e79ad888d33dafcc2",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0818_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T16:00:04.802532+00:00"
+      "timestamp_created_at": "2026-03-22T16:00:04.802532+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0819",
@@ -33013,7 +33195,9 @@
       "timestamp_sha256": "05b46824b6664d8fdd9ec3c55757229e98161d0336761883e4133ea7bbb2f6dc",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0819_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T16:00:06.304807+00:00"
+      "timestamp_created_at": "2026-03-22T16:00:06.304807+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0820",
@@ -33045,7 +33229,9 @@
       "timestamp_sha256": "eec95b0bede662214965be1077d313e6d79a255b8be1ef3ffb192eb3cc601dee",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0820_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T16:00:07.806399+00:00"
+      "timestamp_created_at": "2026-03-22T16:00:07.806399+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0821",
@@ -33077,7 +33263,9 @@
       "timestamp_sha256": "ce22686af40db9ac51f6b046ee74119bdb5345b2931d610c8e69301709bcc9f5",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0821_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T16:00:09.312108+00:00"
+      "timestamp_created_at": "2026-03-22T16:00:09.312108+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0822",
@@ -33109,7 +33297,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0822_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T16:00:14.377596+00:00",
-      "resolution_question_ja": "2026年12月31日までに、少なくとも1つの大手ハリウッドスタジオが、商業公開される作品において、Grok-3を主要なクリエイティブツールとして使用するだろうか？"
+      "resolution_question_ja": "2026年12月31日までに、少なくとも1つの大手ハリウッドスタジオが、商業公開される作品において、Grok-3を主要なクリエイティブツールとして使用するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0823",
@@ -33141,7 +33331,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0823_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T16:00:17.918414+00:00",
-      "resolution_question_ja": "2026年6月30日に、イーサリアム（ETH）は5,000ドル以上の価格を維持しているだろうか？"
+      "resolution_question_ja": "2026年6月30日に、イーサリアム（ETH）は5,000ドル以上の価格を維持しているだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0824",
@@ -33173,7 +33365,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0824_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T16:00:21.476896+00:00",
-      "resolution_question_ja": "2026年12月31日までに、米国のGENIUS法（またはそれに相当する連邦政府によるステーブルコイン関連法案）は成立するだろうか？"
+      "resolution_question_ja": "2026年12月31日までに、米国のGENIUS法（またはそれに相当する連邦政府によるステーブルコイン関連法案）は成立するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0825",
@@ -33205,7 +33399,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0825_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T16:00:24.948439+00:00",
-      "resolution_question_ja": "日本の2026年度本予算は、2026年4月15日までに成立（国会の両院を通過）するだろうか？"
+      "resolution_question_ja": "日本の2026年度本予算は、2026年4月15日までに成立（国会の両院を通過）するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0826",
@@ -33237,12 +33433,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0826_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T16:00:28.520835+00:00",
-      "resolution_question_ja": "2026年12月31日までに、台湾海峡で中国人民解放軍と台湾軍、または米軍との間で、死者を伴う直接的な軍事衝突が発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、台湾海峡で中国人民解放軍と台湾軍、または米軍との間で、死者を伴う直接的な軍事衝突が発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0827",
       "title": "China's 2026 Taiwan Ultimatum — The Escalation Spiral That Reshapes Asia",
-      "ghost_url": "https://nowpattern.com/en/734aa68a-524b-4f24-ad01-e51a607c5f01/",
+      "ghost_url": "https://nowpattern.com/en/chinas-2026-taiwan-ultimatum-the-escalation-spiral-that-reshapes-asia/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -33269,12 +33467,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0827_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T16:00:31.936439+00:00",
-      "resolution_question_ja": "2026年12月31日までに、台湾海峡で中国と台湾、または中国とアメリカの軍事衝突（軍隊間の交戦）は発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、台湾海峡で中国と台湾、または中国とアメリカの軍事衝突（軍隊間の交戦）は発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0828",
       "title": "Taiwan Strait Drone Intercept — The Escalation Spiral Neither Side Can Exit",
-      "ghost_url": "https://nowpattern.com/en/282d7e13-0958-427f-85e0-4c088d0126ed/",
+      "ghost_url": "https://nowpattern.com/en/taiwan-strait-drone-intercept-the-escalation-spiral-neither-side-can-exit-10/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -33301,12 +33501,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0828_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T18:00:06.955326+00:00",
-      "resolution_question_ja": "2026年4月23日までに、台湾海峡またはその近辺で、アメリカ軍と中国軍の間で公式な軍事衝突（米中両軍による交戦、またはどちらかの軍事資産の破壊と定義される）は発生するか？"
+      "resolution_question_ja": "2026年4月23日までに、台湾海峡またはその近辺で、アメリカ軍と中国軍の間で公式な軍事衝突（米中両軍による交戦、またはどちらかの軍事資産の破壊と定義される）は発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0829",
       "title": "Kyiv's Grid Under Fire — Energy War as Escalation Spiral Enters 2026",
-      "ghost_url": "https://nowpattern.com/en/22fda0f8-49bc-423e-a205-f83e43630f81/",
+      "ghost_url": "https://nowpattern.com/en/kyivs-grid-under-fire-energy-war-as-escalation-spiral-enters-2026/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -33333,12 +33535,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0829_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T18:00:10.474977+00:00",
-      "resolution_question_ja": "NATOは、2026年6月30日までに、ウクライナと国境を接する加盟国に対し、（2026年3月時点での既存のローテーション派遣の約束を超えて）追加部隊の展開を発表するか？"
+      "resolution_question_ja": "NATOは、2026年6月30日までに、ウクライナと国境を接する加盟国に対し、（2026年3月時点での既存のローテーション派遣の約束を超えて）追加部隊の展開を発表するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0830",
       "title": "Iran-Saudi Proxy War in Yemen — Escalation Spiral Threatens Global Energy Chokepoint",
-      "ghost_url": "https://nowpattern.com/en/5a4af7d7-5cb7-40f0-b9d3-5e7c563486df/",
+      "ghost_url": "https://nowpattern.com/en/iran-saudi-proxy-war-in-yemen-escalation-spiral-threatens-global-energy-chokepoint/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -33365,12 +33569,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0830_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T18:00:13.858720+00:00",
-      "resolution_question_ja": "2026年4月6日までに、ブレント原油価格は1バレルあたり91.50ドル（2026年3月21日の終値である約83ドルから10%以上の上昇）を超えることがあるか？"
+      "resolution_question_ja": "2026年4月6日までに、ブレント原油価格は1バレルあたり91.50ドル（2026年3月21日の終値である約83ドルから10%以上の上昇）を超えることがあるか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0831",
       "title": "GPT-6's Reasoning Leap — The Winner-Takes-All Race to Define Intelligence",
-      "ghost_url": "https://nowpattern.com/en/79c0c84c-27ee-4a14-9ca9-db8a96ab2a9e/",
+      "ghost_url": "https://nowpattern.com/en/gpt-6s-reasoning-leap-the-winner-takes-all-race-to-define-intelligence/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -33397,12 +33603,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0831_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T18:00:17.601256+00:00",
-      "resolution_question_ja": "GPT-6は2026年9月23日までに、エンタープライズAPIの月間アクティブユーザー数1億人を達成するだろうか？"
+      "resolution_question_ja": "GPT-6は2026年9月23日までに、エンタープライズAPIの月間アクティブユーザー数1億人を達成するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0832",
       "title": "AlphaThink and Quantum Simulation — AI's Leap Into Post-Classical Physics",
-      "ghost_url": "https://nowpattern.com/en/fb167775-520f-421e-9a37-467460c8acef/",
+      "ghost_url": "https://nowpattern.com/en/alphathink-and-quantum-simulation-ais-leap-into-post-classical-physics/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -33429,12 +33637,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0832_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T18:00:20.891683+00:00",
-      "resolution_question_ja": "2027年12月31日までに、AlphaThinkまたはGoogle DeepMindから直接派生したシステムが、量子技術を利用したセキュリティ侵害または暗号解読の公に開示された事例に、明確に貢献するだろうか？"
+      "resolution_question_ja": "2027年12月31日までに、AlphaThinkまたはGoogle DeepMindから直接派生したシステムが、量子技術を利用したセキュリティ侵害または暗号解読の公に開示された事例に、明確に貢献するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0833",
       "title": "Global AGI Safety Accord — The Unenforceable Treaty That Reshapes AI Power",
-      "ghost_url": "https://nowpattern.com/en/55fb9e5d-a2f3-4b54-816a-79b9dcaccdf4/",
+      "ghost_url": "https://nowpattern.com/en/global-agi-safety-accord-the-unenforceable-treaty-that-reshapes-ai-power/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -33461,12 +33671,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0833_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T19:00:07.306649+00:00",
-      "resolution_question_ja": "2026年3月の国連サミットで確立されたAGI（汎用人工知能）安全基準は、2029年3月31日までに、主要なAI開発国・地域（米国、EU、中国、英国、日本）のうち少なくとも3つが引き続き参加している場合、正式に有効な状態を維持されるか？"
+      "resolution_question_ja": "2026年3月の国連サミットで確立されたAGI（汎用人工知能）安全基準は、2029年3月31日までに、主要なAI開発国・地域（米国、EU、中国、英国、日本）のうち少なくとも3つが引き続き参加している場合、正式に有効な状態を維持されるか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0834",
       "title": "EU Crypto Crackdown — Stablecoin Regulation Triggers Market-Wide Contagion",
-      "ghost_url": "https://nowpattern.com/en/57f184d8-c511-4028-8348-021908fd9b99/",
+      "ghost_url": "https://nowpattern.com/en/eu-crypto-crackdown-stablecoin-regulation-triggers-market-wide-contagion/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -33493,7 +33705,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0834_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T19:00:10.845107+00:00",
-      "resolution_question_ja": "ステーブルコインの市場全体の時価総額（CoinGeckoまたはCoinMarketCapで測定）は、2026年9月30日までに、2026年2月以前の規制水準まで回復するか？"
+      "resolution_question_ja": "ステーブルコインの市場全体の時価総額（CoinGeckoまたはCoinMarketCapで測定）は、2026年9月30日までに、2026年2月以前の規制水準まで回復するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0835",
@@ -33525,7 +33739,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0835_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T19:00:14.381589+00:00",
-      "resolution_question_ja": "2026年12月31日までに、日本政府が反撃能力（敵基地攻撃能力）の具体的な運用開始を公式に表明するか？"
+      "resolution_question_ja": "2026年12月31日までに、日本政府が反撃能力（敵基地攻撃能力）の具体的な運用開始を公式に表明するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0836",
@@ -33557,12 +33773,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0836_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T19:00:18.030296+00:00",
-      "resolution_question_ja": "2026年12月31日までに、台湾海峡で中国人民解放軍と、アメリカ軍、台湾軍、自衛隊のいずれかとの間で、死者を伴う直接的な軍事衝突が発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、台湾海峡で中国人民解放軍と、アメリカ軍、台湾軍、自衛隊のいずれかとの間で、死者を伴う直接的な軍事衝突が発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0837",
       "title": "North Korea's New Missile — Japan's Defense Doctrine at a Breaking Point",
-      "ghost_url": "https://nowpattern.com/en/064653df-69b1-463d-8840-8f5f9143217f/",
+      "ghost_url": "https://nowpattern.com/en/north-koreas-new-missile-japans-defense-doctrine-at-a-breaking-point/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -33589,7 +33807,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0837_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T19:00:21.954345+00:00",
-      "resolution_question_ja": "日本は2026年12月31日までに反撃能力の運用準備完了を正式に宣言するだろうか？"
+      "resolution_question_ja": "日本は2026年12月31日までに反撃能力の運用準備完了を正式に宣言するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0838",
@@ -33621,12 +33841,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0838_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T19:00:25.457582+00:00",
-      "resolution_question_ja": "2026年12月31日までに、南シナ海において米中の軍艦または軍用機が、相手国の軍艦・軍用機に対し意図的に武器を使用するか？"
+      "resolution_question_ja": "2026年12月31日までに、南シナ海において米中の軍艦または軍用機が、相手国の軍艦・軍用機に対し意図的に武器を使用するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0839",
       "title": "Taiwan Strait Crisis — Escalation Spiral Tests the Limits of US-Japan Alliance Architecture",
-      "ghost_url": "https://nowpattern.com/en/f81813e4-89e3-46d1-8cc4-25cfc62bf7db/",
+      "ghost_url": "https://nowpattern.com/en/taiwan-strait-crisis-escalation-spiral-tests-the-limits-of-us-japan-alliance-architecture/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -33653,7 +33875,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0839_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T19:00:29.007261+00:00",
-      "resolution_question_ja": "2026年12月31日までに台湾海峡で、国家間の軍事力による直接的な武力衝突（交戦）は発生するか？"
+      "resolution_question_ja": "2026年12月31日までに台湾海峡で、国家間の軍事力による直接的な武力衝突（交戦）は発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0840",
@@ -33685,12 +33909,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0840_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T19:00:32.533503+00:00",
-      "resolution_question_ja": "2026年9月30日までに、アメリカ合衆国またはイスラエルがイランの核関連施設に対して軍事攻撃を行うか？"
+      "resolution_question_ja": "2026年9月30日までに、アメリカ合衆国またはイスラエルがイランの核関連施設に対して軍事攻撃を行うか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0841",
       "title": "South China Sea Flashpoint — The Escalation Spiral Pulling Superpowers Toward Collision",
-      "ghost_url": "https://nowpattern.com/en/0e36f663-66c9-441e-834a-db595d4107a6/",
+      "ghost_url": "https://nowpattern.com/en/south-china-sea-flashpoint-the-escalation-spiral-pulling-superpowers-toward-collision/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -33717,12 +33943,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0841_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T19:00:35.997853+00:00",
-      "resolution_question_ja": "2026年12月31日までに、南シナ海において米軍と中国軍の間で直接的な軍事衝突（銃撃戦を含む）が発生するだろうか？"
+      "resolution_question_ja": "2026年12月31日までに、南シナ海において米軍と中国軍の間で直接的な軍事衝突（銃撃戦を含む）が発生するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0842",
       "title": "Koizumi-Hegseth Call on Iran — The Strait of Hormuz as Alliance Stress Test",
-      "ghost_url": "https://nowpattern.com/en/12aa65b8-2f73-40ff-a9aa-cc6850866348/",
+      "ghost_url": "https://nowpattern.com/en/koizumi-hegseth-call-on-iran-the-strait-of-hormuz-as-alliance-stress-test/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -33749,7 +33977,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0842_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T19:00:39.559933+00:00",
-      "resolution_question_ja": "日本は2026年9月30日までに、海上自衛隊の中東派遣任務を拡大（追加艦艇の派遣、パトロール範囲の拡大、または任務権限の強化）するだろうか？"
+      "resolution_question_ja": "日本は2026年9月30日までに、海上自衛隊の中東派遣任務を拡大（追加艦艇の派遣、パトロール範囲の拡大、または任務権限の強化）するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0843",
@@ -33781,12 +34011,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0843_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T19:00:43.158357+00:00",
-      "resolution_question_ja": "2026年4月のハンガリー議会選挙で、オルバン首相率いるフィデス党は過半数（100議席以上）を維持できるだろうか？"
+      "resolution_question_ja": "2026年4月のハンガリー議会選挙で、オルバン首相率いるフィデス党は過半数（100議席以上）を維持できるだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0844",
       "title": "Trump Backs Orbán Before April Vote — Populist Alliance Meets Electoral Test",
-      "ghost_url": "https://nowpattern.com/en/331f9e2e-cea2-4bce-aed2-f91aec9b4aea/",
+      "ghost_url": "https://nowpattern.com/en/trump-backs-orban-before-april-vote-populist-alliance-meets-electoral-test/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -33813,12 +34045,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0844_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-22T19:00:46.587774+00:00",
-      "resolution_question_ja": "ヴィクトル・オルバーン率いるフィデス党は、2026年4月のハンガリー議会選挙で最多議席を獲得するだろうか？"
+      "resolution_question_ja": "ヴィクトル・オルバーン率いるフィデス党は、2026年4月のハンガリー議会選挙で最多議席を獲得するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0845",
       "title": "Taiwan Strait Drone Intercept — The Escalation Spiral Neither Side Can Exit",
-      "ghost_url": "https://nowpattern.com/en/adb5c053-33ba-49b4-b4f2-e16ede474fbe/",
+      "ghost_url": "https://nowpattern.com/en/taiwan-strait-drone-intercept-the-escalation-spiral-neither-side-can-exit-11/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -33845,7 +34079,9 @@
       "timestamp_sha256": "e4484133a99fab28f15f39c4a1b84ded7ab7ff3e902f34099508d4f3f5d1b1f7",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0845_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T22:00:02.472070+00:00"
+      "timestamp_created_at": "2026-03-22T22:00:02.472070+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0846",
@@ -33877,12 +34113,14 @@
       "timestamp_sha256": "462ded021efb8e0cca0ace0f5cae8e76d4177d9a04249b8b15c8880945af8c8f",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0846_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T22:00:03.979560+00:00"
+      "timestamp_created_at": "2026-03-22T22:00:03.979560+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0847",
       "title": "GPT-6's Reasoning Leap — The Winner-Takes-All Race to Define Intelligence",
-      "ghost_url": "https://nowpattern.com/en/1396b12d-1a9d-40b6-95bb-c52f02c4973d/",
+      "ghost_url": "https://nowpattern.com/en/gpt-6s-reasoning-leap-the-winner-takes-all-race-to-define-intelligence-2/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -33909,12 +34147,14 @@
       "timestamp_sha256": "28f0c55d6e3b3297149d3748cdf937d8af652d49f70a01ca432926b004f52b96",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0847_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T22:00:05.482083+00:00"
+      "timestamp_created_at": "2026-03-22T22:00:05.482083+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0848",
       "title": "Global AGI Safety Accord — The Unenforceable Treaty That Reshapes AI Power",
-      "ghost_url": "https://nowpattern.com/en/9cff5825-bdb3-4ec8-942a-4434870e6631/",
+      "ghost_url": "https://nowpattern.com/en/global-agi-safety-accord-the-unenforceable-treaty-that-reshapes-ai-power-2/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -33941,12 +34181,14 @@
       "timestamp_sha256": "aef29edd6aad3400e30ce94b8a570686c0b2d95ad2f991ce306ae878dff2ed8b",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0848_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-22T22:00:06.983466+00:00"
+      "timestamp_created_at": "2026-03-22T22:00:06.983466+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0849",
       "title": "Mullin to DHS — Trump's Loyalty Purge Reshapes Homeland Security",
-      "ghost_url": "https://nowpattern.com/p/548a59f9-8595-45c8-bd64-60c4baec75a4/",
+      "ghost_url": "https://nowpattern.com/en/mullin-to-dhs-trumps-loyalty-purge-reshapes-homeland-security/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -33973,12 +34215,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0849_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T00:00:08.160909+00:00",
-      "resolution_question_ja": "マークウェイン・マリンは2026年9月30日時点で、まだ国土安全保障長官を務めているだろうか？"
+      "resolution_question_ja": "マークウェイン・マリンは2026年9月30日時点で、まだ国土安全保障長官を務めているだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0850",
       "title": "GPT-6 and the Reasoning Revolution — AI's Assault on Professional Expertise",
-      "ghost_url": "https://nowpattern.com/p/9e4e2150-ef6a-48b2-8457-e4f8219ea730/",
+      "ghost_url": "https://nowpattern.com/en/gpt-6-and-the-reasoning-revolution-ais-assault-on-professional-expertise/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34005,12 +34249,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0850_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T00:00:12.158219+00:00",
-      "resolution_question_ja": "2027年6月30日までに、Am Law 50にランクインする法律事務所のうち、少なくとも3社がGPT-6（またはその後継となるもの）を、実際の顧客案件において、統合された法的推論ツールとして公に導入するだろうか？"
+      "resolution_question_ja": "2027年6月30日までに、Am Law 50にランクインする法律事務所のうち、少なくとも3社がGPT-6（またはその後継となるもの）を、実際の顧客案件において、統合された法的推論ツールとして公に導入するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0851",
       "title": "Tillis vs. Trump on NATO — Alliance Strain Exposes GOP Foreign Policy Fracture",
-      "ghost_url": "https://nowpattern.com/p/30a44c11-9bff-49e7-b574-bb0f775c83f4/",
+      "ghost_url": "https://nowpattern.com/en/tillis-vs-trump-on-nato-alliance-strain-exposes-gop-foreign-policy-fracture/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34037,12 +34283,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0851_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T00:00:15.586294+00:00",
-      "resolution_question_ja": "アメリカ合衆国は、2026年12月31日まで、NATOの正加盟国として、正式な義務水準を変えずに留まるか？"
+      "resolution_question_ja": "アメリカ合衆国は、2026年12月31日まで、NATOの正加盟国として、正式な義務水準を変えずに留まるか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0852",
       "title": "DeepMind's AGI Claim — The Regulatory Reckoning That Reshapes Tech Power",
-      "ghost_url": "https://nowpattern.com/p/50d87500-ca23-49d1-af6c-06dfbe02c4a1/",
+      "ghost_url": "https://nowpattern.com/en/deepminds-agi-claim-the-regulatory-reckoning-that-reshapes-tech-power/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -34069,12 +34317,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0852_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T00:00:19.195286+00:00",
-      "resolution_question_ja": "2028年12月31日までに、少なくとも3つのG20参加国が、AGI（汎用人工知能）クラスのAIシステムに特化した法的拘束力のある法律を制定するだろうか？"
+      "resolution_question_ja": "2028年12月31日までに、少なくとも3つのG20参加国が、AGI（汎用人工知能）クラスのAIシステムに特化した法的拘束力のある法律を制定するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0853",
       "title": "Strait of Hormuz Threat — Iran's Chokepoint Gambit Risks Global Energy Crisis",
-      "ghost_url": "https://nowpattern.com/p/082383ea-7da1-4d05-8803-f72893364805/",
+      "ghost_url": "https://nowpattern.com/en/strait-of-hormuz-threat-irans-chokepoint-gambit-risks-global-energy-crisis/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -34101,12 +34351,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0853_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T00:00:22.675474+00:00",
-      "resolution_question_ja": "2026年6月30日までに、ホルムズ海峡を通る商業輸送が大幅に混乱する（タンカーの1日の通過量が50%以上減少し、それが72時間以上続く場合と定義する）可能性はありますか？"
+      "resolution_question_ja": "2026年6月30日までに、ホルムズ海峡を通る商業輸送が大幅に混乱する（タンカーの1日の通過量が50%以上減少し、それが72時間以上続く場合と定義する）可能性はありますか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0854",
       "title": "USDC's $10B Exodus — When Regulation Triggers the Flight to Decentralization",
-      "ghost_url": "https://nowpattern.com/p/f29447f7-a956-4fa5-8ee6-6865324db580/",
+      "ghost_url": "https://nowpattern.com/en/usdcs-10b-exodus-when-regulation-triggers-the-flight-to-decentralization/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34133,12 +34385,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0854_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T00:00:26.456115+00:00",
-      "resolution_question_ja": "USDCは2026年4月30日までに、7日間連続で完全に1ドルとのペッグ（0.005ドルの範囲内での乖離）を回復し、維持できるか？"
+      "resolution_question_ja": "USDCは2026年4月30日までに、7日間連続で完全に1ドルとのペッグ（0.005ドルの範囲内での乖離）を回復し、維持できるか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0855",
       "title": "South China Sea Near-Collision — The Escalation Spiral Neither Side Can Exit",
-      "ghost_url": "https://nowpattern.com/p/5ea11e28-0b64-471e-8ed3-c1a231f8130d/",
+      "ghost_url": "https://nowpattern.com/en/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-10/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34165,12 +34419,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0855_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T00:00:30.233612+00:00",
-      "resolution_question_ja": "中国は、このニアミス（ニアコリジョン）を受けて、2026年3月25日までに、米国に対して係争地域における海軍作戦の撤退または中止を要求する正式な外交抗議（デマルシュまたは外務省公式声明と定義される）を発出するだろうか？"
+      "resolution_question_ja": "中国は、このニアミス（ニアコリジョン）を受けて、2026年3月25日までに、米国に対して係争地域における海軍作戦の撤退または中止を要求する正式な外交抗議（デマルシュまたは外務省公式声明と定義される）を発出するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0856",
       "title": "Taiwan Drone Incursions — Beijing's Gray Zone Escalation Spiral Before Elections",
-      "ghost_url": "https://nowpattern.com/p/83fed5e1-e4c5-4d8f-9cb6-73bfca07c6ca/",
+      "ghost_url": "https://nowpattern.com/en/taiwan-drone-incursions-beijings-gray-zone-escalation-spiral-before-elections/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34197,12 +34453,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0856_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T01:00:06.727043+00:00",
-      "resolution_question_ja": "台湾は、中国のドローン侵入記録を受けて、2026年3月30日までに、公に発表された軍事演習（防空、海軍、または統合軍）を実施するか？"
+      "resolution_question_ja": "台湾は、中国のドローン侵入記録を受けて、2026年3月30日までに、公に発表された軍事演習（防空、海軍、または統合軍）を実施するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0857",
       "title": "Meta's AR Social Platform — When Immersion Becomes Surveillance Infrastructure",
-      "ghost_url": "https://nowpattern.com/p/256bc379-4a9c-4092-97c8-7922dbb1749a/",
+      "ghost_url": "https://nowpattern.com/en/metas-ar-social-platform-when-immersion-becomes-surveillance-infrastructure/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34229,12 +34487,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0857_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T01:00:10.756930+00:00",
-      "resolution_question_ja": "2027年12月31日までに、MetaのARソーシャルプラットフォームは、少なくとも1件の重大なプライバシー訴訟（集団訴訟または規制当局による執行措置で、1億ドル以上の罰金が求められるもの）に直面するだろうか？"
+      "resolution_question_ja": "2027年12月31日までに、MetaのARソーシャルプラットフォームは、少なくとも1件の重大なプライバシー訴訟（集団訴訟または規制当局による執行措置で、1億ドル以上の罰金が求められるもの）に直面するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0858",
       "title": "Trump's Energy Paradox — How 'Drill Baby Drill' Funds America's Adversaries",
-      "ghost_url": "https://nowpattern.com/p/f2f7ed08-c616-4f7e-8f3f-bd611a80d868/",
+      "ghost_url": "https://nowpattern.com/en/trumps-energy-paradox-how-drill-baby-drill-funds-americas-adversaries/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34261,12 +34521,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0858_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T01:00:14.116749+00:00",
-      "resolution_question_ja": "2026年第3四半期（7月～9月）のブレント原油の平均価格は、1バレルあたり80ドルを超えるだろうか？"
+      "resolution_question_ja": "2026年第3四半期（7月～9月）のブレント原油の平均価格は、1バレルあたり80ドルを超えるだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0859",
       "title": "Russia's Nuclear Drills Near NATO Border — Escalation Spiral Tests Alliance Cohesion",
-      "ghost_url": "https://nowpattern.com/p/905388f7-02d9-471e-985d-1af22bbe952b/",
+      "ghost_url": "https://nowpattern.com/en/russias-nuclear-drills-near-nato-border-escalation-spiral-tests-alliance-cohesion/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34293,7 +34555,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0859_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T01:00:17.729254+00:00",
-      "resolution_question_ja": "NATOは、2026年3月26日までに、ロシアの戦術核演習を非難する正式な共同声明（議長声明や報道発表にとどまらないもの）を発表するだろうか？"
+      "resolution_question_ja": "NATOは、2026年3月26日までに、ロシアの戦術核演習を非難する正式な共同声明（議長声明や報道発表にとどまらないもの）を発表するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0860",
@@ -34325,12 +34589,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0860_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T01:00:21.142039+00:00",
-      "resolution_question_ja": "2026年12月31日までに、自衛隊の海外派遣基準を拡大する法案（PKO参加要件の緩和や武器使用基準の見直しを含む）が、日本の国会で可決されるか？"
+      "resolution_question_ja": "2026年12月31日までに、自衛隊の海外派遣基準を拡大する法案（PKO参加要件の緩和や武器使用基準の見直しを含む）が、日本の国会で可決されるか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0861",
       "title": "Ethereum's 10% Staking Yield — The Centralization Trap Behind the Boom",
-      "ghost_url": "https://nowpattern.com/p/6f5c9469-1c9b-47be-828f-7788db59c1eb/",
+      "ghost_url": "https://nowpattern.com/en/ethereums-10-staking-yield-the-centralization-trap-behind-the-boom-7/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34357,7 +34623,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0861_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T01:00:24.834343+00:00",
-      "resolution_question_ja": "2026年6月30日までにイーサリアムの価格は7,000ドルを超えるだろうか？"
+      "resolution_question_ja": "2026年6月30日までにイーサリアムの価格は7,000ドルを超えるだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0862",
@@ -34389,12 +34657,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0862_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T01:00:28.723668+00:00",
-      "resolution_question_ja": "2026年12月31日までに、南シナ海でアメリカと中国の間で直接的な武力衝突（発砲、ミサイル発射、意図的な体当たりなど）が発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、南シナ海でアメリカと中国の間で直接的な武力衝突（発砲、ミサイル発射、意図的な体当たりなど）が発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0863",
       "title": "Taiwan Strait Crisis — Escalation Spiral Tests the Limits of Deterrence",
-      "ghost_url": "https://nowpattern.com/p/c368bbde-4bf8-4094-8ceb-4ae573c15903/",
+      "ghost_url": "https://nowpattern.com/en/taiwan-strait-crisis-escalation-spiral-tests-the-limits-of-deterrence-2/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -34421,12 +34691,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0863_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T01:00:32.187008+00:00",
-      "resolution_question_ja": "2026年12月31日までに、台湾海峡において、中国人民解放軍と台湾またはアメリカ軍の間で、直接的な軍事衝突（銃撃戦、死傷者を伴う船舶の衝突、または航空機の撃墜など）は発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、台湾海峡において、中国人民解放軍と台湾またはアメリカ軍の間で、直接的な軍事衝突（銃撃戦、死傷者を伴う船舶の衝突、または航空機の撃墜など）は発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0864",
       "title": "South China Sea Standoff — The Escalation Spiral Neither Side Can Exit",
-      "ghost_url": "https://nowpattern.com/p/3641fc9a-2336-4d7a-b335-4b5c2d82015c/",
+      "ghost_url": "https://nowpattern.com/en/south-china-sea-standoff-the-escalation-spiral-neither-side-can-exit-13/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -34453,7 +34725,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0864_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T01:00:35.856883+00:00",
-      "resolution_question_ja": "2026年12月31日までに、南シナ海において、アメリカ軍（沿岸警備隊を含む）と中国軍の間で直接的な武力衝突（実弾を伴う交戦）が発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、南シナ海において、アメリカ軍（沿岸警備隊を含む）と中国軍の間で直接的な武力衝突（実弾を伴う交戦）が発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0865",
@@ -34485,12 +34759,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0865_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T01:00:39.220092+00:00",
-      "resolution_question_ja": "2026年9月30日までに、日本政府は海上自衛隊の中東派遣について、護衛活動の追加など任務内容を拡大する閣議決定を行うか。"
+      "resolution_question_ja": "2026年9月30日までに、日本政府は海上自衛隊の中東派遣について、護衛活動の追加など任務内容を拡大する閣議決定を行うか。",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0866",
       "title": "Japan-U.S. Defense Talks on Iran — The Hormuz Chokepoint Reshapes Alliance Dynamics",
-      "ghost_url": "https://nowpattern.com/p/27f67195-b207-4848-8a48-32cf1e49fcc6/",
+      "ghost_url": "https://nowpattern.com/en/japan-u-s-defense-talks-on-iran-the-hormuz-chokepoint-reshapes-alliance-dynamics/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34517,12 +34793,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0866_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T01:00:42.864071+00:00",
-      "resolution_question_ja": "日本は2026年12月31日までに、海上自衛隊の中東派遣任務の権限（地理的範囲、装備の展開、または作戦権限のいずれか）を拡大するだろうか？"
+      "resolution_question_ja": "日本は2026年12月31日までに、海上自衛隊の中東派遣任務の権限（地理的範囲、装備の展開、または作戦権限のいずれか）を拡大するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0867",
       "title": "Mullin to DHS — Trump's Loyalty Purge Reshapes Homeland Security",
-      "ghost_url": "https://nowpattern.com/p/4b7e4371-250b-4d70-be2f-5162a5530331/",
+      "ghost_url": "https://nowpattern.com/en/mullin-to-dhs-trumps-loyalty-purge-reshapes-homeland-security-2/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34549,12 +34827,14 @@
       "timestamp_sha256": "dd5c2e4636f3e58f8512c2e5f019c49f8a31749d5ec21e627e4aae8666d40fe9",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0867_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-23T04:00:03.160955+00:00"
+      "timestamp_created_at": "2026-03-23T04:00:03.160955+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0868",
       "title": "DeepMind's AGI Claim — The Regulatory Race Begins Before the Technology Arrives",
-      "ghost_url": "https://nowpattern.com/p/b583d833-2489-4982-b3dd-26f6f1d72a51/",
+      "ghost_url": "https://nowpattern.com/en/deepminds-agi-claim-the-regulatory-race-begins-before-the-technology-arrives/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -34581,12 +34861,14 @@
       "timestamp_sha256": "716433aa7bacb746da5df0f26f72b3ab54b30cd431f375054efac88ab0a67493",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0868_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-23T04:00:04.662888+00:00"
+      "timestamp_created_at": "2026-03-23T04:00:04.662888+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0869",
       "title": "USDC's $10B Exodus — Stablecoin Regulation Triggers the Decentralization Reflex",
-      "ghost_url": "https://nowpattern.com/p/cc0b02e2-390f-47c6-aa50-667125e7a84d/",
+      "ghost_url": "https://nowpattern.com/en/usdcs-10b-exodus-stablecoin-regulation-triggers-the-decentralization-reflex/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34613,12 +34895,14 @@
       "timestamp_sha256": "7d87da0f605a885073711035479235ccef9afe6f41d339a80937b7a7b2410d61",
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0869_original.json.ots",
       "timestamp_pending": true,
-      "timestamp_created_at": "2026-03-23T04:00:06.165600+00:00"
+      "timestamp_created_at": "2026-03-23T04:00:06.165600+00:00",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0870",
       "title": "Taiwan Drone Incursions — Beijing's Gray Zone Escalation Spiral Before Elections",
-      "ghost_url": "https://nowpattern.com/p/fe9360c0-622d-476a-b46d-85aeb4089cf7/",
+      "ghost_url": "https://nowpattern.com/en/taiwan-drone-incursions-beijings-gray-zone-escalation-spiral-before-elections-2/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34645,12 +34929,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0870_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T04:00:11.895355+00:00",
-      "resolution_question_ja": "台湾は、中国のドローン侵入への明確な対抗措置として、2026年3月30日までに、公に発表された軍事演習（実弾射撃または大規模動員演習）を実施するか？"
+      "resolution_question_ja": "台湾は、中国のドローン侵入への明確な対抗措置として、2026年3月30日までに、公に発表された軍事演習（実弾射撃または大規模動員演習）を実施するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0871",
       "title": "Bitcoin's $120K Breakthrough — Institutional Herding Rewires Global Capital Flows",
-      "ghost_url": "https://nowpattern.com/p/92ee9a9a-63c1-46bd-ae66-ba29027507b9/",
+      "ghost_url": "https://nowpattern.com/en/bitcoins-120k-breakthrough-institutional-herding-rewires-global-capital-flows/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -34677,12 +34963,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0871_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T04:00:16.646252+00:00",
-      "resolution_question_ja": "2026年6月30日に、ビットコインの価格は12万米ドル以上を維持しているだろうか？"
+      "resolution_question_ja": "2026年6月30日に、ビットコインの価格は12万米ドル以上を維持しているだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0872",
       "title": "Trump's Fossil Fuel Gambit — How Imperial Overreach Enriches Adversaries",
-      "ghost_url": "https://nowpattern.com/p/4e6c49d3-5646-4b68-b487-8c49455bce7a/",
+      "ghost_url": "https://nowpattern.com/en/trumps-fossil-fuel-gambit-how-imperial-overreach-enriches-adversaries/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34709,7 +34997,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0872_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T04:00:21.211303+00:00",
-      "resolution_question_ja": "2026年第3四半期（2026年7月～9月）のブレント原油の平均価格は、1バレルあたり80ドルを超えるか？"
+      "resolution_question_ja": "2026年第3四半期（2026年7月～9月）のブレント原油の平均価格は、1バレルあたり80ドルを超えるか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0873",
@@ -34741,7 +35031,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0873_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T04:00:25.730778+00:00",
-      "resolution_question_ja": "2026年12月31日までに、自衛隊の海外派遣基準を拡大する法案は、日本の国会で成立するだろうか？"
+      "resolution_question_ja": "2026年12月31日までに、自衛隊の海外派遣基準を拡大する法案は、日本の国会で成立するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0874",
@@ -34773,12 +35065,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0874_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T04:00:29.690079+00:00",
-      "resolution_question_ja": "2026年12月31日までに、南シナ海でアメリカ軍と中国軍の間で、正規軍同士による直接的な軍事衝突（発砲やミサイル使用などの武力行使を伴うもの）は発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、南シナ海でアメリカ軍と中国軍の間で、正規軍同士による直接的な軍事衝突（発砲やミサイル使用などの武力行使を伴うもの）は発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0875",
       "title": "South China Sea Standoff — The Escalation Spiral Neither Side Can Exit",
-      "ghost_url": "https://nowpattern.com/p/e08e9651-19db-4f16-a392-34d737c48837/",
+      "ghost_url": "https://nowpattern.com/en/south-china-sea-standoff-the-escalation-spiral-neither-side-can-exit-14/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -34805,12 +35099,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0875_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T04:00:34.264491+00:00",
-      "resolution_question_ja": "2026年12月31日までに、南シナ海において米軍と中国軍の間で軍事衝突が発生し、死傷者または軍艦・航空機の破壊が確認される事態となるか？"
+      "resolution_question_ja": "2026年12月31日までに、南シナ海において米軍と中国軍の間で軍事衝突が発生し、死傷者または軍艦・航空機の破壊が確認される事態となるか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0876",
       "title": "Taiwan Drone Incursions — Beijing's Gray-Zone Escalation Spiral Accelerates",
-      "ghost_url": "https://nowpattern.com/p/6974ea1f-c025-47cf-a89a-f2de162e871c/",
+      "ghost_url": "https://nowpattern.com/en/taiwan-drone-incursions-beijings-gray-zone-escalation-spiral-accelerates/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -34837,12 +35133,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0876_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T09:00:07.231844+00:00",
-      "resolution_question_ja": "台湾は2026年3月30日までに、米国に対し緊急軍事支援（既存の武器販売ルートを超えた、即時の軍事支援、人員派遣、または緊急防衛装備に関する政府間の直接的な要請と定義される）を正式に要請するか？"
+      "resolution_question_ja": "台湾は2026年3月30日までに、米国に対し緊急軍事支援（既存の武器販売ルートを超えた、即時の軍事支援、人員派遣、または緊急防衛装備に関する政府間の直接的な要請と定義される）を正式に要請するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0877",
       "title": "Russia's Nuclear Drills — The Escalation Spiral That Rewrites Deterrence",
-      "ghost_url": "https://nowpattern.com/p/5aa914cd-1b21-4401-972b-c626759b9761/",
+      "ghost_url": "https://nowpattern.com/en/russias-nuclear-drills-the-escalation-spiral-that-rewrites-deterrence/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -34869,12 +35167,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0877_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T09:00:11.111993+00:00",
-      "resolution_question_ja": "NATOは、ロシアが2026年3月に行う核戦力演習に直接対応して、2026年4月6日までに東方 flank に位置する加盟国（ポーランド、バルト三国、ルーマニア、またはフィンランド）への部隊配備増強を発表するだろうか？"
+      "resolution_question_ja": "NATOは、ロシアが2026年3月に行う核戦力演習に直接対応して、2026年4月6日までに東方 flank に位置する加盟国（ポーランド、バルト三国、ルーマニア、またはフィンランド）への部隊配備増強を発表するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0878",
       "title": "EU Stablecoin Crackdown — Tether's Compliance Crisis Tests Crypto's Trust Architecture",
-      "ghost_url": "https://nowpattern.com/p/516c480a-f578-44f5-9430-b2784b8bc574/",
+      "ghost_url": "https://nowpattern.com/en/eu-stablecoin-crackdown-tethers-compliance-crisis-tests-cryptos-trust-architecture/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -34901,12 +35201,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0878_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T09:00:14.522915+00:00",
-      "resolution_question_ja": "USDTの時価総額は、2026年9月30日までに、2026年3月時点の約1400億ドルから10%以上減少し、1260億ドルを下回るだろうか？"
+      "resolution_question_ja": "USDTの時価総額は、2026年9月30日までに、2026年3月時点の約1400億ドルから10%以上減少し、1260億ドルを下回るだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0879",
       "title": "Ethereum Staking Yields Collapse Below 3% — DeFi's Gravitational Pull Reshapes Capital Allocation",
-      "ghost_url": "https://nowpattern.com/p/32978447-9cab-4930-a10c-d74f5f6258b0/",
+      "ghost_url": "https://nowpattern.com/en/ethereum-staking-yields-collapse-below-3-defis-gravitational-pull-reshapes-capital-allocation/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -34933,12 +35235,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0879_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T09:00:18.263602+00:00",
-      "resolution_question_ja": "2026年6月30日までに、イーサリアム上のDeFiのTVL（預かり資産総額）は、イーサリアムのステーキングのTVLを超えるでしょうか？"
+      "resolution_question_ja": "2026年6月30日までに、イーサリアム上のDeFiのTVL（預かり資産総額）は、イーサリアムのステーキングのTVLを超えるでしょうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0880",
       "title": "AGI Summit Clash — The Regulation Race Outpaces the Technology",
-      "ghost_url": "https://nowpattern.com/agi-summit-clash-the-regulation-race-outpaces-the-technology/",
+      "ghost_url": "https://nowpattern.com/en/agi-summit-clash-the-regulation-race-outpaces-the-technology/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -34965,12 +35269,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0880_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T09:00:23.041566+00:00",
-      "resolution_question_ja": "30カ国以上が署名する拘束力のある国際的なAGI（汎用人工知能）ガバナンスの枠組みは、2026年12月31日までに正式に締結されるだろうか？"
+      "resolution_question_ja": "30カ国以上が署名する拘束力のある国際的なAGI（汎用人工知能）ガバナンスの枠組みは、2026年12月31日までに正式に締結されるだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0881",
       "title": "AlphaThink Cracks Quantum Problems — The Cybersecurity Reckoning Begins",
-      "ghost_url": "https://nowpattern.com/p/e71fee33-bc04-4873-a073-bbaedc74b155/",
+      "ghost_url": "https://nowpattern.com/en/alphathink-cracks-quantum-problems-the-cybersecurity-reckoning-begins/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -34997,7 +35303,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0881_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T09:00:30.394356+00:00",
-      "resolution_question_ja": "2026年12月31日までに、RSA-2048またはECC-256で暗号化されたデータが、量子支援復号によって（部分的または完全に）解読された事例が、公に確認されるだろうか？"
+      "resolution_question_ja": "2026年12月31日までに、RSA-2048またはECC-256で暗号化されたデータが、量子支援復号によって（部分的または完全に）解読された事例が、公に確認されるだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0882",
@@ -35029,7 +35337,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0882_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T09:00:34.517482+00:00",
-      "resolution_question_ja": "2026年3月31日までに、ビットコインの価格は1BTCあたり1500万円を超えるだろうか？"
+      "resolution_question_ja": "2026年3月31日までに、ビットコインの価格は1BTCあたり1500万円を超えるだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0883",
@@ -35061,12 +35371,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0883_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T09:00:38.321074+00:00",
-      "resolution_question_ja": "2026年6月30日までにイーサリアム（ETH）の価格は80万円を超えるだろうか？"
+      "resolution_question_ja": "2026年6月30日までにイーサリアム（ETH）の価格は80万円を超えるだろうか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0884",
       "title": "Bitcoin's ¥15M Threshold — Institutional Capital Reshapes Crypto's Power Structure",
-      "ghost_url": "https://nowpattern.com/p/06c28bea-6528-46d9-b1a6-355031531c62/",
+      "ghost_url": "https://nowpattern.com/en/bitcoins-y-15m-threshold-institutional-capital-reshapes-cryptos-power-structure/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -35093,12 +35405,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0884_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T10:00:07.282408+00:00",
-      "resolution_question_ja": "2026年6月30日までに、日本の主要な取引所（bitFlyer、Coincheck、bitbank）のいずれかで、ビットコインの価格が1BTCあたり1500万円を超えることはありますか？"
+      "resolution_question_ja": "2026年6月30日までに、日本の主要な取引所（bitFlyer、Coincheck、bitbank）のいずれかで、ビットコインの価格が1BTCあたり1500万円を超えることはありますか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0885",
       "title": "Ethereum's DeFi Surge Toward ¥800K — Regulation Meets Unstoppable Liquidity",
-      "ghost_url": "https://nowpattern.com/p/62bc9567-f9d9-4764-a181-8a6fb42389b2/",
+      "ghost_url": "https://nowpattern.com/en/ethereums-defi-surge-toward-y-800k-regulation-meets-unstoppable-liquidity/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -35125,7 +35439,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0885_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T10:00:14.123755+00:00",
-      "resolution_question_ja": "2026年6月30日までに、日本の主要な取引所（bitFlyer、Coincheck、GMOコイン）のいずれかで、イーサリアムの価格が80万円を超えることはありますか？"
+      "resolution_question_ja": "2026年6月30日までに、日本の主要な取引所（bitFlyer、Coincheck、GMOコイン）のいずれかで、イーサリアムの価格が80万円を超えることはありますか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0886",
@@ -35157,7 +35473,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0886_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T10:00:20.161348+00:00",
-      "resolution_question_ja": "2026年12月31日までに、日本の登録暗号資産取引所で扱えるアルトコインの銘柄数は、2025年12月31日時点と比べて20%以上減るか？"
+      "resolution_question_ja": "2026年12月31日までに、日本の登録暗号資産取引所で扱えるアルトコインの銘柄数は、2025年12月31日時点と比べて20%以上減るか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0887",
@@ -35189,12 +35507,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0887_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T10:00:27.780082+00:00",
-      "resolution_question_ja": "2026年12月31日までに、南シナ海において米中の軍用機または軍艦が、直接的な物理的接触（衝突、発砲、実力行使など）を伴う軍事衝突を起こすか？"
+      "resolution_question_ja": "2026年12月31日までに、南シナ海において米中の軍用機または軍艦が、直接的な物理的接触（衝突、発砲、実力行使など）を伴う軍事衝突を起こすか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0888",
       "title": "South China Sea Standoff — The Escalation Spiral Neither Side Can Exit",
-      "ghost_url": "https://nowpattern.com/south-china-sea-standoff-the-escalation-spiral-neither-side-can-exit-15/",
+      "ghost_url": "https://nowpattern.com/en/south-china-sea-standoff-the-escalation-spiral-neither-side-can-exit-15/",
       "lang": "en",
       "status": "active",
       "our_pick": "NO",
@@ -35221,7 +35541,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0888_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T10:00:35.290136+00:00",
-      "resolution_question_ja": "2026年12月31日までに、南シナ海において米軍と中国軍の間で直接的な軍事衝突（交戦、体当たり、衝突などにより死傷者が出たり、軍事資産が破壊されたりする事態と定義）は発生するか？"
+      "resolution_question_ja": "2026年12月31日までに、南シナ海において米軍と中国軍の間で直接的な軍事衝突（交戦、体当たり、衝突などにより死傷者が出たり、軍事資産が破壊されたりする事態と定義）は発生するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0889",
@@ -35253,12 +35575,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0889_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T10:00:42.602182+00:00",
-      "resolution_question_ja": "2026年12月31日までにウクライナ戦争の包括的な停戦合意は成立するか？"
+      "resolution_question_ja": "2026年12月31日までにウクライナ戦争の包括的な停戦合意は成立するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0890",
       "title": "Japan's Altcoin Crackdown — Regulatory Tightening Reshapes Asia's Crypto Gateway",
-      "ghost_url": "https://nowpattern.com/p/15cd8b0c-a3a8-4c91-a8ae-063cef67c0a5/",
+      "ghost_url": "https://nowpattern.com/en/japans-altcoin-crackdown-regulatory-tightening-reshapes-asias-crypto-gateway/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -35285,7 +35609,9 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0890_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T10:00:50.176418+00:00",
-      "resolution_question_ja": "2026年1月1日時点の、日本の金融庁登録済みの全取引所に上場しているアルトコインの総数が、2026年12月31日までに20%以上減少するか？"
+      "resolution_question_ja": "2026年1月1日時点の、日本の金融庁登録済みの全取引所に上場しているアルトコインの総数が、2026年12月31日までに20%以上減少するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0891",
@@ -35317,12 +35643,14 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0891_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T10:00:57.694725+00:00",
-      "resolution_question_ja": "2026年の台湾総統選挙で、国民党または親中派と見なされる候補者が当選するか？"
+      "resolution_question_ja": "2026年の台湾総統選挙で、国民党または親中派と見なされる候補者が当選するか？",
+      "our_stance": null,
+      "rebuttals": []
     },
     {
       "prediction_id": "NP-2026-0892",
       "title": "Taiwan's Election Under Siege — China's Economic Coercion as Electoral Weapon",
-      "ghost_url": "https://nowpattern.com/p/e805173a-d6ce-49c6-8d3d-98664e0309a6/",
+      "ghost_url": "https://nowpattern.com/en/taiwans-election-under-siege-chinas-economic-coercion-as-electoral-weapon/",
       "lang": "en",
       "status": "active",
       "our_pick": "YES",
@@ -35349,14 +35677,1068 @@
       "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0892_original.json.ots",
       "timestamp_pending": true,
       "timestamp_created_at": "2026-03-23T10:01:05.202184+00:00",
-      "resolution_question_ja": "中国の経済的威圧にもかかわらず、民進党の候補者は次期台湾総統選挙（2028年予定）で勝利するだろうか？"
+      "resolution_question_ja": "中国の経済的威圧にもかかわらず、民進党の候補者は次期台湾総統選挙（2028年予定）で勝利するだろうか？",
+      "our_stance": null,
+      "rebuttals": []
+    },
+    {
+      "prediction_id": "NP-2026-0893",
+      "title": "Taiwan's Missile Shield — The Escalation Spiral That Could Reshape Asia",
+      "ghost_url": "https://nowpattern.com/en/taiwans-missile-shield-the-escalation-spiral-that-could-reshape-asia-2/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 1,
+      "our_pick_prob_raw": 12,
+      "oracle_question": "Will China impose a naval blockade or maritime quarantine of any kind on Taiwan by April 4, 2026?",
+      "oracle_deadline": "2026-04-04",
+      "oracle_criteria": "A naval blockade or maritime quarantine is defined as China's military or coast guard forces physically intercepting, inspecting, turning away, or sinking commercial vessels bound for Taiwanese ports, OR China declaring an exclusion zone around Taiwan that disrupts normal commercial shipping for at least 48 consecutive hours. Routine military exercises, even large ones, do not count unless they directly and physically impede commercial shipping to Taiwan's major ports (Kaohsiung, Keelung, Taichung).",
+      "oracle_premortem": "If this prediction is wrong, the most likely reason is that an unforeseen trigger event — such as a military accident, a Taiwanese political provocation (e.g., a senior official visiting Washington), or a domestic political crisis in Beijing requiring nationalist distraction — compressed the escalation timeline beyond what structural analysis predicts.",
+      "resolution_question": "Will China impose a naval blockade or maritime quarantine of any kind on Taiwan by April 4, 2026?",
+      "triggers": [
+        {
+          "trigger": "China conducts live-fire exercises within Taiwan's declared Air Defense Identification Zone (ADIZ) with munitions targeting simulated defense installations",
+          "date": "Next 30-90 days (March-May 2026)"
+        },
+        {
+          "trigger": "The US announces a new arms sale package to Taiwan that includes offensive strike capabilities (e.g., long-range cruise missiles, attack submarines)",
+          "date": "Next 60-120 days (April-June 2026)"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "57cdc6497ab63d863f648da3b8411613f014159450640757b2b73de4c28b846d",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0893_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T18:00:11.145247+00:00",
+      "resolution_question_ja": "中国は2026年4月4日までに、台湾に対して何らかの形の海上封鎖または海上検疫を実施するだろうか？"
+    },
+    {
+      "prediction_id": "NP-2026-0894",
+      "title": "South China Sea Standoff — Escalation Spiral Meets Trade Summit Leverage",
+      "ghost_url": "https://nowpattern.com/en/south-china-sea-standoff-escalation-spiral-meets-trade-summit-leverage/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 0,
+      "our_pick_prob_raw": 8,
+      "oracle_question": "Will a US or Chinese warship fire weapons (including warning shots) at the other nation's military vessel in the South China Sea by 2026-04-24?",
+      "oracle_deadline": "2026-04-24",
+      "oracle_criteria": "Confirmed reports from official US Department of Defense, Chinese Ministry of National Defense, or credible international wire services (AP, Reuters, AFP) of any weapons discharge — including warning shots, flares directed at vessels, or offensive weapons fire — by a US or Chinese military vessel targeting the other nation's military vessel in the South China Sea between 2026-03-24 and 2026-04-24.",
+      "oracle_premortem": "If this prediction is wrong, it is most likely because a junior officer on either side made an unauthorized or panicked decision during a close encounter, or because a Philippine vessel incident triggered US treaty obligations that escalated to direct US-China engagement faster than political leaders could control.",
+      "resolution_question": "Will a US or Chinese warship fire weapons (including warning shots) at the other nation's military vessel in the South China Sea by 2026-04-24?",
+      "triggers": [
+        {
+          "trigger": "Trade summit outcome — whether US-China trade talks produce agreements or collapse will directly determine the trajectory of military tensions in the South China Sea",
+          "date": "1-2 weeks (by mid-April 2026)"
+        },
+        {
+          "trigger": "Second Thomas Shoal resupply mission — the Philippines' next rotation/resupply of the BRP Sierra Madre at Second Thomas Shoal, which China has been increasingly trying to block",
+          "date": "2-4 weeks (regular resupply missions occur approximately monthly)"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "444c3c72289a7ea799aae1e2b75d409cb19289557c0709dc0fb255b871e0d3b9",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0894_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T18:00:18.699458+00:00",
+      "resolution_question_ja": "2026年4月24日までに、南シナ海でアメリカまたは中国の軍艦が、相手国の軍艦に対して武器（警告射撃を含む）を発砲する事態は起こるだろうか？"
+    },
+    {
+      "prediction_id": "NP-2026-0895",
+      "title": "US Stablecoin Law — Regulatory Capture Reshapes the $180B Digital Dollar",
+      "ghost_url": "https://nowpattern.com/en/us-stablecoin-law-regulatory-capture-reshapes-the-180b-digital-dollar/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 18,
+      "our_pick_prob_raw": 35,
+      "oracle_question": "Will USDC overtake Tether (USDT) in total market capitalization by 2026-12-31?",
+      "oracle_deadline": "2026-12-31",
+      "oracle_criteria": "On December 31, 2026, compare the total market capitalization of USDC and USDT as reported by CoinMarketCap or CoinGecko at 23:59 UTC. If USDC market cap exceeds USDT market cap, the answer is YES. If USDT market cap is equal to or greater than USDC market cap, the answer is NO.",
+      "oracle_premortem": "If this prediction is wrong, the most likely reason is that Tether fails to achieve compliance and experiences a faster-than-expected exodus of institutional holders, while USDC's institutional adoption accelerates beyond the base case due to major bank partnerships or payment network integrations that were not anticipated.",
+      "resolution_question": "Will USDC overtake Tether (USDT) in total market capitalization by 2026-12-31?",
+      "triggers": [
+        {
+          "trigger": "Tether compliance announcement — whether Tether secures a US banking partnership, applies for a charter, or signals it will exit the US market entirely",
+          "date": "April-July 2026 (within 180-day window)"
+        },
+        {
+          "trigger": "Circle IPO filing with the SEC, which would provide unprecedented transparency into USDC economics and set the market's valuation benchmark for regulated stablecoin issuers",
+          "date": "Q3-Q4 2026"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "d5441dcf24413abedc2223e8a587856af58d32af5094ba21e926743474984690",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0895_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T18:00:26.667627+00:00",
+      "resolution_question_ja": "2026年12月31日までに、USDCの総市場価値がTether（USDT）を上回るか？"
+    },
+    {
+      "prediction_id": "NP-2026-0896",
+      "title": "Bitcoin's $150K Breakout — Institutional Herding Reshapes Digital Asset Markets",
+      "ghost_url": "https://nowpattern.com/en/bitcoins-150k-breakout-institutional-herding-reshapes-digital-asset-markets/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 27,
+      "our_pick_prob_raw": 40,
+      "oracle_question": "Will Bitcoin's spot price remain above $150,000 on June 30, 2026?",
+      "oracle_deadline": "2026-06-30",
+      "oracle_criteria": "Bitcoin's spot price on the CoinDesk Bitcoin Price Index (XBX) or equivalent widely-recognized index must be at or above $150,000.00 USD at the daily close (00:00 UTC) on June 30, 2026. If the price is below $150,000.00, the answer is NO. If at or above, the answer is YES.",
+      "oracle_premortem": "If Bitcoin does sustain above $150K, it will most likely be because sovereign adoption catalysts (strategic reserve announcements) created a demand shock that overwhelmed normal cyclical correction patterns, or because the Fed cut rates more aggressively than expected, maintaining risk-on conditions through Q2.",
+      "resolution_question": "Will Bitcoin's spot price remain above $150,000 on June 30, 2026?",
+      "triggers": [
+        {
+          "trigger": "Federal Reserve FOMC rate decision and forward guidance",
+          "date": "Next meeting: May 6-7, 2026 — dovish guidance supports bull case, hawkish pivot triggers bear case"
+        },
+        {
+          "trigger": "Major sovereign Bitcoin reserve announcement or formal study commission",
+          "date": "Q2-Q3 2026 — several nations reportedly in advanced study phases"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "f892f0172108e2e8b08666128739231b0b0213d22c0166219a06ce6afb2f658a",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0896_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T18:00:34.145319+00:00",
+      "resolution_question_ja": "2026年6月30日に、ビットコインのスポット価格は15万ドル以上を維持しているだろうか？"
+    },
+    {
+      "prediction_id": "NP-2026-0897",
+      "title": "GPT-6's Reasoning Leap — The Race to Automate Professional Judgment",
+      "ghost_url": "https://nowpattern.com/en/gpt-6s-reasoning-leap-the-race-to-automate-professional-judgment/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "YES",
+      "our_pick_prob": 77,
+      "our_pick_prob_raw": 62,
+      "oracle_question": "Will at least 3 of the top 10 US law firms (by revenue) publicly announce firm-wide deployment of GPT-6-class AI reasoning tools for legal analysis by 2027-06-30?",
+      "oracle_deadline": "2027-06-30",
+      "oracle_criteria": "At least 3 of the Am Law 10 firms (Kirkland & Ellis, Latham & Watkins, DLA Piper, Baker McKenzie, Dentons, Skadden, Sidley Austin, Morgan Lewis, White & Case, or equivalent top-10 by gross revenue at measurement date) must have issued public announcements — via press releases, partner memos reported by legal media (American Lawyer, Law.com), or official firm communications — confirming firm-wide deployment (not pilot or trial) of GPT-6, GPT-6-class, or equivalent frontier AI reasoning tools for substantive legal analysis tasks. Firm-wide means available to all attorneys in the firm, not limited to a single practice group or office.",
+      "oracle_premortem": "Professional liability concerns and partner resistance to AI-generated legal analysis prove stronger than expected, causing firms to limit deployments to back-office functions rather than substantive legal work, keeping the count below 3 firm-wide deployments by mid-2027.",
+      "resolution_question": "Will at least 3 of the top 10 US law firms (by revenue) publicly announce firm-wide deployment of GPT-6-class AI reasoning tools for legal analysis by 2027-06-30?",
+      "triggers": [
+        {
+          "trigger": "First major enterprise deployment announcement from a top-20 law firm or top-10 hospital system, with specific productivity and quality metrics published",
+          "date": "Q2-Q3 2026"
+        },
+        {
+          "trigger": "Anthropic Claude 5 or Google Gemini Ultra 3 launch with reasoning benchmarks matching or exceeding GPT-6, ending OpenAI's capability lead",
+          "date": "Q3 2026 - Q1 2027"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "fd9f764af9a5b07177a0e7a909ac736fca3f64f0ea855eaa42c252dcfc8616db",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0897_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T18:00:41.817678+00:00",
+      "resolution_question_ja": "2027年6月30日までに、全米売上高上位10社の法律事務所のうち、少なくとも3社が、法律分析のためにGPT-6クラスのAI推論ツールを事務所全体で導入することを公に発表するだろうか？"
+    },
+    {
+      "prediction_id": "NP-2026-0898",
+      "title": "AlphaThink and the AGI Threshold — When Capability Outpaces Governance",
+      "ghost_url": "https://nowpattern.com/en/alphathink-and-the-agi-threshold-when-capability-outpaces-governance-2/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 11,
+      "our_pick_prob_raw": 30,
+      "oracle_question": "Will at least one country or supranational body (e.g., EU, UN) enact binding AGI-specific regulation by 2028-12-31?",
+      "oracle_deadline": "2028-12-31",
+      "oracle_criteria": "Resolution requires that by December 31, 2028, at least one sovereign nation or supranational body with legislative authority (e.g., EU, but not advisory bodies like OECD) has enacted a binding law, regulation, or directive that (1) explicitly uses the term 'artificial general intelligence' or 'AGI' in its text, (2) establishes specific compliance requirements or restrictions that apply to AGI-class systems as a distinct category, and (3) has entered into force (not merely proposed or passed committee). If such a law exists and is in force by the deadline, the answer is YES. If not, NO.",
+      "oracle_premortem": "A major AlphaThink safety incident in 2026-2027 creates political urgency that compresses the usual multi-year legislative timeline, or China enacts AGI-specific regulation as a strategic move to constrain Western AI companies operating in its market.",
+      "resolution_question": "Will at least one country or supranational body (e.g., EU, UN) enact binding AGI-specific regulation by 2028-12-31?",
+      "triggers": [
+        {
+          "trigger": "Independent evaluation of AlphaThink capabilities by a credible third party (e.g., NIST, Alan Turing Institute, or a consortium of university AI labs)",
+          "date": "Q2-Q3 2026"
+        },
+        {
+          "trigger": "EU AI Office announcement on whether AlphaThink-class systems require new classification or regulatory treatment under the AI Act",
+          "date": "Q3 2026 - Q1 2027"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "f759ec484969e8daf8e1f3849936ef4d9141e49bc6c85a55337e0c231af89eff",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0898_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T18:00:49.258179+00:00",
+      "resolution_question_ja": "少なくとも一つの国または超国家機関（例：EU、国連）が、2028年12月31日までにAGI（汎用人工知能）に特化した法的拘束力のある規制を制定するだろうか？"
+    },
+    {
+      "prediction_id": "NP-2026-0899",
+      "title": "Trump's Boomerang — How GOP Overreach May Hand Democrats Congress",
+      "ghost_url": "https://nowpattern.com/en/trumps-boomerang-how-gop-overreach-may-hand-democrats-congress/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "YES",
+      "our_pick_prob": 77,
+      "our_pick_prob_raw": 62,
+      "oracle_question": "Will Democrats win a majority in the U.S. House of Representatives in the November 2026 midterm elections?",
+      "oracle_deadline": "2026-11-15",
+      "oracle_criteria": "Democrats win 218 or more seats in the U.S. House of Representatives in the November 3, 2026 general election, as determined by certified results or Associated Press race calls by November 15, 2026.",
+      "oracle_premortem": "If this prediction is wrong, the most likely reason is that an improving economy and absence of a major deportation crisis allowed Republican incumbents to localize their races and retain enough swing districts to hold a narrow majority.",
+      "resolution_question": "Will Democrats win a majority in the U.S. House of Representatives in the November 2026 midterm elections?",
+      "triggers": [
+        {
+          "trigger": "Court rulings on voter registration proof-of-citizenship requirements in Arizona, Texas, and Georgia",
+          "date": "April-September 2026"
+        },
+        {
+          "trigger": "Major deportation-related incident generating sustained national media coverage (wrongful deportation of citizen, death in custody, or mass operation in politically sensitive area)",
+          "date": "Anytime before November 2026"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "ecfad12da9bb7fd7cbcf6037d7f89b50870f706f6a4723c02ac248bd2aa46009",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0899_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:00:10.447958+00:00",
+      "resolution_question_ja": "2026年11月の中間選挙で、民主党はアメリカ合衆国下院で多数派を占めるだろうか？"
+    },
+    {
+      "prediction_id": "NP-2026-0900",
+      "title": "ホルムズ海峡危機 — 米イラン「対立の螺旋」がエネルギー秩序を揺るがす",
+      "ghost_url": "https://nowpattern.com/horumuzuhai-xia-wei-ji-mi-iran-dui-li-noluo-xuan-gaenerugizhi-xu-woyao-rugasu/",
+      "lang": "ja",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 18,
+      "our_pick_prob_raw": 35,
+      "oracle_question": "2026年4月30日までに米軍はイラン領内の発電所またはエネルギーインフラに対して軍事攻撃を実施するか？",
+      "oracle_deadline": "2026-04-30",
+      "oracle_criteria": "米国防総省または信頼できる複数の国際メディア（ロイター、AP、AFP等）が、米軍によるイラン領内の発電所またはエネルギーインフラへの攻撃を確認・報道した場合にYES。限定的な軍事施設への攻撃のみの場合はNO。",
+      "oracle_premortem": "偶発的な衝突や誤算により、トランプ政権が当初想定以上のエスカレーションに踏み切る場合。あるいはイラン側の挑発（米艦船への攻撃等）が米国内世論を軍事行動支持に傾ける場合。",
+      "resolution_question": "2026年4月30日までに米軍はイラン領内の発電所またはエネルギーインフラに対して軍事攻撃を実施するか？",
+      "triggers": [
+        {
+          "trigger": "48時間最後通牒の期限到来（2026年3月25日頃）",
+          "date": "24〜48時間以内"
+        },
+        {
+          "trigger": "米軍によるイラン領内への攻撃実施の有無",
+          "date": "期限後1〜3日以内"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "e6357a605471d6f4087b8eee72d7e34664870253aecdc2161a72def54176b5ca",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0900_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:00:18.719807+00:00",
+      "resolution_question_ja": "2026年4月30日までに、米軍がイラン領内の発電所またはエネルギー関連施設に対して軍事攻撃を行うか？"
+    },
+    {
+      "prediction_id": "NP-2026-0901",
+      "title": "Ethereum's 10% Staking Yield — The Gravity Well Reshaping Crypto Capital Flows",
+      "ghost_url": "https://nowpattern.com/en/ethereums-10-staking-yield-the-gravity-well-reshaping-crypto-capital-flows-3/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 23,
+      "our_pick_prob_raw": 38,
+      "oracle_question": "Will Ethereum's price exceed $8,000 by 2026-06-30?",
+      "oracle_deadline": "2026-06-30",
+      "oracle_criteria": "ETH/USD price on any major exchange (Coinbase, Binance, Kraken) closes above $8,000.00 on any trading day on or before June 30, 2026. A single daily close above $8,000 is sufficient; it does not need to be sustained.",
+      "oracle_premortem": "If this prediction is wrong, the most likely reason is that institutional FOMO driven by staking-enabled ETF approvals and accelerating Fed rate cuts created a reflexive price spiral that pushed ETH through $8,000 faster than the base case anticipated.",
+      "resolution_question": "Will Ethereum's price exceed $8,000 by 2026-06-30?",
+      "triggers": [
+        {
+          "trigger": "SEC decision on staking-enabled Ethereum ETFs — approval would unlock institutional staking capital at scale; denial would cap upside",
+          "date": "Q2-Q3 2026"
+        },
+        {
+          "trigger": "Ethereum staking yield decay rate — whether yield stabilizes above 8% or declines toward 5-6% as new validators enter will determine narrative sustainability",
+          "date": "April-June 2026 (60-90 day observation window)"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "34e69b2575c5c38896e10465d77ca7ed18f572215208b86797caa7d23161eb02",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0901_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:00:27.320711+00:00",
+      "resolution_question_ja": "2026年6月30日までにイーサリアムの価格は8,000ドルを超えるだろうか？"
+    },
+    {
+      "prediction_id": "NP-2026-0902",
+      "title": "Hormuz Strait Ultimatum — Trump's 48-Hour Deadline Triggers Escalation Spiral",
+      "ghost_url": "https://nowpattern.com/en/hormuz-strait-ultimatum-trumps-48-hour-deadline-triggers-escalation-spiral/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 18,
+      "our_pick_prob_raw": 35,
+      "oracle_question": "Will the United States conduct a military strike on Iranian territory (including power plants or other infrastructure) by 2026-04-07?",
+      "oracle_deadline": "2026-04-07",
+      "oracle_criteria": "Confirmed reports from the US Department of Defense, Iranian government, or at least two credible international news agencies (Reuters, AP, AFP, BBC) that US military forces conducted kinetic strikes against targets located within Iran's internationally recognized borders. Naval skirmishes in international waters or cyberattacks do not count; strikes must involve physical munitions impacting Iranian soil.",
+      "oracle_premortem": "The prediction fails if Trump's ultimatum was not a negotiating bluff but a genuine operational decision already made, and the 48-hour timeline represents actual military planning rather than coercive diplomacy — similar to the 2003 Iraq ultimatum where the decision to invade had already been finalized.",
+      "resolution_question": "Will the United States conduct a military strike on Iranian territory (including power plants or other infrastructure) by 2026-04-07?",
+      "triggers": [
+        {
+          "trigger": "Expiration of 48-hour ultimatum and nature of immediate US military response (strikes on civilian vs. military targets, or no strikes)",
+          "date": "March 25, 2026 (within 48 hours of March 23 announcement)"
+        },
+        {
+          "trigger": "Iran's retaliatory action: scope, targeting choices, and whether civilian infrastructure in Gulf states is struck",
+          "date": "24-72 hours after any US military strike"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "35a1aaff7eefc83d81d16320270a00cd6304a3c2e8e3b1a6f418f4730ff49fb2",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0902_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:00:35.212158+00:00",
+      "resolution_question_ja": "2026年4月7日までに、アメリカ合衆国はイラン領内（発電所やその他のインフラを含む）に対して軍事攻撃を行うか？"
+    },
+    {
+      "prediction_id": "NP-2026-0903",
+      "title": "日本の防衛費GDP比3%突破 — 戦後安保体制の不可逆的転換点",
+      "ghost_url": "https://nowpattern.com/ri-ben-nofang-wei-fei-gdpbi-3-tu-po-zhan-hou-an-bao-ti-zhi-nobu-ke-ni-de-zhuan-huan-dian/",
+      "lang": "ja",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 11,
+      "our_pick_prob_raw": 30,
+      "oracle_question": "2026年12月31日までに日本の2026年度防衛費（当初予算ベース）がGDP比3%を超えるか？",
+      "oracle_deadline": "2026-12-31",
+      "oracle_criteria": "日本政府が閣議決定した2026年度当初予算における防衛費が、内閣府発表の2026年度名目GDP見通しの3%を超えているかどうか。防衛費は狭義の防衛省所管予算で判定し、海上保安庁予算等の「広義の安全保障費」は含めない。",
+      "oracle_premortem": "台湾海峡での重大インシデントや米国からの強い圧力により、政治的に3%突破が不可避となり、財源問題を先送りにして予算が通過した場合に予測が外れる。",
+      "resolution_question": "2026年12月31日までに日本の2026年度防衛費（当初予算ベース）がGDP比3%を超えるか？",
+      "triggers": [
+        {
+          "trigger": "2026年度予算の概算要求（防衛省）の防衛費総額確定",
+          "date": "2026年8〜9月"
+        },
+        {
+          "trigger": "台湾海峡または東シナ海での中国軍による重大な軍事的挑発（大規模演習・領空侵犯等）",
+          "date": "2026年通年（特に春〜秋）"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "890855cd78f42e1ea0fb048daf7c314490ded6b9f2d44d4f1c21454fb293b5b9",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0903_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:00:42.640520+00:00",
+      "resolution_question_ja": "2026年度末までに、日本の防衛費（当初予算）がGDPの3%を超えるか？"
+    },
+    {
+      "prediction_id": "NP-2026-0904",
+      "title": "Japan's Defense Surge to 3% GDP — The End of Pacifist Restraint",
+      "ghost_url": "https://nowpattern.com/en/japans-defense-surge-to-3-gdp-the-end-of-pacifist-restraint/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 11,
+      "our_pick_prob_raw": 30,
+      "oracle_question": "Will Japan's official defense budget for FY2026 exceed 3.0% of GDP as stated in the approved budget by the Japanese Diet by 2026-12-31?",
+      "oracle_deadline": "2026-12-31",
+      "oracle_criteria": "Resolution requires the Japanese Diet to have approved the FY2026 defense budget, and for the officially stated defense expenditure to exceed 3.0% of Japan's GDP as calculated by the Cabinet Office. Both the defense figure and GDP figure must be from official Japanese government sources. Supplementary budgets approved before December 31, 2026 are included in the calculation.",
+      "oracle_premortem": "If this prediction is wrong (i.e., Japan does exceed 3%), the most likely reason is that a major geopolitical shock — such as a Chinese military confrontation over Taiwan or an aggressive North Korean provocation — created emergency political conditions that enabled supplementary defense budgets to push spending above 3%, overriding fiscal constraints through crisis momentum.",
+      "resolution_question": "Will Japan's official defense budget for FY2026 exceed 3.0% of GDP as stated in the approved budget by the Japanese Diet by 2026-12-31?",
+      "triggers": [
+        {
+          "trigger": "Japanese FY2026 budget approval in the Diet, with final defense spending figures and funding sources confirmed",
+          "date": "March-April 2026"
+        },
+        {
+          "trigger": "Chinese military exercises around Taiwan or in the East China Sea that directly affect Japanese territorial waters or airspace",
+          "date": "Ongoing, with heightened risk during any Taiwan political transition or US-China friction point in 2026"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "94955efd37656459ca8e3e8fb293fe64fe8bf0570f2327533e91625f93e6c9ad",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0904_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:00:46.014125+00:00",
+      "resolution_question_ja": "2026年12月31日までに、日本の2026年度の公式防衛予算は、国会で承認された予算に示されているように、GDPの3.0%を超えるか？"
+    },
+    {
+      "prediction_id": "NP-2026-0905",
+      "title": "EU AI Regulation Act — Brussels' Bid to Write the Global Rulebook",
+      "ghost_url": "https://nowpattern.com/en/eu-ai-regulation-act-brussels-bid-to-write-the-global-rulebook/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 18,
+      "our_pick_prob_raw": 35,
+      "oracle_question": "Will the EU AI Act measurably slow down AI startup formation in Europe (defined as a 20%+ year-over-year decline in new EU-based AI startup incorporations) by 2027-06-30?",
+      "oracle_deadline": "2027-06-30",
+      "oracle_criteria": "Compare the number of new AI startup incorporations in EU member states during H2 2026 + H1 2027 versus H2 2025 + H1 2026, using Dealroom, Crunchbase, or equivalent EU startup tracking databases. If the year-over-year decline exceeds 20%, the answer is YES. If the decline is less than 20% or there is growth, the answer is NO.",
+      "oracle_premortem": "If our NO prediction is wrong, the most likely reason is that the compliance cost burden proves more severe than anticipated for seed-stage and Series A companies, combined with a simultaneous downturn in European VC sentiment that amplifies the regulatory effect beyond what the Act alone would cause.",
+      "resolution_question": "Will the EU AI Act measurably slow down AI startup formation in Europe (defined as a 20%+ year-over-year decline in new EU-based AI startup incorporations) by 2027-06-30?",
+      "triggers": [
+        {
+          "trigger": "First major enforcement action by the EU AI Office against a non-EU AI company (likely targeting a US foundation model developer)",
+          "date": "Q3 2026 - Q1 2027"
+        },
+        {
+          "trigger": "Release of the European AI Office's implementing guidance on foundation model systemic risk assessments, which will define practical compliance requirements",
+          "date": "Q2-Q3 2026"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "62854f12f97660a3212188dbf38cf48bfd6b74e21e81e412125c5ccc51c4d3bb",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0905_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:00:49.085865+00:00",
+      "resolution_question_ja": "EU AI法は、2027年6月30日までに、ヨーロッパにおけるAIスタートアップの設立を（EUを拠点とするAIスタートアップの設立数が前年比で20%以上減少すると定義して）明確に減速させるだろうか？"
+    },
+    {
+      "prediction_id": "NP-2026-0906",
+      "title": "南シナ海の米中軍事対峙 — 対立の螺旋が偶発衝突の閾値を下げる構造",
+      "ghost_url": "https://nowpattern.com/nan-sinahai-nomi-zhong-jun-shi-dui-zhi-dui-li-noluo-xuan-gaou-fa-chong-tu-noyu-zhi-woxia-gerugou-zao-3/",
+      "lang": "ja",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 3,
+      "our_pick_prob_raw": 20,
+      "oracle_question": "2026年12月31日までに南シナ海で米中いずれかの軍人に死者が出る軍事衝突が発生するか？",
+      "oracle_deadline": "2026-12-31",
+      "oracle_criteria": "2026年1月1日から12月31日の間に、南シナ海（スプラトリー諸島、パラセル諸島、スカボロー礁を含む海域）において、米軍または中国人民解放軍（海軍・海警局を含む）の軍人に1名以上の死者が出る武力衝突が発生したことが、米中いずれかの政府の公式発表、または主要国際メディア（ロイター、AP、AFP）の報道によって確認されること。",
+      "oracle_premortem": "予測が外れる最も可能性の高い理由は、セカンド・トーマス礁でのフィリピン補給作戦をめぐるエスカレーションが想定を超えて急速に進行し、中国海警局の実力行使がフィリピン軍人の死亡を招き、米比相互防衛条約の発動が議論される中で米中間の直接的な軍事的対峙に発展するケースである。",
+      "resolution_question": "2026年12月31日までに南シナ海で米中いずれかの軍人に死者が出る軍事衝突が発生するか？",
+      "triggers": [
+        {
+          "trigger": "セカンド・トーマス礁でのフィリピン補給作戦に対する中国海警局の物理的阻止行動のエスカレーション",
+          "date": "2026年4〜6月（次回補給ミッション時期）"
+        },
+        {
+          "trigger": "米中軍用機または軍艦の異常接近・接触事故の発生",
+          "date": "2026年通年（特に大規模演習期間中）"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "1547b44ab3a4330edb6833ea3121ac5bf895330e89971caaa2fc798b6ba9f25a",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0906_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:00:52.058385+00:00",
+      "resolution_question_ja": "2026年12月31日までに、南シナ海で米中間の軍事衝突が発生し、死者が出る可能性はあるか？"
+    },
+    {
+      "prediction_id": "NP-2026-0907",
+      "title": "イラン・エネルギー施設攻撃 — 中東「対立の螺旋」が世界供給網を断裂させる構造",
+      "ghost_url": "https://nowpattern.com/iranenerugishi-she-gong-ji-zhong-dong-dui-li-noluo-xuan-gashi-jie-gong-gei-wang-woduan-lie-saserugou-zao/",
+      "lang": "ja",
+      "status": "active",
+      "our_pick": "YES",
+      "our_pick_prob": 38,
+      "our_pick_prob_raw": 45,
+      "oracle_question": "2026年6月30日までにブレント原油先物価格が1バレル120ドルを超える日が1日以上発生するか？",
+      "oracle_deadline": "2026-06-30",
+      "oracle_criteria": "ICE（インターコンチネンタル取引所）のブレント原油先物（期近物）の終値が2026年6月30日までに1バレル120.00ドル以上を記録した日が1日以上あれば「YES」、なければ「NO」とする。",
+      "oracle_premortem": "米国の迅速な外交介入とOPECの緊急増産により、予想以上に早期に原油供給不安が緩和され、120ドルに到達する前に価格が安定化する可能性がある。",
+      "resolution_question": "2026年6月30日までにブレント原油先物価格が1バレル120ドルを超える日が1日以上発生するか？",
+      "triggers": [
+        {
+          "trigger": "イランによるホルムズ海峡の通航妨害（機雷敷設またはタンカー攻撃）の実行",
+          "date": "2026年3月下旬〜5月（イランの軍事的劣勢が明確化するタイミングで実行される可能性が最も高い）"
+        },
+        {
+          "trigger": "OPECプラス臨時閣僚会合の開催と緊急増産決定の有無",
+          "date": "2026年4月上旬〜中旬"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "cda9604c9268a329384c48783987567d7a63afea9a0dac81dbe56a721bad9b80",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0907_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:00:55.116016+00:00",
+      "resolution_question_ja": "2026年6月30日までに、ブレント原油先物価格が1バレルあたり120ドルを超える日が一度でもあるか？"
+    },
+    {
+      "prediction_id": "NP-2026-0908",
+      "title": "Iran Energy Infrastructure Under Fire — The Escalation Spiral Threatening Global Oil Markets",
+      "ghost_url": "https://nowpattern.com/en/iran-energy-infrastructure-under-fire-the-escalation-spiral-threatening-global-oil-markets/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "YES",
+      "our_pick_prob": 87,
+      "our_pick_prob_raw": 68,
+      "oracle_question": "Will Brent crude oil remain above $100 per barrel on June 30, 2026?",
+      "oracle_deadline": "2026-06-30",
+      "oracle_criteria": "Brent crude front-month futures contract settlement price on ICE Futures Europe on June 30, 2026, is at or above $100.00 USD per barrel. If June 30 is not a trading day, use the last trading day before June 30.",
+      "oracle_premortem": "A rapid ceasefire combined with aggressive OPEC+ spare capacity deployment and coordinated IEA strategic reserve releases could bring prices below $100 faster than expected, particularly if the conflict resolves within 3-4 weeks and Hormuz shipping remains unimpeded.",
+      "resolution_question": "Will Brent crude oil remain above $100 per barrel on June 30, 2026?",
+      "triggers": [
+        {
+          "trigger": "Strait of Hormuz disruption — any confirmed mining, anti-ship missile strike on commercial vessels, or sustained IRGC naval operations blocking tanker transit",
+          "date": "Next 1-4 weeks (highest risk in immediate aftermath of strikes)"
+        },
+        {
+          "trigger": "Saudi Aramco production decision — whether Saudi Arabia agrees to significantly increase output (1.5+ million bpd) to compensate for lost Iranian supply",
+          "date": "Next OPEC+ meeting or emergency session, likely within 2-4 weeks"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "41f6e361ade8dbf09511bb691a547331eaba6960818fd03e0d9a0d57f8d60030",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0908_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:00:58.882108+00:00",
+      "resolution_question_ja": "2026年6月30日に、ブレント原油は1バレルあたり100ドルを超えた水準を維持しているだろうか？"
+    },
+    {
+      "prediction_id": "NP-2026-0909",
+      "title": "South China Sea Standoff — The Escalation Spiral Neither Side Can Exit",
+      "ghost_url": "https://nowpattern.com/en/south-china-sea-standoff-the-escalation-spiral-neither-side-can-exit-16/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 1,
+      "our_pick_prob_raw": 15,
+      "oracle_question": "Will a military confrontation between U.S. and Chinese forces in the South China Sea result in confirmed casualties on either side by 2026-12-31?",
+      "oracle_deadline": "2026-12-31",
+      "oracle_criteria": "Confirmed by official government statements, credible international media, or United Nations reports that at least one military service member from either the United States or China was killed or seriously injured as a direct result of a hostile or accidental military engagement between U.S. and Chinese forces (not proxies) in the South China Sea between 2026-01-01 and 2026-12-31.",
+      "oracle_premortem": "An unintended collision or autonomous system malfunction during one of the increasingly close naval encounters escalated before either side could de-escalate, particularly because the military hotline remained suspended and commanders on scene lacked direct communication protocols.",
+      "resolution_question": "Will a military confrontation between U.S. and Chinese forces in the South China Sea result in confirmed casualties on either side by 2026-12-31?",
+      "triggers": [
+        {
+          "trigger": "PLA Navy live-fire exercise in proximity to Philippine-claimed features (Second Thomas Shoal or Scarborough Shoal)",
+          "date": "April-June 2026"
+        },
+        {
+          "trigger": "U.S.-Philippines Balikatan military exercises (annually the largest bilateral exercise in the region, a known flashpoint for Chinese response)",
+          "date": "April 2026"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "f7a47de23a9e9e07836e11e78689984f68ad7ec18a0c688615d2c5be314e14d6",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0909_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:01:02.184141+00:00",
+      "resolution_question_ja": "2026年12月31日までに、南シナ海における米軍と中国軍の軍事衝突で、双方いずれかに死傷者が確認される事態は発生するか？"
+    },
+    {
+      "prediction_id": "NP-2026-0910",
+      "title": "台湾統一期限2026年 — 対立の螺旋が臨界点に達するとき",
+      "ghost_url": "https://nowpattern.com/tai-wan-tong-yi-qi-xian-2026nian-dui-li-noluo-xuan-galin-jie-dian-nida-surutoki/",
+      "lang": "ja",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 6,
+      "our_pick_prob_raw": 25,
+      "oracle_question": "2026年12月31日までに中国が台湾に対し直接的な軍事行動（武力攻撃、海上封鎖、または離島の軍事占領のいずれか）を実行するか？",
+      "oracle_deadline": "2026-12-31",
+      "oracle_criteria": "2026年12月31日23:59（UTC）までに、中国人民解放軍が台湾本島、台湾が実効支配する離島（金門島、馬祖列島、太平島等）に対する武力攻撃を実施した場合、または台湾海峡・台湾周辺海域の公式な海上封鎖を宣言・実行した場合にYES。軍事演習、防空識別圏への進入、サイバー攻撃のみの場合はNOと判定する。",
+      "oracle_premortem": "偶発的な軍事衝突（軍用機同士の接触事故等）がエスカレーションの連鎖を引き起こし、中国指導部が引き返せない状況に追い込まれた場合、NOの予測は覆される。",
+      "resolution_question": "2026年12月31日までに中国が台湾に対し直接的な軍事行動（武力攻撃、海上封鎖、または離島の軍事占領のいずれか）を実行するか？",
+      "triggers": [
+        {
+          "trigger": "中国共産党中央軍事委員会の拡大会議と戦備態勢の変更",
+          "date": "2026年4〜6月"
+        },
+        {
+          "trigger": "米国中間選挙に向けた台湾政策の政治化（議会での台湾関連法案の審議）",
+          "date": "2026年6〜9月"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "278316a84fb1fbf46c2b2a85345ca8e0c3376cd3dc51b995da6673aad71ceecc",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0910_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:01:05.967437+00:00",
+      "resolution_question_ja": "2026年12月31日までに中国が台湾に対して、直接的な軍事行動（武力攻撃、海上封鎖、または離島の軍事占領のいずれか）を実行するか？"
+    },
+    {
+      "prediction_id": "NP-2026-0911",
+      "title": "日米首脳会談とイラン危機 — 同盟の亀裂が試す日本外交の自律性",
+      "ghost_url": "https://nowpattern.com/ri-mi-shou-noy-hui-tan-toiranwei-ji-tong-meng-nogui-lie-gashi-suri-ben-wai-jiao-nozi-lu-xing/",
+      "lang": "ja",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 3,
+      "our_pick_prob_raw": 20,
+      "oracle_question": "2026年9月30日までに茂木敏充外務大臣がイランを公式訪問するか？",
+      "oracle_deadline": "2026-09-30",
+      "oracle_criteria": "日本外務省が公式に発表する茂木外相のイラン訪問（公式訪問または実務訪問）が2026年9月30日までに実施されたかどうか。国連総会サイドラインでの非公式接触は含まない。",
+      "oracle_premortem": "予測が外れる（＝訪問が実現する）最も可能性が高い理由は、イラン国内で穏健派が力を得て対話の窓が開き、米国が日本の仲介を黙認する外交環境が整った場合である。",
+      "resolution_question": "2026年9月30日までに茂木敏充外務大臣がイランを公式訪問するか？",
+      "triggers": [
+        {
+          "trigger": "IAEAによるイラン核開発に関する次回報告書の公表",
+          "date": "2026年4月〜5月"
+        },
+        {
+          "trigger": "トランプ政権によるイランへの追加制裁パッケージの発動",
+          "date": "2026年4月〜6月"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "fd5c81575f013a7e4590ad9c1e7f9a501e2458e50224ecfe0de83f6ddbb08a4b",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0911_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:01:09.232803+00:00",
+      "resolution_question_ja": "2026年9月30日までに茂木敏充外務大臣がイランを公式訪問するかどうか。"
+    },
+    {
+      "prediction_id": "NP-2026-0912",
+      "title": "China's 2026 Taiwan Ultimatum — The Escalation Spiral That Could Reshape the Pacific Order",
+      "ghost_url": "https://nowpattern.com/en/chinas-2026-taiwan-ultimatum-the-escalation-spiral-that-could-reshape-the-pacific-order/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 1,
+      "our_pick_prob_raw": 15,
+      "oracle_question": "Will China initiate a military blockade of, or launch a kinetic military attack against, Taiwan by 2026-12-31?",
+      "oracle_deadline": "2026-12-31",
+      "oracle_criteria": "Resolved YES if by December 31, 2026, the PLA has either: (1) imposed a declared or de facto naval/air blockade of Taiwan that physically interdicts commercial shipping for 72+ hours, or (2) conducted kinetic military strikes (missiles, airstrikes, or amphibious landing operations) against Taiwan-controlled territory. Resolved NO if neither of these conditions is met by the deadline. Large-scale military exercises that do not physically interdict shipping or strike Taiwanese territory do not count.",
+      "oracle_premortem": "If this prediction is wrong, the most likely reason is that an unexpected trigger event — such as a Taiwan independence declaration, a military accident during exercises, or an internal CCP power struggle — created a crisis escalation that outran rational cost-benefit calculations, paralleling the pattern of the July 1914 crisis.",
+      "resolution_question": "Will China initiate a military blockade of, or launch a kinetic military attack against, Taiwan by 2026-12-31?",
+      "triggers": [
+        {
+          "trigger": "Major PLA military exercise around Taiwan involving live-fire drills, simulated blockade operations, or unprecedented proximity to Taiwan's territorial waters",
+          "date": "April-October 2026 (likely during spring/summer exercise season)"
+        },
+        {
+          "trigger": "Taiwan domestic political crisis — either a formal independence declaration, constitutional amendment, or a highly provocative diplomatic action such as a presidential visit to Washington",
+          "date": "Throughout 2026, with heightened risk around any legislative sessions or referenda"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "dc2ef6c8bab4b1edffef1260b052b7a018f507bd9b5599ad2009700dee2103cb",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0912_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:01:12.920994+00:00",
+      "resolution_question_ja": "中国は2026年12月31日までに台湾に対して軍事封鎖を開始するか、または実力行使による軍事攻撃を開始するか？"
+    },
+    {
+      "prediction_id": "NP-2026-0913",
+      "title": "日本のホルムズ海峡艦船派遣 ── 同盟の亀裂か、新たな安全保障アーキテクチャの胎動か",
+      "ghost_url": "https://nowpattern.com/ri-ben-nohorumuzuhai-xia-jian-chuan-pai-qian-tong-meng-nogui-lie-ka-xin-tanaan-quan-bao-zhang-akitekutiyanotai-dong-ka/",
+      "lang": "ja",
+      "status": "active",
+      "our_pick": "YES",
+      "our_pick_prob": 73,
+      "our_pick_prob_raw": 60,
+      "oracle_question": "2026年6月30日までに、日本政府はホルムズ海峡またはその近海への自衛隊艦船の追加派遣（現行の護衛艦1隻体制からの増強）を正式に決定するか？",
+      "oracle_deadline": "2026-06-30",
+      "oracle_criteria": "防衛大臣または官房長官が記者会見等で、ホルムズ海峡またはペルシャ湾への護衛艦の追加派遣、活動海域の拡大、または艦種の変更（イージス艦の投入等）を正式に発表した場合にYES。現行体制の単なる延長（派遣期間の更新のみ）はNOと判定する。",
+      "oracle_premortem": "日米首脳会談で経済分野での大きな譲歩（自動車関税の引き下げ等）が実現し、安全保障面での追加要求が棚上げされた場合、または中東情勢が急速に安定化してホルムズ海峡派遣の緊急性が低下した場合に、予測が外れる可能性が最も高い。",
+      "resolution_question": "2026年6月30日までに、日本政府はホルムズ海峡またはその近海への自衛隊艦船の追加派遣（現行の護衛艦1隻体制からの増強）を正式に決定するか？",
+      "triggers": [
+        {
+          "trigger": "日米首脳会談の開催と共同声明の内容（ホルムズ海峡・中東安全保障への言及の有無と強度）",
+          "date": "2026年3月下旬〜4月"
+        },
+        {
+          "trigger": "フーシ派による紅海・ホルムズ海峡近海での新たな攻撃事案の発生",
+          "date": "2026年3月〜6月（継続的監視）"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "f39a604ce0ca2ba6b55b762cb2e7f1b7990d3523c5decdf937f6e50000090539",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0913_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:01:16.277334+00:00",
+      "resolution_question_ja": "2026年6月30日までに、日本政府はホルムズ海峡またはその周辺海域への自衛隊艦艇の追加派遣（現在の護衛艦1隻体制からの増強）を正式決定するのだろうか？"
+    },
+    {
+      "prediction_id": "NP-2026-0914",
+      "title": "Japan's Post-Summit Diplomacy — Balancing Trump and Iran on a Tightrope",
+      "ghost_url": "https://nowpattern.com/en/japans-post-summit-diplomacy-balancing-trump-and-iran-on-a-tightrope/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 11,
+      "our_pick_prob_raw": 30,
+      "oracle_question": "Will Japan's Foreign Minister Motegi visit Iran or hold a formal bilateral meeting with Iran's Foreign Minister by 2026-09-30?",
+      "oracle_deadline": "2026-09-30",
+      "oracle_criteria": "A confirmed visit by FM Motegi to Tehran, or a formal bilateral meeting between Motegi and Iran's Foreign Minister at any location, reported by official Japanese government sources or major wire services (Kyodo, Reuters, AP) by September 30, 2026.",
+      "oracle_premortem": "If this prediction is wrong, it would most likely be because the Iran situation de-escalated sufficiently to create diplomatic space, or because the U.S. actively encouraged Japanese mediation as part of a broader diplomatic strategy shift.",
+      "resolution_question": "Will Japan's Foreign Minister Motegi visit Iran or hold a formal bilateral meeting with Iran's Foreign Minister by 2026-09-30?",
+      "triggers": [
+        {
+          "trigger": "Iran enrichment announcement exceeding 60% purity or IAEA access restrictions",
+          "date": "April-June 2026"
+        },
+        {
+          "trigger": "U.S. military deployment escalation in Persian Gulf beyond routine rotation",
+          "date": "Next 90 days (April-June 2026)"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "3e903a4c7ef8345ce6a8469f96ff09dc8a597e6cc3c7e2e8a5747ef45015148b",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0914_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T19:01:19.953501+00:00",
+      "resolution_question_ja": "2026年9月30日までに、日本の茂木外務大臣はイランを訪問するか、イランの外務大臣と正式な二国間会談を行うだろうか？"
+    },
+    {
+      "prediction_id": "NP-2026-0915",
+      "title": "Taiwan's Missile Shield — The Escalation Spiral That Could Reshape the Indo-Pacific",
+      "ghost_url": "https://nowpattern.com/en/taiwans-missile-shield-the-escalation-spiral-that-could-reshape-the-indo-pacific/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 1,
+      "our_pick_prob_raw": 15,
+      "oracle_question": "Will China impose a naval blockade or declared maritime exclusion zone around Taiwan by April 4, 2026?",
+      "oracle_deadline": "2026-04-04",
+      "oracle_criteria": "A Chinese naval blockade is defined as: (1) an official or de facto restriction on commercial shipping to or from Taiwan enforced by PLA Navy vessels, OR (2) a declared 'maritime exclusion zone' or 'inspection zone' that effectively prevents free commercial navigation to Taiwan's major ports (Kaohsiung, Keelung, Taichung). Routine military exercises that temporarily affect shipping lanes but do not constitute a sustained restriction on commercial traffic do NOT qualify. The answer is YES if credible international news sources (Reuters, AP, Bloomberg) report such a blockade or exclusion zone being actively enforced for 48+ consecutive hours before the deadline.",
+      "oracle_premortem": "If this prediction is wrong (i.e., China does impose a blockade), the most likely reason is that hardliners within the PLA convinced Xi Jinping that Taiwan's missile defense deployment represented a now-or-never moment, and that a limited quarantine could be executed without triggering full U.S. military intervention — a catastrophic miscalculation of American resolve.",
+      "resolution_question": "Will China impose a naval blockade or declared maritime exclusion zone around Taiwan by April 4, 2026?",
+      "triggers": [
+        {
+          "trigger": "PLA Eastern Theater Command announces new large-scale military exercises encircling Taiwan",
+          "date": "Within 30 days (by early April 2026)"
+        },
+        {
+          "trigger": "United States announces additional arms sale or military advisory deployment to Taiwan",
+          "date": "Within 60 days (by early May 2026)"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "resolution_question_ja": "中国は2026年4月4日までに台湾周辺に海軍封鎖または海洋排除区域を設定するだろうか？",
+      "timestamp_sha256": "7acbef0df3a6ff950fe4258990511ba3e91534b556443217a4c7e5e0051ca29f",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0915_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T22:00:02.058319+00:00"
+    },
+    {
+      "prediction_id": "NP-2026-0916",
+      "title": "Bitcoin's $150K Breakthrough — Institutional FOMO Rewires Global Capital Allocation",
+      "ghost_url": "https://nowpattern.com/en/bitcoins-150k-breakthrough-institutional-fomo-rewires-global-capital-allocation/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 23,
+      "our_pick_prob_raw": 38,
+      "oracle_question": "Will Bitcoin sustain a price above $150,000 through the end of Q2 2026 (June 30, 2026)?",
+      "oracle_deadline": "2026-06-30",
+      "oracle_criteria": "Bitcoin's daily closing price (UTC, as reported by CoinGecko or CoinMarketCap) must remain above $150,000 on every single trading day from March 24, 2026 through June 30, 2026. If Bitcoin closes below $150,000 on any day in this period, the answer is NO. If it closes above $150,000 on every day, the answer is YES.",
+      "oracle_premortem": "If our NO prediction is wrong, the most likely reason is that institutional inflows proved even stronger than expected — perhaps accelerated by a sovereign wealth fund announcement or faster-than-anticipated Fed rate cuts — creating a demand shock that overwhelmed any cyclical correction pressure during Q2.",
+      "resolution_question": "Will Bitcoin sustain a price above $150,000 through the end of Q2 2026 (June 30, 2026)?",
+      "triggers": [
+        {
+          "trigger": "Federal Reserve FOMC rate decision and dot plot — any hawkish surprise would immediately pressure Bitcoin and all risk assets",
+          "date": "Next FOMC meeting: May 6-7, 2026"
+        },
+        {
+          "trigger": "Q1 2026 13-F filings revealing which institutional investors have taken new Bitcoin ETF positions or exited existing ones",
+          "date": "Filing deadline: May 15, 2026"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "resolution_question_ja": "2026年第2四半期末（2026年6月30日）までに、ビットコインは15万ドル以上の価格を維持できるか？",
+      "timestamp_sha256": "480505f135d4811a0d9c27049b0b8ef34270dd1bd9c7445e8074320cc3d7dd21",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0916_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T22:00:03.560325+00:00"
+    },
+    {
+      "prediction_id": "NP-2026-0917",
+      "title": "AlphaThink and the AGI Threshold — When Capability Outruns Governance",
+      "ghost_url": "https://nowpattern.com/en/alphathink-and-the-agi-threshold-when-capability-outruns-governance/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 2,
+      "our_pick_prob_raw": 18,
+      "oracle_question": "Will at least one binding international treaty or multilateral agreement specifically governing AGI-class AI systems be signed by three or more G7 nations by 2028-12-31?",
+      "oracle_deadline": "2028-12-31",
+      "oracle_criteria": "A binding international treaty, convention, or multilateral agreement that (1) explicitly addresses AGI or general-purpose AI systems above a defined capability threshold, (2) imposes enforceable obligations on signatory nations regarding the development, deployment, or governance of such systems, and (3) is formally signed by at least three G7 member nations (US, UK, France, Germany, Italy, Japan, Canada). Non-binding communiqués, voluntary commitments, and executive statements do not qualify. The agreement must be signed, though ratification is not required by the deadline.",
+      "oracle_premortem": "A high-visibility AI catastrophe or near-miss event in 2027 could create the political urgency needed to overcome coordination barriers and drive an emergency multilateral agreement, similar to how the Cuban Missile Crisis accelerated nuclear arms control.",
+      "resolution_question": "Will at least one binding international treaty or multilateral agreement specifically governing AGI-class AI systems be signed by three or more G7 nations by 2028-12-31?",
+      "triggers": [
+        {
+          "trigger": "Independent third-party evaluation results for AlphaThink on AGI benchmarks (ARC Prize, METR, HELM)",
+          "date": "Q2-Q3 2026"
+        },
+        {
+          "trigger": "EU AI Office formal classification decision on AlphaThink under the AI Act's general-purpose AI provisions",
+          "date": "Q3-Q4 2026"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "resolution_question_ja": "2028年12月31日までに、AGI（汎用人工知能）クラスのAIシステムを具体的に規制する拘束力のある国際条約または多国間協定が、G7諸国のうち3か国以上によって署名されるか？",
+      "timestamp_sha256": "600ea5fa7effdf0bb81bf492f92b33ef41984d54f70a626a0065e1e3942e3b18",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0917_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T22:00:05.061557+00:00"
+    },
+    {
+      "prediction_id": "NP-2026-0918",
+      "title": "Trump's Electoral Boomerang — How GOP Overreach Seeds Democratic Revival",
+      "ghost_url": "https://nowpattern.com/en/trumps-electoral-boomerang-how-gop-overreach-seeds-democratic-revival/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "YES",
+      "our_pick_prob": 91,
+      "our_pick_prob_raw": 72,
+      "oracle_question": "Will Democrats win a net gain of at least 5 seats in the U.S. House of Representatives in the November 2026 midterm elections?",
+      "oracle_deadline": "2026-12-01",
+      "oracle_criteria": "Based on certified results from state election authorities following the November 3, 2026 midterm elections. Democrats must achieve a net gain of 5 or more House seats compared to the pre-election composition of the House. The count uses the party affiliation at the time of certification, with vacancies attributed to the party that last held the seat.",
+      "oracle_premortem": "A strong economic recovery or major external crisis generates rally-around-the-flag dynamics that override the backlash patterns, allowing Republicans to hold losses below the 5-seat threshold despite structural headwinds.",
+      "resolution_question": "Will Democrats win a net gain of at least 5 seats in the U.S. House of Representatives in the November 2026 midterm elections?",
+      "triggers": [
+        {
+          "trigger": "Major deportation incident generating sustained national media coverage and bipartisan condemnation (analogous to 2018 family separation crisis)",
+          "date": "Q2-Q3 2026 (April-September), with maximum electoral impact if occurring June-August before November election"
+        },
+        {
+          "trigger": "Supreme Court rulings on voter registration law challenges (SAVE Act constitutionality, state-level proof-of-citizenship requirements)",
+          "date": "June 2026 term, with decisions expected before July recess"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "9bf903a4f77c4b0462135fe3770a90b1be00317adbec436528bc077febc74ed4",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0918_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T22:00:14.215754+00:00"
+    },
+    {
+      "prediction_id": "NP-2026-0919",
+      "title": "ホルムズ海峡危機 — 米イラン「対立の螺旋」が中東エネルギー秩序を揺るがす",
+      "ghost_url": "https://nowpattern.com/horumuzuhai-xia-wei-ji-mi-iran-dui-li-noluo-xuan-gazhong-dong-enerugizhi-xu-woyao-rugasu/",
+      "lang": "ja",
+      "status": "active",
+      "our_pick": "YES",
+      "our_pick_prob": 38,
+      "our_pick_prob_raw": 45,
+      "oracle_question": "2026年4月30日までにホルムズ海峡で米軍とイラン軍の間で直接的な軍事交戦（砲撃、ミサイル攻撃、航空攻撃のいずれか）が発生するか？",
+      "oracle_deadline": "2026-04-30",
+      "oracle_criteria": "米国防総省またはイラン国防省の公式発表、あるいは複数の主要国際通信社（AP、Reuters、AFPのうち2社以上）が、ホルムズ海峡周辺における米軍とイラン軍の直接的な軍事交戦（意図的な砲撃、ミサイル攻撃、または航空攻撃）の発生を報じた場合にYES。威嚇射撃、偶発的接触、サイバー攻撃、代理勢力による攻撃は含まない。",
+      "oracle_premortem": "水面下の外交チャンネル（特にオマーンや中国経由）が想定以上に機能し、最後通牒が『交渉開始のための瀬戸際戦術』に過ぎなかった場合、直接交戦は回避される。トランプ政権がレトリックの激しさに反して実際には軍事行動を避ける選択をする可能性。",
+      "resolution_question": "2026年4月30日までにホルムズ海峡で米軍とイラン軍の間で直接的な軍事交戦（砲撃、ミサイル攻撃、航空攻撃のいずれか）が発生するか？",
+      "triggers": [
+        {
+          "trigger": "48時間の最後通牒期限到来と米軍の行動判断",
+          "date": "2026年3月25日前後（声明から48時間後）"
+        },
+        {
+          "trigger": "イランの報復行動（ミサイル発射、海峡での示威行動、代理勢力の活性化）",
+          "date": "米軍行動後24〜72時間以内"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "eb9a19b86c80a32e0c571462bc85edc4def5b60f0154b596781994419453af43",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0919_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T22:00:21.873269+00:00"
+    },
+    {
+      "prediction_id": "NP-2026-0920",
+      "title": "Hormuz Strait Ultimatum — Trump's 48-Hour Threat Triggers Escalation Spiral with Iran",
+      "ghost_url": "https://nowpattern.com/en/hormuz-strait-ultimatum-trumps-48-hour-threat-triggers-escalation-spiral-with-iran/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 27,
+      "our_pick_prob_raw": 40,
+      "oracle_question": "Will the US conduct a military strike on Iranian territory by 2026-04-07?",
+      "oracle_deadline": "2026-04-07",
+      "oracle_criteria": "Confirmed reports from the US Department of Defense, credible international media (AP, Reuters, BBC), or official Iranian government statements of US military strikes hitting targets within Iranian sovereign territory (excluding proxy targets in Iraq, Syria, or Yemen). Cyberattacks alone do not count; kinetic strikes are required.",
+      "oracle_premortem": "The prediction fails if Trump follows through on his explicit public threat because the political cost of backing down from a televised 48-hour ultimatum proves higher than expected, or if a miscalculation or proxy incident triggers escalation beyond both sides' control.",
+      "resolution_question": "Will the US conduct a military strike on Iranian territory by 2026-04-07?",
+      "triggers": [
+        {
+          "trigger": "Expiration of Trump's 48-hour ultimatum (~March 25, 2026) and whether US military action follows",
+          "date": "24-48 hours from March 23, 2026"
+        },
+        {
+          "trigger": "Iran's specific military response to any US strike — whether calibrated (limited base strike) or escalatory (multi-target regional salvo)",
+          "date": "0-12 hours following any US military action"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "0c92c12cdbe17fc04c4a5620c94066e74f0aa26bffdb3aa7cab1d3c31832165b",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0920_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T22:00:29.612111+00:00"
+    },
+    {
+      "prediction_id": "NP-2026-0921",
+      "title": "日本の防衛費GDP比3%突破 — 戦後安保体制の不可逆的構造転換",
+      "ghost_url": "https://nowpattern.com/ri-ben-nofang-wei-fei-gdpbi-3-tu-po-zhan-hou-an-bao-ti-zhi-nobu-ke-ni-de-gou-zao-zhuan-huan/",
+      "lang": "ja",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 11,
+      "our_pick_prob_raw": 30,
+      "oracle_question": "2026年12月31日までに、日本の防衛関連支出（NATO基準換算）がGDP比3.0%を超えるか？",
+      "oracle_deadline": "2026-12-31",
+      "oracle_criteria": "日本政府が公表する2026年度防衛予算（補正予算含む）および防衛関連支出について、NATO基準での算定方法（海上保安庁、退役自衛官費用、サイバー関連予算等を含む広義の安全保障支出）でGDP比3.0%以上に達したことが、政府発表資料または信頼できる国際機関（NATO、SIPRI等）の推計で確認されること",
+      "oracle_premortem": "台湾海峡での重大な軍事的緊張事案の発生、または米国からの極めて強い圧力により、日本が想定を大幅に上回る補正予算を編成し、広義の防衛支出が3%を超える可能性がある。",
+      "resolution_question": "2026年12月31日までに、日本の防衛関連支出（NATO基準換算）がGDP比3.0%を超えるか？",
+      "triggers": [
+        {
+          "trigger": "2026年度防衛省概算要求の発表（具体的な予算規模と内訳の判明）",
+          "date": "2025年8月末"
+        },
+        {
+          "trigger": "与党税制調査会による防衛増税の具体的設計と実施時期の決定",
+          "date": "2025年12月"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "430160799edcc4f24871c5fff823053e9e3b8d42f183dd6e14d0232abf459a2c",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0921_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T22:00:37.143682+00:00"
+    },
+    {
+      "prediction_id": "NP-2026-0922",
+      "title": "Japan's Defense Surge to 3% GDP — The End of Postwar Pacifism's Last Guardrail",
+      "ghost_url": "https://nowpattern.com/en/japans-defense-surge-to-3-gdp-the-end-of-postwar-pacifisms-last-guardrail/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 11,
+      "our_pick_prob_raw": 30,
+      "oracle_question": "Will Japan's officially appropriated FY2026 defense budget exceed 3.0% of GDP by the time the budget is finalized?",
+      "oracle_deadline": "2026-12-31",
+      "oracle_criteria": "The FY2026 defense budget as passed by the Japanese Diet, calculated as a percentage of GDP using the Cabinet Office's GDP estimate at the time of budget finalization. The budget must use the Japanese government's own definition of defense-related expenditure (which has been expanded since 2022 to include coast guard and some dual-use items). If the budget exceeds 3.0% of GDP under this definition, the answer is YES. If it is 3.0% or below, the answer is NO.",
+      "oracle_premortem": "If this prediction is wrong (i.e., Japan does exceed 3%), it would most likely be because a major security crisis — such as a Chinese military confrontation over Taiwan or a North Korean nuclear test — created political conditions for an emergency supplementary defense budget that pushed the total above 3%.",
+      "resolution_question": "Will Japan's officially appropriated FY2026 defense budget exceed 3.0% of GDP by the time the budget is finalized?",
+      "triggers": [
+        {
+          "trigger": "FY2026 Budget Appropriation Vote in the Diet",
+          "date": "June-July 2026"
+        },
+        {
+          "trigger": "Next North Korean ICBM or Nuclear Test",
+          "date": "Any time (elevated probability in Q2-Q3 2026)"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "b7817fd0e384efd421372b6e027042c40f56b30a3b260d16a70c463e235693eb",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0922_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T22:00:44.627341+00:00"
+    },
+    {
+      "prediction_id": "NP-2026-0923",
+      "title": "南シナ海の米中対立 — 対立の螺旋が偶発的衝突の閾値を下げる構造",
+      "ghost_url": "https://nowpattern.com/nan-sinahai-nomi-zhong-dui-li-dui-li-noluo-xuan-gaou-fa-de-chong-tu-noyu-zhi-woxia-gerugou-zao/",
+      "lang": "ja",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 11,
+      "our_pick_prob_raw": 30,
+      "oracle_question": "2026年12月31日までに、南シナ海において米中いずれかの正規軍が相手側に対し実弾（銃弾・ミサイル・魚雷を含む）を使用する軍事衝突が発生するか？",
+      "oracle_deadline": "2026-12-31",
+      "oracle_criteria": "米国政府、中国政府、または国際的に信頼される報道機関（Reuters、AP、AFP等）が、南シナ海において米軍と中国軍（海警局を含む）の間で実弾が使用された事案を報じた場合にYES。放水砲、レーザー照射、体当たり等の物理的衝突は含まない。実弾の使用（警告射撃を含む）が確認された場合のみYESとする。",
+      "oracle_premortem": "セカンド・トーマス礁での補給作戦中にフィリピン兵士が死亡し、米比相互防衛条約に基づく米軍の護衛活動が開始された結果、中国海軍との間で偶発的な発砲事案が発生するシナリオが、予測が外れる最も蓋然性の高い経路である。",
+      "resolution_question": "2026年12月31日までに、南シナ海において米中いずれかの正規軍が相手側に対し実弾（銃弾・ミサイル・魚雷を含む）を使用する軍事衝突が発生するか？",
+      "triggers": [
+        {
+          "trigger": "セカンド・トーマス礁周辺でのフィリピン軍兵士の重大な死傷事案",
+          "date": "2026年4月-12月（補給活動が継続する限り常にリスク存在）"
+        },
+        {
+          "trigger": "米中軍事ホットラインの復旧または正式な断絶宣言",
+          "date": "2026年中（G20サミットやAPEC等の外交機会に注目）"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "7092974fb2abf791500a96841eb967f482e57568e8c5c83416e4e3df5163b05f",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0923_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T22:00:52.108155+00:00"
+    },
+    {
+      "prediction_id": "NP-2026-0924",
+      "title": "South China Sea Flashpoint — The Escalation Spiral Neither Side Can Exit",
+      "ghost_url": "https://nowpattern.com/en/south-china-sea-flashpoint-the-escalation-spiral-neither-side-can-exit/",
+      "lang": "en",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 6,
+      "our_pick_prob_raw": 25,
+      "oracle_question": "Will a military incident in the South China Sea result in confirmed casualties (killed or wounded) among US, Chinese, Philippine, or allied military personnel by 2026-12-31?",
+      "oracle_deadline": "2026-12-31",
+      "oracle_criteria": "A verified report from any official government source (US Department of Defense, Chinese Ministry of National Defense, Philippine Armed Forces, or equivalent allied military) confirming that military personnel were killed or wounded as a direct result of a hostile or accidental military encounter in the South China Sea between January 1 and December 31, 2026. Coast guard personnel count if the incident involves military-grade weapons or is classified as a military engagement by the reporting government.",
+      "oracle_premortem": "If this prediction is wrong, the most likely cause is an accidental collision or weapons discharge during an increasingly crowded and tense operating environment where the margin for error has shrunk below the threshold of human and mechanical reliability.",
+      "resolution_question": "Will a military incident in the South China Sea result in confirmed casualties (killed or wounded) among US, Chinese, Philippine, or allied military personnel by 2026-12-31?",
+      "triggers": [
+        {
+          "trigger": "Lethal incident during a US-Philippines-China encounter near Second Thomas Shoal or Scarborough Shoal",
+          "date": "Ongoing risk, elevated during joint patrol cycles (monthly)"
+        },
+        {
+          "trigger": "China declares an Air Defense Identification Zone (ADIZ) over part or all of the South China Sea",
+          "date": "2026-2027, most likely during a period of heightened bilateral tension"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "0eacbbe7badcf2fc89d3c9eafff457f4df8ba17495445bb332b99e9f4c404432",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0924_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T22:00:59.579290+00:00"
+    },
+    {
+      "prediction_id": "NP-2026-0925",
+      "title": "日米首脳会談とイラン危機 — 同盟の「忠誠試験」が日本外交の自律性を侵食する構造",
+      "ghost_url": "https://nowpattern.com/ri-mi-shou-noy-hui-tan-toiranwei-ji-tong-meng-no-zhong-cheng-shi-yan-gari-ben-wai-jiao-nozi-lu-xing-woqin-shi-surugou-zao/",
+      "lang": "ja",
+      "status": "active",
+      "our_pick": "NO",
+      "our_pick_prob": 1,
+      "our_pick_prob_raw": 15,
+      "oracle_question": "2026年9月30日までに高市首相またはトランプ大統領がイランとの直接対話・交渉開始を公式に発表するか？",
+      "oracle_deadline": "2026-09-30",
+      "oracle_criteria": "高市首相またはトランプ大統領が記者会見、公式声明、またはSNS投稿でイラン政府との直接的な外交交渉の開始を公式に発表したことが、主要メディア（NHK、AP、Reuters等）で報じられた場合にYESと判定する。非公式な接触や第三者を介した間接的な対話は含まない。",
+      "oracle_premortem": "トランプ大統領がディールメーカーとしてのレガシーを追求し、イランとの「グランドバーゲン」に予想外に前向きになった場合。あるいはイラン国内で政権交代や政策転換が発生し、対話の窓口が急速に開いた場合。",
+      "resolution_question": "2026年9月30日までに高市首相またはトランプ大統領がイランとの直接対話・交渉開始を公式に発表するか？",
+      "triggers": [
+        {
+          "trigger": "トランプ政権によるイランへの新規制裁パッケージの発表",
+          "date": "2026年4-6月"
+        },
+        {
+          "trigger": "IAEAによるイラン核開発に関する新たな報告書の公表",
+          "date": "2026年6月（次回理事会）"
+        }
+      ],
+      "created_at": "2026-03-24",
+      "market_consensus": {},
+      "timestamp_sha256": "ea5252ec252083a85bbcc339ed032b453c82ef2026b2cdeb40012d9d4d43627c",
+      "timestamp_ots_path": "/opt/shared/predictions/timestamps/NP-2026-0925_original.json.ots",
+      "timestamp_pending": true,
+      "timestamp_created_at": "2026-03-23T22:01:07.083157+00:00"
     }
   ],
   "stats": {
-    "total": 891,
-    "resolved": 29,
-    "open": 251,
-    "avg_brier_score": 0.1295,
-    "last_updated": "2026-03-23T18:37:27.930071"
+    "total": 924,
+    "resolved": 31,
+    "open": 284,
+    "correct": 0,
+    "incorrect": 8,
+    "forecasters": {},
+    "avg_brier_score": 0.1793,
+    "last_updated": "2026-03-24T06:47:43.208712",
+    "avg_brier": 0.1793
   }
 }

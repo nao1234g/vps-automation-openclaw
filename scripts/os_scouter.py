@@ -766,6 +766,7 @@ def save_history(result: dict):
     history.setdefault("os", []).append({
         "timestamp": result["timestamp"],
         "overall_level": result["overall_level"],
+        "overall_confidence": result.get("overall_confidence"),
         "axes": {a["axis"]: a["level"] for a in result["axes"]},
         "frontier_gap": result["frontier_gap"],
     })
