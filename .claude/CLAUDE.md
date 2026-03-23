@@ -194,6 +194,20 @@ EN版: nowpattern.com/en/[name]/    ← Ghostスラッグ: en-[name]（内部名
 
 ---
 
+## 意思決定チャネルルール（2026-03-21 永久刻印）
+
+- **主たる意思決定チャネルはこの会話**。Telegram は補助通知チャネルであり、承認UIではない
+- 質問・確認・提案・承認依頼は、まずこの会話で行う（Telegram に先に送ることは原則禁止。例外は下記に限定する）
+- `pending_approvals.json` への追加や Telegram 送信を「完了条件」にしない
+- **非可逆・高リスク・セキュリティ操作**のみ、この会話で明示確認を取る。確認フォーマット：
+  > 何をするか / なぜ必要か / リスク / 推奨 / 実行コマンド
+- Telegram を残す例外（これ以外は会話内確認を先行させる）：
+  - Naoto不在中の自律監視アラート（service_watchdog / zero-article-alert / QA FAIL 等）
+  - 定期FYIレポート（Hey Loop / weekly-analysis 等）
+  - NEO-ONE/TWO への作業指示（通信路がTelegramのため不可避）
+
+---
+
 ## 制約条件
 
 - **VPS**: ConoHa / Ubuntu 22.04 LTS / Docker Compose v2

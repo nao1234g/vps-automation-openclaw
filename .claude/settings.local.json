@@ -5,19 +5,6 @@
     "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1"
   },
   "permissions": {
-    "deny": [
-      "Read(**/.env)",
-      "Read(**/.env.*)",
-      "Read(**/*credentials*)",
-      "Read(**/*secret*)",
-      "Read(**/*private_key*)",
-      "Read(**/*.pem)",
-      "Read(**/*.key)",
-      "Write(**/.env)",
-      "Write(**/.env.*)",
-      "Write(**/*credentials*)",
-      "Write(**/*private_key*)"
-    ],
     "allow": [
       "Bash",
       "Task",
@@ -143,11 +130,25 @@
       "WebFetch(domain:llmstxt.org)",
       "WebFetch"
     ],
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*credentials*)",
+      "Read(**/*secret*)",
+      "Read(**/*private_key*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Write(**/.env)",
+      "Write(**/.env.*)",
+      "Write(**/*credentials*)",
+      "Write(**/*private_key*)"
+    ],
     "defaultMode": "bypassPermissions",
     "additionalDirectories": [
       "\\tmp",
       "c:\\tmp",
-      "C:\\Users\\user\\AppData\\Roaming\\Code\\User"
+      "C:\\Users\\user\\AppData\\Roaming\\Code\\User",
+      "c:\\Users\\user\\OneDrive\\デスクトップ\\naoto-os"
     ]
   },
   "model": "claude-opus-4-6",

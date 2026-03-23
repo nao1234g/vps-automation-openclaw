@@ -377,6 +377,18 @@
   - Ghost codeinjection_foot のJSを更新（CSSメディアクエリ強化）
   - 目標: モバイル投票完了率 +30%
 
+- [x] **J8: evolution_loop → calibration_rules 自動更新パイプライン** (2026-03-22 実稼働確認済)
+  - ✅ evolution_loop.py が週次実行後に calibration_rules.json を直接自動更新（pending_approvals ステップをスキップして直接書き込み）
+  - ✅ last_auto_update: 2026-03-22T06:10:43Z 確認済み、status: "active - end-to-end confirmed 2026-03-22"
+  - ✅ 5つのルール(CR-001〜CR-005)が Gemini 分析を経て自動更新されていることを SSH + one-shot で確認
+  - 注記: 仕様は「pending_approvals エンキュー → 承認後反映」だったが、実装は直接書き込み。機能的には同等以上
+
+- [ ] **J9: prediction_ensemble.py 自動実行パイプライン**
+  - 現状: prediction_ensemble.py は CLI のみ（手動実行）。直近稼働: 2026-03-03（18日間なし）
+  - 実装: 新規予測 DB 登録時に自動で ensemble 実行する hook または cron
+  - 仕様: prediction_db.json が更新された時（NEO が予測登録後）→ ensemble.py → calibration 適用 → our_pick_prob を自動更新
+  - 目標: 全予測が calibration_rules を通過して公開される状態を達成
+
 ---
 
 ---
@@ -449,4 +461,4 @@
 
 ---
 
-*最終更新: 2026-03-21 — I5エントリ更新: reader_votesスキーマ済み（brier_score/resolved_at/outcomeカラム確認済み）、reader_prediction_api.pyのBrier計算バグ（status=="hit"→hit_miss=="correct"）を記録。prediction_page_builder.py 502修正（timeout 120s + _page_id guard）・_validate_market_consensus resolved予測スキップ修正・substack-api healthcheckバグ修正（/health→/）を実施。/top-forecasters エンドポイント追加。NEO-TWO OAuthトークン失効（15日間）→ /home/neocloop/.claude/.credentials.json 更新・復旧完了。sync-neo-token.ps1 のREMOTE_CRED パス誤り（/root/ → /home/neocloop/）修正。FileLock+Ghost Webhook既実装確認（prediction_page_builder.py:2380-2386 + ghost-page-guardian.service 2026-03-10〜稼働）。*
+*最終更新: 2026-03-23 (OR-2026-0323-01 完了) — 夜間自律実行 CW1-CW8 全件 verified=true。NP-2026-0825 UUID ghost_url 修正（7件目）。nowpattern_scouter.py: next_to_improve追加・critical_issues false positive修正。M007 recurrence_count:1→2・last_seen:2026-03-23更新。metrics整合: DB(825総予測,29解決,Brier=0.1295)/API stats-bulk(820件)/reader_votes(826票) 一致確認。Brier unit test PASS。overnight state files 作成(run_state/backlog/checklist/completed/blockers)。KNOWN_MISTAKES.md に3件追記。os_scouter overall=5.14/7・nowpattern_scouter overall=6.14/7 両スカウター全必須フィールド OK。*

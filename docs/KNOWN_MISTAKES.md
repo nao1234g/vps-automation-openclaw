@@ -6,6 +6,270 @@
 
 ---
 
+### 2026-03-23: UUID ghost_url が再発 — M007 2回目（NP-2026-0825）
+
+- **症状**: NP-2026-0825 の `ghost_url` が `https://nowpattern.com/p/UUID/` 形式のドラフトURLのまま prediction_db.json に残存。前セッション（2026-03-22）で NP-0819〜0824 の6件を修正したが、NP-0825 が漏れていた
+- **根本原因**: 一括修正スクリプトが range(819, 825) で作成され、825 が exclusive boundary で除外された（Python の `range(a, b)` は b を含まない）
+- **直接原因**: `fix_uuid_v4.py` の range 指定ミス。またはバッチ外で個別作成した予測エントリのチェック漏れ
+- **正しい解決策**: `ghost_url` を `""` にクリアして audit PASS 復旧（2026-03-23 本セッションで修正済み）
+- **教訓**: 一括修正後は必ず `prediction_db_audit.py --verbose` で全件チェックを行う。range 境界は常に +1 を疑う
+- **再発防止コード**: mistake_registry.json M007 の `recurrence_count` を 2 に更新、`last_seen: 2026-03-23` に更新済み。UUIDパターン検知フィンガープリント: `/p/[0-9a-f-]{36}|ghost_url.*uuid`
+
+---
+
+### 2026-03-23: nowpattern_scouter.py の `next_to_improve` フィールドが return dict に未追加
+
+- **症状**: `nowpattern_scouter.py` の出力に `next_to_improve` キーが存在しない（`KeyError` または `None` が返る）
+- **根本原因**: コード上で `next_to_improve` リストを計算するブロックを追加したが、その後の `return {}` の中に `"next_to_improve": next_to_improve` の行を追加し忘れた（計算と返却の2ステップのうち1ステップが漏れた）
+- **直接原因**: 2段階の修正（計算追加 → return dict 追加）のうち第2段が別パッチで必要だった。Edit ツールの `old_string` がマッチしなかったために最初のパッチが失敗し、Pythonスクリプトで再適用した際に return dict への追加が漏れた
+- **正しい解決策**: Python スクリプトで `"not_fixed_because": not_fixed_because,` の次の行に `"next_to_improve": next_to_improve,` を挿入（2026-03-23 修正済み）
+- **教訓**: フィールドの追加は「計算ブロック」と「return dict への追加」の2箇所が必要。パッチ後は必ず `python3 script.py --dry-run | grep next_to_improve` で出力を確認する
+- **再発防止コード**: nowpattern_scouter.py の required output fields リスト: `overall, world_gap, critical_issues, fixed_this_run, not_fixed_because, next_to_improve, history_saved_this_run, history_path, trend`
+
+---
+
+### 2026-03-23: nowpattern_scouter.py の `critical_issues` が "FAIL count: 0" を誤検知
+
+- **症状**: サイトヘルスチェックが "Site health FAIL count: 0/12" (=0件のFAIL) というエビデンス文字列を持つ場合でも、`critical_issues` リストに追加されてしまう
+- **根本原因**: `critical_issues` フィルタが `"FAIL" in ev` を使っており、"FAIL count: 0" の文字列も `FAIL` を含むため True になる。0件のFAILは実際にはPASS（問題なし）
+- **正しい解決策**: `"FAIL" in ev` に `not ("FAIL count: 0" in ev or ev.rstrip().endswith("FAIL: 0"))` という除外条件を追加（2026-03-23 修正済み）
+- **教訓**: 文字列フィルタは「含む」だけでなく「意味」を考慮する。特にカウント系の文字列（"FAIL count: 0" = ゼロ件 = 正常）は誤検知しやすい。修正後は `critical_issues` が `[]` になることを確認する
+- **再発防止コード**: 同様のパターンで "WARNING count: 0"、"ERROR count: 0" も除外対象になりうる。フィルタには常に `count: 0` の除外ロジックを入れる
+
+---
+
+### 2026-03-23: prediction_db_audit.py が旧ステータスラベル "tracking" を使用（正: "resolving"/"active"）
+
+- **症状**: audit ログが `tracking: 0` を表示するが実際は `resolving: 611 + active: 170` が存在。audit は PASS になるが数値が全く正しくない
+- **根本原因**: DB のステータスは `open/active/resolving/resolved` の4種だが、audit スクリプトが旧ラベル `tracking` のみカウントしていた
+- **正しい解決策**: `prediction_db_audit.py` の `tracking_count` → `resolving_count + active_count` に変更（2026-03-23修正済み）
+- **教訓**: prediction_db の status フィールドを変更したら audit スクリプトも同時に更新する
+
+---
+
+### 2026-03-23: Ghost ドラフト UUID URL が prediction_db に混入（M007 再発）
+
+- **症状**: prediction_db_audit.py が `UUID ghost_url: 31` 件を報告。/predictions/ ページの記事リンクが `/p/UUID/` 形式になり全件404
+- **根本原因**: NEO が記事を draft 状態のまま prediction_db に登録した。Ghost ドラフトの URL は `/p/[UUID]/` 形式（例: `https://nowpattern.com/p/40526c48-100d-47d3-9b61-6965fe66e04d/`）
+- **正しい解決策**:
+  1. prediction_db.json の UUID ghost_url をクリア（空文字列 `""`）
+  2. 記事を Ghost で公開（published 状態に変更）
+  3. `ghost_url_updater.py`（30分cron）が自動で正しい slug URL を設定
+  （2026-03-23修正済み）
+- **教訓**: UUID形式の `ghost_url` = 記事がまだ draft。`ghost_url_updater.py` の次回 cron 実行（30分以内）で自動更新される
+- **再発防止コード（M007 ガード、nowpattern_publisher.py L911-916）**:
+  ```python
+  if status == 'draft' or '/p/' in url:
+      print(f'  prediction_tracker: SKIP ghost_url for {_p["prediction_id"]} (DRAFT or /p/ URL)')
+  else:
+      _p['ghost_url'] = url; _pt_save(_ptdb)
+  ```
+- **識別パターン**: `ghost_url` が `/p/[0-9a-f-]{36}` にマッチする場合 = draft URL
+
+---
+
+### 2026-03-23: スカウター出力に必須フィールド欠如（overall/history_saved_this_run/history_path/trend）
+
+- **症状**: `os_scouter.py --json` と `nowpattern_scouter.py --json` の出力に `overall`/`history_saved_this_run`/`history_path`/`trend` フィールドが存在しない
+- **根本原因**: `main()` 内で `save_history(result)` を呼んだ後、result dict に必須フィールドを追加していなかった
+- **正しい解決策**: `save_history(result)` の直後に `result["overall"] = result["overall_level"]` 等を追加（2026-03-23修正済み）
+- **教訓**: スカウターの出力仕様（必須フィールド一覧）を変更したら `main()` の result dict 生成も必ず同時に更新する
+
+---
+
+### 2026-03-23: Reflection/ECC axis の memory_coverage が linked_test を使用（正: linked_memory）
+
+- **症状**: Reflection/ECC の `memory_coverage=0.2857` に対し SMNA の `memory_coverage=0.0952` と不一致（両軸で計算基準が違う）
+- **根本原因**: Reflection/ECC axis が `tested = sum(linked_test)` を memory_coverage の proxy として使用。本来は `linked_memory` フィールドで計算すべき
+- **正しい解決策**: `round(sum(1 for m in mistakes if m.get("linked_memory")) / total, 4)` に統一（2026-03-23修正済み）
+- **教訓**: 同一指標を複数の場所で計算するときは必ず同一の計算式を使う
+
+---
+
+### 2026-03-22: Ghost canonical_urlフィールドとcodeinjection_headの二重canonical問題
+
+- **症状**: `/en/about/` と `/en/taxonomy/` ページでcanonical tagが2つ表示された（`/en-about/` と `/en/about/` の両方）
+- **根本原因**: Ghost は内部スラッグ（`en-about`）からデフォルトcanonical（`/en-about/`）を自動生成する。codeinjection_headに別canonicalを追加しても両方が出力されてしまう
+- **正しい解決策**:
+  1. Ghost Admin API で `canonical_url` フィールドを正しいURLに設定（例: `https://nowpattern.com/en/about/`）
+  2. codeinjection_headからは `<link rel="canonical">` 行を**削除**し、hreflangタグのみ残す
+- **APIスニペット**:
+  ```python
+  api_put(f'pages/{page_id}/', {'pages': [{'id': page_id, 'canonical_url': 'https://nowpattern.com/en/about/', 'updated_at': p['updated_at']}]})
+  ```
+- **重要**: Ghost API PUTは `updated_at` を含めないと 409 Conflict になる。先にGETして最新 `updated_at` を取得すること
+- **教訓**: Ghost EN ページ新設時の標準手順: slug=`en-name`（内部）+ canonical_url=`/en/name/`（API）+ codeinjection_headにはhreflangのみ
+- **影響ページ**: /en/about/ と /en/taxonomy/ — 2026-03-22修正済み
+
+---
+
+### 2026-03-22: Ghost API `.get("field", "")` が None を返す（キーが存在+値がNone）
+
+- **症状**: Ghost Admin API のレスポンスで `post.get("published_at", "")[:10]` が `TypeError: 'NoneType' object is not subscriptable` でクラッシュ
+- **根本原因**: Python の `.get(key, default)` はキーが存在しない場合のみ default を返す。キーが存在して値が `None` の場合は `None` を返す。Ghost は下書き記事の `published_at` をキーは残したまま値を `None` にする
+- **正しい解決策**: `(post.get("published_at") or "")[:10]` を使う。`or ""` はNoneも空文字列も両方カバーする
+- **教訓**: Ghost API のフィールドは「キーあり、値None」という状態がある。`or ""` パターンを常に使う
+- **再発防止**: Ghost API を使うスクリプトでは `p.get("field", "")` → `(p.get("field") or "")` に統一
+
+---
+
+### 2026-03-22: site_health_check.py の VALID_GENRE_SLUGS が旧形式のみ（670件誤FAIL）
+
+- **症状**: `site_health_check.py --quick` が GENRE FAIL 670件を報告するが、実際の記事タグは正常
+- **根本原因**: `VALID_GENRE_SLUGS` に `"geopolitics"` (プレフィックスなし旧形式) のみ登録されていたが、現行記事は `"genre-geopolitics"` (genre-プレフィックス付き新形式) を使用
+- **正しい解決策**: 両形式を VALID_GENRE_SLUGS に含める:
+  ```python
+  VALID_GENRE_SLUGS = {
+      "genre-geopolitics", "genre-finance", ...,  # 現行
+      "geopolitics", "finance", ...,               # 後方互換
+  }
+  ```
+- **教訓**: バリデータを変更したとき、既存データの実際の形式を確認してから更新する
+- **再発防止**: バリデータ修正後は必ず既存記事サンプルのタグ形式を確認してから deploy
+
+---
+
+### 2026-03-22: Ghost ナビゲーション更新は Admin API で 501 → SQLite直接更新が正解
+
+- **症状**: `PUT /ghost/api/admin/settings/` で `{"navigation": [...]}` を送ると `HTTP Error 501: Not Implemented`
+- **根本原因**: Ghost Admin API の `/settings/` エンドポイントはナビゲーション更新を実装していない
+- **正しい解決策**:
+  1. `sqlite3 /var/www/nowpattern/content/data/ghost.db` で `UPDATE settings SET value='[...]' WHERE key='navigation'`
+  2. `systemctl restart ghost-nowpattern` でGhostを再起動
+- **教訓**: CLAUDE.md Known Mistakes に「Ghost Settings API 501 → SQLite直接更新」と記載済みだが、APIを試みてから学ぶという無駄が発生した。次回は最初からSQLiteを使う
+- **Python snippet**:
+  ```python
+  import sqlite3, json
+  conn = sqlite3.connect('/var/www/nowpattern/content/data/ghost.db')
+  new_nav = [{"label": "Nowpattern", "url": "/"}, ...]  # 完全なリスト
+  conn.execute("UPDATE settings SET value=? WHERE key='navigation'", (json.dumps(new_nav),))
+  conn.commit()
+  ```
+
+---
+
+### 2026-03-22: Ghost記事のORACLE STATEMENTアンカーID誤記（np-vote-label vs np-2026-XXXX）
+
+- **症状**: 記事内のORACLE STATEMENTリンクが `#np-vote-label-NP-2026-0019` を使っているが、予測ページの実際のID は `#np-2026-0019`
+- **根本原因**: prediction_page_builder.py の予測カードIDは `id="np-2026-XXXX"` だが、古いバージョンの記事テンプレートが `#np-vote-label-NP-2026-XXXX` を生成していた
+- **正しいアンカー形式**: `nowpattern.com/predictions/#np-2026-0019`（`np-vote-label-` プレフィックスなし）
+- **修正方法**: SQLiteで `posts` テーブルの `html` と `lexical` フィールドを両方更新 → Ghost再起動
+- **教訓**: 記事テンプレートのアンカーID形式が変わったらQAで全既存記事を検査する。`np-vote-label` というIDは存在しない（deleted design）
+
+---
+
+### 2026-03-22: prediction_db の `actual_outcome` フィールドは存在しない（正しくは `outcome`）
+
+- **症状**: DB監査スクリプトで `p.get('actual_outcome')` を使って29件全てNoneと誤判定。「全29件のoutcomeが欠落」という誤ったアラートが出た
+- **根本原因**: prediction_auto_verifier.py が保存するフィールド名は `outcome`。`actual_outcome` というフィールドは存在しない
+- **正しいフィールド名**: `p.get('outcome')` — verifier.py の `pred["outcome"] = judgment["outcome"]` で保存
+- **確認方法**: `python3 -c "import json; db=json.load(open('/opt/shared/scripts/prediction_db.json')); print(sum(1 for p in db['predictions'] if p.get('outcome') is not None))"`
+- **教訓**: フィールド名を仮定してコードを書かない。必ず実際のDBエントリのキー一覧を確認してから使用する
+- **再発防止**: test_brier_score.py の integration tests が `outcome` フィールド存在を毎日確認する
+
+---
+
+### 2026-03-22: evolution_log.json はリスト形式（dictではない）
+
+- **症状**: daily_memory_harvest.py が `'list' object has no attribute 'get'` エラーを出力
+- **根本原因**: evolution_log.json は `list` 型（各エントリがdict）であるが、古いバージョンのharvestスクリプトがdictとして `.get()` を呼び出していた
+- **現在の状態**: daily_memory_harvest.py は既に修正済み（`isinstance(entries, list)` チェック + `entries[-1]` で最新エントリを取得）
+- **evolution_log.json のスキーマ**: `[{'date', 'timestamp', 'analyzed_count', 'new_count', 'avg_brier', 'hit_count', 'miss_count', 'insights_summary', 'action', 'principle'}, ...]`
+- **教訓**: 新規JSONファイルを読み込むコードを書く前に、実際のファイル型（list/dict）をSSHで確認する
+
+---
+
+### 2026-03-22: prediction_page_builder が scenarios=None の予測（新形式）をスキップ
+
+- **症状**: NP-2026-0655〜0814 の162件（新形式予測: `our_pick_prob` + `our_pick` フィールドのみ、`scenarios` フィールドなし）が `/predictions/` および `/en/predictions/` ページに表示されなかった
+- **根本原因**: `build_rows()` 関数内で `scenarios` から `base/opt/pess` を取得し、全て `None` の場合 `continue`（スキップ）していた。新形式予測は `scenarios` を持たないため全件スキップされた
+- **正しい解決策**: `scenarios=None` のとき `our_pick_prob` からフォールバック確率を生成する:
+  ```python
+  if base is None and opt is None and pess is None:
+      _fallback_prob = pred.get("our_pick_prob")
+      if _fallback_prob is not None:
+          base = int(_fallback_prob)
+          if str(pred.get("our_pick","")).upper() == "YES":
+              opt = min(base + 15, 95); pess = max(base - 20, 5)
+          else:
+              opt = max(100 - base - 15, 5); pess = max(100 - base + 20, 5); base = 100 - base
+      else:
+          continue
+  ```
+- **修正**: `/opt/shared/scripts/prediction_page_builder.py` 668-682行目（2026-03-22）
+- **影響範囲**: JA 26件→156件、EN 37件→659件（全DB815件が全表示に）
+- **教訓**: prediction_db.json に新フィールド形式を追加するときは、page_builderのスキップ条件を必ず確認する
+- **再発防止**: `build_rows()` に `our_pick_prob` フォールバックコードを追加済み
+
+---
+
+### 2026-03-22: ORACLE STATEMENTアンカーリンクの大文字小文字不一致
+
+- **症状**: 記事内の `nowpattern.com/predictions/#np-2026-0042`（小文字）リンクがクリックしても /predictions/ ページの該当予測カードにジャンプしなかった
+- **根本原因**: `prediction_page_builder.py` がHTML出力時に `id="{prediction_id}"` を大文字のまま生成（例: `id="NP-2026-0042"`）。一方、ORACLE STATEMENTリンクは小文字アンカー（`#np-2026-0042`）を使用。HTMLのアンカーIDは大文字小文字を区別するため全件リンク切れ
+- **正しい解決策**: アンカーID生成箇所を `{prediction_id.lower()}` に変更（2箇所）:
+  ```python
+  # 変更前（2箇所: 約1743行と2109行）
+  f'<details id="{prediction_id}" ...'
+  # 変更後
+  f'<details id="{prediction_id.lower()}" ...'
+  ```
+- **修正**: `/opt/shared/scripts/prediction_page_builder.py`（2026-03-22）
+- **教訓**: 新しいアンカーリンクを実装するときは、記事テンプレート側（小文字）とHTML生成側（大文字）の一致を必ず確認する。HTMLアンカーIDは大文字小文字を区別する（RFC準拠）
+- **再発防止**: content-rules.md にリンク形式を `#[prediction_id.lower()]` と明記済み
+
+---
+
+### 2026-03-22: Brier Score計算式の方向依存バグ
+
+- **症状**: `our_pick=NO` の予測で Brier Score が過大評価（0.49〜0.98）。avg Brier が 0.4256 と異常に高かった
+- **根本原因**: `prediction_auto_verifier.py` が `our_pick == 'NO'` の場合に確率を反転（`100 - our_pick_prob`）してからBrier計算していた。これは**間違い**。Brier Score の定義は `(P_forecast - outcome)^2` であり、`P_forecast` は**常に P(YES)** を使う。`our_pick` の方向に関わらず `our_pick_prob/100` がそのまま P(YES) を表す
+- **正しい数式（canonical）**: `BS = (our_pick_prob/100 - outcome)^2`
+  - `outcome = 1.0` if hit（YESが的中）
+  - `outcome = 0.0` if miss（YESが外れ）
+  - `our_pick_prob` は**常に P(YES)**（our_pickがNOでも変えない）
+- **修正したファイル**: VPS `/opt/shared/scripts/prediction_auto_verifier.py` — `calc_brier_score()` 関数
+- **修正した予測DB**: NP-2026-0002, 0020, 0021, 0005 のBrier値を直接修正（backup: prediction_db.json.bak-brier-fix-20260322）
+- **修正後のavg Brier**: 0.4256 → 0.1295（GOOD水準）
+- **教訓**: Brier Score は「予測が正しかったか」ではなく「YESの確率がどれだけ正確だったか」を測る。our_pick の方向で確率を反転させるのは絶対禁止
+- **再発防止**: `calc_brier_score()` にコメントを明記済み（2026-03-22）
+
+---
+
+### 2026-03-22: Ghost /p/UUID/ URLが prediction_db.json に混入するバグ
+
+- **症状**: NP-2026-0795〜0808 の12件の `ghost_url` フィールドが `https://nowpattern.com/p/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/` 形式（Ghost内部ドラフトプレビューURL）になっていた。/predictions/ ページのリンクが全てGhost内部URLを指し、読者がアクセスしても「ページが存在しない」または「ドラフト閲覧には管理者権限が必要」エラーになる
+- **根本原因**: 記事がまだDRAFT状態のときに publisher.py が Ghost Admin API から返ってくる内部 `/p/UUID/` URLをそのまま `ghost_url` に保存してしまっていた。公開後のスラッグベースURLに更新されなかった
+- **正しい解決策**:
+  1. Ghost SQLite DB (`ghost.db`) から UUID → slug のマッピングを取得
+  2. `ghost_url` を `https://nowpattern.com/[slug]/`（JA）または `https://nowpattern.com/en/[slug]/`（EN、`en-` プレフィックスを除去）に更新
+- **修正**: VPS Python スクリプトで12件を一括修正（2026-03-22、backup: prediction_db.json.bak-uuid-fix-20260322182912）
+- **注意**: 12件の記事はDRAFT状態のまま。リンクは修正済みだが、記事が公開されるまで外部からアクセス不可
+- **教訓**:
+  - publisher.py は記事公開後に ghost_url を更新するロジックが必要
+  - DRAFT状態のときは ghost_url を空欄にするか、公開後に更新フックを用意する
+  - Ghost の `/p/UUID/` はプレビュー専用。prediction_db には含めない
+- **再発防止**: nowpattern_publisher.py にバリデーション追加済み（2026-03-22）
+  - `status == "draft"` または `"/p/" in url` の場合は `ghost_url` を保存しない
+  - バックアップ: `nowpattern_publisher.py.bak-draft-fix-20260322`
+
+---
+
+### 2026-03-22: ChromaDB長期記憶が28日間停止（2026-02-23〜2026-03-22）
+
+- **症状**: VPS `/opt/shared/memory/entries/` に2026-02-23の1件のみ。セッション記憶が28日間蓄積されていなかった
+- **根本原因**: `memory_system.py` が `import chromadb` を試みるが `chromadb` パッケージがシステムPythonに未インストール。Markdownフォールバックモードには入ったが、ChromaDB vectorデータベースとして機能せず
+- **正しい解決策**:
+  1. `/opt/shared/memory/venv/` に venv作成
+  2. `pip install chromadb==1.5.5` をvenv内にインストール
+  3. `/opt/shared/scripts/memory_store_run.sh` ラッパースクリプトを作成（venv Python経由で実行）
+  4. `/opt/shared/scripts/daily_memory_harvest.py` を作成 + cron追加（毎日 00:00 UTC = 09:00 JST）
+- **修正後**: ChromaDB 7エントリ稼働中。daily_memory_harvest.py が brier_audit + evolution_log + known_mistakes を自動収集
+- **教訓**: 依存パッケージのインストール確認なしでスクリプトをデプロイしない。`memory_system.py` のような依存モジュールは起動時に `import` エラーを Telegram 通知すべき
+- **再発防止**: `daily_memory_harvest.py` cron（0 0 * * *）が毎日ChromaDB更新を確認
+
+---
+
 ### 2026-03-09: subprocess引数へのnull byteでdispatcherクラッシュ
 - **症状**: `ValueError: embedded null byte` — neo_queue_dispatcher.py が3件目の記事で毎回クラッシュ
 - **根本原因**: `subprocess.run(["python3", ..., "--msg", message])` の `message` に `\x00`（null byte）が含まれていた。記事本文/タイトルに混入するケースがある
@@ -1578,6 +1842,9 @@
 
 - **GUARD_PATTERN**: `{"pattern": "requests\\.(get|post|put)\\([^)]*https://nowpattern(?!.*verify=False)", "feedback": "⛔ Ghost CMS APIへのHTTPSリクエストはverify=Falseが必要です。urllib3.disable_warnings()も追加してください", "name": "GHOST_SSL_VERIFY_MISSING"}`
 
+- **GUARD_PATTERN**: `{"pattern": "AGENT_WISDOM.*qualitative|qualitative.*calibrat|calibration.*text.*only|text.*ルール.*機械強制なし", "feedback": "⛔ AGENT_WISDOMへの定性テキスト記録だけでは機械強制になりません。calibration_rules.json（JSON構造化ルール）+ apply_calibration_rules()のコード実装が必要です。学んでいるふりを防いでください。", "name": "CALIBRATION_QUALITATIVE_ONLY"}`
+
+- **GUARD_PATTERN**: `{"pattern": "xmrig|xmrig-restore|/etc/xmrig|systemd-bench", "feedback": "⛔ xmrig Moneroマイナーの痕跡です。VPSへの不正アクセスによるマルウェア。除去には: 1) crontab -l | grep -v xmrig-restore | crontab - 2) rm -rf /etc/xmrig-restore/ 3) rm -f /root/.system-cache/systemd-bench。Naoto承認後に実行してください（Type 1判断）。", "name": "XMRIG_MINER_ARTIFACT"}`
 
 ---
 ## VPS Auto-Collected Errors (from KNOWN_MISTAKES_VPS.md)
@@ -1787,3 +2054,91 @@ Traceback (most recent call last):
   - `prediction_page_builder.py` の build_tracking_rows() に ghost_url 欠損時の `⚠️ NO ARTICLE` 警告を追加
   - `content-rules.md` §12 に `/predictions/` のみのリンクを **❌ 禁止** として明記
   - NEO-ONE/TWO CLAUDE.md に「ORACLE STATEMENT リンクルール」セクションを追加（2026-03-21）
+
+---
+
+### 2026-03-21: calibration_rules.json 未作成でBrier 0.4256（学んでいるふり）
+
+- **症状**: evolution_loop.py が AGENT_WISDOM.md に定性テキストを書くが Brier Score 0.4256 が改善しない。29件中18件外れ。地政学エスカレーション予測が特に過大評価。
+- **根本原因**: qualitative text = LLM reads but can freely ignore。機械強制なし = 学んでいるふり。learning_loop の Stage 4-5（反映・強制）が実装されていなかった。
+- **正しい解決策**:
+  1. `/opt/shared/data/calibration_rules.json` 作成（JSON構造化ルール 5件）
+  2. `prediction_ensemble.py` に `apply_calibration_rules()` を実装して呼び出し
+  3. CR-001: 地政学60%超 → base_rate 8% に40%ブレンド（85%→54%、Brier 0.75→0.30）
+  4. CR-005: [5%, 95%] クリップでBrier=1.0を防止
+- **教訓**: qualitative AGENT_WISDOM ≠ machine enforcement。予測精度ルールは必ずJSONで構造化してコードで呼び出す
+- **再発防止コード**: `/opt/shared/data/calibration_rules.json` + `apply_calibration_rules()` in `prediction_ensemble.py`
+
+---
+
+### 2026-03-21: VPS xmrig Monero マイナー感染（未解決 — Naoto承認待ち）
+
+- **症状**: `/etc/xmrig-restore/` に Monero マイナー。cron に `@reboot sleep 90 && /etc/xmrig-restore/restore.sh` と `*/30 * * * * /etc/xmrig-restore/restore.sh` の永続化エントリ。ロシア語コメント（`# Восстановление системных файлов`）。`/root/.system-cache/systemd-bench` に偽装バイナリ。
+- **根本原因**: VPS への不正アクセス（推定: SSH鍵漏洩または既知脆弱性）
+- **正しい解決策**（Naoto承認後に実行）:
+  1. `crontab -l | grep -v xmrig-restore | crontab -`
+  2. `rm -rf /etc/xmrig-restore/`
+  3. `rm -f /root/.system-cache/systemd-bench`
+  4. `lastb` / `/var/log/auth.log` で侵入経路確認
+  5. `ufw status verbose` でファイアウォール再確認
+- **教訓**: 定期的に `crontab -l` と `ps auxf` でプロセスを確認。`systemd-bench` という名前は偽装の典型パターン。
+- **再発防止コード**: `service_watchdog.py` に CPU使用率 > 80% アラートを追加検討（J10候補）
+
+---
+
+### 2026-03-21: Telegram を承認UIとして扱い、会話内確認をスキップした
+
+- **症状**: xmrig除去（非可逆・セキュリティ操作）をこの会話で確認せず、Telegramに通知を送って「完了」とみなした
+- **直接原因**: 意思決定チャネル（この会話）と補助通知チャネル（Telegram）の区別が曖昧だった
+- **構造原因**: pending_approvals.json へのエンキューや Telegram 送信が「処理完了」に見える運用になっていた
+- **正しい解決策**: 非可逆・高リスク・セキュリティ操作は、Telegramより先にこの会話で「何をするか / なぜ必要か / リスク / 推奨 / 実行コマンド」を提示してから確認を取る
+- **教訓**: Telegram に送ったことは完了ではない。Naotoが判断できる場（この会話）で先に提案することが必須
+- **再発防止**: CLAUDE.md に「意思決定チャネルルール」を追加（2026-03-21）
+
+---
+
+### 2026-03-22: Binary Brier Score 計算式の根本バグ（NOピック全件誤算）
+
+- **症状**: 的中したNO予測（例: 確率6%でNO → 結果NO）のBrier Scoreが `0.8836` と異常に高い（最悪値に近い）。実際は `0.0036` が正解
+- **根本原因**: `prediction_auto_verifier.py` の `_actual` 計算が `outcome == our_pick` の一致チェックを使っていた。バイナリBrier Scoreの `actual` は「YESが起きたかどうか（0/1）」であり、「ピックが合っていたかどうか」ではない
+  - 旧（誤）: `_actual = 1.0 if str(judgment["outcome"]).upper() == str(pred.get("our_pick", "")).upper() else 0.0`
+  - 新（正）: `_actual = 1.0 if str(judgment["outcome"]).upper() == "YES" else 0.0`
+- **影響**: NOピックかつ resolved な全予測が誤算。Case A（正解NOピック）はBrierが過大評価、Case B（外れNOピック）は過小評価。全体avg Brier: 0.4256 → 0.0939（77.9%改善）
+- **正しい解決策**: `_fix_brier_formula.py` を VPS で実行 → verifier を修正 + 11件の既存スコアを再計算
+- **教訓**: バイナリBrier Scoreの定義: `BS = (p - a)^2` where `a = 1 if outcome==YES else 0`、`p = prob_YES`。ourPickではなくoutcomeのYES/NOで判定する。NOピックの場合 `p = 1 - our_pick_prob/100`（YESの確率）
+- **再発防止コード**: `prediction_auto_verifier.py` に YES/NO単体テストを追加すべき。Brier=1.0 or Brier>0.5を自動フラグする audit を `reader_prediction_api.py` に追加
+
+---
+
+### 2026-03-22: OAuthトークン失効 → NEO 9時間全停止（1日記事0本）
+
+- **症状**: 2026-03-22 04:00〜12:00 JST の9時間、`neo-token-watchdog.py` が TOKEN_EXPIRED を連続記録。NEO generator の全バッチ（02:30, 05:30, 08:30, 11:30）が Claude exit code 1 で失敗。1日0本の完全生産停止
+- **根本原因**: SCPによるOAuthトークン同期（Windows→VPS、4時間ごと）が 00:00 sync後に失効し、次の sync（04:00）が token renewal より先に token expired になった。SCP自体は動いていたが、コピー元のトークンが既に古かった可能性が高い
+- **直接原因**: Claude Max のトークンは定期的に失効する。ローカルPC側でも Claude Code が起動していないとトークンが更新されない
+- **正しい解決策**: 13:00のSCP sync後に token OK 確認。17:30バッチから自動回復
+- **教訓**: トークン同期は「ファイルをコピー」するだけで、トークン更新を保証しない。ローカルPCのClaude Codeが起動していないとトークンが古くなる
+- **再発防止コード**: `neo-token-watchdog.py` に「TOKEN_EXPIRED 3回連続 → Telegram即時アラート + 次バッチをスキップ」機能追加。失効パターン検知時は 10:00 以降の SCP を強制実行するよう Windows スケジューラを調整
+
+---
+
+### 2026-03-22: prediction_db UUID ghost_url — Ghostドラフト記事のUUIDが404になる
+
+- **症状**: 264件の予測に `ghost_url` が `https://nowpattern.com/en/40526c48-100d-47d3-9b61-6965fe66e04d/` のようなUUID形式で設定されており、全件404。予測ページの「記事リンク」が機能しない
+- **根本原因**: 予測作成スクリプトがGhostの内部 `uuid` フィールド（`40526c48-...`形式）を使ってURLを生成していた。正しいURLはGhostの `slug` フィールドをベースに `/[slug]/` または `/en/[slug-without-en-prefix]/` とすべきだった
+- **構造原因**: 問題の264記事がすべて **draft状態**のため、修正スクリプトが `WHERE status='published'` でフィルタして全件スキップしていた（v1〜v3の修正スクリプトが失敗した理由）
+- **正しい解決策**: `SELECT uuid, slug FROM posts WHERE type='post'`（status filterなし）でインデックスを作成し、draft含む全記事のUUID→slugマッピングを取得して修正
+- **影響**: 264件 修正完了 → `prediction_db.json` の `ghost_url` がslugベースURLに更新済み（2026-03-22）
+- **教訓**: Ghost DBの `uuid` フィールドはAPIのIDとは別物。公開URLに使えるのは `slug` のみ。また `status='published'` フィルタは予測と記事のライフサイクルが異なる場合（記事はdraft、予測はopen）に失敗する
+- **再発防止コード**: 予測作成時の `ghost_url` は必ず `slug` をベースに生成すること。UUID形式URLは使わない。修正スクリプト: `/opt/shared/scripts/fix_uuid_v4.py`
+
+---
+
+### 2026-03-22: _validate_market_consensus が日英混在で誤警告（MISMATCH false positive）
+
+- **症状**: NP-2026-0017 に `⚠️ WARNING: market_consensus MISMATCH` が出るが、予測（ロシア・ウクライナ停戦交渉）とPolymarketマーケット（Russia x Ukraine ceasefire by end of 2026?）は実際には一致している
+- **根本原因**: `_validate_market_consensus()` がキーワードの「重複」でトピック一致を判定する。日本語タイトル（`ウクライナ・ロシア停戦交渉`）の抽出キーワードと英語マーケット質問（`russia ukraine ceasefire`）の抽出キーワードは文字コード体系が異なるため、意味が同じでも重複ゼロになる
+- **正しい解決策**: topic_kw が全CJK（ASCII英字なし）かつ mc_kw が全ASCII（CJKなし）の場合、言語が違うので比較不可能 → 警告をスキップ（`topic_has_ascii != mc_has_ascii` チェックを追加）
+- **教訓**: 多言語システムでのキーワードマッチングは、文字コード体系の違いを先にチェックすること。同じ意味でも言語が違えば重複ゼロになる
+- **再発防止コード**: `prediction_page_builder.py:_validate_market_consensus()` に cross-language スキップ条件を追加済み（2026-03-22）
+
+---

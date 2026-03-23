@@ -169,8 +169,11 @@ Nowpatternの予測: [our_pick] — [our_pick_prob]%確率
 | `prediction_id` | prediction_db の `prediction_id`（例: NP-2026-0042） |
 
 **⚠️ 必須ルール（このルールを破ると読者が迷子になる）:**
-- リンクは必ず `nowpattern.com/predictions/#[prediction_id]` の形式にする
-- `prediction_id` は prediction_db.json の該当エントリから取得（例: `NP-2026-0042`）
+- リンクは必ず `nowpattern.com/predictions/#[prediction_id_lowercase]` の形式にする
+- `prediction_id` は **必ず小文字** に変換してアンカーIDとして使う（ページHTML側が `.lower()` でID生成するため）
+  - DBの値: `NP-2026-0042` → リンクで使う値: `np-2026-0042`（小文字）
+  - ✅ 正: `nowpattern.com/predictions/#np-2026-0042`
+  - ❌ 誤: `nowpattern.com/predictions/#NP-2026-0042`（大文字はアンカー不一致で404）
 - ❌ 禁止: `nowpattern.com/predictions/` のみ（ページトップに飛ぶだけで何も見つからない）
 - ❌ 禁止: `prediction_id` を省略または推測で書く
 
