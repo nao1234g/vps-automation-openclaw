@@ -55,9 +55,26 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Claude Code
+# Claude Code — internal state (ZONE 0: ULTRA PRIVATE)
 .claude/projects/
 .claude/hooks/state/
+.claude/memory/
+.claude/state/
+.claude/plans/
+
+# ZONE 0: Secrets & Credentials (never commit)
+secrets.txt
+*.credentials.json
+**/credentials.json
+*private_key*
+*.pem
+*.key
+
+# ZONE 1: Founder / Strategy / Private reasoning (never in public repo)
+founder_memory/
+brainstorm/
+decisions/
+intelligence/
 
 # Logs
 *.log

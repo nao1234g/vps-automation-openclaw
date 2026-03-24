@@ -1,0 +1,37 @@
+# .claudeignore — Claude Code がコンテキストに読み込まないファイル
+# 目的: ZONE 0/1 のプライベートデータを Claude の awareness から除外
+# 参照: docs/PRIVACY_POLICY.md
+#
+# NOTE: これは Claude Code 公式機能。.gitignore と同構文。
+# Claude Code はこれらのファイルを Read/Write/Edit ツールで開けなくなる。
+
+# ── ZONE 0: ULTRA PRIVATE（絶対に AI に読ませない） ──
+secrets.txt
+*.credentials.json
+**/credentials.json
+*private_key*
+*.pem
+*.key
+.env
+.env.local
+.env.*.local
+
+# ── ZONE 1: Founder / Strategy / Private reasoning ──
+founder_memory/
+brainstorm/
+decisions/
+intelligence/
+
+# ── Claude internal state（セッション間で共有すべきでない） ──
+.claude/projects/
+.claude/plans/
+# NOTE: .claude/memory/ と .claude/state/ は Claude Code 自身が管理するため除外しない
+# NOTE: .claude/rules/ は CLAUDE.md の @import で必要なため除外しない
+
+# ── バイナリ / 大容量ファイル（コンテキスト汚染防止） ──
+*.sqlite3
+*.db
+*.tar.gz
+*.sql.gz
+volumes/
+backups/
