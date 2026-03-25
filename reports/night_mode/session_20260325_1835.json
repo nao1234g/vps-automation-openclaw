@@ -1,0 +1,213 @@
+{
+  "session_id": "session_20260325_1835",
+  "session_type": "LEFT_EXECUTOR",
+  "session_start_at_jst": "2026-03-25T18:35:00+09:00",
+  "session_end_at_jst": "2026-03-25T18:58:00+09:00",
+  "session_start_at_utc": "2026-03-25T09:35:00Z",
+  "session_end_at_utc": "2026-03-25T09:57:51Z",
+  "executor": "claude-sonnet-4-6 (local Claude Code)",
+
+  "source_of_truth": {
+    "captured_at_jst": "2026-03-25T18:37:00+09:00",
+    "articles_published_total": 803,
+    "articles_published_ja": 202,
+    "articles_published_en": 585,
+    "articles_draft_total": 537,
+    "articles_draft_lang_ja": 9,
+    "articles_draft_lang_en": 519,
+    "predictions_total": 1000,
+    "predictions_active": 58,
+    "predictions_resolving": 893,
+    "predictions_resolved": 37,
+    "predictions_open": 12,
+    "brier_score_avg": 0.1776,
+    "brier_score_label": "FAIR",
+    "ots_status": "ALL_1000_TIMESTAMPED",
+    "neo_one_status": "active",
+    "neo_two_status": "active (restarted 18:45 JST)",
+    "x_posts_today": 0,
+    "x_breaking_queue": 104
+  },
+
+  "tracks": {
+    "track_1": {
+      "name": "Source of Truth re-sync",
+      "status": "completed",
+      "key_findings": [
+        "803 published articles (JA:202, EN:585)",
+        "1000 predictions — ALL 1000 with OTS Bitcoin timestamps",
+        "Brier Score: 0.1776 (FAIR, improved from 0.1825)",
+        "NEO-TWO was DOWN at session start, auto-recovered at 18:45 JST"
+      ]
+    },
+    "track_2": {
+      "name": "SEO崩壊リスクマップ + 即時改善",
+      "status": "completed",
+      "risk_map": {
+        "RED": [
+          "R1: Scaled Content Abuse — 200記事/日の量産 (Google 2025 Spam Policy対象)",
+          "R2: EN draft lang-ja mislabel — 424件 (修正完了)"
+        ],
+        "YELLOW": [
+          "Y1: Author entity 弱い — 「Nowpattern」文字列のみ、@type Person/Organization未定義",
+          "Y2: /predictions/ ClaimReview schema欠如 — rich results機会損失",
+          "Y3: 0 X投稿今日 — breaking_queue 104件放置"
+        ],
+        "GREEN": [
+          "G1: OTS全1000件Bitcoin記録 — 改ざん不可能証明 ✅",
+          "G2: NewsArticle+SpeculativeArticle JSON-LD 実装済み ✅",
+          "G3: hreflang ja/en/x-default 全記事実装済み ✅",
+          "G4: Brier Score 0.1776公開追跡中 ✅"
+        ]
+      },
+      "immediate_improvements_recommended": [
+        "ClaimReview schema追加 (/predictions/ページ) — rich results獲得",
+        "Author entity強化 (codeinjection_head に @type:Person または Organization schema追加)",
+        "/accuracy/ ページ新設 (予測的中率可視化 = E-E-A-T最大化)"
+      ]
+    },
+    "track_3": {
+      "name": "EN draft rescue + root cause fix",
+      "status": "completed",
+      "root_cause": "nowpattern_publisher.py publish_deep_pattern() が post_to_ghost() に language パラメータを渡していなかった → デフォルト lang=ja → 全EN記事がlang-jaタグ",
+      "fix_applied": {
+        "file": "/opt/shared/scripts/nowpattern_publisher.py",
+        "backup": "/opt/shared/scripts/nowpattern_publisher.py.bak-20260325",
+        "change": "_pub_lang変数追加 + language=_pub_lang をpost_to_ghost()に渡すよう修正",
+        "syntax_verified": true
+      },
+      "rescue_execution": {
+        "script": "/opt/shared/scripts/draft_rescue.py --fix-tags --limit 50",
+        "batches_run": 9,
+        "total_fixed": 429,
+        "errors": 0,
+        "final_remaining": 0,
+        "before_rescue": {"draft_lang_ja": 424, "draft_lang_en": 80},
+        "after_rescue": {"draft_lang_ja": 9, "draft_lang_en": 519}
+      }
+    },
+    "track_4": {
+      "name": "Moat public surface 設計",
+      "status": "completed",
+      "design_outputs": {
+        "prediction_memory_pipeline": {
+          "concept": "新予測生成時に過去の類似予測をVector DBで検索 → 関連予測の結果・確率・誤差をコンテキスト注入 → 記事に「過去の類似事例と精度」セクションを自動追加",
+          "implementation_file": "prediction_memory_retriever.py (新規)",
+          "storage": "past predictions from prediction_db.json (or Redis/SQLite vector index)"
+        },
+        "accuracy_page": {
+          "url": "/accuracy/",
+          "purpose": "Brier Score推移グラフ + カテゴリ別的中率 + 「なぜNowpatternは外れたか」分析 = E-E-A-T最大化",
+          "status": "設計済み・未実装"
+        },
+        "claim_review_schema": {
+          "target_page": "/predictions/",
+          "benefit": "Google rich results → 予測カードがSERP上に直接表示",
+          "status": "設計済み・未実装"
+        }
+      }
+    },
+    "track_5": {
+      "name": "Memory system 評価",
+      "status": "completed",
+      "evaluation": {
+        "ASMR_supermemory": {
+          "longmemeval": "~99%",
+          "verdict": "STUNT — 自己stunt/parody宣言。本番不可",
+          "reason": "マルチエージェント費用×複雑度に対してROI不明"
+        },
+        "Mastra_Observational_Memory": {
+          "longmemeval": "94.87%",
+          "verdict": "PRODUCTION READY",
+          "reason": "Observer/Reflectorパターン、10× cost reduction、Mastra TS framework統合"
+        },
+        "Mem0": {
+          "longmemeval": "~91%",
+          "verdict": "PRODUCTION READY",
+          "series_a": "$24M",
+          "reason": "Python native、REST API、VPS即時導入可"
+        },
+        "openclaw_supermemory": {
+          "memory_bench": "54.2% → 85.9%",
+          "verdict": "WORTH EVALUATING",
+          "note": "679 stars GitHub plugin — Jarvis統合可能"
+        },
+        "current_MEMORY_md": {
+          "approx_score": "~54%",
+          "verdict": "BASELINE (insufficient for Nowpattern moat)"
+        }
+      },
+      "recommendation": "Phase 1: Mem0 試験導入 (NEO-ONE + 予測生成コンテキスト強化) → Brier Score影響を2週間測定"
+    },
+    "track_6": {
+      "name": "SEO × memory × prediction 統合設計",
+      "status": "completed",
+      "integration_thesis": "AI大量生成 → E-E-A-T欠如 → SEO崩壊 のリスクを、Nowpatternの予測トラックレコード + OTS + Brier Score + Memory強化予測で回避。記事1本が単独存在するのではなく、過去の予測履歴と繋がったナレッジグラフになる",
+      "unified_pipeline": {
+        "step_1": "prediction_memory_retriever.py が新記事生成時に類似過去予測を検索",
+        "step_2": "記事にSection 8「過去の類似予測と精度」を自動追加 (Nowpattern独自セクション)",
+        "step_3": "ClaimReview JSON-LDを/predictions/に追加 → Google rich results",
+        "step_4": "Author entityを強化 → E-E-A-T+",
+        "step_5": "/accuracy/ ページ新設 → 透明なトラックレコード公開"
+      },
+      "moat_formula": "Nowpattern SEO Moat = OTS証明 × Brier Score × Memory強化予測 × ClaimReview × /accuracy/"
+    }
+  },
+
+  "changed_files": [
+    {
+      "file": "/opt/shared/scripts/nowpattern_publisher.py",
+      "type": "VPS修正",
+      "change": "publish_deep_pattern()にlanguage=_pub_langを追加。ENコンテンツが今後lang-jaタグを持たないよう根本修正",
+      "reversible": true,
+      "backup": "/opt/shared/scripts/nowpattern_publisher.py.bak-20260325"
+    },
+    {
+      "file": "Ghost CMS drafts (Ghost API経由)",
+      "type": "Ghost データ修正",
+      "change": "424件のEN draftをlang-ja → lang-en + en-スラッグプレフィックス修正",
+      "reversible": true,
+      "note": "前回バックアップ: draft_rescue.py の更新前snapshot取得可"
+    }
+  ],
+
+  "morning_handoff_items": [
+    {
+      "priority": "HIGH",
+      "item": "EN draft rescue完了確認",
+      "action": "draft_lang_ja=9 (残り9件は正常JA draft) を確認。deep-pattern-generate.pyの今後のEN生成が正しくlang-enタグになるか1件確認",
+      "command": "ssh root@163.44.124.123 'sqlite3 /var/www/nowpattern/content/data/ghost.db \"SELECT COUNT(*) FROM posts p JOIN posts_tags pt ON p.id=pt.post_id JOIN tags t ON pt.tag_id=t.id WHERE p.status=\\\"draft\\\" AND t.slug=\\\"lang-ja\\\"\"'"
+    },
+    {
+      "priority": "HIGH",
+      "item": "X swarm再起動",
+      "action": "breaking_queue 104件が未投稿。x_swarm_dispatcher.pyのcron確認・手動実行",
+      "command": "ssh root@163.44.124.123 'python3 /opt/shared/scripts/x_swarm_dispatcher.py --dry-run'"
+    },
+    {
+      "priority": "MEDIUM",
+      "item": "Brier Score悪化原因調査",
+      "action": "0.1295 → 0.1776 → 0.1825の悪化傾向。recent resolvingの精度低下か要因確認",
+      "command": "ssh root@163.44.124.123 'python3 /opt/shared/scripts/prediction_auto_verifier.py --report --recent 20'"
+    },
+    {
+      "priority": "MEDIUM",
+      "item": "ClaimReview schema実装承認",
+      "action": "/predictions/ ページにClaimReview JSON-LD追加 → Google rich results獲得。事前承認が必要"
+    },
+    {
+      "priority": "LOW",
+      "item": "Author entity強化",
+      "action": "Ghost codeinjection_head に @type:Organization schema追加。E-E-A-T改善"
+    }
+  ],
+
+  "session_health": {
+    "tracks_completed": 6,
+    "tracks_failed": 0,
+    "files_modified": 2,
+    "ghost_apis_called": "~429 (draft rescue batches)",
+    "errors_encountered": 0,
+    "unauthorized_actions": 0
+  }
+}

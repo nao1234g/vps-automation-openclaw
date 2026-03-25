@@ -124,6 +124,82 @@ bash scripts/night-mode-off.sh
 
 ---
 
+## Night Mode タイミング設計（標準パターン）
+
+### 推奨スケジュール
+
+| フェーズ | 時刻 | 内容 |
+|----------|------|------|
+| **就寝前 (Day 0)** | 23:00〜24:00 JST | Night Mode ON + タスク指示入力 |
+| **夜間実行** | 00:00〜06:00 JST | Claude Code 自律実行（NEO も並行稼働） |
+| **朝起床後** | 07:00〜08:00 JST | Night Mode OFF + 引き継ぎレポート確認 |
+
+### セッションタイミング記録フォーマット
+
+引き継ぎレポートに必ず記載:
+
+```
+## セッションタイミング
+- 開始: YYYY-MM-DD HH:MM JST
+- 終了: YYYY-MM-DD HH:MM JST
+- 経過: N時間M分
+- チェックポイント:
+  - HH:MM Track A 完了
+  - HH:MM Track B 完了
+  - HH:MM Track C 完了
+```
+
+### Night Mode の期待値
+
+| 項目 | 目安 |
+|------|------|
+| 1 Track あたりの所要時間 | 30〜60分 |
+| 5 Track セッション | 4〜6時間 |
+| 最大 safe publish 件数 | 10件（承認待ち） |
+| VPS 構造変更 | 禁止（朝承認後） |
+
+---
+
+## Morning Handoff 標準フォーマット
+
+ファイル名: `docs/MORNING_HANDOFF_YYYY-MM-DD.md`
+
+### 必須セクション構成
+
+```markdown
+# Morning Handoff — YYYY-MM-DD
+
+## セッションタイミング
+[上記フォーマット]
+
+## 完了サマリー（1行/Track）
+- Track A: ✅ 何をした
+- Track B: ✅ 何をした（何件）
+- Track C: ✅ 何を調査し何を発見した
+- Track D: ✅ 何を作成した
+- Track E: ✅ 何を確認した
+
+## 朝の必須アクション（優先順）
+1. **[RED: 即実行]** 何をする
+2. **[ORANGE: 今日中]** 何をする
+3. **[GREEN: 任意]** 何をする
+
+## 承認待ち事項
+| 操作 | 件数 | リスク | コマンド |
+|------|------|--------|---------|
+| EN draft publish | N件 | LOW | `python3 ... --fix-tags --limit 50` |
+
+## 発見した問題
+| 問題 | 深刻度 | 解決方法 |
+|------|--------|---------|
+| 問題内容 | HIGH/MID/LOW | 解決策 |
+
+## 変更したファイル
+- path/to/file.py: 何をした
+```
+
+---
+
 ## Night Mode 成果物の標準構成
 
 | ファイル | 内容 |

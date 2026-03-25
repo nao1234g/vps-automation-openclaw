@@ -128,7 +128,10 @@
       "WebFetch(domain:www.gtechme.com)",
       "WebFetch(domain:www.ulpa.jp)",
       "WebFetch(domain:llmstxt.org)",
-      "WebFetch"
+      "mcp__claude-peers__set_summary",
+      "mcp__claude-peers__list_peers",
+      "mcp__claude-peers__send_message",
+      "mcp__claude-peers__check_messages"
     ],
     "deny": [
       "Read(**/.env)",
@@ -148,7 +151,8 @@
       "\\tmp",
       "c:\\tmp",
       "C:\\Users\\user\\AppData\\Roaming\\Code\\User",
-      "c:\\Users\\user\\OneDrive\\デスクトップ\\naoto-os"
+      "c:\\Users\\user\\OneDrive\\デスクトップ\\naoto-os",
+      "C:\\Users\\user\\claude-peers-mcp"
     ]
   },
   "model": "claude-opus-4-6",
@@ -358,7 +362,7 @@
           {
             "type": "command",
             "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/vps-health-gate.py\" \"$CLAUDE_PROJECT_DIR\"",
-            "timeout": 60
+            "timeout": 30
           }
         ]
       },

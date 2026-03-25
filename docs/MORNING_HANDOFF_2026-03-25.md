@@ -5,6 +5,45 @@
 
 ---
 
+## ⚡ UPDATE: 2026-03-25 08:30 JST — Track A-E 再確認セッション完了
+
+> 02:00以降に追加セッション（Track A-E 5トラック）を実行。以下のデータを更新・訂正しました。
+
+### 訂正データ
+
+| 項目 | 前回値（02:00） | 訂正値（08:30） | 備考 |
+|------|--------------|--------------|------|
+| prediction_db件数 | 956件 | **982件** | NEOが+26件追加 |
+| Brier Score | 0.1295（GOOD） | **0.1825（FAIR）** | ⚠️ 悪化 — 要調査 |
+| Mislabeled EN draft | 400件 | **424件** | SQLite実測値（Ghost API誤差） |
+| Note queue | DEGRADED（Cookies問題） | **EMPTY（0件）** | キューに投稿待ちコンテンツ自体がない |
+| X breaking_queue | 未確認 | **5件のみ（全2月21日）** | ⚠️ 新記事が入っていない — 枯渇 |
+| Pilot修正完了 | 0件 | **10件修正済み（FIXED:10 Errors:0）** | 残414件が承認待ち |
+
+### 追加発見: X投稿パイプライン コンテンツ枯渇
+
+`nowpattern-deep-pattern-generate.py`が記事を生成しても`breaking_queue.json`に追加されていない。
+Xへの投稿が実質的に古いコンテンツのリサイクルになっている（または0投稿）。
+
+### Track A-E 完了サマリー
+
+- Track A: ✅ MEMORY.md をVPS実態データで更新（published 776、Brier 0.1825等）
+- Track B: ✅ dry-run 424件全件確認 + pilot 10件修正（FIXED:10, Errors:0, Remaining:414）
+- Track C: ✅ パイプライン全体ヘルスチェック（X枯渇・note空・記事生成OK・予測OK）
+- Track D: ✅ NIGHT_MODE_OPS.md timing/handoff/期待値テーブル追加
+- Track E: ✅ プライバシー境界クリーン（漏洩なし、gitignore正常、pre-commitフック確認）
+
+### 朝の優先アクション（訂正版）
+
+1. **[RED]** EN draft 414件のtag修正承認 → `python3 /opt/shared/scripts/draft_rescue.py --fix-tags --limit 50` × 9回
+2. **[RED]** X breaking_queue.json コンテンツ枯渇の修正判断（generator→queue連携追加）
+3. **[ORANGE]** deep-pattern-generate.py がEN draftをlang-jaで作り続ける根本修正
+4. **[ORANGE]** Brier Score 0.1295→0.1825 悪化の原因調査
+
+---
+
+---
+
 ## 1. Executive Summary（30秒で読む）
 
 **5トラック中5トラック完了。** 主な成果:
