@@ -1,5 +1,4 @@
 {
-  "defaultMode": "acceptEdits",
   "permissions": {
     "allow": [
       "Read(**)",
@@ -7,7 +6,11 @@
       "Grep(**)",
       "WebSearch",
       "TodoWrite",
-      "TodoRead"
+      "TodoRead",
+      "mcp__claude-peers__set_summary",
+      "Bash(# Check:*)",
+      "Bash(/c/tmp/check_hooks.py:*)",
+      "Bash(\"/c/Program Files/Python312/python.exe\" /c/tmp/check_hooks.py)"
     ],
     "deny": [
       "Bash(* rm -rf /*)",
@@ -25,5 +28,6 @@
       "Read(**/*.pem)",
       "Read(**/*.key)"
     ]
-  }
+  },
+  "defaultMode": "acceptEdits"
 }

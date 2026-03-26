@@ -19,6 +19,19 @@ SCORECARD = PROJECT_DIR / ".claude" / "SCORECARD.md"
 
 STATE_DIR.mkdir(parents=True, exist_ok=True)
 
+# Atomic write utility
+try:
+    sys.path.insert(0, str(PROJECT_DIR / ".claude" / "hooks"))
+    from _state_utils import safe_read_json, safe_write_json
+except ImportError:
+    def safe_read_json(path, default=None):
+        try:
+            return json.loads(path.read_text(encoding="utf-8")) if path.exists() else (default or {})
+        except Exception:
+            return default or {}
+    def safe_write_json(path, data, indent=None):
+        path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+
 # ── 禁止用語リスト（AGENT_KNOWLEDGE.mdの「存在しないもの」と同期） ──
 BANNED_TERMS = [
     "@aisaintel",
@@ -41,18 +54,13 @@ tool_name = data.get("tool_name", "")
 tool_input = data.get("tool_input", {})
 
 # Load state
-state = {"research_done": False, "search_count": 0, "errors": [], "task_started": False}
-if STATE_FILE.exists():
-    try:
-        state = json.loads(STATE_FILE.read_text())
-    except Exception:
-        pass
+state = safe_read_json(STATE_FILE, default={"research_done": False, "search_count": 0, "errors": [], "task_started": False})
 
 # ── Track research: WebSearch/WebFetch ──
 if tool_name in ("WebSearch", "WebFetch"):
     state["research_done"] = True
     state["search_count"] = state.get("search_count", 0) + 1
-    STATE_FILE.write_text(json.dumps(state))
+    safe_write_json(STATE_FILE, state)
     sys.exit(0)
 
 # ── Track research: Read operations (5+ reads = context understood) ──
@@ -66,7 +74,7 @@ if tool_name == "Read":
         state["read_count"] = read_count
         if read_count >= 5:
             state["research_done"] = True  # 5+ file reads = context understood
-    STATE_FILE.write_text(json.dumps(state))
+    safe_write_json(STATE_FILE, state)
     sys.exit(0)
 
 # ── Write/Edit/Bash: 禁止用語チェック（ブロック） ──
@@ -108,7 +116,7 @@ if tool_name in ("Edit", "Write", "Bash"):
         if is_new_code or is_large_edit:
             state["task_started"] = True
             state["started_without_research"] = True
-            STATE_FILE.write_text(json.dumps(state))
+            safe_write_json(STATE_FILE, state)
             msg = (
                 "🚫 BLOCKED: 新規コード作成・大規模編集にはリサーチが必要です。\n"
                 "OPERATING_PRINCIPLES原則 (P↑): 実装前に実装例を検索すること。\n"
@@ -129,7 +137,7 @@ if tool_name in ("Edit", "Write", "Bash"):
         if not plan_created:
             state["task_started"] = True
             state["started_without_plan"] = True
-            STATE_FILE.write_text(json.dumps(state))
+            safe_write_json(STATE_FILE, state)
             msg = (
                 "🚫 BLOCKED: 新規コードファイルの作成前にTodoWriteでタスク計画が必要です。\n"
                 "→ まず TodoWrite ツールで「やること」を箇条書きにしてください。\n"
@@ -143,12 +151,12 @@ if tool_name in ("Edit", "Write", "Bash"):
             # 小規模編集・設定変更 → 警告のみ（止めない）
             state["task_started"] = True
             state["started_without_research"] = True
-            STATE_FILE.write_text(json.dumps(state))
+            safe_write_json(STATE_FILE, state)
             print("⚠️  WARNING: リサーチなしでファイルを編集しています（小規模編集のため許可）。")
             print("KNOWN_MISTAKES.md を確認しましたか？WebSearchで解決策を探しましたか？")
     else:
         state["task_started"] = True
-        STATE_FILE.write_text(json.dumps(state))
+        safe_write_json(STATE_FILE, state)
 
     # ── UI変更検出: ui_task_pending を設定（要件1 + 要件2の前提） ─────────────────
     # CSS/.html/.hbs ファイル編集、または Ghost codeinjection 変更を検出
@@ -165,10 +173,7 @@ if tool_name in ("Edit", "Write", "Bash"):
 
     if _ui_file or _ui_bash:
         # 要件1: TodoWrite でテスト計画がない場合はブロック
-        try:
-            state = json.loads(STATE_FILE.read_text()) if STATE_FILE.exists() else state
-        except Exception:
-            pass
+        state = safe_read_json(STATE_FILE, default=state)
         plan_ok = state.get("plan_created", False)
         if not plan_ok:
             msg = (
@@ -209,6 +214,6 @@ if tool_name in ("Edit", "Write", "Bash"):
         # 計画あり・ベースラインあり → UI作業中フラグON
         state["ui_task_pending"] = True
         state["ui_approved"] = False
-        STATE_FILE.write_text(json.dumps(state))
+        safe_write_json(STATE_FILE, state)
 
 sys.exit(0)

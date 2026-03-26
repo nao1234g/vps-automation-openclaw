@@ -128,4 +128,42 @@ ssh root@163.44.124.123 "python3 /opt/shared/scripts/nowpattern-deep-pattern-gen
 
 ---
 
+## ✅ 追加実装完了（SEO監査セッション — 09:xx JST）
+
+### SEO 監査 + 修正（3件完了）
+
+| 修正 | 詳細 | 検証 |
+|------|------|------|
+| **Fix 1**: `/tag/genre-*` noindex 化 | Caddyfile Guard 1 拡張 | `X-Robots-Tag: noindex, follow` ✅ |
+| **Fix 2**: 全記事 hreflang 一括注入 | `a4-hreflang-injector.py --lang=all` | **1326/1342 記事完了**（エラー: 0） |
+| **Fix 3**: ホームページ hreflang | Caddy `handle /` / `handle /en/` ブロック | `Link: ... hreflang=ja ...` ✅ |
+
+**hreflang 注入の内訳**:
+- JA-EN ペアリング済み: 約617記事
+- EN ソロ（JA対訳なし）: 約494記事
+- `__GHOST_URL__` プレースホルダー使用でドメインハードコードなし
+
+### SEO 監査ドキュメント（7件作成 → `docs/seo_audit/`）
+
+| ファイル | 内容 |
+|----------|------|
+| `implemented_low_risk_fixes.md` | 3修正の詳細記録 |
+| `indexing_crawl_diagnosis.md` | クロールバジェット診断 |
+| `hreflang_architecture.md` | 3層 hreflang 設計書 |
+| `quality_and_trust_risk_map.md` | P0〜P4 リスクマトリクス |
+| `search_console_current_state_report.md` | GSC 確認ガイド |
+| `template_level_prevention_plan.md` | 再発防止策・SEO ゲート提案 |
+| `final_priority_recommendations.md` | 優先度別推奨アクション |
+
+### Naoto が今日確認すべきこと
+
+1. **xmrig 除去確認（P0）**: `ps aux | grep xmrig` — なければ安全
+2. **Google Safe Browsing 確認**: `https://transparencyreport.google.com/safe-browsing/search?url=nowpattern.com`
+3. **GSC 国際ターゲティング**: hreflang エラー数確認（1〜2週間後に反映）
+
+詳細: [docs/seo_audit/final_priority_recommendations.md](seo_audit/final_priority_recommendations.md)
+
+---
+
 *LEFT_EXECUTOR Night Mode — 2026-03-26 05:09 JST*
+*SEO Audit Session — 2026-03-26 09:xx JST*

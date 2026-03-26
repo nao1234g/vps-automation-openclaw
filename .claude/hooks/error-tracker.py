@@ -18,6 +18,19 @@ from pathlib import Path
 PROJECT_DIR = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(".")
 STATE_DIR = PROJECT_DIR / ".claude" / "hooks" / "state"
 STATE_FILE = STATE_DIR / "session.json"
+
+# Atomic write utility
+try:
+    sys.path.insert(0, str(PROJECT_DIR / ".claude" / "hooks"))
+    from _state_utils import safe_read_json, safe_write_json
+except ImportError:
+    def safe_read_json(path, default=None):
+        try:
+            return json.loads(path.read_text(encoding="utf-8")) if path.exists() else (default or {})
+        except Exception:
+            return default or {}
+    def safe_write_json(path, data, indent=None):
+        path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 SCORECARD = PROJECT_DIR / ".claude" / "SCORECARD.md"
 ERROR_LOG = STATE_DIR / "errors.log"
 MISTAKES_FILE = PROJECT_DIR / "docs" / "KNOWN_MISTAKES.md"
@@ -57,15 +70,11 @@ with open(ERROR_LOG, "a", encoding="utf-8") as f:
     f.write("[%s] %s FAILED: %s\n" % (date_full, tool_name, error_short))
 
 # 2. Update state
-if STATE_FILE.exists():
-    try:
-        state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
-    except Exception:
-        state = {"research_done": False, "search_count": 0, "errors": [], "task_started": False}
-    if "errors" not in state:
-        state["errors"] = []
-    state["errors"].append({"tool": tool_name, "error": error_short})
-    STATE_FILE.write_text(json.dumps(state), encoding="utf-8")
+state = safe_read_json(STATE_FILE, default={"research_done": False, "search_count": 0, "errors": [], "task_started": False})
+if "errors" not in state:
+    state["errors"] = []
+state["errors"].append({"tool": tool_name, "error": error_short})
+safe_write_json(STATE_FILE, state)
 
 # 3. Check for repeated known mistake
 is_repeated = False

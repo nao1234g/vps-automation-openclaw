@@ -55,6 +55,11 @@ try:
 except Exception:
     sys.exit(0)
 
+# ── Night Mode bypass ─────────────────────────────────────────────────────
+_NIGHT_MODE_FLAG = STATE_DIR / "night_mode.flag"
+if _NIGHT_MODE_FLAG.exists():
+    sys.exit(0)  # Night Mode中はPVQE-P証拠チェックをバイパス（自律運転モード）
+
 # ── pvqe_p.json 読み込み ───────────────────────────────────────────────────
 if not PVQE_P_FILE.exists():
     sys.exit(0)  # pvqe_p.json なし → このhookは関係ない

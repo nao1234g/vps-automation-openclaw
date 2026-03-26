@@ -24,6 +24,19 @@ from datetime import datetime
 PROJECT_DIR = Path(os.environ.get("CLAUDE_PROJECT_DIR", "."))
 STATE_DIR = PROJECT_DIR / ".claude" / "hooks" / "state"
 STATE_FILE = STATE_DIR / "session.json"
+
+# Atomic write utility (same hooks dir)
+try:
+    sys.path.insert(0, str(PROJECT_DIR / ".claude" / "hooks"))
+    from _state_utils import safe_read_json, safe_write_json
+except ImportError:
+    def safe_read_json(path, default=None):
+        try:
+            return json.loads(path.read_text(encoding="utf-8")) if path.exists() else (default or {})
+        except Exception:
+            return default or {}
+    def safe_write_json(path, data, indent=None):
+        path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 KNOWN_MISTAKES = PROJECT_DIR / "docs" / "KNOWN_MISTAKES.md"
 
 # ── 意図確認ゲート用フラグ ─────────────────────────────────────────────────
@@ -73,15 +86,10 @@ CORRECTION_PATTERNS = re.compile(
 )
 
 def load_state() -> dict:
-    if STATE_FILE.exists():
-        try:
-            return json.loads(STATE_FILE.read_text(encoding="utf-8"))
-        except Exception:
-            pass
-    return {}
+    return safe_read_json(STATE_FILE, default={})
 
 def save_state(state: dict):
-    STATE_FILE.write_text(json.dumps(state, ensure_ascii=False), encoding="utf-8")
+    safe_write_json(STATE_FILE, state)
 
 # ── stdin を読む ─────────────────────────────────────────────────────────
 try:

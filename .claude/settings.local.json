@@ -6,7 +6,6 @@
   },
   "permissions": {
     "allow": [
-      "Bash",
       "Task",
       "WebFetch(domain:docs.bigmodel.cn)",
       "WebFetch(domain:ai.google.dev)",
@@ -131,7 +130,11 @@
       "mcp__claude-peers__set_summary",
       "mcp__claude-peers__list_peers",
       "mcp__claude-peers__send_message",
-      "mcp__claude-peers__check_messages"
+      "mcp__claude-peers__check_messages",
+      "WebFetch(domain:www.googleapis.com)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(claude auto-mode:*)",
+      "Bash(\"/c/Program Files/Python312/python.exe\":*)"
     ],
     "deny": [
       "Read(**/.env)",
@@ -146,7 +149,19 @@
       "Write(**/*credentials*)",
       "Write(**/*private_key*)"
     ],
-    "defaultMode": "bypassPermissions",
+    "ask": [
+      "Bash(git push *)",
+      "Bash(git push --force *)",
+      "Bash(rm -rf *)",
+      "Bash(docker container rm *)",
+      "Bash(docker rm *)",
+      "Bash(systemctl stop *)",
+      "Bash(systemctl disable *)",
+      "Bash(crontab -r*)",
+      "Bash(DROP TABLE*)",
+      "Bash(DELETE FROM*)"
+    ],
+    "defaultMode": "auto",
     "additionalDirectories": [
       "\\tmp",
       "c:\\tmp",
@@ -440,6 +455,15 @@
           }
         ]
       }
+    ]
+  },
+  "autoMode": {
+    "environment": [
+      "**Trusted repo**: vps-automation-openclaw on GitHub. Single developer (Naoto), main branch is the working branch.",
+      "**Trusted VPS**: 163.44.124.123 (ConoHa, SSH key auth only) — hosts Ghost CMS, Telegram bots, Docker containers. SSH read/write is normal workflow.",
+      "**Source control**: GitHub remote origin. Pushing to main is the normal single-developer workflow (no PR review required).",
+      "**Key internal services**: Ghost CMS (nowpattern.com port 2368), Telegram bots (NEO-ONE/TWO/GPT), Docker Compose, PostgreSQL, Caddy reverse proxy",
+      "**Platform**: Windows 11 native (no sandbox available). Python at C:/Program Files/Python312/python.exe. Bash via Git Bash."
     ]
   }
 }

@@ -44,8 +44,14 @@ fi
 
 # 3. ★ CRITICAL: VPSの最新状態を取得（CLAUDE.mdより優先）
 echo "--- VPS LIVE STATE (authoritative — overrides CLAUDE.md) ---"
-VPS_STATE=$(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -o BatchMode=yes \
-    "$VPS" "cat /opt/shared/SHARED_STATE.md" 2>/dev/null)
+# SSH retry: 最大3回（一時的なネットワーク不安定に対応）
+VPS_STATE=""
+for _ssh_retry in 1 2 3; do
+    VPS_STATE=$(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=8 -o BatchMode=yes \
+        "$VPS" "cat /opt/shared/SHARED_STATE.md" 2>/dev/null)
+    [ -n "$VPS_STATE" ] && break
+    [ "$_ssh_retry" -lt 3 ] && sleep 2
+done
 
 if [ -n "$VPS_STATE" ]; then
     echo "$VPS_STATE"

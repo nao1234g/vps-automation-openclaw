@@ -17,6 +17,28 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+# ── Observability: timing log ─────────────────────────────────────────────────
+_HOOK_START = time.time()
+_TIMINGS_LOG = Path(__file__).parent / "state" / "hook_timings.jsonl"
+
+
+def _write_timing(exit_code: int, check_name: str = "OK") -> None:
+    """Append a timing entry to hook_timings.jsonl (never raises)."""
+    try:
+        elapsed_ms = int((time.time() - _HOOK_START) * 1000)
+        entry = {
+            "at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "hook": "fact-checker",
+            "check": check_name,
+            "elapsed_ms": elapsed_ms,
+            "exit_code": exit_code,
+        }
+        with open(_TIMINGS_LOG, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except Exception:
+        pass  # タイミングログ失敗でも本体は止めない
+# ─────────────────────────────────────────────────────────────────────────────
+
 
 def log_prevention(pattern_name: str, message_preview: str = "") -> None:
     """fact-checker.py が exit(2) を発火した時に prevention_log.json に記録する"""
@@ -41,6 +63,7 @@ def log_prevention(pattern_name: str, message_preview: str = "") -> None:
         )
     except Exception:
         pass  # ログ失敗でも本体の exit(2) は止めない
+    _write_timing(2, pattern_name)
 
 # トランスクリプト解析: 検証が必要なファイル拡張子（スクリプト・コード + ビジュアル系）
 # .css/.hbs/.html はスクリーンショット検証が必要（語彙チェックでは捕捉不可能な視覚バグ対策）
@@ -939,6 +962,7 @@ def main():
         except Exception:
             pass  # state読み取り失敗はサイレント無視
 
+    _write_timing(0, "OK")
     sys.exit(0)
 
 if __name__ == "__main__":

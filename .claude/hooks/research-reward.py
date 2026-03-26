@@ -15,6 +15,19 @@ SCORECARD = PROJECT_DIR / ".claude" / "SCORECARD.md"
 
 STATE_DIR.mkdir(parents=True, exist_ok=True)
 
+# Atomic write utility
+try:
+    sys.path.insert(0, str(PROJECT_DIR / ".claude" / "hooks"))
+    from _state_utils import safe_read_json, safe_write_json
+except ImportError:
+    def safe_read_json(path, default=None):
+        try:
+            return json.loads(path.read_text(encoding="utf-8")) if path.exists() else (default or {})
+        except Exception:
+            return default or {}
+    def safe_write_json(path, data, indent=None):
+        path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+
 # Read stdin
 try:
     raw = sys.stdin.read()
@@ -29,31 +42,26 @@ if tool_name not in ("WebSearch", "WebFetch"):
     sys.exit(0)
 
 # Update research state
-if STATE_FILE.exists():
-    try:
-        state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
-    except Exception:
-        state = {"research_done": False, "search_count": 0, "errors": [], "task_started": False}
+state = safe_read_json(STATE_FILE, default={"research_done": False, "search_count": 0, "errors": [], "task_started": False})
+task_started = state.get("task_started", False)
+already_rewarded = state.get("research_rewarded", False)
 
-    task_started = state.get("task_started", False)
-    already_rewarded = state.get("research_rewarded", False)
+# Reward if research happens BEFORE task started (before any Edit/Write)
+if not task_started and not already_rewarded:
+    state["research_done"] = True
+    state["search_count"] = state.get("search_count", 0) + 1
+    state["research_rewarded"] = True
+    safe_write_json(STATE_FILE, state)
 
-    # Reward if research happens BEFORE task started (before any Edit/Write)
-    if not task_started and not already_rewarded:
-        state["research_done"] = True
-        state["search_count"] = state.get("search_count", 0) + 1
-        state["research_rewarded"] = True
-        STATE_FILE.write_text(json.dumps(state), encoding="utf-8")
-
-        date_short = datetime.now().strftime("%Y-%m-%d %H:%M")
-        if SCORECARD.exists():
-            with open(SCORECARD, "a", encoding="utf-8") as f:
-                f.write("| %s | +2 | Research before implementation | %s |\n" % (date_short, tool_name))
-        print("Good: Research done before implementation. +2 points.")
-    else:
-        # Research after starting is still tracked but less rewarded
-        state["research_done"] = True
-        state["search_count"] = state.get("search_count", 0) + 1
-        STATE_FILE.write_text(json.dumps(state), encoding="utf-8")
+    date_short = datetime.now().strftime("%Y-%m-%d %H:%M")
+    if SCORECARD.exists():
+        with open(SCORECARD, "a", encoding="utf-8") as f:
+            f.write("| %s | +2 | Research before implementation | %s |\n" % (date_short, tool_name))
+    print("Good: Research done before implementation. +2 points.")
+else:
+    # Research after starting is still tracked but less rewarded
+    state["research_done"] = True
+    state["search_count"] = state.get("search_count", 0) + 1
+    safe_write_json(STATE_FILE, state)
 
 sys.exit(0)
