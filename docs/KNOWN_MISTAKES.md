@@ -2142,3 +2142,28 @@ Traceback (most recent call last):
 - **再発防止コード**: `prediction_page_builder.py:_validate_market_consensus()` に cross-language スキップ条件を追加済み（2026-03-22）
 
 ---
+
+
+### 2026-03-28: Ghost Admin API PUT — updated_at ISO 8601形式の不一致でHTTP 422
+
+- **症状**: `slug_repair2.py --execute` で50件全件 `HTTP 422: Validation failed for updated_at` エラー。スラッグの変更が一切適用されなかった
+- **根本原因**: Ghost Admin API が要求する `updated_at` は ISO 8601 形式（`2026-03-27T18:02:42.000Z`）だが、SQLite から直接取得した値はスペース区切り（`2026-03-27 18:02:42`）で、タイムゾーン情報もない。Ghost はこれを楽観的ロック（optimistic locking）のETagとして使用しており、形式不一致でバリデーション失敗する
+- **正しい解決策**: SQLite から取得した `updated_at` を `.replace(" ", "T") + ".000Z"` で変換してからAPIに渡す
+- **教訓**: Ghost Admin API でリソースを更新するとき、`updated_at` を渡す場合は必ず ISO 8601 形式（UTC、ミリ秒含む）に変換すること。SQLite の raw 値は使えない
+- **再発防止コード**: `/opt/shared/scripts/slug_repair2.py` の line 201 に変換処理追加済み。今後 Ghost API PUT を行うスクリプトを書く際は、`updated_at` 変換を必須チェックリストに含める
+
+---
+
+### 2026-03-28: EN記事スラッグ が日本語ローマ字（ピンイン）になる根本原因
+
+- **症状**: EN記事のURLが `/en/en-nan-sinahai-nomi-zhong-jun-shi...` のような意味不明な文字列になっていた。190件のEN記事が影響
+- **根本原因**: `nowpattern_publisher.py` の `post_to_ghost()` が `slug` パラメータを受け取らず、Ghost CMS がタイトルから自動生成していた。EN記事のタイトルは日本語タイトルを英訳したものだが、Ghost の自動slug生成がタイトルをローマ字変換する動作をしていた（または英語タイトル前のJA slugが継承された）
+- **正しい解決策**:
+  1. `_title_to_en_slug(title)` 関数を追加（ASCII正規表現でクリーンな英語スラッグを生成）
+  2. `post_to_ghost()` に `slug: str = ""` パラメータを追加
+  3. `publish_deep_pattern()` 内で `_pub_lang == "en"` のとき `_pub_slug` を計算して渡す
+- **修正ファイル**: `/opt/shared/scripts/nowpattern_publisher.py`（バックアップ: `.bak-20260328-slug-fix`）
+- **教訓**: Ghost CMS にスラッグを自動生成させてはいけない（特に多言語環境）。常に明示的にスラッグを渡すこと
+- **再発防止コード**: `publish_deep_pattern()` が `slug` を明示指定。`_title_to_en_slug()` は `re.sub(r'[^\w\s-]', '', s)` で非ASCII文字を除去（Unicodeを含まないシンプルな正規表現）
+
+---

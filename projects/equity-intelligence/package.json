@@ -1,0 +1,32 @@
+{
+  "name": "equity-intelligence",
+  "version": "0.1.0",
+  "description": "Personal equity research OS — US & JP stocks, J-Quants, EDINET, Dexter-pattern agent",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/domain",
+    "packages/adapters",
+    "packages/services",
+    "packages/walltalk"
+  ],
+  "scripts": {
+    "dev": "bun --watch packages/services/src/research/agent.ts",
+    "research": "bun packages/services/src/research/agent.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@langchain/anthropic": "^0.3.11",
+    "@langchain/core": "^1.1.1",
+    "@langchain/community": "^1.0.7",
+    "zod": "^3.23.8",
+    "dotenv": "^16.4.5",
+    "axios": "^1.7.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "@types/node": "^22.7.5",
+    "bun-types": "latest"
+  }
+}

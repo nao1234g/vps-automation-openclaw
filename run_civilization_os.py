@@ -45,14 +45,15 @@ def _import_engines() -> Dict[str, bool]:
     results = {}
 
     checks = [
-        ("truth_engine",     "truth_engine.truth_engine",          "TruthEngine"),
-        ("prediction_engine","prediction_engine.prediction_registry","PredictionRegistry"),
-        ("knowledge_engine", "knowledge_engine.knowledge_store",    "KnowledgeStore"),
-        ("decision_engine",  "decision_engine.strategy_engine",     "StrategyEngine"),
-        ("capital_engine",   "decision_engine.capital_engine",      "CapitalEngine"),
-        ("exec_planner",     "decision_engine.execution_planner",   "ExecutionPlanner"),
-        ("board_meeting",    "board.board_meeting",                 "BoardMeeting"),
-        ("agent_manager",    "agent_civilization.agent_manager",    "AgentManager"),
+        ("truth_engine",       "truth_engine.truth_engine",            "TruthEngine"),
+        ("prediction_engine",  "prediction_engine.prediction_registry", "PredictionRegistry"),
+        ("knowledge_engine",   "knowledge_engine.knowledge_store",      "KnowledgeStore"),
+        ("decision_engine",    "decision_engine.strategy_engine",       "StrategyEngine"),
+        ("capital_engine",     "decision_engine.capital_engine",        "CapitalEngine"),
+        ("exec_planner",       "decision_engine.execution_planner",     "ExecutionPlanner"),
+        ("board_meeting",      "board.board_meeting",                   "BoardMeeting"),
+        ("agent_manager",      "agent_civilization.agent_manager",      "AgentManager"),
+        ("completion_engine",  "completion_engine",                     "StateMachine"),
     ]
 
     for name, module_path, class_name in checks:

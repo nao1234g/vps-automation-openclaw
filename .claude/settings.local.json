@@ -134,7 +134,12 @@
       "WebFetch(domain:www.googleapis.com)",
       "WebFetch(domain:docs.anthropic.com)",
       "Bash(claude auto-mode:*)",
-      "Bash(\"/c/Program Files/Python312/python.exe\":*)"
+      "Bash(\"/c/Program Files/Python312/python.exe\":*)",
+      "Bash(ssh:*)",
+      "Bash(grep:*)",
+      "Bash(\"/c/Program Files/Python312/python.exe\" ask.py \"日銀 利上げ\" -n 5)",
+      "Bash(\"/c/Program Files/Python312/python.exe\" dossier.py --list)",
+      "Bash(\"/c/Program Files/Python312/python.exe\" dossier.py \"日銀\")"
     ],
     "deny": [
       "Read(**/.env)",

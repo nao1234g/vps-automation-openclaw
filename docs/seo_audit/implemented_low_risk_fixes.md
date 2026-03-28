@@ -122,6 +122,44 @@ curl -sI https://nowpattern.com/ | grep -i link
 
 ---
 
+---
+
+## Fix 4: 全タグページ `/tag/*` noindex 拡張（2026-03-27 追加）
+
+### 問題
+- Fix 1 で `genre-*` は対処済みだったが、`/tag/geopolitics/` `/tag/crypto/` `/tag/finance/` など
+  コンテンツカテゴリタグ（表示用タグ）もインデックス対象のままだった
+- Ghost が自動生成する 59件のタグページのうち、Fix 1 でカバーしていたのは一部のみ
+
+### 修正内容
+**ファイル**: `/etc/caddy/Caddyfile`
+
+```caddy
+# 変更前:
+@internal_tags path /tag/p-* /tag/event-* /tag/lang-* /tag/deep-pattern/ /tag/nowpattern/ /tag/genre-*
+
+# 変更後:
+@internal_tags path /tag/*
+```
+
+全タグページを一括でカバーするシンプルなパターンに変更。
+
+### 検証
+```bash
+curl -sI https://nowpattern.com/tag/geopolitics/ | grep -i robots
+# → x-robots-tag: noindex, follow ✅
+
+caddy validate --config /etc/caddy/Caddyfile
+# → "Valid configuration" ✅
+```
+
+### なぜ全タグを noindex にするか
+- タグページは記事リストであり、独自コンテンツが薄い
+- 重複コンテンツとして評価され、クロールバジェットを浪費する
+- 例外 (`/tag/nowpattern/` など権威あるハブタグ) は将来的に個別判断で noindex 解除可能
+
+---
+
 ## 全修正のリスク評価
 
 | 修正 | リスク | 影響範囲 | ロールバック |
@@ -129,7 +167,89 @@ curl -sI https://nowpattern.com/ | grep -i link
 | Fix 1: genre-* noindex | 低 | /tag/genre-* のみ | Caddyfileから行削除 + caddy reload |
 | Fix 2: hreflang注入 | 低 | 全記事 codeinjection_head | マーカー削除スクリプトで一括リセット可 |
 | Fix 3: Homepage Link header | 低 | / と /en/ のみ | handleブロック削除 + caddy reload |
+| Fix 4: 全タグ /tag/* noindex | 低 | 全59タグページ | @internal_tags を旧パターンに戻す + caddy reload |
+| Fix 5: EN記事スラッグ一括修正 | 中 | EN記事190件 | slug_migration_map.csvで逆引き + Ghost API再更新 |
 
 ---
 
-*作成: 2026-03-26 | Session: SEO Audit*
+## Fix 5: EN記事 ピンインスラッグ一括修正（2026-03-28 実施）
+
+### 問題
+
+EN記事のスラッグが日本語タイトルのローマ字（ピンイン）になっていた。
+
+**例（修正前）:**
+```
+/en/en-nan-sinahai-nomi-zhong-jun-shi-dui-zhi-dui-li-noluo-xuan-gaou-fa-.../
+/en/guan-ce-rogu-xxx/
+```
+
+**例（修正後）:**
+```
+/en/us-china-military-standoff-in-the-south-china/
+/en/us-china-military-standoff-in-the-south-china-sea/
+```
+
+### 根本原因
+
+`nowpattern_publisher.py` の `post_to_ghost()` が `slug` パラメータを受け取らず、Ghost CMS がタイトルから自動生成していた。EN記事のタイトルは日本語タイトルの英訳だが、Ghost がローマ字変換してしまい `en-{ピンイン}` スラッグになっていた。
+
+### 修正内容（2つの対応）
+
+**対応1: 既存190件の一括修正**
+- スクリプト: `/opt/shared/scripts/slug_repair2.py`
+- 検出アルゴリズム: `is_bad_slug()` - スラッグとタイトル間のトークン重複率 < 30% を検出
+- 修正数: **190件（en-プレフィックス 181件 + guan-ce-rogu- 9件）**
+- 失敗: **0件**
+- 301リダイレクト: **190件** を `/etc/caddy/nowpattern-redirects.txt` に追加
+- Caddy reload: ✅ 成功
+
+**対応2: 新規記事のスラッグ英語化（根本修正）**
+- ファイル: `/opt/shared/scripts/nowpattern_publisher.py`
+- バックアップ: `.bak-20260328-slug-fix`
+- 追加した関数: `_title_to_en_slug(title)` — ASCIIのみの英語スラッグ生成
+- 変更: `post_to_ghost()` に `slug: str = ""` パラメータ追加
+- 変更: `publish_deep_pattern()` が EN記事のとき `_pub_slug` を計算して渡す
+
+```python
+def _title_to_en_slug(title: str) -> str:
+    """Generate clean ASCII English slug from title for Ghost API."""
+    s = title.lower()
+    s = re.sub(r'[^\w\s-]', '', s)
+    s = re.sub(r'[\s_]+', '-', s)
+    s = re.sub(r'-+', '-', s)
+    s = s.strip('-')
+    if len(s) > 80:
+        s = s[:80].rsplit('-', 1)[0]
+    return s or 'article'
+```
+
+### 注意: updated_at 形式バグ（最初に遭遇した障害）
+
+Ghost Admin API が要求する形式: `2026-03-27T18:02:42.000Z`（ISO 8601）
+SQLite が保存している形式: `2026-03-27 18:02:42`（スペース区切り、タイムゾーンなし）
+
+最初の50件が全件 HTTP 422 で失敗した。修正: `.replace(" ", "T") + ".000Z"`
+
+### 検証結果
+
+```
+curl -sI 'https://nowpattern.com/en/en-bitutokoin1500mo-yuan-tu-po-yu-ce-...-zi-jia-nocan-...'
+→ HTTP/2 301  location: /en/bitcoin-predicted-to-surpass-15-million/ ✅
+
+curl -sI 'https://nowpattern.com/en/bitcoin-predicted-to-surpass-15-million/'
+→ HTTP/2 200 ✅
+```
+
+### アーティファクト
+
+| ファイル | 場所 | 内容 |
+|---------|------|------|
+| migration map JSON | `/opt/shared/reports/slug_migration_map.json` | 190件の old→new マッピング |
+| migration map CSV | `/opt/shared/reports/slug_migration_map.csv` | CSV形式 |
+| 修正レポート | `/opt/shared/reports/slug_repair_report.json` | 成功189件・失敗0件 |
+| 301リダイレクト | `/etc/caddy/nowpattern-redirects.txt` | 190行追加済み |
+
+---
+
+*作成: 2026-03-26 | 更新: 2026-03-28 (Fix 5 追記) | Session: SEO Audit*

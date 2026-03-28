@@ -10,7 +10,17 @@
       "mcp__claude-peers__set_summary",
       "Bash(# Check:*)",
       "Bash(/c/tmp/check_hooks.py:*)",
-      "Bash(\"/c/Program Files/Python312/python.exe\" /c/tmp/check_hooks.py)"
+      "Bash(\"/c/Program Files/Python312/python.exe\" /c/tmp/check_hooks.py)",
+      "WebFetch(domain:jpx-jquants.com)",
+      "WebFetch(domain:api.jquants.com)",
+      "WebFetch(domain:api.edinet-fsa.go.jp)",
+      "WebFetch(domain:exa.ai)",
+      "WebFetch(domain:docs.exa.ai)",
+      "WebFetch(domain:github.com)",
+      "Bash(ssh root@163.44.124.123:*)",
+      "Bash(\"c:/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/docs/KNOWN_MISTAKES.md\":*)",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c:*)",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \":*)"
     ],
     "deny": [
       "Bash(* rm -rf /*)",
@@ -27,6 +37,9 @@
       "Read(**/*private_key*)",
       "Read(**/*.pem)",
       "Read(**/*.key)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\docs\\seo_audit"
     ]
   },
   "defaultMode": "acceptEdits"
