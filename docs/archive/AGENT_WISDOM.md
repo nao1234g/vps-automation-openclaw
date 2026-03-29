@@ -201,3 +201,19 @@ When you complete a task or encounter a problem:
 
 *Last updated: 2026-02-19*
 *Update this file whenever new knowledge is gained. This is our collective memory.*
+
+---
+
+## 自己学習ログ（T023 — 2026-03-29 自動記録）
+
+### 2026-03-29 T023: NAOTO OS 自己学習ループ強化 完了
+
+**修正内容:**
+- Fix A: .shラッパー4本のpython3||pythonパターンをpython直接呼出しに統一（G1/G2解消）
+- Fix B: memory_extract.py v2 — task_ledger.json/failure_memory.jsonから実知識を抽出する extract_from_task_ledger() / extract_from_failure_memory() を追加（G3解消）
+- Fix C: session-end.pyのAGENT_WISDOM書込を成功セッション（完了タスクあり）にも拡張（G4解消）
+
+**学習した再発防止パターン:**
+- 同種バグを修正する際は `grep -rn "pattern" .claude/hooks/*.sh` で全インスタンスを確認してから着手する
+- センサー（search_count）が壊れていると上流の全記憶システムが機能しない — センサーの健全性は最優先で確認する
+- memory_extractはsession.jsonだけでなくtask_ledger/failure_memoryも参照することで実知識が蓄積される

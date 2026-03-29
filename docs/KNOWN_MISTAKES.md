@@ -6,6 +6,102 @@
 
 ---
 
+### 2026-03-29: KNOWN_MISTAKES.md ↔ mistake_patterns.json の同期ギャップが2件残存（T030）
+
+- **症状**: KNOWN_MISTAKES.md に GUARD_PATTERN として記録されていた CALIBRATION_QUALITATIVE_ONLY と XMRIG_MINER_ARTIFACT が mistake_patterns.json に存在せず、regression 対象にも入っていなかった
+- **根本原因**: auto-codifier.py は PostToolUse（Edit/Write）のフックとして動作するため、フック全停止期間（2026-02-22前後）や `Edit` ツールを経由しない直接書き込みで追加されたエントリは同期されない。これが「auto-codifier を信頼しすぎる」構造的欠陥
+- **正しい解決策**: T030 Phase 2 で手動クロスリファレンスを実施し、2件を mistake_patterns.json に直接追加。regression 36/36 PASS 確認済み
+- **教訓**: ECC Pipeline の健全性確認には「KNOWN_MISTAKES.md の全 GUARD_PATTERN と mistake_patterns.json の全エントリを突合する手動フェーズ」が必要。auto-codifier だけに頼ると同期ギャップが生じる
+- **再発防止コード**: T-series タスクの Phase 2 標準項目として「GUARD_PATTERN 全件突合」を実施すること（T030 で確立）
+
+### 2026-03-29: session-end.py が task_ledger.json のキー名を誤参照していた（T029 — GAP-T029-1）
+
+- **症状**: AGENT_WISDOM の「完了タスク: ?」に全タスクが "?" と記録されていた（T022〜T028 の全セッション）
+- **根本原因**: `session-end.py:81` が `t.get("id", "?")` を使っていたが、`task_ledger.json` の全エントリは `"task_id"` キーを使う。"id" キーは存在しないため常にフォールバック "?" になっていた
+- **正しい解決策**: `t.get("task_id", t.get("id", "?"))` に変更（後方互換フォールバック付き）
+- **教訓**: 構造化ファイル（JSON）のキー名を変更した場合は、そのファイルを参照する全スクリプトのキー名を同時に更新すること。task_ledger.json が `"task_id"` に統一された際に session-end.py の更新が漏れた
+- **再発防止コード**: task_ledger.json を参照するコードは常に `t.get("task_id", t.get("id","?"))` の形でフォールバックを書く
+
+`GUARD_PATTERN: {"pattern": "t\\.get\\([\"']id[\"'],", "feedback": "⛔ task_ledger.json は 'task_id' キーを使う。t.get('task_id', t.get('id','?')) の形でフォールバック付きにしてください", "name": "TASK_LEDGER_KEY_MISMATCH", "example": "t.get('id', '?') for t in tasks"}`
+
+### 2026-03-29: KNOWN_MISTAKES.md の GUARD_PATTERN が mistake_patterns.json に同期されていなかった（T029 — GAP-T029-2）
+
+- **症状**: KNOWN_MISTAKES.md に GUARD_PATTERN JSON を記述した EN_PIPELINE_QUALITY / PATTERN_HISTORY_FIELD_MISMATCH / BILINGUAL_URL_SLUG_WRONG の3パターンが regression に含まれておらず、ECC ガードとして機能していなかった
+- **根本原因**: auto-codifier.py は `KNOWN_MISTAKES` を含むファイルへの Edit/Write ツール実行後にのみ起動する（PostToolUse フック）。2026-03-06/07 に手書きで追記された GUARD_PATTERN は、auto-codifier が起動しない形で書かれた（または起動したが JSON 解析に失敗した）
+- **正しい解決策**: GUARD_PATTERN を KNOWN_MISTAKES.md に追記した後は、regression-runner.py を手動実行して dynamic パターン数が増えたことを確認する
+- **教訓**: KNOWN_MISTAKES.md への記録 ≠ ECC ガードの有効化。mistake_patterns.json への物理登録と regression PASS が「ECC ガード有効」の定義
+- **再発防止コード**: T029 で3パターンを mistake_patterns.json に直接追加。regression 34/34 PASS 確認済み
+
+### 2026-03-29: Dead guards が undocumented のまま放置されていた（T027 — F006/F007）
+
+- **症状**: pvqe-p-gate.py と intent-confirm.py が hooks/ に存在するが settings.local.json に未登録で無効状態。しかし何も記録されていないため、次の監査で「なぜ無効か？」が不明になる
+- **根本原因**: ガードを無効化（または未有効化）した際に「なぜ無効化したか」を failure_memory.json や KNOWN_MISTAKES.md に記録しなかった。Dead guard が存在するだけでは「設計か？バグか？」の判断ができない
+- **正しい解決策**: Dead guard を発見したら failure_memory.json に wont_fix エントリを追加し、無効化の理由を記録する
+- **教訓**: hooks/ に存在するファイルはすべて「登録済み」か「意図的無効化（documented）」かのどちらかでなければならない。3番目の状態（存在するが登録なし・記録なし）は混乱の種
+- **再発防止コード**: failure_memory.json に F006（pvqe-p-gate.py）と F007（intent-confirm.py）を wont_fix として追加（T027）。今後 dead guard を発見したら必ずこのパターンに従う
+
+---
+
+### 2026-03-29: セッション終了フックの AGENT_WISDOM 重複チェックが1日1エントリ制限になっていた（T026）
+
+- **症状**: 同日2セッション目以降の AGENT_WISDOM.md への書き込みがスキップされ、完了タスクが記録されなかった
+- **根本原因**: `session-end.py` の重複チェック `if date_header not in existing or marker not in existing:` で `date_header`（YYYY-MM-DD）を使用 → 1日1件目が書かれた後は always skip
+- **正しい解決策**: `date_short`（YYYY-MM-DD HH:MM）をヘッダーおよびチェックキーに使用。同分以内の重複のみ防止し、異なるセッションは個別記録される
+- **教訓**: 「重複防止」のチェックキーは粒度が重要。日付レベルは荒すぎる（1日1セッション前提の設計）。タイムスタンプ（分）が適切
+- **再発防止コード**: `session-end.py` line 98/110 修正済み（T026）。`check_key = date_short + " セッションサマリー（自動記録）"` で完全一致チェック
+
+---
+
+### 2026-03-29: regression-runner.py が手動実行専用（自動化なし）になっていた（T026）
+
+- **症状**: mistake_patterns.json に新パターンを追加しても、次のセッションまで regression の PASS/FAIL が確認されない。ガードが壊れていても誰も気づかない状態
+- **根本原因**: `regression-runner.py` が `settings.local.json` のどのフックにも登録されていなかった。VPS cron 例はコメントに書かれていたが、ローカルでは未設定
+- **正しい解決策**: `session-start.sh` に前回実行結果キャッシュの表示 + バックグラウンド再実行を追加（`$STATE_DIR/last_regression_result.txt` にキャッシュ）
+- **教訓**: 「実行したら確認する」は人間の記憶依存。「セッション開始時に自動で確認する」が唯一の保証。監視ツール自身の自動化を忘れない
+- **再発防止コード**: `session-start.sh` 3d節: regression結果表示 + バックグラウンド実行（T026）
+- **GUARD_PATTERN**: `{"pattern": "regression.*手動|手動.*regression|regression.*run.*manually", "feedback": "⛔ REGRESSION_MANUAL_ONLY 検出: regression-runner.py を手動実行専用とするのは危険です。session-start.sh の 3d セクション（バックグラウンド実行）が正しい自動化実装例です。", "name": "REGRESSION_MANUAL_ONLY"}`
+
+---
+
+### 2026-03-29: AGENT_WISDOM.md 不存在によるセルフラーニングループの全停止（T025）
+
+- **症状**: session-end.py がセッション終了時に `docs/AGENT_WISDOM.md` に書き込まず、自己学習ログが全セッションにわたって蓄積されていなかった
+- **根本原因**: `session-end.py` line 97 の `if AGENT_WISDOM.exists():` が False → サイレントスキップ。`docs/AGENT_WISDOM.md` ファイル自体が存在しなかった
+- **正しい解決策**: `docs/AGENT_WISDOM.md` を作成（T025）。session-start.sh に読み込みセクション追加（3c節）
+- **教訓**: 書き込み先ファイルの存在確認は作成側（session-end.py）ではなく、CI/初期化スクリプト側で保証すること。サイレントスキップは最も発見しにくいバグ
+- **再発防止コード**: `docs/AGENT_WISDOM.md` 作成済み。session-start.sh 3c節: `if [ -f "$AGENT_WISDOM_FILE" ]` で存在チェック + WARN表示
+
+---
+
+### 2026-03-29: MONITORING_ONLY パターン example が regex に不一致（T025）
+
+- **症状**: `regression-runner.py` で MONITORING_ONLY が `exit=0`（ブロックされるべきなのに通過）
+- **根本原因**: example「監視スクリプトを追加しました」が regex `監視(?:を追加|に追加|スクリプト|cron)(?:しました|...)` にマッチしない。`監視スクリプト` の後に `しました` が直接来ないため
+- **正しい解決策**: pattern から `スクリプト` 選択肢を除去。example を「監視を追加しました」に変更
+- **教訓**: regex パターンを追加したら必ず regression-runner.py を実行して `example` が実際にマッチするか確認する
+
+---
+
+### 2026-03-29: PROJECT DRIFT — Nowpatternをリポジトリのルートと誤認するリスク（T024 予防的登録）
+
+- **症状**: AI が vps-automation-openclaw を「Nowpatternのリポジトリ」「Nowpatternのルート」と表現する。Nowpatternの話をしているつもりで NAOTO OS 全体の構造を変更する
+- **根本原因**: Nowpatternは最重要プロジェクトであるため、会話が進むにつれ「Nowpattern = このOS全体」に意識がドリフトする。CLAUDE.md 冒頭の「このリポジトリはNaoto Intelligence OSのルート」宣言が読み飛ばされる
+- **正しい解決策**: 毎セッション開始時に NAOTO OS PRIMARY ANCHOR を表示（session-start.sh に追加済み）。PROJECT_DRIFT_GUARD パターンを mistake_patterns.json に追加（fact-checker.py が Stop hookで検知）
+- **教訓**: 最重要サブプロジェクトは最上位OSと混同されやすい。セッション開始時の明示的なアンカーが必要
+- **再発防止コード**: `.claude/hooks/state/mistake_patterns.json` に `PROJECT_DRIFT_GUARD` 追加（T024-manual）。`.claude/hooks/session-start.sh` に NAOTO OS PRIMARY ANCHOR セクション追加
+
+---
+
+### 2026-03-29: Bash exit code 7 = VPS 到達不能（F005 根本原因特定）
+
+- **症状**: Bash ツールが exit code 7 で失敗（T021 作業中に発生）
+- **根本原因**: SSH / curl の接続拒否またはタイムアウト。exit 7 = curl CURLE_COULDNT_CONNECT（ホスト到達不能）または SSH ConnectTimeout 超過
+- **正しい解決策**: SSH コマンドは `ConnectTimeout=5 BatchMode=yes -o StrictHostKeyChecking=no` を付与し、exit 7 を VPS_UNREACHABLE として記録・スキップする。session-start.sh の SSH retry ループ（最大3回）が正しい参照実装
+- **教訓**: VPS 依存コマンドを連鎖させる前に SSH ping で到達性確認を挟む。exit 7 は「コマンドエラー」ではなく「インフラ問題」なのでリトライが有効
+- **再発防止コード**: `failure_memory.json` F005 の root_cause / prevention_rule 更新済み（T024）
+
+---
+
 ### 2026-03-23: UUID ghost_url が再発 — M007 2回目（NP-2026-0825）
 
 - **症状**: NP-2026-0825 の `ghost_url` が `https://nowpattern.com/p/UUID/` 形式のドラフトURLのまま prediction_db.json に残存。前セッション（2026-03-22）で NP-0819〜0824 の6件を修正したが、NP-0825 が漏れていた
@@ -2167,3 +2263,97 @@ Traceback (most recent call last):
 - **再発防止コード**: `publish_deep_pattern()` が `slug` を明示指定。`_title_to_en_slug()` は `re.sub(r'[^\w\s-]', '', s)` で非ASCII文字を除去（Unicodeを含まないシンプルな正規表現）
 
 ---
+
+### 2026-03-28: T022 — error-tracker.py が34日間死亡していた（ECC盲目化）
+- **症状**: `.claude/hooks/state/errors.log` が2026-02-22以降エントリ追加なし。PostToolUseFailureフックが動作していなかった
+- **根本原因**: `error-tracker.sh`（bash wrapper）が `python3 ... 2>/dev/null || python ...` パターンを使用。Windows環境で`python3`はApp Execution Aliasダミー（exit 49）だが、**実行前にSTDINを全消費する**。`||`でフォールバックした`python`（本物）にはSTDINが空で渡り、`tool_name=""`で即サイレントexit
+- **誤ったアプローチ**: bash wrapperでpython3/python切替は安全に見えるが、Windowsのpython3ダミーがSTDINを消費するという特殊動作を考慮していなかった
+- **正しい解決策**:
+  1. `settings.local.json` のPostToolUseFailureフックを `bash error-tracker.sh` → `python error-tracker.py` 直接呼び出しに変更
+  2. `error-tracker.py` の`tool_name`空チェック（line 55）をサイレントexit → 診断ログ出力に変更
+- **修正ファイル**: `.claude/settings.local.json` (line 446), `.claude/hooks/error-tracker.py` (line 55-61)
+- **教訓**: bash wrapperでの`python3 || python`パターンはWindows環境で致命的。STDINを読むスクリプトは特に危険。settings.local.jsonから直接pythonを呼ぶのが正解
+- **再発防止コード**: settings.local.json変更（物理的にbash wrapperを迂回）+ 診断ログ（将来のSTDIN問題を即検知）
+- **GUARD_PATTERN**: NAOTO_OS_CANONICAL_NAME ガードも同時追加（mistake_patterns.json、22パターン目）
+- **影響範囲**: ECCパイプライン全体が34日間盲目化。error-tracker → auto-codifier → fact-checker の連鎖が機能停止していた
+
+---
+
+### 2026-03-29: T023 — .shラッパーのpython3パターン残存が自己学習ループ全体を機能停止させていた
+- **症状**: search_count永続0（30+セッション）、INDEX.json 34件中29件が無価値なセッションサマリー、成功セッションが長期記憶に残らない
+- **根本原因(G1/G2)**: session-end.sh / research-gate.sh / research-reward.sh が `python3 ... 2>/dev/null || python ...` パターンを使用。T022でerror-tracker.shは修正済みだったが残り3本が未修正のまま残存
+- **根本原因(G3)**: memory_extract.pyがsession.jsonしか参照せず、task_ledger.json/failure_memory.jsonの実知識を抽出していなかった
+- **根本原因(G4)**: session-end.pyのAGENT_WISDOM書込条件が `error_count > 0 or started_without` のみで、成功完了セッションは一切記録されなかった
+- **正しい解決策**: (A) .shラッパー4本を `python ...` 直接呼出しに統一。(B) memory_extract.py v2: extract_from_task_ledger() + extract_from_failure_memory() 追加。(C) session-end.py: has_completed_tasks 条件でAGENT_WISDOM書込を成功セッションにも拡張
+- **教訓**: 同種バグを修正する際は必ず全インスタンスを検索してから修正すること。T022で1本修正して「完了」とみなし残り3本を見落とした
+- **再発防止**: 次回同種バグ修正時は `grep -rn "python3" .claude/hooks/*.sh` で同種ファイルを一括確認してから着手する
+
+---
+
+### 2026-03-29: T023 — .shラッパーのpython3||pythonパターンが自己学習ループ全体を機能停止させていた
+- **症状**: research-reward.shのsearch_count永続0（30+セッション）、INDEX.json 34件中29件が無価値なセッションサマリー、成功セッションが長期記憶に残らない
+- **根本原因**: 3本の.shラッパー（session-end.sh / research-gate.sh / research-reward.sh）が  パターンを使用。T022でerror-tracker.shは修正済みだったが残り3本が未修正のまま残存していた
+- **副次的根本原因G3**: memory_extract.pyがsession.jsonしか参照せず、task_ledger.jsonとfailure_memory.jsonの実知識を抽出していなかった
+- **副次的根本原因G4**: session-end.pyのAGENT_WISDOM書込条件が  のみで、成功完了セッションは一切記録されなかった
+- **正しい解決策**:
+  1. .shラッパー4本を  直接呼出しに統一（T022の修正パターンを残り3本に適用）
+  2. memory_extract.py v2: extract_from_task_ledger() + extract_from_failure_memory() を追加。ゴミsession_summaryを search_count>0 or errors の場合のみ生成
+  3. session-end.py: _get_completed_tasks_today() ヘルパー追加、should_write_wisdom条件を has_completed_tasks でも真になるよう拡張
+- **教訓**: T022でerror-tracker.shのみ修正して「完了」とみなしたが、同一パターンを持つ残り3本を見落とした。修正は「同一パターンの全インスタンス」を対象にすべき（grep で pattern を検索してから修正）
+- **再発防止**: 次回同種のバグ修正時は .claude/hooks/session-start.sh:    "$VPS" "python3 -c "
+.claude/hooks/session-start.sh:    "$VPS" "python3 -c " で同種ファイルを一括確認してから修正
+
+---
+
+### 2026-03-29: T025 — 予測ページのUI品質がユーザーに見える状態で世に出た（Oracle Guardian 94%ブロック + エラー文字列表示）
+
+**これは単発バグではなく「出荷基準」の構造的欠陥である。**
+
+#### 症状
+1. `/predictions/` ページで1108件中1045件(94%)が「Oracle Guardian — データ不完全」エラーカードとして表示されていた
+2. `(本文抽出不可)` という内部エラー文字列が43箇所でユーザーに直接表示されていた
+
+#### 根本原因（3層）
+
+**G1（スキーマ進化の断絶）**: prediction_db.json のフィールドが `hit_condition_ja` → `oracle_criteria` に変わったが、`_validate_tracker_card()` の必須フィールドチェックが更新されていなかった。ビルドは成功（exit 0）するが、出力が壊れていた。
+
+**G2（エラー文字列のサニタイズ漏れ）**: コンテンツ抽出パイプラインが失敗した際のエラー文字列 `(本文抽出不可)` が prediction_db.json に書き込まれ、builder がフィルタなしにそのままHTMLに出力していた。`scenarios_labeled[].content` の一部パスにのみフィルタがあり、`base_content/opt_content/pess_content` 割り当てパスには未適用だった。
+
+**G3（UI品質モニタリングの欠如）**: oracle-monitor.py は「ビルドプロセスが動いたか（ログの更新時刻）」だけを確認していた。「実際にユーザーに何が見えるか」を確認していなかった。「ビルド成功 ≠ 出力品質良好」という事実を前提とした監視設計になっていなかった。
+
+#### 正しい解決策
+1. **スキーマ修正**: `_validate_tracker_card()` に `oracle_criteria` を追加（旧フィールド名と新フィールド名の両方を受け入れる）
+2. **サニタイズ追加**: `normalize_payload()` の末尾に `_CONTENT_ERRORS` フィルタを追加。全コンテンツフィールドから既知エラー文字列を除去
+3. **スキーマ互換チェッカー**: ビルダー起動時にサンプル50件のOracleGuardianブロック率を出力（`[SCHEMA CHECK]` ログ）。>50% でアラート
+4. **C3/C4監視**: oracle-monitor.py にライブページ取得チェックを追加。OracleGuardian出現数とプレースホルダー出現数を毎日07:00 JSTに確認。閾値超えでTelegram通知
+
+#### 教訓
+- **「ビルドが動いた」≠「ユーザーに正しいものが見えている」**。この2つは別のチェックが必要
+- スキーマを変更したら必ず validator も同時に更新する。片方だけ更新するのは半端な修正
+- 内部エラー文字列は生成時にフィルタするのではなく、表示層でも必ずサニタイズする（多層防御）
+- 「監視している」と思っていても「何を監視しているか」を問い直す必要がある
+
+#### 再発防止コード（追加済み）
+- `prediction_page_builder.py:normalize_payload()` — `_CONTENT_ERRORS` サニタイズレイヤー追加
+- `prediction_page_builder.py:main()` — `[SCHEMA CHECK]` スタートアップ診断（サンプル50件のブロック率）
+- `oracle-monitor.py` — C3(OracleGuardianブロック率) + C4(プレースホルダー表示) チェック追加（毎日07:00 JST）
+- `prediction_auto_verifier.py` — `KeyError: 'outcome'` クラッシュ修正（`judgment.get('outcome')`でガード）
+
+---
+
+### 2026-03-29: T026 — 重複記事156件がサイトに公開されていた（パイプラインにdedup機構なし）
+
+- **症状**: site_health_check.py が88件のFAILを検知。全て「重複タイトル」。87タイトルグループ × 複数件。最大21件重複（"South China Sea Standoff"）。公開記事数が本来の1194件→1350件（+156件）に膨れ上がっていた
+- **根本原因**: `nowpattern_publisher.py` の `publish_deep_pattern()` に重複タイトルチェックがなかった。NEOが同一トピックで記事を複数回生成しても、Ghost APIは毎回別記事として受け付け、スラッグに `-2`, `-3` を自動付与。誰も気づかないまま累積
+- **副次原因**: Ghost Admin APIの`updated_at`フィールドはSQLite形式（`2026-03-28 22:42:02`）で返るが、PUT APIはISO 8601形式（`2026-03-28T22:42:02.000Z`）を要求。この不一致で最初の修正スクリプトが144件中11件しか成功しなかった
+- **正しい解決策**:
+  1. dedup2.py (`fix_dt()` 付き) で全156件をDRAFT降格 — 144/144成功（11件は初回スクリプトで処理済み）
+  2. `nowpattern_publisher.py` に v5.5 重複タイトルゲートを追加（SQLite照合 → 同一タイトル発見→`ValueError`でブロック）。バックアップ: `.bak-20260329-dedup`
+- **教訓**:
+  - **「Ghost APIが受け付けた = 新規記事として正しい」ではない**。Ghost側はスラッグ衝突を自動解決するが、ビジネス要件としての重複はアプリ側で防ぐ必要がある
+  - **`updated_at`のDB形式とAPI形式は異なる**。DB: `YYYY-MM-DD HH:MM:SS` → API: `YYYY-MM-DDTHH:MM:SS.000Z`（`T`、ミリ秒、`Z`が必要）
+  - 出荷前チェック（`site_health_check.py --quick`）を実行すれば即座に検知できた。定期実行が重要
+- **再発防止コード（追加済み）**:
+  - `nowpattern_publisher.py:publish_deep_pattern()` L791 — v5.5 dedup gate: Ghost SQLiteを照合し同一タイトルが存在すれば`ValueError`をraiseしてブロック
+  - `site_health_check.py` — チェック9（重複記事）が毎回検査。出荷基準: FAIL 0件
+

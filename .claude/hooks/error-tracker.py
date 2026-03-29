@@ -53,7 +53,12 @@ else:
 
 # ── ノイズフィルター: 権限ブロック・空エラーはスキップ ──
 if not tool_name:
-    sys.exit(0)  # ツール名が空 = hookシステム自体の問題
+    # T022修正: サイレントexitではなく診断ログを残す（stdin配信問題の検知用）
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    with open(ERROR_LOG, "a", encoding="utf-8") as f:
+        f.write("[%s] DIAG: tool_name empty (stdin may be broken). raw=%s\n" % (
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"), repr(raw[:100]) if raw else "EMPTY"))
+    sys.exit(0)
 NOISE_SIGNALS = [
     "permission denied", "not allowed", "blocked by settings",
     "tool_use_error", "unknown error"

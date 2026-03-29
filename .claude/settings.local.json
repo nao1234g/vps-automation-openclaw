@@ -443,7 +443,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/error-tracker.sh\"",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/error-tracker.py\" \"$CLAUDE_PROJECT_DIR\"",
             "timeout": 5
           }
         ]

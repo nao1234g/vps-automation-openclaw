@@ -28,6 +28,17 @@ rm -f "$STATE_DIR/intent_needs_confirmation.flag"
 echo "=== SESSION START: MANDATORY CONTEXT ==="
 echo ""
 
+# ── NAOTO OS PRIMARY ANCHOR（Resume Guard — project drift 防止） ──────────────
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "🏛️  NAOTO OS PRIMARY ANCHOR"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  このリポジトリ = Naoto Intelligence OS のルート"
+echo "  Nowpattern    = NAOTO OS 配下のプロジェクト（最重要だが最上位ではない）"
+echo "  正式名称: 「NAOTO OS」または「Naoto Intelligence OS」"
+echo "  ⚠️  Nowpattern を主語にして OS を語ること / vps-automation を Nowpattern 専用と言うことは禁止"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
 # 1. Show scorecard
 if [ -f "$SCORECARD_FILE" ]; then
     echo "--- YOUR PERFORMANCE SCORECARD ---"
@@ -94,6 +105,22 @@ else
     echo "[WARN] AGENT_KNOWLEDGE.md取得失敗"
 fi
 echo ""
+
+# 3c. ★ ローカル自己学習ログ（session-end.py が自動更新）
+AGENT_WISDOM_FILE="$PROJECT_DIR/docs/AGENT_WISDOM.md"
+if [ -f "$AGENT_WISDOM_FILE" ]; then
+    echo "--- AGENT WISDOM (local self-learning log, auto-updated by session-end.py) ---"
+    WISDOM_TAIL=$(grep -A 30 "## 自己学習ログ" "$AGENT_WISDOM_FILE" 2>/dev/null | tail -20)
+    if [ -n "$WISDOM_TAIL" ]; then
+        echo "$WISDOM_TAIL"
+    else
+        echo "（自己学習ログなし）"
+    fi
+    echo ""
+else
+    echo "[WARN] docs/AGENT_WISDOM.md が見つかりません (session-end.py の書き込みが無効化されています)"
+    echo ""
+fi
 
 # 4. ★ 長期記憶から関連コンテキストを注入
 MEMORY_DIR="$PROJECT_DIR/.claude/memory"
@@ -242,6 +269,26 @@ if [ -n "$EVO_AUDIT" ]; then
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
 fi
+
+# ── 3d. ECC Guard Health Check（前回regression結果表示 + バックグラウンド更新） ──
+REGRESSION_CACHE="$STATE_DIR/last_regression_result.txt"
+REGRESSION_RUNNER="$PROJECT_DIR/.claude/hooks/regression-runner.py"
+if [ -f "$REGRESSION_CACHE" ]; then
+    REGRESSION_SUMMARY=$(grep -E "^結果:|❌ FAIL" "$REGRESSION_CACHE" 2>/dev/null | head -5)
+    REGRESSION_TS=$(grep "\[REGRESSION RUNNER\] 開始:" "$REGRESSION_CACHE" 2>/dev/null | head -1)
+    if [ -n "$REGRESSION_SUMMARY" ]; then
+        echo "--- ECC GUARD HEALTH (regression-runner.py) ---"
+        [ -n "$REGRESSION_TS" ] && echo "  $REGRESSION_TS"
+        echo "  $REGRESSION_SUMMARY"
+        echo ""
+    fi
+elif [ -f "$REGRESSION_RUNNER" ]; then
+    echo "--- ECC GUARD HEALTH ---"
+    echo "  [初回] 初期化中 — バックグラウンドで regression-runner.py を実行中"
+    echo ""
+fi
+# バックグラウンド実行（次回セッション用にキャッシュ更新、失敗しても続行）
+[ -f "$REGRESSION_RUNNER" ] && python "$REGRESSION_RUNNER" "$PROJECT_DIR" > "$REGRESSION_CACHE" 2>&1 &
 
 echo "--- RULES ---"
 echo "1. RESEARCH FIRST: WebSearch/WebFetch BEFORE any implementation"

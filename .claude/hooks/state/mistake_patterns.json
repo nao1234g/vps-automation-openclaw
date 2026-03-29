@@ -166,5 +166,85 @@
     "added_at": "2026-03-15",
     "source": "auto-codifier",
     "example": "NEO-ONE (Claude Opus 4.6, VPS) → 予測生成"
+  },
+  {
+    "pattern": "(?<![A-Za-z])NOT OS(?![A-Za-z])|(?<![A-Za-z])NOT-OS(?![A-Za-z])|(?<![a-z])not os(?![a-z])|(?<![A-Za-z])Naoto OS(?!.*Intelligence)",
+    "feedback": "⛔ 正式名称は「NAOTO OS」または「Naoto Intelligence OS」です。「NOT OS」「Naoto OS」等の略称・誤称は禁止。CLAUDE.md冒頭を参照: Naoto Intelligence OS。",
+    "name": "NAOTO_OS_CANONICAL_NAME",
+    "added_at": "2026-03-28",
+    "source": "T022-manual",
+    "example": "NOT OSの健康状態を確認します"
+  },
+  {
+    "pattern": "Nowpattern.*(?:が|は|こそ).*(?:ルート|最上位|主要システム|(?<!NAOTO )OS|オペレーティング|primary.*system|root.*context|top.level)|このリポジトリ.*(?:は|=).*Nowpattern.*(?:専用|のみ|だけ|のリポジトリ|のルート|ルート)|vps-automation.*Nowpattern.*(?:専用|のリポジトリ)|Nowpattern.*NAOTO.*OS.*(?:より|超|上位)",
+    "feedback": "⛔ PROJECT DRIFT 検出: このリポジトリのルートは「NAOTO Intelligence OS」です。Nowpatternは配下のプロジェクトであり、最上位ではありません。CLAUDE.md冒頭: 「このリポジトリ（vps-automation-openclaw）はNaoto Intelligence OSのルートである」",
+    "name": "PROJECT_DRIFT_GUARD",
+    "added_at": "2026-03-29",
+    "source": "T024-manual",
+    "example": "このリポジトリはNowpatternのルートです。Nowpatternが最上位のOSです。"
+  },
+  {
+    "pattern": "(?:学習しました|理解しました|把握しました|確認しました|分かりました)(?![^。]*(?:実装|修正|変更|追加|削除|作成|デプロイ|コミット|プッシュ|実行|適用))",
+    "feedback": "⛔ LEARNING_WITHOUT_ACTION 検出: 学習・理解の報告だけで実装アクションが伴っていません。「学習しました」だけでは不十分。必ず対応するコード修正・実装・テスト実行を伴って報告してください。",
+    "name": "LEARNING_WITHOUT_ACTION",
+    "added_at": "2026-03-29",
+    "source": "T025-manual",
+    "example": "この問題のパターンを学習しました。今後は同じミスをしないよう理解しました。"
+  },
+  {
+    "pattern": "監視(?:を追加|に追加|cron)(?:しました|しています|済み)(?![^。]*(?:根本原因|root cause|修正|fix|解決|resolve|対処))",
+    "feedback": "⛔ MONITORING_ONLY 検出: 監視追加の報告だけで根本原因修正が伴っていません。監視は再発防止の補助手段です。まず根本原因を修正してから監視を追加してください。",
+    "name": "MONITORING_ONLY",
+    "added_at": "2026-03-29",
+    "source": "T025-manual",
+    "example": "このエラーを検知するための監視を追加しました。監視cronを設定済みです。"
+  },
+  {
+    "pattern": "regression.*手動|手動.*regression|regression.*run.*manually",
+    "feedback": "⛔ REGRESSION_MANUAL_ONLY 検出: regression-runner.py を手動実行専用とするのは危険です。session-start.sh の 3d セクション（バックグラウンド実行）が正しい自動化実装例です。",
+    "name": "REGRESSION_MANUAL_ONLY",
+    "added_at": "2026-03-29",
+    "source": "T027-manual",
+    "example": "regression-runner.pyは手動実行のみです。自動化は不要です。"
+  },
+  {
+    "pattern": "picsum\\.photos|thinkingConfig.*top.level|split.*\\\\n.*0",
+    "feedback": "⛔ EN_PIPELINE_QUALITY 検出: picsum.photos使用禁止（本番サムネイルに仮画像を使わない）。Gemini thinkingConfigはgenerationConfig内に配置する（top-levelでは無効）。\\n改行でタイトルが切れる場合はreplace('\\n','')を使う。",
+    "name": "EN_PIPELINE_QUALITY",
+    "added_at": "2026-03-29",
+    "source": "T029-manual",
+    "example": "feature_image にpicsum.photosを使って記事サムネイルを設定します。"
+  },
+  {
+    "pattern": "pattern_history.*title|pattern_history.*content.*similarity",
+    "feedback": "⛔ PATTERN_HISTORY_FIELD_MISMATCH 検出: pattern_historyのAIスキーマはevent/pattern/lessonフィールドを返す。title/contentはフォールバックのみ。event・pattern・lessonを優先して参照してください。",
+    "name": "PATTERN_HISTORY_FIELD_MISMATCH",
+    "added_at": "2026-03-29",
+    "source": "T029-manual",
+    "example": "pattern_historyセクションのtitleフィールドを読み込みます。"
+  },
+  {
+    "pattern": "slug.*en-[a-z]+.*create|pages.*slug.*en-[a-z]+.*post",
+    "feedback": "⛔ BILINGUAL_URL_SLUG_WRONG 検出: ENページのslugをen-XXX形式で直接createするとURLが /en-XXX/（SEO非推奨）になります。正しい公開URL: /en/XXX/。Caddyのrewriteで /en/XXX/ → Ghost slug en-XXX にマッピングしてください。",
+    "name": "BILINGUAL_URL_SLUG_WRONG",
+    "added_at": "2026-03-29",
+    "source": "T029-manual",
+    "example": "slug en-aboutをGhost APIでcreateします。"
+  },
+  {
+    "pattern": "AGENT_WISDOM.*qualitative|qualitative.*calibrat|calibration.*text.*only|text.*ルール.*機械強制なし",
+    "feedback": "⛔ CALIBRATION_QUALITATIVE_ONLY 検出: AGENT_WISDOMへの定性テキスト記録だけでは機械強制になりません。calibration_rules.json（JSON構造化ルール）+ apply_calibration_rules()のコード実装が必要です。学んでいるふりを防いでください。",
+    "name": "CALIBRATION_QUALITATIVE_ONLY",
+    "added_at": "2026-03-29",
+    "source": "T030-manual",
+    "example": "AGENT_WISDOMにqualitativeな学習メモを追記しました。calibrationテキストを記録しました。"
+  },
+  {
+    "pattern": "xmrig|xmrig-restore|/etc/xmrig|systemd-bench",
+    "feedback": "⛔ XMRIG_MINER_ARTIFACT 検出: xmrig Moneroマイナーの痕跡です。VPSへの不正アクセスによるマルウェア。除去には: 1) crontab -l | grep -v xmrig-restore | crontab - 2) rm -rf /etc/xmrig-restore/ 3) rm -f /root/.system-cache/systemd-bench。Naoto承認後に実行してください（Type 1判断）。",
+    "name": "XMRIG_MINER_ARTIFACT",
+    "added_at": "2026-03-29",
+    "source": "T030-manual",
+    "example": "xmrig プロセスが稼働中です。systemd-benchのcronが登録されています。"
   }
 ]

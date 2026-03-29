@@ -68,19 +68,49 @@ if SCORECARD.exists():
         pass
 
 # 2. AGENT_WISDOM 自動更新（セッションで学んだことを記録）
-# エラーが1件以上あった場合、またはリサーチなしで開始した場合は記録
-if (error_count > 0 or started_without) and AGENT_WISDOM.exists():
-    wisdom_entry = "\n### %s セッションサマリー（自動記録）\n" % date_header
+# 条件: エラーあり / リサーチなし開始 / 完了タスクあり — 成功セッションも記録対象
+def _get_completed_tasks_today(project_dir: Path, today: str) -> list:
+    """タスク台帳から今日完了したタスクIDリストを返す"""
+    ledger_file = project_dir / ".claude" / "state" / "task_ledger.json"
+    if not ledger_file.exists():
+        return []
+    try:
+        ledger = json.loads(ledger_file.read_text(encoding="utf-8"))
+        tasks = ledger.get("tasks", [])
+        return [
+            t.get("task_id", t.get("id", "?"))
+            for t in tasks
+            if t.get("status") == "done"
+            and (
+                (t.get("completed_at") or "").startswith(today)
+                or (t.get("created_at") or "").startswith(today)
+            )
+        ]
+    except Exception:
+        return []
+
+completed_today = _get_completed_tasks_today(PROJECT_DIR, date_header)
+has_completed_tasks = len(completed_today) > 0
+
+should_write_wisdom = (error_count > 0 or started_without or has_completed_tasks)
+
+if should_write_wisdom and AGENT_WISDOM.exists():
+    # date_short（HH:MM付き）をヘッダーに使うことで、同日複数セッションも個別記録される
+    wisdom_entry = "\n### %s セッションサマリー（自動記録）\n" % date_short
     wisdom_entry += "- searches: %d, errors: %d, research_first: %s\n" % (search_count, error_count, research_done)
     if errors:
         wisdom_entry += "- エラー発生ツール: %s\n" % ", ".join(set(e.get("tool", "?") for e in errors[:5]))
     if started_without:
         wisdom_entry += "- ⚠️ リサーチなしで実装開始（次回は先にWebSearchすること）\n"
+    if has_completed_tasks:
+        wisdom_entry += "- ✅ 完了タスク: %s\n" % ", ".join(completed_today)
 
-    # 既存の自動記録エントリと重複しないよう確認
-    marker = "セッションサマリー（自動記録）"
+    # 重複チェック: date_short（HH:MM粒度）単位で同一エントリを防ぐ
+    # date_short = "2026-03-29 14:30" — 同分以内の重複書き込みのみ防止
+    # ★ 旧ロジック（date_headerのみ）は1日1エントリ制限になっていたので修正
     existing = AGENT_WISDOM.read_text(encoding="utf-8")
-    if date_header not in existing or marker not in existing:
+    check_key = date_short + " セッションサマリー（自動記録）"
+    if check_key not in existing:
         with open(AGENT_WISDOM, "a", encoding="utf-8") as f:
             f.write(wisdom_entry)
         print("📚 AGENT_WISDOM.md にセッションサマリーを記録しました。")
@@ -88,10 +118,16 @@ if (error_count > 0 or started_without) and AGENT_WISDOM.exists():
 # 3. 長期記憶システムに自動保存（ChromaDB + Markdown）
 try:
     sys.path.insert(0, str(SCRIPTS_DIR))
-    from memory_extract import extract_from_session
+    from memory_extract import (
+        extract_from_session,
+        extract_from_task_ledger,
+        extract_from_failure_memory,
+    )
     from memory_system import MemorySystem
 
     memories = extract_from_session(PROJECT_DIR)
+    memories.extend(extract_from_task_ledger(PROJECT_DIR))
+    memories.extend(extract_from_failure_memory(PROJECT_DIR))
     if memories:
         # ローカル保存先（VPS不達時のフォールバック）
         local_memory_dir = PROJECT_DIR / ".claude" / "memory"

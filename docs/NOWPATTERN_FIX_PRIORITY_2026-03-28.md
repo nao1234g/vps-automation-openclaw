@@ -28,7 +28,7 @@
 | **acceptance_criteria** | `curl -s https://nowpattern.com/llms.txt \| grep "en/predictions"` が 2件ヒットすること |
 | **evidence_needed** | llms.txt の全文（URL 含む） |
 | **evidence_source** | `curl -s https://nowpattern.com/llms.txt` |
-| **status** | FAIL |
+| **status** | ✅ DONE（2026-03-28） |
 | **blocker_reason** | 現在 `en-predictions/`（2箇所）が誤り |
 | **notes** | Ghost Admin → Pages → llms.txt で編集。約5分の作業。リスクゼロ。ISS-001 + ISS-009 を同時解決 |
 
@@ -86,7 +86,7 @@ ssh root@163.44.124.123 "systemctl restart ghost-nowpattern"
 | **acceptance_criteria** | `curl -s https://nowpattern.com/predictions/ \| grep -c 'id="np-scoreboard"'` → 1 / `curl -s https://nowpattern.com/predictions/ \| grep -c 'id="np-resolved"'` → 1 |
 | **evidence_needed** | 両予測ページの HTML（ID 属性） |
 | **evidence_source** | curl + grep 実行 |
-| **status** | FAIL |
+| **status** | ✅ DONE（2026-03-28） |
 | **blocker_reason** | audit_check.py: np-scoreboard=False, np-resolved=False（両ページ） |
 | **notes** | prediction_page_builder.py の class="np-scoreboard-wrapper" → id="np-scoreboard" class="np-scoreboard-wrapper" に変更。ページ再生成が必要。ISS-006 + ISS-007 を同時解決 |
 
@@ -120,7 +120,7 @@ ssh root@163.44.124.123 "python3 /opt/shared/scripts/prediction_page_builder.py"
 | **acceptance_criteria** | `curl -o /dev/null -w "%{http_code}" https://nowpattern.com/llms-full.txt` → 200 |
 | **evidence_needed** | curl HTTP ステータスコード |
 | **evidence_source** | curl 実行 |
-| **status** | FAIL |
+| **status** | ✅ DONE（2026-03-28） |
 | **blocker_reason** | 301 → /llms-full.txt/ (trailing slash) → 404。Caddyfile に file_server 設定なし |
 | **notes** | Caddyfile の Ghost reverse_proxy より上位に `handle /llms-full.txt` ブロックを追加。llms-full.txt ファイルが `/var/www/nowpattern/content/files/` に存在することを先に確認。ISS-002 解決 |
 
@@ -149,7 +149,7 @@ handle /llms-full.txt {
 | **acceptance_criteria** | `curl -I -H "Accept-Encoding: gzip" https://nowpattern.com/predictions/ \| grep content-encoding` → `content-encoding: gzip` |
 | **evidence_needed** | curl -I の content-encoding ヘッダー |
 | **evidence_source** | curl 実行 |
-| **status** | FAIL |
+| **status** | ✅ DONE（2026-03-28） |
 | **blocker_reason** | content-encoding ヘッダーなし（289,579 bytes 非圧縮）。Caddyfile に `encode zstd gzip` なし |
 | **notes** | REQ-004 と同じ Caddyfile 編集セッションで同時修正可能。`encode zstd gzip` を nowpattern.com ブロックの先頭近くに追加。ISS-011 解決 |
 
@@ -280,7 +280,7 @@ dataset_schema = {
 | **acceptance_criteria** | `curl -s https://nowpattern.com/ \| grep -c hreflang` → 3以上 |
 | **evidence_needed** | curl の hreflang タグ数 |
 | **evidence_source** | curl 実行 |
-| **status** | FAIL |
+| **status** | ✅ ALREADY PASSING（変更なし） |
 | **blocker_reason** | ホームページの hreflang = 0件 |
 | **notes** | Ghost Admin → Code Injection → Site Header に3行追加。5分以下の作業。ISS-010 解決 |
 
@@ -347,7 +347,7 @@ dataset_schema = {
 | **acceptance_criteria** | curl でステータス 200 + `status: ok` の JSON レスポンス |
 | **evidence_needed** | curl レスポンス |
 | **evidence_source** | `curl -s https://nowpattern.com/reader-predict/health` |
-| **status** | UNVERIFIED |
+| **status** | ✅ ALREADY PASSING（変更なし） |
 | **blocker_reason** | 未確認（調査が必要） |
 | **notes** | 5分以内で確認可能。FAIL の場合は FastAPI サービス再起動が必要。ISS-018 解決 |
 
