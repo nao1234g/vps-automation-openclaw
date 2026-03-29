@@ -1,0 +1,189 @@
+name: Live Site Guard
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+jobs:
+  availability:
+    name: External Availability Probe
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run availability probe
+        run: |
+          python scripts/live_site_availability_check.py \
+            --base-url https://nowpattern.com \
+            --json-out reports/live_site_guard/availability.json
+
+      - name: Upload availability report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-site-availability
+          path: reports/live_site_guard/
+          retention-days: 14
+
+  ui-smoke:
+    name: External UI Smoke Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Playwright
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Run site UI smoke audit
+        run: |
+          python scripts/site_ui_smoke_audit.py \
+            --base-url https://nowpattern.com \
+            --skip-articles \
+            --json-out reports/live_site_guard/site_ui_smoke.json \
+            --screenshot-dir reports/live_site_guard/screenshots
+
+      - name: Upload smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-site-ui-smoke
+          path: reports/live_site_guard/
+          retention-days: 14
+
+  article-smoke:
+    name: Daily Article UI Smoke
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 4 * * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Playwright
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Run article-inclusive smoke audit
+        run: |
+          python scripts/site_ui_smoke_audit.py \
+            --base-url https://nowpattern.com \
+            --json-out reports/live_site_guard/site_ui_smoke_articles.json \
+            --screenshot-dir reports/live_site_guard/article-screenshots
+
+      - name: Upload article smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-site-article-smoke
+          path: reports/live_site_guard/
+          retention-days: 14
+
+  notify:
+    name: Notify Guard Result
+    runs-on: ubuntu-latest
+    needs: [availability, ui-smoke, article-smoke]
+    if: always()
+
+    steps:
+      - name: Create or update outage issue
+        if: needs.availability.result == 'failure' || needs.ui-smoke.result == 'failure' || needs.article-smoke.result == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'Live site guard alert: nowpattern.com failing';
+            const body = [
+              'The scheduled live-site guard detected a production issue.',
+              '',
+              `Date: ${new Date().toISOString()}`,
+              `Availability: ${'${{ needs.availability.result }}'}`,
+              `UI smoke: ${'${{ needs.ui-smoke.result }}'}`,
+              `Article smoke: ${'${{ needs.article-smoke.result }}'}`,
+              '',
+              `Workflow run: https://github.com/${owner}/${repo}/actions/runs/${context.runId}`
+            ].join('\n');
+
+            const issues = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: 'open',
+              per_page: 100
+            });
+
+            const existing = issues.data.find((issue) => issue.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body
+              });
+            } else {
+              await github.rest.issues.createIssue({
+                owner,
+                repo,
+                title,
+                body,
+                labels: ['bug']
+              });
+            }
+
+      - name: Close resolved outage issue
+        if: needs.availability.result == 'success' && needs.ui-smoke.result == 'success' && (needs.article-smoke.result == 'success' || needs.article-smoke.result == 'skipped')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'Live site guard alert: nowpattern.com failing';
+            const issues = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: 'open',
+              per_page: 100
+            });
+            const existing = issues.data.find((issue) => issue.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body: `Recovered at ${new Date().toISOString()}. Workflow run: https://github.com/${owner}/${repo}/actions/runs/${context.runId}`
+              });
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: existing.number,
+                state: 'closed'
+              });
+            }

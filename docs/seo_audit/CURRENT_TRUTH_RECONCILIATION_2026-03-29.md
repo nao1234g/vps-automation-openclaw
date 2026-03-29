@@ -105,4 +105,33 @@ FINAL_HANDOFF_2026-03-28 の記録内容は総じて正確。
 
 ---
 
-*作成: 2026-03-29 | Engineer: Claude Code (local)*
+## 追記: Session 5 comprehensive re-audit（2026-03-29）
+
+### 実施内容
+
+13仮説をライブVPS確認で全分類。実装対象ゼロ確認。
+
+| 確認項目 | 結果 |
+|---------|------|
+| DLQ | 0 ✅ (回帰なし) |
+| ghost_url 4件 | 全JA URL ✅ (session2修正維持) |
+| JA/EN predictions schemas | Dataset+FAQPage+CollectionPage 全共存 ✅ |
+| about/taxonomy 4ページ WebPage | 全4ページ ✅ (session1修正維持) |
+| Builder最終実行 | 2026-03-29 07:01 JST / E2E PASS ✅ |
+| robots.txt AI directives | GPTBot等全Disallow:/ ✅ |
+| llms.txt / llms-full.txt | 200 OK / gzip ✅ |
+| Homepage hreflang | JS injection確認 (ISS-HREFLANG-001 backlog) |
+
+### 13仮説分類結果
+
+STALE_HYPOTHESIS_CLOSED: 11件 / BLOCKED: 1件 / OUT_OF_SCOPE: 1件 / **OPEN_CURRENT: 0件**
+
+### Session 5 結論
+
+実装なし。全修正が維持されている。STATE D (TERMINAL_WAIT) 確定。
+
+詳細証跡: `VERIFICATION_LOG_2026-03-29-session5.md`
+
+---
+
+*作成: 2026-03-29 | 更新: session5 2026-03-29 | Engineer: Claude Code (local)*

@@ -99,6 +99,31 @@ if tool_name in ("Edit", "Write", "Bash"):
             print(json.dumps({"decision": "block", "reason": msg}))
             sys.exit(2)
 
+    # ── KNOWN_MISTAKES.md への新規エントリには GUARD_PATTERN 必須（物理ブロック）──
+    fp_check = tool_input.get("file_path", "")
+    content_check = (
+        tool_input.get("new_string", "")
+        or tool_input.get("content", "")
+        or ""
+    )
+    if "KNOWN_MISTAKES" in fp_check.upper():
+        import re as _re
+        # 新規ミスエントリ（"### 2026-" パターン）が含まれる場合
+        has_new_entry = bool(_re.search(r'###\s+20\d\d-', content_check))
+        has_guard_pattern = "GUARD_PATTERN" in content_check or "mistake_patterns" in content_check.lower()
+        if has_new_entry and not has_guard_pattern:
+            msg = (
+                "🚫 BLOCKED: KNOWN_MISTAKES.md に新規ミスエントリを書く場合は GUARD_PATTERN が必須です。\n\n"
+                "テキスト記録だけでは物理強制力ゼロ。コードガードとセットが必要。\n\n"
+                "必須フォーマット（エントリの末尾に追加）:\n"
+                "**GUARD_PATTERN**: `{\"pattern\":\"<regex>\",\"feedback\":\"<msg>\",\"name\":\"<NAME>\",\"added_at\":\"2026-03-29\",\"source\":\"manual\"}`\n\n"
+                "→ GUARD_PATTERN を含めてから再度書き込んでください。\n"
+                "→ 適切な regex がない場合は: name=PROCESS_ONLY として process-only entry であることを明記\n"
+                "（このブロックは「テキストは強制しない、コードだけが強制する」原則の物理強制です）"
+            )
+            print(json.dumps({"decision": "block", "reason": msg}))
+            sys.exit(2)
+
     # ── Research check before Edit/Write ──
     research_done = state.get("research_done", False)
     if not research_done:

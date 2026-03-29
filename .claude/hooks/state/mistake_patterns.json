@@ -246,5 +246,51 @@
     "added_at": "2026-03-29",
     "source": "T030-manual",
     "example": "xmrig プロセスが稼働中です。systemd-benchのcronが登録されています。"
+  },
+  {
+    "pattern": "t\\.get\\([\"']id[\"'],",
+    "feedback": "⛔ TASK_LEDGER_KEY_MISMATCH 検出: task_ledger.json は 'task_id' キーを使う。t.get('task_id', t.get('id','?')) の形でフォールバック付きにしてください",
+    "name": "TASK_LEDGER_KEY_MISMATCH",
+    "added_at": "2026-03-29",
+    "source": "T031-manual",
+    "example": "t.get('id', '?') for t in tasks"
+  },
+  {
+    "pattern": "status\\s*==\\s*['\"](resolved|open|awaiting|expired)['\"]",
+    "feedback": "⛔ PREDICTION_STATUS_LOWERCASE 検出: prediction_db.json の status は UPPERCASE のみ（RESOLVED, OPEN, AWAITING_EVIDENCE, EXPIRED_UNRESOLVED）。lowercase 比較では0件になります",
+    "name": "PREDICTION_STATUS_LOWERCASE",
+    "added_at": "2026-03-29",
+    "source": "SEO-session5-manual",
+    "example": "status == \"resolved\""
+  },
+  {
+    "pattern": "grep.*hreflang\\b(?!.*alternate)",
+    "feedback": "⚠️ HREFLANG_GREP_FALSE_POSITIVE 注意: grep hreflang は JS コード行も含む偽陽性を返す。静的 <link> タグ確認には grep alternate.*hreflang を使うこと",
+    "name": "HREFLANG_GREP_FALSE_POSITIVE",
+    "added_at": "2026-03-29",
+    "source": "SEO-session5-manual",
+    "example": "grep -c hreflang page.html"
+  },
+  {
+    "pattern": "KNOWN_MISTAKES(?:\\.md)?.*?(?:追記|更新|記録)(?:しました|完了|しています|済み).*?(?:ことで|これで|により).*?(?:再発防止|防止|防ぎ|守ら|徹底|完了|対応済)",
+    "feedback": "⛔ TEXT_NOT_ENFORCEMENT 検出: KNOWN_MISTAKESへのテキスト記録だけでは物理強制力ゼロ。mistake_patterns.json に GUARD_PATTERN を同時登録してください。テキスト記録 = 人間への通知のみ。コード強制 = fact-checker.py が exit 2 で物理ブロック。この2つがセットで初めてガード完了。",
+    "name": "TEXT_NOT_ENFORCEMENT",
+    "added_at": "2026-03-29",
+    "source": "naoto-demand-2026-03-29",
+    "example": "KNOWN_MISTAKES.mdに追記しました。これで再発防止完了です。"
+  },
+  {
+    "pattern": "(?:テキスト|ドキュメント|ルール|CLAUDE\\.md|AGENT_WISDOM).*?(?:書いた|追記|記録|更新).*?(?:だけで|のみで).*?(?:強制|防止|徹底|守|完了)|テキストに.*?書く.*?(?:だけで|のみで).*?(?:エージェント|守|強制|徹底)",
+    "feedback": "⛔ TEXT_ONLY_ENFORCEMENT_CLAIM 検出: テキスト記録だけでは全エージェントへの強制力はゼロ。mistake_patterns.json のGUARD_PATTERN + fact-checker.py (exit 2) の組み合わせだけが物理強制。CLAUDE.md / AGENT_WISDOM への記録は参考情報にすぎない。",
+    "name": "TEXT_ONLY_ENFORCEMENT_CLAIM",
+    "added_at": "2026-03-29",
+    "source": "naoto-demand-2026-03-29",
+    "example": "テキストルールに書いただけで全エージェントが守るようになります。"
+  },
+  {
+    "name": "STAT_DISPLAY_CONSISTENCY",
+    "pattern": "的中.*外れ.*正確率|HITS.*MISSES.*ACCURACY|hits.*misses.*accuracy",
+    "feedback": "⚠️ STAT_CONSISTENCY_CHECK: HIT/MISS と ACCURACY を同時表示する場合、ACCURACY = HIT/(HIT+MISS) で計算した値と一致しているか確認してください。別の分母（RESOLVED-NOT_SCORED等）を使っている場合は注記必須。",
+    "added_at": "2026-03-29"
   }
 ]

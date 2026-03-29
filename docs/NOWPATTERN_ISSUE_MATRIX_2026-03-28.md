@@ -129,3 +129,4 @@ ISS-003 (/en/predictions/ Article schema)
 *更新2: 2026-03-29 Phase 5 — ISS-003 RESOLVED（CollectionPage on /en/predictions/）。ISS-012 RESOLVED（WebPage on 4 about/taxonomy pages）。合計 19件 / 解決済み 17件 / OPEN 2件（ISS-008/014）*
 *更新3: 2026-03-29 session2 — ISS-014 RESOLVED（ライブ確認でWebSite重複なし・仮説誤りだった）。合計 19件 / 解決済み 18件 / OPEN 1件（ISS-008）。prediction_db ghost_url 4件修正完了（NP-2026-0020/21/25/27: EN URL → JA URL）*
 *更新4: 2026-03-29 session3 — ISS-NAV-001 正式RESOLVED確認（Ghost nav=/taxonomy/使用中をVPS SQLite確認）。合計 20件 / 解決済み 19件 / BLOCKED 1件（ISS-008のみ）。TERMINAL STATE確定。*
+*更新5: 2026-03-29 session5 — comprehensive re-audit pass実施。13仮説全分類（STALE×11/BLOCKED×1/OUT_OF_SCOPE×1）。OPEN_CURRENT=0件。実装なし。全修正が維持されていることをライブ確認。STATE D (TERMINAL_WAIT) 再確定。*

@@ -20,7 +20,8 @@
       "Bash(ssh root@163.44.124.123:*)",
       "Bash(\"c:/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/docs/KNOWN_MISTAKES.md\":*)",
       "Bash(\"/c/Program Files/Python312/python.exe\" -c:*)",
-      "Bash(\"/c/Program Files/Python312/python.exe\" -c \":*)"
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \":*)",
+      "Bash(wsl -d Ubuntu -e bash -c '$HOME/.smux/tmux-bridge read codex 5 && $HOME/.smux/tmux-bridge type codex \"\"esc\"\"')"
     ],
     "deny": [
       "Bash(* rm -rf /*)",

@@ -139,7 +139,9 @@
       "Bash(grep:*)",
       "Bash(\"/c/Program Files/Python312/python.exe\" ask.py \"日銀 利上げ\" -n 5)",
       "Bash(\"/c/Program Files/Python312/python.exe\" dossier.py --list)",
-      "Bash(\"/c/Program Files/Python312/python.exe\" dossier.py \"日銀\")"
+      "Bash(\"/c/Program Files/Python312/python.exe\" dossier.py \"日銀\")",
+      "Bash(wsl -d Ubuntu -e bash -c 'sleep 35 && tmux capture-pane -t agents:0.1 -p -S -60')",
+      "Bash(wsl -d Ubuntu -e bash -c 'sleep 40 && tmux capture-pane -t agents:0.1 -p -S -50')"
     ],
     "deny": [
       "Read(**/.env)",
@@ -244,6 +246,16 @@
       }
     ],
     "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/coordination-pretool.py\"",
+            "timeout": 5
+          }
+        ]
+      },
       {
         "matcher": "Edit|Write",
         "hooks": [

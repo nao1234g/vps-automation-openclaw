@@ -51,6 +51,7 @@ if tool_name == "Write":
     PROTECTED_FILES = [
         "/.claude/rules/north_star.md",
         "/.claude/rules/operating_principles.md",
+        "/.claude/hooks/state/regression_floor.json",  # T036-P5: フロア改ざん防止
     ]
     for pf in PROTECTED_FILES:
         if normalized.endswith(pf.lstrip("/")):
@@ -139,6 +140,25 @@ if tool_name == "Edit" and hook_event == "PreToolUse":
                     "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
                 )
                 sys.exit(2)
+
+    # ── P2 (T037): regression_floor.json の floor フィールド Edit をブロック ──────
+    # Write 保護だけでは Edit ツールで "floor" 値を書き換える抜け穴がある（T037 MAX coach 指摘）。
+    # Hard Gate 34: Protection-Symmetry — Write保護とEdit保護の対称性を担保する。
+    is_floor_json = normalized.endswith("regression_floor.json")
+    if is_floor_json and '"floor"' in old_string:
+        print(
+            "\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "🔒 [NORTH STAR GUARD] regression_floor.json Edit 禁止\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"  対象ファイル: {file_path}\n"
+            "\n"
+            '  "floor" フィールドの Edit はブロックされています。\n'
+            "  フロア値は regression-runner.py が全テスト PASS 時に自動更新します。\n"
+            "  手動で引き下げることは禁止です（Hard Gate 34: Protection-Symmetry）。\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        )
+        sys.exit(2)
 
 # ── [PostToolUse] Edit: CHANGELOG 未更新をブロック（NORTH_STAR.md / OPERATING_PRINCIPLES.md）───
 if tool_name == "Edit" and hook_event == "PostToolUse":

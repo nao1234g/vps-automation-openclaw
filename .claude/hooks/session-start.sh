@@ -39,6 +39,41 @@ echo "  ⚠️  Nowpattern を主語にして OS を語ること / vps-automatio
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
+# ── ⛔ ECC強制の鉄則（全エージェント毎セッション必読・コードで強制表示） ────────
+echo "╔══════════════════════════════════════════════════╗"
+echo "║  ⛔  テキストは強制しない。コードだけが強制する  ║"
+echo "╚══════════════════════════════════════════════════╝"
+echo ""
+echo "  ❌ KNOWN_MISTAKES.md に書く  = ゼロ強制力（人間への通知のみ）"
+echo "  ❌ AGENT_WISDOM.md に書く    = ゼロ強制力（人間への通知のみ）"
+echo "  ❌ CLAUDE.md にルールを書く  = ゼロ強制力（コンテキスト外れたら忘れる）"
+echo ""
+echo "  ✅ 唯一の物理強制手段:"
+echo "     mistake_patterns.json に GUARD_PATTERN 追加"
+echo "     → fact-checker.py が Stop hook で exit 2 → 物理ブロック"
+echo ""
+PATTERN_COUNT=$(python -c "
+import json, sys
+try:
+    d = json.load(open('$PROJECT_DIR/.claude/hooks/state/mistake_patterns.json', encoding='utf-8'))
+    n = len(d) if isinstance(d, list) else len(d.get('patterns', []))
+    print(n)
+except Exception as e:
+    print('?')
+" 2>/dev/null || echo "?")
+echo "  現在の物理ガード数: ${PATTERN_COUNT} パターン（mistake_patterns.json）"
+echo ""
+echo "  ★ ミス発見したとき の正しい手順（2段セット必須）："
+echo "     Step 1: KNOWN_MISTAKES.md に記録（人間可読）"
+echo "     Step 2: mistake_patterns.json に GUARD_PATTERN 追加（機械強制）"
+echo "     ← この2つが揃って初めてガード完了。Step 1だけでは未完了。"
+echo ""
+echo "  ⚠️  違反検知: fact-checker.py が「テキスト記録=完了」主張をブロック"
+echo "╔══════════════════════════════════════════════════╗"
+echo "║  この原則は初めてではない。何度も言われている。  ║"
+echo "╚══════════════════════════════════════════════════╝"
+echo ""
+
 # 1. Show scorecard
 if [ -f "$SCORECARD_FILE" ]; then
     echo "--- YOUR PERFORMANCE SCORECARD ---"
@@ -289,6 +324,83 @@ elif [ -f "$REGRESSION_RUNNER" ]; then
 fi
 # バックグラウンド実行（次回セッション用にキャッシュ更新、失敗しても続行）
 [ -f "$REGRESSION_RUNNER" ] && python "$REGRESSION_RUNNER" "$PROJECT_DIR" > "$REGRESSION_CACHE" 2>&1 &
+
+# ── Coordination OS: local-claude セッション開始時の登録 ─────────────────────
+# 毎セッション開始時に local-claude を coordination.db に登録（INSERT OR REPLACE）
+COORD_REG=$(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=8 -o BatchMode=yes \
+    "$VPS" "python3 -c \"
+import sqlite3, time, uuid, sys
+DB = '/opt/shared/coordination/coordination.db'
+agent_id = 'local-claude'
+model = 'claude-sonnet-4-6'
+host = 'local-win11'
+workspace = 'c:/Users/user/OneDrive/desktop/vps-automation-openclaw'
+try:
+    db = sqlite3.connect(DB, timeout=10)
+    db.execute('PRAGMA journal_mode=WAL')
+    db.execute('PRAGMA busy_timeout=8000')
+    now = time.time()
+    sid = str(uuid.uuid4())
+    db.execute(
+        'INSERT OR REPLACE INTO agents (agent_id, session_id, model, host, workspace, current_status, last_heartbeat_at, registered_at) VALUES (?,?,?,?,?,?,?,?)',
+        (agent_id, sid, model, host, workspace, 'idle', now, now)
+    )
+    db.execute(
+        'INSERT OR IGNORE INTO events (event_id, event_type, timestamp, actor, entity_type, entity_id, previous_state, new_state, payload) VALUES (?,?,?,?,?,?,?,?,?)',
+        (str(uuid.uuid4()), 'agent.registered', now, agent_id, 'agent', agent_id, 'dead', 'idle', '{\"source\":\"session-start.sh\"}')
+    )
+    db.commit()
+    db.close()
+    print('OK')
+except Exception as e:
+    print(f'FAIL: {e}')
+\"" 2>/dev/null)
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "🤝 COORDINATION OS — エージェント状態"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+if [ "$COORD_REG" = "OK" ]; then
+    echo "  ✅ local-claude を coordination.db に登録しました"
+else
+    echo "  ⚠️  local-claude 登録失敗: $COORD_REG（VPS接続を確認してください）"
+fi
+
+# ── Coordination タスク作成（セッション開始時） ────────────────────────
+COORD_STATE_FILE="$PROJECT_DIR/.claude/hooks/state/coord_session_task.json"
+COORD_TASK_ID=$(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=8 -o BatchMode=yes \
+    "$VPS" "python3 -c \"
+import sys, json
+sys.path.insert(0, '/opt/shared/scripts')
+from coordination_workflow import CoordWorkflow
+wf = CoordWorkflow('local-claude')
+ctx = wf.start(
+    title='local-claude-session',
+    description='Claude Code session on Windows',
+    scope='local-session',
+    tags=['local-claude', 'session'],
+)
+if ctx:
+    print(ctx.task_id)
+else:
+    print('FAILED')
+\"" 2>/dev/null || echo "FAILED")
+
+if [ "$COORD_TASK_ID" != "FAILED" ] && [ -n "$COORD_TASK_ID" ]; then
+    echo "  ✅ セッションタスク登録: $COORD_TASK_ID"
+    echo "{\"task_id\": \"$COORD_TASK_ID\", \"files_edited\": []}" > "$COORD_STATE_FILE" 2>/dev/null || true
+else
+    echo "  ⚠️  セッションタスク登録失敗 (VPS接続確認)"
+fi
+
+COORD_STATUS=$(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -o BatchMode=yes \
+    "$VPS" "python3 /opt/shared/scripts/coordination_cli.py agents 2>/dev/null" 2>/dev/null)
+if [ -n "$COORD_STATUS" ]; then
+    echo "$COORD_STATUS"
+else
+    echo "  [WARN] coordination_cli.py agents 取得失敗"
+fi
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
 
 echo "--- RULES ---"
 echo "1. RESEARCH FIRST: WebSearch/WebFetch BEFORE any implementation"

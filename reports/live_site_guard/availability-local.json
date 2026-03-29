@@ -1,0 +1,82 @@
+{
+  "base_url": "https://nowpattern.com",
+  "generated_at_epoch": 1774824748,
+  "results": [
+    {
+      "slug": "home-ja",
+      "url": "https://nowpattern.com/",
+      "status": 0,
+      "ok": false,
+      "elapsed_ms": 12123,
+      "final_url": "",
+      "content_type": "",
+      "errors": [
+        "<urlopen error _ssl.c:983: The handshake operation timed out>",
+        "critical latency 12123ms > 12000ms"
+      ],
+      "warnings": []
+    },
+    {
+      "slug": "home-en",
+      "url": "https://nowpattern.com/en/",
+      "status": 0,
+      "ok": false,
+      "elapsed_ms": 12066,
+      "final_url": "",
+      "content_type": "",
+      "errors": [
+        "<urlopen error _ssl.c:983: The handshake operation timed out>",
+        "critical latency 12066ms > 12000ms"
+      ],
+      "warnings": []
+    },
+    {
+      "slug": "predictions-ja",
+      "url": "https://nowpattern.com/predictions/",
+      "status": 0,
+      "ok": false,
+      "elapsed_ms": 12070,
+      "final_url": "",
+      "content_type": "",
+      "errors": [
+        "<urlopen error _ssl.c:983: The handshake operation timed out>",
+        "critical latency 12070ms > 12000ms"
+      ],
+      "warnings": []
+    },
+    {
+      "slug": "predictions-en",
+      "url": "https://nowpattern.com/en/predictions/",
+      "status": 0,
+      "ok": false,
+      "elapsed_ms": 12075,
+      "final_url": "",
+      "content_type": "",
+      "errors": [
+        "<urlopen error _ssl.c:983: The handshake operation timed out>",
+        "critical latency 12075ms > 12000ms"
+      ],
+      "warnings": []
+    },
+    {
+      "slug": "reader-api-health",
+      "url": "https://nowpattern.com/reader-predict/health",
+      "status": 0,
+      "ok": false,
+      "elapsed_ms": 12062,
+      "final_url": "",
+      "content_type": "",
+      "errors": [
+        "<urlopen error _ssl.c:983: The handshake operation timed out>",
+        "critical latency 12062ms > 12000ms"
+      ],
+      "warnings": []
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "failed": 5,
+    "warnings": 0,
+    "service_green": false
+  }
+}

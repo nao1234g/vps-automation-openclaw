@@ -11,11 +11,13 @@ VPS健全性チェック (vps-health-gate.py との連携):
   このStopフックはその状態を読んで、FAILが残っている間はexit(2)でブロック。
 """
 import json
+import os
 import sys
 import re
 import time
 from datetime import datetime
 from pathlib import Path
+from guard_pattern_utils import extract_guard_pattern_names
 
 # ── Observability: timing log ─────────────────────────────────────────────────
 _HOOK_START = time.time()
@@ -208,7 +210,20 @@ KNOWN_ERRORS = [
 # ── ECC Pipeline: mistake_patterns.json から動的ロード ────────────────────────
 # auto-codifier.py が KNOWN_MISTAKES.md の GUARD_PATTERN フィールドを自動登録する。
 # ここでそのパターンを KNOWN_ERRORS に合流させる（ハードコードなし）。
-_PATTERNS_FILE = Path(__file__).parent / "state" / "mistake_patterns.json"
+def _path_from_env(env_name: str, default: Path) -> Path:
+    override = os.environ.get(env_name, "").strip()
+    return Path(override) if override else default
+
+
+_PATTERNS_FILE = _path_from_env(
+    "CLAUDE_FACT_CHECKER_PATTERNS_FILE",
+    Path(__file__).parent / "state" / "mistake_patterns.json",
+)
+_KNOWN_MISTAKES_FILE = _path_from_env(
+    "CLAUDE_FACT_CHECKER_KNOWN_MISTAKES_FILE",
+    Path(__file__).parent.parent.parent / "docs" / "KNOWN_MISTAKES.md",
+)
+_dynamic = None  # None=未読み込み/読み込み失敗, []=正当な空リスト（Codex review fix: HG-23区別）
 if _PATTERNS_FILE.exists():
     try:
         _dynamic = json.loads(_PATTERNS_FILE.read_text(encoding="utf-8"))
@@ -217,7 +232,7 @@ if _PATTERNS_FILE.exists():
             if _p.get("name", "") not in _existing_names and _p.get("pattern") and _p.get("feedback"):
                 KNOWN_ERRORS.append(_p)
     except Exception:
-        pass  # パターンファイル読み込み失敗は無視（既存ガードは有効のまま）
+        _dynamic = None  # 読み込み失敗 → Noneのまま（HG-23スキップ対象）
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -661,20 +676,37 @@ def main():
         re.IGNORECASE
     )
 
-    # 証拠として認められるパターン（実行証拠 + ユーザー確認依頼）
-    # ポリシー: 「Bashで確認してください」型の返答は許容する（ユーザーへの委譲）
-    ANY_PROOF_PATTERN = re.compile(
+    # 証拠として認められるパターン: 2バケットに分離（Codex review 2026-03-29）
+    # バケット1: ハード証拠（コード出力・ステータス・テスト結果）→ 単独で十分
+    HARD_EVIDENCE_PATTERN = re.compile(
         r"(```[\s\S]{40,}```|"
         r"PATCH [A-F] OK|"
         r"✅ .{0,80}(OK|PASS|成功)|"
         r"Active:\s*active|FAIL:\s*0[^\d]|FAIL:0[^\d]|"
-        r"exit\s+0|HTTP/[12]|200 OK|"
-        r"確認してください|ブラウザで確認|実際に確認|以下の出力|以下で確認|"
+        r"exit\s+0|HTTP/[12]|200 OK)",
+        re.IGNORECASE | re.DOTALL
+    )
+    # バケット2: ユーザー委譲フレーズ → 具体的コマンド/URLが同一メッセージに含まれる場合のみ有効
+    HANDOFF_PHRASE_PATTERN = re.compile(
+        r"(確認してください|ブラウザで確認|実際に確認|以下の出力|以下で確認|"
         r"見てみてください|開いて確認|URLで確認|"
         r"実行してください|試してみてください|テストしてください|"
         r"以下のコマンドを実行|確認をお願いします)",
-        re.IGNORECASE | re.DOTALL
+        re.IGNORECASE
     )
+    HANDOFF_CONCRETE_PATTERN = re.compile(
+        r"(https?://|ssh\s|curl\s|python[3]?\s|bash\s|docker\s|`[^`]{5,}`|"
+        r"site_health_check|pytest|git\s)",
+        re.IGNORECASE
+    )
+
+    def _has_proof(msg: str) -> bool:
+        """ハード証拠 OR (委譲フレーズ+具体的コマンド/URL) で証拠ありと判定"""
+        if HARD_EVIDENCE_PATTERN.search(msg):
+            return True
+        if HANDOFF_PHRASE_PATTERN.search(msg) and HANDOFF_CONCRETE_PATTERN.search(msg):
+            return True
+        return False
 
     # ── トランスクリプト解析ベース チェック（語彙完全非依存・最高精度）────────────
     # 設計: 「何を言ったか」ではなく「ツール呼び出し系列」で判定（SWE-bench方式）
@@ -691,7 +723,7 @@ def main():
         data.get("transcript_path", "")
     )
     if transcript_unverified:
-        if not ANY_PROOF_PATTERN.search(last_message):
+        if not _has_proof(last_message):
             files = [Path(f).name for f in transcript_unverified[:3]]
             file_list = ", ".join(files)
             # CSS/HTML/テンプレート変更の場合はスクリーンショット検証を優先案内
@@ -885,13 +917,24 @@ def main():
     _NP_URL_PATTERN = re.compile(r'https://nowpattern\.com/[^\s"\'<>)\]]*', re.IGNORECASE)
 
     def _check_url_status(url: str) -> str:
-        """Python urllib で URL の HTTP ステータスを返す。失敗時は '000'"""
+        """Python urllib で URL の HTTP ステータスを返す。HEAD失敗時はGETリトライ。失敗時は '000'"""
         import urllib.request as _ur
         import ssl as _ssl
+        ctx = _ssl.create_default_context()
+        # まずHEADで試行
         try:
-            ctx = _ssl.create_default_context()
             req = _ur.Request(url, method='HEAD')
             with _ur.urlopen(req, context=ctx, timeout=8) as r:
+                if 200 <= r.status < 300:
+                    return str(r.status)
+        except Exception:
+            pass
+        # HEAD失敗/非2xx → GETでリトライ（Codex review fix: リダイレクトやHEAD拒否対応）
+        try:
+            req = _ur.Request(url, method='GET')
+            with _ur.urlopen(req, context=ctx, timeout=8) as r:
+                if 200 <= r.status < 300:
+                    return '200'  # リダイレクト後の2xxも200扱い
                 return str(r.status)
         except Exception as e:
             try:
@@ -939,7 +982,7 @@ def main():
             sess = json.loads(session_state_path.read_text(encoding="utf-8"))
             if sess.get("correction_needed", False):
                 baseline_mtime = sess.get("mistakes_mtime_at_correction", 0)
-                known_mistakes = Path(__file__).parent.parent.parent / "docs" / "KNOWN_MISTAKES.md"
+                known_mistakes = _KNOWN_MISTAKES_FILE
                 current_mtime = known_mistakes.stat().st_mtime if known_mistakes.exists() else 0
 
                 if current_mtime <= baseline_mtime:
@@ -961,6 +1004,60 @@ def main():
                     session_state_path.write_text(json.dumps(sess, ensure_ascii=False), encoding="utf-8")
         except Exception:
             pass  # state読み取り失敗はサイレント無視
+
+    # ── mp↔km リアルタイムパリティチェック（HG-22: Real-Time Parity Gate） ──────────
+    # regression-runner.py の MP_KM_REVERSE_PARITY と同じロジックを Stop hook にも実装。
+    # これにより「翌日の regression 待ち」ではなく「次のレスポンス前」に違反を検出できる。
+    # 要求: Naoto「翌日じゃないと分からないっていうのがまたおかしいんだよな。スピード感がない。」
+    _rt_mp_file = _PATTERNS_FILE
+    _rt_km_file = _KNOWN_MISTAKES_FILE
+    if _rt_mp_file.exists() and _rt_km_file.exists():
+        try:
+            _rt_mp_data = globals().get("_dynamic")  # P3: Double I/O 回避 — module-level _dynamic 再利用
+            if _rt_mp_data is None:  # Codex fix: None=読み込み失敗のみスキップ。[]=正当な空→HG-23実行
+                print("[WARN] HG-22/23: _dynamic が None（読み込み失敗）— 誤検知防止のためパリティチェックをスキップ", file=sys.stderr)
+                _rt_mp_data = []
+                _rt_skip_hg23 = True
+            else:
+                _rt_skip_hg23 = False
+            _rt_mp_names = {e.get("name", "") for e in _rt_mp_data if e.get("name")}
+
+            _rt_km_text = _rt_km_file.read_text(encoding="utf-8")
+            _rt_km_names = extract_guard_pattern_names(_rt_km_text)
+
+            _rt_orphan = _rt_mp_names - _rt_km_names
+            if _rt_orphan:
+                _orphan_list = ", ".join(sorted(_rt_orphan))
+                print(
+                    f"⛔ [HG-22] mp↔km リアルタイムパリティ違反\n"
+                    f"  mistake_patterns.json に登録されているが KNOWN_MISTAKES.md に記載のないパターン: {len(_rt_orphan)} 件\n"
+                    f"  孤立パターン: {_orphan_list}\n"
+                    f"  → docs/KNOWN_MISTAKES.md の該当エントリに **GUARD_PATTERN** フィールドを追加する\n"
+                    f"  → または .claude/hooks/state/mistake_patterns.json から削除する\n"
+                    f"  ❌ 禁止: この違反を無視して回答を続けること"
+                )
+                log_prevention("MP_KM_PARITY_VIOLATION", _orphan_list[:120])
+                sys.exit(2)
+
+            # ── km→mp リアルタイムパリティチェック（HG-23: RT-KM-MP Parity Gate） ──────────
+            # HG-22 は mp→km のみ。HG-23 は逆方向: km に GUARD_PATTERN あるが mp に未登録。
+            # 歴史的失敗7件すべてがこの方向（km エントリ GUARD_PATTERN → mp 未反映）。
+            # T036-P3: _dynamic 空フォールバック時は全 km がorphanになり誤検知が起きるためスキップ
+            if not _rt_skip_hg23:
+                _rt_km_orphan = _rt_km_names - _rt_mp_names
+                if _rt_km_orphan:
+                    _km_orphan_list = ", ".join(sorted(_rt_km_orphan))
+                    print(
+                        f"⛔ [HG-23] km→mp リアルタイムパリティ違反\n"
+                        f"  KNOWN_MISTAKES.md に GUARD_PATTERN があるが mistake_patterns.json に未登録: {len(_rt_km_orphan)} 件\n"
+                        f"  孤立パターン: {_km_orphan_list}\n"
+                        f"  → auto-codifier.py を実行するか、mistake_patterns.json に手動で追加する\n"
+                        f"  ❌ 禁止: この違反を無視して回答を続けること"
+                    )
+                    log_prevention("KM_MP_PARITY_VIOLATION", _km_orphan_list[:120])
+                    sys.exit(2)
+        except Exception as _e_parity:
+            print(f"[WARN] HG-22/23 パリティチェック エラー（非ブロッキング）: {_e_parity}", file=sys.stderr)
 
     _write_timing(0, "OK")
     sys.exit(0)

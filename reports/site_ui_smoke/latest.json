@@ -1,0 +1,670 @@
+{
+  "base_url": "https://nowpattern.com",
+  "results": [
+    {
+      "slug": "home-ja",
+      "viewport": "desktop",
+      "url": "https://nowpattern.com/",
+      "final_url": "https://nowpattern.com/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 1,
+        ".post-feed": 0,
+        "article": 12
+      },
+      "internal_link_sample": [
+        "/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
+        "/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation/",
+        "/world-war-iii-comparisons-why-threat-inflation-distorts-strategic-clarity/",
+        "/us-china-paris-trade-talks-rare-earths-as-the-new-leverage-battleground/",
+        "/ethereum-staking-yields-collapse-defis-gravity-well-reshapes-network-security/",
+        "/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\home-ja-desktop.png"
+      ],
+      "extra": {
+        "body_text_length": 7604,
+        "overflow": {
+          "scrollWidth": 1440,
+          "innerWidth": 1440,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/en/"
+      }
+    },
+    {
+      "slug": "home-en",
+      "viewport": "desktop",
+      "url": "https://nowpattern.com/en/",
+      "final_url": "https://nowpattern.com/en/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 2,
+        ".post-feed": 0,
+        "article": 12
+      },
+      "internal_link_sample": [
+        "/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
+        "/en/en-eu-stablecoin-crackdown-regulatory-capture-reshapes-digital-dollar-dominance-2/",
+        "/en/en-ethereums-10-staking-yield-the-gravity-well-reshaping-crypto-capital-flows-2-2/",
+        "/en/en-taiwan-strait-standoff-the-escalation-spiral-neither-side-can-exit-4-2/",
+        "/en/en-takaichi-trump-summit-alliance-strain-meets-middle-east-escalation-2-2/",
+        "/en/en-boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit-2-2/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\home-en-desktop.png"
+      ],
+      "extra": {
+        "body_text_length": 6907,
+        "overflow": {
+          "scrollWidth": 1440,
+          "innerWidth": 1440,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/"
+      }
+    },
+    {
+      "slug": "about-ja",
+      "viewport": "desktop",
+      "url": "https://nowpattern.com/about/",
+      "final_url": "https://nowpattern.com/about/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 1,
+        "article": 1
+      },
+      "internal_link_sample": [
+        "/predictions/",
+        "/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\about-ja-desktop.png"
+      ],
+      "extra": {
+        "body_text_length": 831,
+        "overflow": {
+          "scrollWidth": 1440,
+          "innerWidth": 1440,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/en/about/"
+      }
+    },
+    {
+      "slug": "about-en",
+      "viewport": "desktop",
+      "url": "https://nowpattern.com/en/about/",
+      "final_url": "https://nowpattern.com/en/about/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 1,
+        "article": 1
+      },
+      "internal_link_sample": [
+        "/about/",
+        "/en/predictions/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\about-en-desktop.png"
+      ],
+      "extra": {
+        "body_text_length": 1997,
+        "overflow": {
+          "scrollWidth": 1440,
+          "innerWidth": 1440,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/about/"
+      }
+    },
+    {
+      "slug": "taxonomy-ja",
+      "viewport": "desktop",
+      "url": "https://nowpattern.com/taxonomy/",
+      "final_url": "https://nowpattern.com/taxonomy/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 1,
+        "article": 1
+      },
+      "internal_link_sample": [
+        "/taxonomy-en/",
+        "/taxonomy-guide-ja/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\taxonomy-ja-desktop.png"
+      ],
+      "extra": {
+        "body_text_length": 2939,
+        "overflow": {
+          "scrollWidth": 1440,
+          "innerWidth": 1440,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/en/taxonomy/"
+      }
+    },
+    {
+      "slug": "taxonomy-en",
+      "viewport": "desktop",
+      "url": "https://nowpattern.com/en/taxonomy/",
+      "final_url": "https://nowpattern.com/en/taxonomy/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 1,
+        "article": 1
+      },
+      "internal_link_sample": [
+        "/taxonomy-ja/",
+        "/taxonomy-guide-en/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\taxonomy-en-desktop.png"
+      ],
+      "extra": {
+        "body_text_length": 6985,
+        "overflow": {
+          "scrollWidth": 1440,
+          "innerWidth": 1440,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/taxonomy/"
+      }
+    },
+    {
+      "slug": "predictions-ja",
+      "viewport": "desktop",
+      "url": "https://nowpattern.com/predictions/",
+      "final_url": "https://nowpattern.com/predictions/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "#np-tracking-list": 1,
+        "#np-tracking-list details": 179
+      },
+      "internal_link_sample": [
+        "/integrity-audit/",
+        "/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/",
+        "/aiezientoga-mai-iwu-woshi-metagou-zao-50dorunoshi-yan-kara15zhao-dorunowei-lai-he/",
+        "/eu-vs-mi-guo-tetukuzhan-zheng-dmagayin-kiqi-kosugui-zhi-nodi-que-bian-dong/",
+        "/du-wa-nodu-tokuremurin-nawarinuian-sha-nohua-xue-de-zheng-ming/",
+        "/ziyunebuno6shi-jian-4nian-mu-nozhan-zheng-ga-jiao-she-woshi-metagou-zao/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\predictions-ja-desktop.png"
+      ],
+      "extra": {
+        "body_text_length": 13221,
+        "overflow": {
+          "scrollWidth": 1440,
+          "innerWidth": 1440,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/en/predictions/"
+      }
+    },
+    {
+      "slug": "predictions-en",
+      "viewport": "desktop",
+      "url": "https://nowpattern.com/en/predictions/",
+      "final_url": "https://nowpattern.com/en/predictions/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "#np-tracking-list": 1,
+        "#np-tracking-list details": 622
+      },
+      "internal_link_sample": [
+        "/en/integrity-audit/",
+        "/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/",
+        "/aiezientoga-mai-iwu-woshi-metagou-zao-50dorunoshi-yan-kara15zhao-dorunowei-lai-he/",
+        "/eu-vs-mi-guo-tetukuzhan-zheng-dmagayin-kiqi-kosugui-zhi-nodi-que-bian-dong/",
+        "/du-wa-nodu-tokuremurin-nawarinuian-sha-nohua-xue-de-zheng-ming/",
+        "/ziyunebuno6shi-jian-4nian-mu-nozhan-zheng-ga-jiao-she-woshi-metagou-zao/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\predictions-en-desktop.png"
+      ],
+      "extra": {
+        "body_text_length": 33951,
+        "overflow": {
+          "scrollWidth": 1440,
+          "innerWidth": 1440,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/predictions/"
+      }
+    },
+    {
+      "slug": "sample-ja-article",
+      "viewport": "desktop",
+      "url": "https://nowpattern.com/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
+      "final_url": "https://nowpattern.com/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 1,
+        "article": 5
+      },
+      "internal_link_sample": [
+        "/predictions/",
+        "/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
+        "/en/en-eu-stablecoin-crackdown-regulatory-capture-reshapes-digital-dollar-dominance-2/",
+        "/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation/",
+        "/world-war-iii-comparisons-why-threat-inflation-distorts-strategic-clarity/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\sample-ja-article-desktop.png"
+      ],
+      "extra": {
+        "body_text_length": 13103,
+        "overflow": {
+          "scrollWidth": 1440,
+          "innerWidth": 1440,
+          "overflow": 0
+        }
+      }
+    },
+    {
+      "slug": "sample-en-article",
+      "viewport": "desktop",
+      "url": "https://nowpattern.com/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
+      "final_url": "https://nowpattern.com/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 1,
+        "article": 5
+      },
+      "internal_link_sample": [
+        "/predictions/",
+        "/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
+        "/en/en-eu-stablecoin-crackdown-regulatory-capture-reshapes-digital-dollar-dominance-2/",
+        "/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
+        "/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\sample-en-article-desktop.png"
+      ],
+      "extra": {
+        "body_text_length": 13733,
+        "overflow": {
+          "scrollWidth": 1440,
+          "innerWidth": 1440,
+          "overflow": 0
+        }
+      }
+    },
+    {
+      "slug": "home-ja",
+      "viewport": "mobile",
+      "url": "https://nowpattern.com/",
+      "final_url": "https://nowpattern.com/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 1,
+        ".post-feed": 0,
+        "article": 12
+      },
+      "internal_link_sample": [
+        "/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
+        "/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation/",
+        "/world-war-iii-comparisons-why-threat-inflation-distorts-strategic-clarity/",
+        "/us-china-paris-trade-talks-rare-earths-as-the-new-leverage-battleground/",
+        "/ethereum-staking-yields-collapse-defis-gravity-well-reshapes-network-security/",
+        "/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\home-ja-mobile.png"
+      ],
+      "extra": {
+        "body_text_length": 7530,
+        "overflow": {
+          "scrollWidth": 390,
+          "innerWidth": 390,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/en/"
+      }
+    },
+    {
+      "slug": "home-en",
+      "viewport": "mobile",
+      "url": "https://nowpattern.com/en/",
+      "final_url": "https://nowpattern.com/en/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 2,
+        ".post-feed": 0,
+        "article": 12
+      },
+      "internal_link_sample": [
+        "/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
+        "/en/en-eu-stablecoin-crackdown-regulatory-capture-reshapes-digital-dollar-dominance-2/",
+        "/en/en-ethereums-10-staking-yield-the-gravity-well-reshaping-crypto-capital-flows-2-2/",
+        "/en/en-taiwan-strait-standoff-the-escalation-spiral-neither-side-can-exit-4-2/",
+        "/en/en-takaichi-trump-summit-alliance-strain-meets-middle-east-escalation-2-2/",
+        "/en/en-boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit-2-2/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\home-en-mobile.png"
+      ],
+      "extra": {
+        "body_text_length": 6827,
+        "overflow": {
+          "scrollWidth": 390,
+          "innerWidth": 390,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/"
+      }
+    },
+    {
+      "slug": "about-ja",
+      "viewport": "mobile",
+      "url": "https://nowpattern.com/about/",
+      "final_url": "https://nowpattern.com/about/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 1,
+        "article": 1
+      },
+      "internal_link_sample": [
+        "/predictions/",
+        "/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\about-ja-mobile.png"
+      ],
+      "extra": {
+        "body_text_length": 767,
+        "overflow": {
+          "scrollWidth": 390,
+          "innerWidth": 390,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/en/about/"
+      }
+    },
+    {
+      "slug": "about-en",
+      "viewport": "mobile",
+      "url": "https://nowpattern.com/en/about/",
+      "final_url": "https://nowpattern.com/en/about/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 1,
+        "article": 1
+      },
+      "internal_link_sample": [
+        "/about/",
+        "/en/predictions/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\about-en-mobile.png"
+      ],
+      "extra": {
+        "body_text_length": 1933,
+        "overflow": {
+          "scrollWidth": 465,
+          "innerWidth": 465,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/about/"
+      }
+    },
+    {
+      "slug": "taxonomy-ja",
+      "viewport": "mobile",
+      "url": "https://nowpattern.com/taxonomy/",
+      "final_url": "https://nowpattern.com/taxonomy/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 1,
+        "article": 1
+      },
+      "internal_link_sample": [
+        "/taxonomy-en/",
+        "/taxonomy-guide-ja/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\taxonomy-ja-mobile.png"
+      ],
+      "extra": {
+        "body_text_length": 2875,
+        "overflow": {
+          "scrollWidth": 390,
+          "innerWidth": 390,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/en/taxonomy/"
+      }
+    },
+    {
+      "slug": "taxonomy-en",
+      "viewport": "mobile",
+      "url": "https://nowpattern.com/en/taxonomy/",
+      "final_url": "https://nowpattern.com/en/taxonomy/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 1,
+        "article": 1
+      },
+      "internal_link_sample": [
+        "/taxonomy-ja/",
+        "/taxonomy-guide-en/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\taxonomy-en-mobile.png"
+      ],
+      "extra": {
+        "body_text_length": 6921,
+        "overflow": {
+          "scrollWidth": 390,
+          "innerWidth": 390,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/taxonomy/"
+      }
+    },
+    {
+      "slug": "predictions-ja",
+      "viewport": "mobile",
+      "url": "https://nowpattern.com/predictions/",
+      "final_url": "https://nowpattern.com/predictions/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "#np-tracking-list": 1,
+        "#np-tracking-list details": 179
+      },
+      "internal_link_sample": [
+        "/integrity-audit/",
+        "/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/",
+        "/aiezientoga-mai-iwu-woshi-metagou-zao-50dorunoshi-yan-kara15zhao-dorunowei-lai-he/",
+        "/eu-vs-mi-guo-tetukuzhan-zheng-dmagayin-kiqi-kosugui-zhi-nodi-que-bian-dong/",
+        "/du-wa-nodu-tokuremurin-nawarinuian-sha-nohua-xue-de-zheng-ming/",
+        "/ziyunebuno6shi-jian-4nian-mu-nozhan-zheng-ga-jiao-she-woshi-metagou-zao/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\predictions-ja-mobile.png"
+      ],
+      "extra": {
+        "body_text_length": 13160,
+        "overflow": {
+          "scrollWidth": 439,
+          "innerWidth": 439,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/en/predictions/"
+      }
+    },
+    {
+      "slug": "predictions-en",
+      "viewport": "mobile",
+      "url": "https://nowpattern.com/en/predictions/",
+      "final_url": "https://nowpattern.com/en/predictions/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "#np-tracking-list": 1,
+        "#np-tracking-list details": 622
+      },
+      "internal_link_sample": [
+        "/en/integrity-audit/",
+        "/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/",
+        "/aiezientoga-mai-iwu-woshi-metagou-zao-50dorunoshi-yan-kara15zhao-dorunowei-lai-he/",
+        "/eu-vs-mi-guo-tetukuzhan-zheng-dmagayin-kiqi-kosugui-zhi-nodi-que-bian-dong/",
+        "/du-wa-nodu-tokuremurin-nawarinuian-sha-nohua-xue-de-zheng-ming/",
+        "/ziyunebuno6shi-jian-4nian-mu-nozhan-zheng-ga-jiao-she-woshi-metagou-zao/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\predictions-en-mobile.png"
+      ],
+      "extra": {
+        "body_text_length": 33887,
+        "overflow": {
+          "scrollWidth": 444,
+          "innerWidth": 444,
+          "overflow": 0
+        },
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/predictions/"
+      }
+    },
+    {
+      "slug": "sample-ja-article",
+      "viewport": "mobile",
+      "url": "https://nowpattern.com/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
+      "final_url": "https://nowpattern.com/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 1,
+        "article": 5
+      },
+      "internal_link_sample": [
+        "/predictions/",
+        "/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
+        "/en/en-eu-stablecoin-crackdown-regulatory-capture-reshapes-digital-dollar-dominance-2/",
+        "/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation/",
+        "/world-war-iii-comparisons-why-threat-inflation-distorts-strategic-clarity/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\sample-ja-article-mobile.png"
+      ],
+      "extra": {
+        "body_text_length": 13042,
+        "overflow": {
+          "scrollWidth": 390,
+          "innerWidth": 390,
+          "overflow": 0
+        }
+      }
+    },
+    {
+      "slug": "sample-en-article",
+      "viewport": "mobile",
+      "url": "https://nowpattern.com/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
+      "final_url": "https://nowpattern.com/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {
+        "main": 1,
+        "article": 5
+      },
+      "internal_link_sample": [
+        "/predictions/",
+        "/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
+        "/en/en-eu-stablecoin-crackdown-regulatory-capture-reshapes-digital-dollar-dominance-2/",
+        "/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
+        "/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation/"
+      ],
+      "screenshots": [
+        "reports\\site_ui_smoke\\screens\\sample-en-article-mobile.png"
+      ],
+      "extra": {
+        "body_text_length": 13669,
+        "overflow": {
+          "scrollWidth": 390,
+          "innerWidth": 390,
+          "overflow": 0
+        }
+      }
+    }
+  ],
+  "summary": {
+    "total": 20,
+    "passed": 20,
+    "failed": 0
+  }
+}

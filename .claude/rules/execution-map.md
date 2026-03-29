@@ -74,12 +74,13 @@
 | KNOWN_MISTAKES.md 更新 → パターン自動登録 | **B型** | PostToolUse(Edit/Write)でauto-codifier起動 | `.claude/hooks/auto-codifier.py` |
 | 出力前にパターン照合 → 物理ブロック | **A型** | Stop hookでfact-checker起動（exit 2） | `.claude/hooks/fact-checker.py` |
 | 未知パターンを意味レベルで検知 | **A型** | PreToolUse(Edit/Write)でGemini判定（exit 1） | `.claude/hooks/llm-judge.py` |
-| 全ガードの劣化を毎日テスト | **B型** | regression-runner.py（25/25 PASS確認済み） | `.claude/hooks/regression-runner.py` |
+| 全ガードの劣化を毎日テスト | **B型** | regression-runner.py（46/46 PASS確認済み、T033） | `.claude/hooks/regression-runner.py` |
 | 実装前に証拠計画を要求 | **A型** | PreToolUse(Edit/Write)でpvqe_p.json確認 | `.claude/hooks/pvqe-p-gate.py` |
 | 証拠計画の実行を完了前に確認 | **A型** | Stop hookで実行済みBashを確認 | `.claude/hooks/pvqe-p-stop.py` |
 | SSH前にVPS健全性チェック | **A型** | PreToolUse(Bash)でVPS状態確認 | `.claude/hooks/vps-ssh-guard.py` |
 
-**現在のガード数: 20パターン（mistake_patterns.json）/ regression 25/25 PASS**
+**現在のガード数: 36パターン（mistake_patterns.json）/ regression 46/46 PASS（T033 2026-03-29）**
+**双方向パリティ確認: km⊆mp + mp⊆km（HG-15 + HG-19）/ フロアゲート: 45 ≥ 44（HG-21）**
 
 ---
 
@@ -96,6 +97,8 @@
 ✅ 完了: 「実装したつもり」防止 → fact-checker.py にWebファイル検証チェック追加 (2026-02-23)
 ✅ 完了: ECC Pipeline全段 — auto-codifier + llm-judge + pvqe-p + regression-runner (2026-03-04)
 ✅ 完了: regression-runner.py 25/25 PASS (2026-03-04)
+✅ 完了: Hard Gate 19 (MP_KM_REVERSE_PARITY) + Hard Gate 21 (BASELINE_FLOOR_GATE) — 46/46 PASS (2026-03-29 T033)
+✅ 完了: 7件のdocs-state gap全修正（km⊆mp + mp⊆km 双方向パリティ達成）(2026-03-29 T033)
 ✅ 完了: VPS FileLock + Ghost Webhook改ざん検知 (2026-03-04)
 ✅ 完了: VPS本番スクリプトのクラッシュ検知（0記事アラート）— zero-article-alert.py 30分cron (2026-03-04)
 ✅ 完了: Article Health DB (SQLite) + QA Sentinel バッチ — 151件監査、88タスク委譲 (2026-03-08)

@@ -53,8 +53,15 @@ if not ("KNOWN_MISTAKES" in edited_file or "KNOWN_MISTAKES" in str(edited_file))
     sys.exit(0)
 
 # ── KNOWN_MISTAKES.md を解析 ──────────────────────────────────────────────────
+# 標準フォーマット: **GUARD_PATTERN**: `{...}`
 GUARD_PATTERN_RE = re.compile(
     r"\*\*GUARD_PATTERN\*\*\s*:\s*`(\{[^`]+\})`",
+    re.MULTILINE
+)
+# T031修正: 非標準フォーマット (backtick-first): `GUARD_PATTERN: {...}`
+# KNOWN_MISTAKES.md L25等で使われていた形式。auto-codifier が検出できなかった sync gap の根本原因。
+GUARD_PATTERN_RE_ALT = re.compile(
+    r"`GUARD_PATTERN:\s*(\{[^`]+\})`",
     re.MULTILINE
 )
 
@@ -62,7 +69,13 @@ if not MISTAKES_FILE.exists():
     sys.exit(0)
 
 mistakes_text = MISTAKES_FILE.read_text(encoding="utf-8")
-found = GUARD_PATTERN_RE.findall(mistakes_text)
+# 両フォーマットをマージ（重複排除、順序保持）
+_seen_raw = set()
+found = []
+for raw in GUARD_PATTERN_RE.findall(mistakes_text) + GUARD_PATTERN_RE_ALT.findall(mistakes_text):
+    if raw not in _seen_raw:
+        _seen_raw.add(raw)
+        found.append(raw)
 
 if not found:
     sys.exit(0)

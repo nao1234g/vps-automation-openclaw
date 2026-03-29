@@ -6,6 +6,77 @@
 
 ---
 
+### 2026-03-29: 「書いただけでは強制できない」ルール自体がテキストでしか書かれていなかった（Naoto要求 — 永久刻印）
+
+- **症状**: 全セッション・全エージェントが「KNOWN_MISTAKES.mdに追記しました、完了です」と報告し、mistake_patterns.json のコードガードを追加しないまま終わっていた。何度指摘されても繰り返した。
+- **根本原因**: CLAUDE.md / NORTH_STAR.md / OPERATING_PRINCIPLES.md に「テキストは強制しない、コードだけが強制する」と書いてあるが、**そのルール自体がテキストにしか書かれていなかった**。物理的なブロック機構がなかった。循環矛盾。
+- **正しい解決策**: 4層の物理強制を実装（2026-03-29）:
+  1. `session-start.sh` — 毎セッション開始時に囲み枠で強制表示（スキップ不可）
+  2. `mistake_patterns.json` — TEXT_NOT_ENFORCEMENT / TEXT_ONLY_ENFORCEMENT_CLAIM ガード追加（fact-checker.py が exit 2）
+  3. `research-gate.py` — KNOWN_MISTAKES.md への新規エントリに GUARD_PATTERN 必須（exit 2 物理ブロック）
+  4. VPS `/opt/claude-code-telegram/CLAUDE.md` + `neo2/CLAUDE.md` — 同ルールを NEO-ONE / NEO-TWO に注入
+- **教訓**: あるルールを「強制したい」なら、そのルールを守るための物理的なコード機構が必要。テキストに書くだけでは何も変わらない。これ自体を何度も言われてきた。
+- **再発防止コード**: research-gate.py L102-120（GUARD_PATTERN_REQUIRED_IN_KNOWN_MISTAKES）。fact-checker.py が TEXT_NOT_ENFORCEMENT を検出すると exit 2。
+- **GUARD_PATTERN**: `{"pattern": "KNOWN_MISTAKES(?:\\.md)?.*?(?:追記|更新|記録)(?:しました|完了|しています|済み).*?(?:ことで|これで|により).*?(?:再発防止|防止|防ぎ|守ら|徹底|完了|対応済)", "feedback": "⛔ TEXT_NOT_ENFORCEMENT 検出: テキスト記録だけでは物理強制力ゼロ。mistake_patterns.json に GUARD_PATTERN を同時登録してください。", "name": "TEXT_NOT_ENFORCEMENT", "added_at": "2026-03-29", "source": "naoto-demand-2026-03-29"}`
+- **GUARD_PATTERN**: `{"pattern": "(?:テキスト|ドキュメント|ルール|CLAUDE\\.md|AGENT_WISDOM).*?(?:書いた|追記|記録|更新).*?(?:だけで|のみで).*?(?:強制|防止|徹底|守|完了)|テキストに.*?書く.*?(?:だけで|のみで).*?(?:エージェント|守|強制|徹底)", "feedback": "⛔ TEXT_ONLY_ENFORCEMENT_CLAIM 検出: テキスト記録だけでは全エージェントへの強制力はゼロ。GUARD_PATTERN + fact-checker.py の組み合わせだけが物理強制。CLAUDE.md / AGENT_WISDOM への記録は参考情報にすぎない。", "name": "TEXT_ONLY_ENFORCEMENT_CLAIM", "example": "テキストルールに書いただけで全エージェントが守るようになります。"}`
+
+---
+
+### 2026-03-29: 統計数値の内部矛盾をチェックせずに公開した（スコアリングページ accuracy 72.9% vs MISS=18）
+
+- **症状**: scoring-guide ページに「的中35 / 外れ18 / 正確率72.9%」を同時表示。読者が 35/(35+18)=66.0% を計算すると矛盾。
+- **根本原因**: `meta.accuracy_pct=72.9` は `HIT/(RESOLVED-NOT_SCORED)=35/48` という別式だが、HITS/MISSES と同じ画面に並べた。複数の数値ソースを組み合わせた後に「組み合わせが整合するか」のクロスチェックをしなかった。
+- **正しい解決策**: ページに HITS=35 と MISSES=18 を表示するなら accuracy は 35/(35+18)=66.0%。数式の注記も追加して透明性を確保。
+- **教訓**: 複数の統計数値を同一画面に並べるときは、**読者の視点で全ての組み合わせを暗算して矛盾がないか確認する**。特に分母が違う割合を混在させない。
+- **再発防止**: 数値を含むページHTML作成後、必ず「この数値から読者が計算できる値と、表示している割合が一致するか」を頭の中で検算する。
+- **GUARD_PATTERN**: `{"pattern": "的中.*外れ.*正確率|HITS.*MISSES.*ACCURACY|hits.*misses.*accuracy", "feedback": "⚠️ STAT_CONSISTENCY_CHECK: HIT/MISS と ACCURACY を同時表示する場合、ACCURACY = HIT/(HIT+MISS) で計算した値と一致しているか確認してください。別の分母（RESOLVED-NOT_SCORED等）を使っている場合は注記必須。", "name": "STAT_DISPLAY_CONSISTENCY", "added_at": "2026-03-29"}`
+
+---
+
+### 2026-03-29: grep hreflang が JS コードの偽陽性を返す（SEO Session 5 検出）
+
+- **症状**: `curl ... | grep -c hreflang` が 7 を返したが、実際には静的 `<link rel="alternate" hreflang="">` タグが 0 件だった
+- **根本原因**: nowpattern.com の hreflang は JavaScript injection で実装されているため、grep は JS コード行（`link.hreflang = lang`、`el.hreflang = hl` 等）もカウントする
+- **正しい解決策**: 静的 hreflang の確認は `grep 'alternate.*hreflang\|hreflang.*alternate'` を使う。または `grep '<link rel="alternate"'` で `<link>` タグのみを対象にする
+- **教訓**: `grep hreflang` は「hreflang という文字列が含まれる行数」を返す。JS コードと HTML タグを区別しない。nowpattern.com では JS injection が設計上の仕様（ISS-HREFLANG-001）なので、「静的タグなし」は正常
+- **GUARD_PATTERN**: `{"pattern": "grep.*hreflang.*件|hreflang.*grep.*確認", "feedback": "⚠️ HREFLANG_GREP_FALSE_POSITIVE 注意: grep hreflang は JS コード行も含む。静的 link タグ確認には grep 'alternate.*hreflang' を使うこと。nowpattern.com は JS injection 設計のため静的タグなしは正常", "name": "HREFLANG_GREP_FALSE_POSITIVE"}`
+
+---
+
+### 2026-03-29: prediction_db.json の status 値が UPPERCASE のみ（SEO Session 5 確認）
+
+- **症状**: `status == "resolved"` で検索して0件になる
+- **根本原因**: prediction_db.json の status フィールドは全て UPPERCASE（RESOLVED, AWAITING_EVIDENCE, OPEN, EXPIRED_UNRESOLVED, RESOLVING）
+- **正しい解決策**: `status == "RESOLVED"` と大文字で比較する。または `status.upper() == "RESOLVED"` でケースインセンシティブにする
+- **教訓**: prediction_db.json の文字列フィールドは大文字規則を持つ。コードで比較する際は必ず UPPERCASE を使うか、`.upper()` で正規化する
+- **GUARD_PATTERN**: `{"pattern": "status.*==.*['\"]resolved['\"]|status.*==.*['\"]open['\"]|status.*==.*['\"]awaiting", "feedback": "⛔ PREDICTION_STATUS_LOWERCASE 検出: prediction_db.json の status は UPPERCASE のみ（RESOLVED, OPEN, AWAITING_EVIDENCE）。lowercase 比較では0件になります。大文字に変更してください", "name": "PREDICTION_STATUS_LOWERCASE"}`
+
+---
+
+### 2026-03-29: Hard Gate 16/17 未実装 + 行頭限定regex未適用でGUARD_FORMAT_NORMALが誤検知していた（T032）
+
+- **症状**: KNOWN_MISTAKES.md L39 の非標準フォーマット（backtick-first）が T031 で正規化されなかった。また regression-runner.py の Hard Gate 16 初期 regex が行頭アンカーなしで、説明文中のインライン参照（`` `GUARD_PATTERN: {...}` ``）も拾って false positive になった
+- **根本原因**: T031 は非標準エントリの「存在検出」と「auto-codifier追加」に注力し、元の非標準行の正規化（削除・注記変換）を後回しにした。また Hard Gate 16 の regex が `re.MULTILINE` + 行頭アンカー（`^`）なしだったため、インライン記述も検出対象になった
+- **正しい解決策**: (1) KNOWN_MISTAKES.md L39 を ``> ⚠️ [T032正規化済み]...`` 注記に変換。(2) Hard Gate 16 regex に `^[ \t]*` 行頭アンカーを追加（`re.MULTILINE`）。(3) Hard Gate 17（TASK_STATE_GATE）を regression-runner.py に追加し active_task_id ↔ ledger 整合性を毎回確認
+- **教訓**: 非標準エントリの「検出」と「正規化（変換・削除）」は別工程。検出したら同一タスク内で正規化まで完了させること。regex は行頭アンカー + MULTILINE の組み合わせが安全
+- **再発防止コード**: Hard Gate 16 (GUARD_FORMAT_NORMAL) + Hard Gate 17 (TASK_STATE_GATE) を regression-runner.py に追加。40/40 PASS（T032）
+
+---
+
+### 2026-03-29: GUARD_PATTERN 非標準フォーマットがauto-codifierを迂回して同期ギャップを生んでいた（T031）
+
+- **症状**: KNOWN_MISTAKES.md L25 の TASK_LEDGER_KEY_MISMATCH が非標準フォーマット（`` `GUARD_PATTERN: {...}` ``）で記録されており、auto-codifier.py の GUARD_PATTERN_RE regex（`**GUARD_PATTERN**:` 形式のみ対応）に検出されず、mistake_patterns.json に未登録だった
+- **根本原因**: GUARD_PATTERN の記述フォーマットが2種類存在した。標準: `**GUARD_PATTERN**: \`{...}\`` / 非標準: `` `GUARD_PATTERN: {...}` ``。auto-codifier.py は標準形式のみを検出する正規表現だった
+- **正しい解決策**: (1) TASK_LEDGER_KEY_MISMATCH を mistake_patterns.json に手動追加（T031）。(2) auto-codifier.py に GUARD_PATTERN_RE_ALT（非標準フォーマット対応）を追加。(3) regression-runner.py に GUARD_PATTERN_PARITY name-set check を追加（Hard Gate 15 Path 3）
+- **教訓**: GUARD_PATTERN フォーマットは `**GUARD_PATTERN**:` 形式（標準）のみを使う。非標準フォーマットは自動検出されないため書いても ECC ガードにならない
+- **再発防止コード**: auto-codifier.py が両フォーマットを検出するようになった（GUARD_PATTERN_RE_ALT追加）。regression-runner.py の GUARD_PATTERN_PARITY が毎回 km⊆mp を確認する。38/38 PASS（T031）
+
+**GUARD_PATTERN フォーマット標準（この形式のみ使うこと）:**
+
+- **GUARD_PATTERN**: `{"pattern": "t\\.get\\([\"']id[\"'],", "feedback": "⛔ TASK_LEDGER_KEY_MISMATCH 検出: task_ledger.json は 'task_id' キーを使う。t.get('task_id', t.get('id','?')) の形でフォールバック付きにしてください", "name": "TASK_LEDGER_KEY_MISMATCH", "example": "t.get('id', '?') for t in tasks"}`
+
+---
+
 ### 2026-03-29: KNOWN_MISTAKES.md ↔ mistake_patterns.json の同期ギャップが2件残存（T030）
 
 - **症状**: KNOWN_MISTAKES.md に GUARD_PATTERN として記録されていた CALIBRATION_QUALITATIVE_ONLY と XMRIG_MINER_ARTIFACT が mistake_patterns.json に存在せず、regression 対象にも入っていなかった
@@ -22,7 +93,7 @@
 - **教訓**: 構造化ファイル（JSON）のキー名を変更した場合は、そのファイルを参照する全スクリプトのキー名を同時に更新すること。task_ledger.json が `"task_id"` に統一された際に session-end.py の更新が漏れた
 - **再発防止コード**: task_ledger.json を参照するコードは常に `t.get("task_id", t.get("id","?"))` の形でフォールバックを書く
 
-`GUARD_PATTERN: {"pattern": "t\\.get\\([\"']id[\"'],", "feedback": "⛔ task_ledger.json は 'task_id' キーを使う。t.get('task_id', t.get('id','?')) の形でフォールバック付きにしてください", "name": "TASK_LEDGER_KEY_MISMATCH", "example": "t.get('id', '?') for t in tasks"}`
+> ⚠️ **[T032正規化済み]** 上記は旧フォーマット（非標準 backtick-first 形式）で記録されていた TASK_LEDGER_KEY_MISMATCH エントリです。T032 で標準形式に変換済み。標準形式エントリは本節冒頭（T031 closed-loop note セクション）の **GUARD_PATTERN**: 行を参照してください。このブロック自体は履歴として保持しますが、ECC パターンとしては機能しません。
 
 ### 2026-03-29: KNOWN_MISTAKES.md の GUARD_PATTERN が mistake_patterns.json に同期されていなかった（T029 — GAP-T029-2）
 
@@ -79,6 +150,7 @@
 - **根本原因**: example「監視スクリプトを追加しました」が regex `監視(?:を追加|に追加|スクリプト|cron)(?:しました|...)` にマッチしない。`監視スクリプト` の後に `しました` が直接来ないため
 - **正しい解決策**: pattern から `スクリプト` 選択肢を除去。example を「監視を追加しました」に変更
 - **教訓**: regex パターンを追加したら必ず regression-runner.py を実行して `example` が実際にマッチするか確認する
+- **GUARD_PATTERN**: `{"pattern": "監視(?:を追加|に追加|cron)(?:しました|しています|済み)(?![^。]*(?:根本原因|root cause|修正|fix|解決|resolve|対処))", "feedback": "⛔ MONITORING_ONLY 検出: 監視追加だけでは根本原因の修正になりません。根本原因を特定し、修正・対処を行ってから監視を追加してください", "name": "MONITORING_ONLY", "example": "このエラーを検知するための監視を追加しました。監視cronを設定済みです。"}`
 
 ---
 
@@ -89,6 +161,7 @@
 - **正しい解決策**: 毎セッション開始時に NAOTO OS PRIMARY ANCHOR を表示（session-start.sh に追加済み）。PROJECT_DRIFT_GUARD パターンを mistake_patterns.json に追加（fact-checker.py が Stop hookで検知）
 - **教訓**: 最重要サブプロジェクトは最上位OSと混同されやすい。セッション開始時の明示的なアンカーが必要
 - **再発防止コード**: `.claude/hooks/state/mistake_patterns.json` に `PROJECT_DRIFT_GUARD` 追加（T024-manual）。`.claude/hooks/session-start.sh` に NAOTO OS PRIMARY ANCHOR セクション追加
+- **GUARD_PATTERN**: `{"pattern": "vps-automation-openclaw.*(?:Nowpattern|nowpattern).*(?:リポジトリ|ルート|最上位)|(?:このリポジトリ|このレポ|このrepository).*(?:Nowpattern|nowpattern).*(?:です|である|のルート)", "feedback": "⛔ PROJECT_DRIFT_GUARD 検出: vps-automation-openclaw は Naoto Intelligence OS のルートです。Nowpatternはその中の最重要プロジェクトですが、このリポジトリ=Nowpatternではありません", "name": "PROJECT_DRIFT_GUARD", "example": "このリポジトリはNowpatternのルートです。"}`
 
 ---
 
@@ -2274,7 +2347,7 @@ Traceback (most recent call last):
 - **修正ファイル**: `.claude/settings.local.json` (line 446), `.claude/hooks/error-tracker.py` (line 55-61)
 - **教訓**: bash wrapperでの`python3 || python`パターンはWindows環境で致命的。STDINを読むスクリプトは特に危険。settings.local.jsonから直接pythonを呼ぶのが正解
 - **再発防止コード**: settings.local.json変更（物理的にbash wrapperを迂回）+ 診断ログ（将来のSTDIN問題を即検知）
-- **GUARD_PATTERN**: NAOTO_OS_CANONICAL_NAME ガードも同時追加（mistake_patterns.json、22パターン目）
+- **GUARD_PATTERN**: `{"pattern": "(?<![A-Za-z])NOT OS(?![A-Za-z])|(?<![A-Za-z])NOT-OS(?![A-Za-z])|(?<![A-Za-z])Naoto OS(?!.*Intelligence)", "feedback": "⛔ NAOTO_OS_CANONICAL_NAME 検出: 正式名称は NAOTO OS または Naoto Intelligence OS です。NOT OS / NOT-OS は誤記。全エージェントは正式名称を使うこと", "name": "NAOTO_OS_CANONICAL_NAME", "example": "NOT OSの健康状態を確認します"}`
 - **影響範囲**: ECCパイプライン全体が34日間盲目化。error-tracker → auto-codifier → fact-checker の連鎖が機能停止していた
 
 ---
@@ -2356,4 +2429,95 @@ Traceback (most recent call last):
 - **再発防止コード（追加済み）**:
   - `nowpattern_publisher.py:publish_deep_pattern()` L791 — v5.5 dedup gate: Ghost SQLiteを照合し同一タイトルが存在すれば`ValueError`をraiseしてブロック
   - `site_health_check.py` — チェック9（重複記事）が毎回検査。出荷基準: FAIL 0件
+
+---
+
+### 2026-03-29: T025 — 学習・確認報告で実装を伴わない「理解しました」が完了扱いになる（LEARNING_WITHOUT_ACTION）
+
+- **症状**: AI が「この問題を学習しました」「パターンを把握しました」と報告して終了するが、実際にはコードへの修正・実装・GUARD_PATTERN追加等の具体的アクションが伴っていない
+- **根本原因**: 学習・理解・把握は「認識の更新」であり「実装」ではない。ECC原則では「コードだけが忘れない」——テキストで理解を表明しても物理ブロックは生まれない
+- **正しい解決策**: 学習・理解の次のステップとして必ず具体的なコードアクション（修正/追加/デプロイ/コミット）を実行し、その結果を報告する
+- **教訓**: 「学習しました」で終わるセッションは ECC パイプラインへの貢献ゼロ。必ず GUARD_PATTERN 追加 or スクリプト修正 or regression-runner.py での確認まで完走する
+- **再発防止コード**: `mistake_patterns.json` に `LEARNING_WITHOUT_ACTION` パターン追加（T025-manual）。fact-checker.py が Stop hook で検知
+- **GUARD_PATTERN**: `{"pattern": "(?:学習しました|理解しました|把握しました|確認しました|分かりました)(?![^。]*(?:実装|修正|変更|追加|削除|作成|デプロイ|コミット|プッシュ|実行|適用))", "feedback": "⛔ LEARNING_WITHOUT_ACTION 検出: 学習・確認の報告だけでは ECC パイプラインに貢献しません。必ず具体的なコードアクション（GUARD_PATTERN追加/スクリプト修正/regression実行）を伴わせてください", "name": "LEARNING_WITHOUT_ACTION", "example": "この問題のパターンを学習しました。今後は同じミスをしないよう理解しました。"}`
+
+---
+
+### 2026-03-15: T015 — モデルバージョンを constitution ファイルに直書きする（MODEL_VERSION_FIXATION）
+
+- **症状**: SYSTEM_GOVERNOR.md や SYSTEM_MAP.md の役割分担表に「Claude Opus 4.6」等の具体的モデルバージョンを記述し、モデルが更新されるたびにファイル修正が必要になる
+- **根本原因**: モデルバージョンは運用変数（頻繁に変わる）であるが、constitution ファイル（ほぼ不変）に混入すると変更コストが増大する。さらにバージョン表記が古くなってもガードに引っかからず検知されない
+- **正しい解決策**: constitution ファイルでは役割を「Anthropic Claude」等の抽象名で記述する。具体的モデルバージョンは `settings.local.json` または `MODEL_ROUTING_POLICY.md` のみに限定する
+- **教訓**: constitution（NORTH_STAR/OPERATING_PRINCIPLES/SYSTEM_GOVERNOR）はモデルバージョン非依存にすること。バージョン情報はオペレーション層（settings）にのみ書く
+- **再発防止コード**: `mistake_patterns.json` に `MODEL_VERSION_FIXATION` パターン追加（auto-codifier、T015）。fact-checker.py が Stop hook で検知
+- **GUARD_PATTERN**: `{"pattern": "claude-opus-4-[0-9]|claude-sonnet-4-[0-9]|claude-haiku-4-[0-9]|Opus 4\\.[0-9]|Sonnet 4\\.[0-9]", "feedback": "⛔ MODEL_VERSION_FIXATION 検出: constitution/map ファイルにモデルバージョンを直書きしないでください。具体バージョンは settings.local.json / MODEL_ROUTING_POLICY.md のみに限定。constitution では Anthropic Claude 等の抽象名を使用", "name": "MODEL_VERSION_FIXATION", "example": "NEO-ONE (Claude Opus 4.6, VPS) → 予測生成"}`
+
+
+
+### 2026-03-26: prediction-page-builder エラー検知 (sig: dcc05134)
+- **スクリプト**: prediction-page-builder
+- **ログ**: /opt/shared/polymarket/prediction_page.log
+- **エラー**:
+```
+ in connect
+    self.sock = self._context.wrap_socket(self.sock,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/ssl.py", line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/ssl.py", l
+```
+- **検知時刻**: 2026-03-26 23:02 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-26: prediction-page-builder エラー検知 (sig: 2b89775a)
+- **スクリプト**: prediction-page-builder
+- **ログ**: /opt/shared/polymarket/prediction_page.log
+- **エラー**:
+```
+^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 492, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 1392, in https_open
+    return self.do_open(http.client.HTTPSConnection, req,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+```
+- **検知時刻**: 2026-03-26 23:02 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-27: prediction-page-builder-en エラー検知 (sig: 201cc901)
+- **スクリプト**: prediction-page-builder-en
+- **ログ**: /opt/shared/polymarket/prediction_page_en.log
+- **エラー**:
+```
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/playwright/_impl/_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/playwright/_impl/_c
+```
+- **検知時刻**: 2026-03-27 23:00 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-28: prediction-verifier エラー検知 (sig: 2f588b4d)
+- **スクリプト**: prediction-verifier
+- **ログ**: /var/log/prediction-verifier.log
+- **エラー**:
+```
+Traceback (most recent call last):
+  File "/opt/shared/scripts/prediction_auto_verifier.py", line 1007, in <module>
+    main()
+  File "/opt/shared/scripts/prediction_auto_verifier.py", line 958, in main
+    log(f"    Judgment: {judgment['outcome']} (confidence: {judgment.get('confidence', '?')})")
+ 
+```
+- **検知時刻**: 2026-03-28 01:00 JST
+- **自動記録**: vps-error-capture.py
 

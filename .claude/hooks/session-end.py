@@ -231,4 +231,34 @@ try:
 except Exception:
     pass  # VPS不達でも続行
 
+# 7. Coordination タスク完了（セッション終了時）
+try:
+    coord_state_file = PROJECT_DIR / ".claude" / "hooks" / "state" / "coord_session_task.json"
+    if coord_state_file.exists():
+        coord_state = json.loads(coord_state_file.read_text(encoding="utf-8"))
+        task_id = coord_state.get("task_id", "")
+        files_edited = coord_state.get("files_edited", [])
+        if task_id and task_id != "FAILED":
+            files_json = json.dumps(files_edited[:20]).replace('"', '\\"')
+            py_cmd = (
+                'import sys; sys.path.insert(0, "/opt/shared/scripts"); '
+                'from coordination_workflow import CoordWorkflow, WorkflowContext; '
+                'import time; '
+                f'wf = CoordWorkflow("local-claude"); '
+                f'ctx = WorkflowContext("local-claude", "{task_id}", []); '
+                f'wf.done(ctx, evidence=["session:completed", "files:{n}"], '
+                f'summary="Session ended, {n} files edited")'
+            ).format(n=len(files_edited))
+            result = subprocess.run(
+                ['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8',
+                 '-o', 'StrictHostKeyChecking=no', 'root@163.44.124.123',
+                 f'python3 -c \'{py_cmd}\''],
+                capture_output=True, timeout=12
+            )
+            if result.returncode == 0:
+                print(f"🤝 Coordination task {task_id[:12]}... → completed ({len(files_edited)} files)")
+            coord_state_file.unlink(missing_ok=True)
+except Exception:
+    pass  # coordination failure must never crash session-end
+
 sys.exit(0)
