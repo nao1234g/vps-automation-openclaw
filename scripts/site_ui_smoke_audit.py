@@ -4,11 +4,14 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import re
 import ssl
 import sys
 import urllib.request
 from dataclasses import asdict, dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import urljoin, urlparse
@@ -84,6 +87,30 @@ CORE_PAGES = [
     },
 ]
 
+NEUTRAL_INTERNAL_PATHS = {
+    "/",
+    "/en/",
+    "/about/",
+    "/en/about/",
+    "/taxonomy/",
+    "/en/taxonomy/",
+    "/taxonomy-ja/",
+    "/taxonomy-en/",
+    "/taxonomy-guide/",
+    "/en/taxonomy-guide/",
+    "/taxonomy-guide-ja/",
+    "/taxonomy-guide-en/",
+    "/predictions/",
+    "/en/predictions/",
+    "/leaderboard/",
+    "/en/leaderboard/",
+    "/my-predictions/",
+    "/en/my-predictions/",
+    "/integrity-audit/",
+    "/en/integrity-audit/",
+}
+NEUTRAL_INTERNAL_PREFIXES = ("/tag/", "/author/", "/rss/", "/page/")
+
 
 @dataclass
 class PageResult:
@@ -103,6 +130,63 @@ class PageResult:
     def fail(self, message: str) -> None:
         self.ok = False
         self.errors.append(message)
+
+
+RGBA_RE = re.compile(r"rgba?\(([^)]+)\)")
+
+
+def parse_css_rgba(value: str | None) -> tuple[float, float, float, float] | None:
+    if not value:
+        return None
+    match = RGBA_RE.search(value.strip())
+    if not match:
+        return None
+    parts = [part.strip() for part in match.group(1).split(",")]
+    if len(parts) < 3:
+        return None
+    try:
+        r = float(parts[0])
+        g = float(parts[1])
+        b = float(parts[2])
+        a = float(parts[3]) if len(parts) > 3 else 1.0
+    except ValueError:
+        return None
+    return (r, g, b, a)
+
+
+def _linearize_channel(channel: float) -> float:
+    channel = channel / 255.0
+    if channel <= 0.04045:
+        return channel / 12.92
+    return ((channel + 0.055) / 1.055) ** 2.4
+
+
+def contrast_ratio(fg: str | None, bg: str | None, fallback_bg: str | None = None) -> float | None:
+    fg_rgba = parse_css_rgba(fg)
+    bg_rgba = parse_css_rgba(bg)
+    fallback_rgba = parse_css_rgba(fallback_bg)
+    if not fg_rgba:
+        return None
+    if bg_rgba and bg_rgba[3] < 0.99 and fallback_rgba:
+        bg_rgba = fallback_rgba
+    if not bg_rgba:
+        bg_rgba = fallback_rgba
+    if not bg_rgba:
+        return None
+
+    def luminance(rgb: tuple[float, float, float, float]) -> float:
+        r, g, b = rgb[:3]
+        return (
+            0.2126 * _linearize_channel(r)
+            + 0.7152 * _linearize_channel(g)
+            + 0.0722 * _linearize_channel(b)
+        )
+
+    fg_l = luminance(fg_rgba)
+    bg_l = luminance(bg_rgba)
+    lighter = max(fg_l, bg_l)
+    darker = min(fg_l, bg_l)
+    return (lighter + 0.05) / (darker + 0.05)
 
 
 def ensure_stdout_utf8() -> None:
@@ -155,10 +239,19 @@ def detect_page_not_found(page) -> bool:
     )
 
 
+def rotating_sample(items: list[str], limit: int, salt: str) -> list[str]:
+    keyed = sorted(
+        items,
+        key=lambda item: hashlib.sha256(f"{salt}:{item}".encode("utf-8")).hexdigest(),
+    )
+    return keyed[:limit]
+
+
 def sample_internal_links(page, base_url: str) -> list[str]:
     hrefs = page.evaluate(
         """() => Array.from(document.querySelectorAll('main a[href], article a[href], #np-tracking-list a[href]'))
-          .map((anchor) => anchor.href)
+          .filter((anchor) => anchor.dataset.crossLangLink !== 'true')
+          .map((anchor) => anchor.getAttribute('href') || anchor.href)
           .filter(Boolean)"""
     )
     samples: list[str] = []
@@ -171,14 +264,15 @@ def sample_internal_links(page, base_url: str) -> list[str]:
             continue
         seen.add(path)
         samples.append(path)
-        if len(samples) >= 6:
-            break
-    return samples
+    salt = datetime.now(timezone.utc).strftime("%Y%m%d%H")
+    return rotating_sample(samples, 10, salt)
 
 
 def same_language_path_issues(paths: list[str], expected_lang: str) -> list[str]:
     issues: list[str] = []
     for path in paths:
+        if path in NEUTRAL_INTERNAL_PATHS or path.startswith(NEUTRAL_INTERNAL_PREFIXES):
+            continue
         if expected_lang == "en":
             if path != "/en/" and not path.startswith("/en/"):
                 issues.append(path)
@@ -193,15 +287,42 @@ def check_internal_link_statuses(base_url: str, paths: list[str]) -> list[str]:
     ssl_ctx.check_hostname = False
     ssl_ctx.verify_mode = ssl.CERT_NONE
     failures: list[str] = []
-    for path in paths[:4]:
+    for path in paths[:10]:
+        url = urljoin(base_url, path)
+        last_error = None
+        for method, timeout_seconds in (("HEAD", 15), ("GET", 25)):
+            try:
+                request = urllib.request.Request(
+                    url,
+                    method=method,
+                    headers={"User-Agent": "nowpattern-site-ui-smoke/1.0"},
+                )
+                with urllib.request.urlopen(request, context=ssl_ctx, timeout=timeout_seconds) as response:
+                    if response.status < 400:
+                        last_error = None
+                        break
+                    last_error = f"HTTP {response.status}"
+            except Exception as exc:
+                last_error = str(exc)
+        if last_error:
+            failures.append(f"{path} -> {last_error}")
+    return failures
+
+
+def check_feed_card_statuses(base_url: str, paths: list[str]) -> list[str]:
+    ssl_ctx = ssl.create_default_context()
+    ssl_ctx.check_hostname = False
+    ssl_ctx.verify_mode = ssl.CERT_NONE
+    failures: list[str] = []
+    for path in paths[:8]:
         url = urljoin(base_url, path)
         try:
             request = urllib.request.Request(
                 url,
-                method="HEAD",
+                method="GET",
                 headers={"User-Agent": "nowpattern-site-ui-smoke/1.0"},
             )
-            with urllib.request.urlopen(request, context=ssl_ctx, timeout=15) as response:
+            with urllib.request.urlopen(request, context=ssl_ctx, timeout=20) as response:
                 if response.status >= 400:
                     failures.append(f"{path} -> HTTP {response.status}")
         except Exception as exc:
@@ -236,7 +357,7 @@ def navigation_timing(page) -> dict[str, int | None]:
     )
 
 
-def discover_feed_articles(page, base_url: str, limit: int = 2) -> list[str]:
+def discover_feed_articles(page, base_url: str, limit: int = 4) -> list[str]:
     hrefs = page.evaluate(
         """() => Array.from(document.querySelectorAll('.post-feed a[href], .gh-card a[href], article a[href]'))
           .map((anchor) => anchor.href)
@@ -262,11 +383,30 @@ def discover_feed_articles(page, base_url: str, limit: int = 2) -> list[str]:
         else:
             fallback.append(path)
 
-    for group in (prioritized, fallback):
-        for path in group:
-            paths.append(path)
-            if len(paths) >= limit:
-                return paths
+    seed = datetime.now(timezone.utc).strftime("%Y%m%d")
+    ordered = rotating_sample(prioritized, min(limit, len(prioritized)), seed)
+    remaining = max(0, limit - len(ordered))
+    if remaining > 0:
+        ordered.extend(rotating_sample(fallback, remaining, seed))
+    return ordered
+
+
+def homepage_card_paths(page, base_url: str, limit: int = 8) -> list[str]:
+    hrefs = page.evaluate(
+        """() => Array.from(document.querySelectorAll('.gh-card-link[href], .post-feed .gh-card-link[href]'))
+          .map((anchor) => anchor.getAttribute('href') || '')
+          .filter(Boolean)"""
+    )
+    paths: list[str] = []
+    seen: set[str] = set()
+    for href in hrefs:
+        path = internal_path(href, base_url)
+        if not path or path in seen:
+            continue
+        seen.add(path)
+        paths.append(path)
+        if len(paths) >= limit:
+            break
     return paths
 
 
@@ -363,6 +503,27 @@ def header_ui_snapshot(page) -> dict[str, Any]:
           const texts = (selector) => Array.from(document.querySelectorAll(selector))
             .map((el) => (el.textContent || '').trim())
             .filter(Boolean);
+          const nodeStyle = (selector) => {
+            const el = document.querySelector(selector);
+            if (!el) return null;
+            const style = window.getComputedStyle(el);
+            const parentStyle = el.parentElement ? window.getComputedStyle(el.parentElement) : null;
+            const rect = el.getBoundingClientRect();
+            return {
+              text: (el.textContent || '').trim(),
+              href: el.getAttribute('href') || '',
+              color: style.color,
+              background: style.backgroundColor,
+              parent_background: parentStyle ? parentStyle.backgroundColor : '',
+              font_size: style.fontSize,
+              font_weight: style.fontWeight,
+              width: rect.width,
+              height: rect.height,
+              opacity: style.opacity,
+              active: el.getAttribute('data-np-lang-active') === 'true',
+              disabled: el.getAttribute('data-np-lang-disabled') === 'true',
+            };
+          };
           return {
             html_lang: (document.documentElement.getAttribute('lang') || '').toLowerCase(),
             html_classes: document.documentElement.className || '',
@@ -370,22 +531,34 @@ def header_ui_snapshot(page) -> dict[str, Any]:
             member_texts: texts('.gh-navigation-members a'),
             brand_href: document.querySelector('.gh-navigation-logo')?.getAttribute('href') || '',
             about_href: document.querySelector('.nav-about a')?.getAttribute('href') || '',
+            lang_bar: nodeStyle('#np-lang-bar'),
+            lang_ja: nodeStyle('#np-lang-bar [data-np-lang="ja"]'),
+            lang_en: nodeStyle('#np-lang-bar [data-np-lang="en"]'),
           };
         }"""
     )
 
 
-def portal_trigger_label(page) -> str | None:
-    try:
-        label = page.frame_locator('iframe[data-testid="portal-trigger-frame"]').locator(
-            ".gh-portal-triggerbtn-label"
-        ).first
-        if label.count() == 0:
-            return None
-        text = label.inner_text(timeout=4000).strip()
-        return text or None
-    except Exception:
-        return None
+def portal_trigger_label(page, expected_label: str | None = None) -> str | None:
+    label = page.frame_locator('iframe[data-testid="portal-trigger-frame"]').locator(
+        ".gh-portal-triggerbtn-label"
+    ).first
+    for _ in range(10):
+        try:
+            if label.count() == 0:
+                page.wait_for_timeout(500)
+                continue
+            text = label.inner_text(timeout=2000).strip()
+            if text and (not expected_label or text == expected_label):
+                return text
+            if text:
+                observed = text
+            else:
+                observed = None
+        except Exception:
+            observed = None
+        page.wait_for_timeout(500)
+    return observed if "observed" in locals() else None
 
 
 def validate_language_specific_ui(page, result: PageResult, expected_lang: str) -> None:
@@ -400,8 +573,36 @@ def validate_language_specific_ui(page, result: PageResult, expected_lang: str) 
     about_path = urlparse(urljoin(page.url, str(snapshot.get("about_href") or ""))).path or "/"
     nav_member_text = " | ".join(list(snapshot.get("nav_texts") or []) + list(snapshot.get("member_texts") or []))
 
-    portal_label = portal_trigger_label(page)
+    expected_portal_label = "Join Free" if expected_lang == "en" else "\u7121\u6599\u3067\u53c2\u52a0"
+    portal_label = portal_trigger_label(page, expected_portal_label)
     result.extra["portal_trigger_label"] = portal_label
+
+    lang_bar = snapshot.get("lang_bar")
+    lang_ja = snapshot.get("lang_ja")
+    lang_en = snapshot.get("lang_en")
+    if not lang_bar or not lang_ja or not lang_en:
+        result.fail("language switcher missing managed JA/EN controls")
+    else:
+        min_width = 40 if result.viewport == "mobile" else 42
+        min_height = 30 if result.viewport == "mobile" else 32
+        min_font = 13 if result.viewport == "mobile" else 14
+        for label, node in {"JA": lang_ja, "EN": lang_en}.items():
+            width = float(node.get("width") or 0)
+            height = float(node.get("height") or 0)
+            font_size = float(str(node.get("font_size") or "0").replace("px", "") or 0)
+            ratio = contrast_ratio(
+                str(node.get("color") or ""),
+                str(node.get("background") or ""),
+                str(node.get("parent_background") or ""),
+            )
+            if width < min_width or height < min_height:
+                result.fail(
+                    f"{label} toggle hit area too small: {width:.1f}x{height:.1f}px"
+                )
+            if font_size < min_font:
+                result.fail(f"{label} toggle font too small: {font_size:.1f}px")
+            if ratio is None or ratio < 4.5:
+                result.fail(f"{label} toggle contrast too low: {ratio if ratio is not None else 'n/a'}")
 
     if expected_lang == "en":
         for bad_text in [
@@ -530,6 +731,16 @@ def run_page_audit(page, base_url: str, spec: dict[str, Any], viewport_name: str
         wrong_lang_paths = same_language_path_issues(result.internal_link_sample, spec["expected_lang"])
         if wrong_lang_paths:
             result.fail(f"same-language landing mismatch: {', '.join(wrong_lang_paths[:3])}")
+
+    if spec["slug"].startswith("home-"):
+        card_paths = homepage_card_paths(page, base_url)
+        result.extra["homepage_card_paths"] = card_paths
+        preview_paths = [path for path in card_paths if path.startswith("/p/")]
+        if preview_paths:
+            result.warnings.append(f"preview-style homepage links present: {', '.join(preview_paths[:3])}")
+        card_failures = check_feed_card_statuses(base_url, card_paths)
+        if card_failures:
+            result.fail(f"broken homepage card links: {', '.join(card_failures[:3])}")
 
     nav_timing = navigation_timing(page)
     result.extra["navigation_timing"] = nav_timing

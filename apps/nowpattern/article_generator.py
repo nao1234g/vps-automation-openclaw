@@ -25,7 +25,7 @@ ARTICLE_SECTIONS = {
     "pattern_history": "📚 パターンの歴史",
     "what_next": "🔮 次のシナリオ",
     "open_loop": "🔄 追跡ループ",
-    "oracle": "🎯 オラクル宣言",
+    "oracle": "🎯 予測の答え合わせ",
 }
 
 EN_SECTIONS = {
@@ -36,7 +36,7 @@ EN_SECTIONS = {
     "pattern_history": "📚 PATTERN HISTORY",
     "what_next": "🔮 WHAT'S NEXT",
     "open_loop": "🔄 OPEN LOOP",
-    "oracle": "🎯 ORACLE STATEMENT",
+    "oracle": "🎯 PREDICTION CHECK",
 }
 
 

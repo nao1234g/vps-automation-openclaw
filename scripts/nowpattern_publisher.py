@@ -42,6 +42,9 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from article_release_guard import assert_release_ready
+from article_truth_guard import evaluate_article_truth
+
 
 # ---------------------------------------------------------------------------
 # Genre-based URL structure (v4.0: routes.yaml collection routing)
@@ -269,6 +272,40 @@ def make_ghost_jwt(admin_api_key: str) -> str:
     return f"{signing_input}.{b64url(sig)}"
 
 
+def _assert_publishable_truth(
+    *,
+    title: str,
+    html: str,
+    source_urls: list[str] | None,
+    ghost_url: str,
+    tags: list[str] | list[dict] | None = None,
+    status: str = "published",
+) -> None:
+    if (status or "").lower() != "published":
+        truth_errors, _ = evaluate_article_truth(
+            title=title,
+            html=html,
+            source_urls=source_urls or [],
+            site_url=ghost_url,
+            require_external_sources=True,
+        )
+        if truth_errors:
+            raise ValueError("truth/source guard blocked publish: " + ", ".join(truth_errors))
+        return
+
+    assert_release_ready(
+        title=title,
+        html=html,
+        source_urls=source_urls or [],
+        tags=tags or [],
+        site_url=ghost_url,
+        status=status,
+        channel="public",
+        require_external_sources=True,
+        check_source_fetchability=True,
+    )
+
+
 def generate_organization_jsonld(
     ghost_url: str = "https://nowpattern.com",
 ) -> str:
@@ -385,6 +422,7 @@ def post_to_ghost(
     title: str,
     html: str,
     tags: list[str] | list[dict] | None = None,
+    source_urls: list[str] | None = None,
     ghost_url: str = "https://nowpattern.com",
     admin_api_key: str = "",
     status: str = "published",
@@ -448,6 +486,20 @@ def post_to_ghost(
         ghost_tags.append({"name": "日本語", "slug": "lang-ja"})
     else:
         ghost_tags.append({"name": "English", "slug": "lang-en"})
+
+    release_tags = list(tag_objects or tags or [])
+    if language == "ja":
+        release_tags = release_tags + ["lang-ja"]
+    else:
+        release_tags = release_tags + ["lang-en"]
+    _assert_publishable_truth(
+        title=title,
+        html=html,
+        source_urls=source_urls or [],
+        ghost_url=ghost_url,
+        tags=release_tags,
+        status=status,
+    )
 
     url = f"{ghost_url}/ghost/api/admin/posts/"
     headers = {
@@ -774,6 +826,14 @@ def publish_deep_pattern(
         print(f"  BLOCK v5.3 validation: HTML missing {', '.join(missing)}")
         print(f"     -> See docs/ARTICLE_FORMAT.md for required sections")
         raise ValueError(f"v5.3 format validation failed: missing {', '.join(missing)}")
+    _assert_publishable_truth(
+        title=title,
+        html=html,
+        source_urls=source_urls,
+        ghost_url=ghost_url,
+        tags=genre_tags + event_tags + dynamics_tags,
+        status=status,
+    )
 
     # --- タクソノミーバリデーション + 正規化（STRICT: 不正タグ→投稿ブロック） ---
     print("  Taxonomy validation (STRICT)...")
@@ -819,6 +879,7 @@ def publish_deep_pattern(
         title=title,
         html=html,
         tag_objects=tag_objects,
+        source_urls=source_urls,
         ghost_url=ghost_url,
         admin_api_key=admin_api_key,
         status=status,
@@ -945,6 +1006,14 @@ def publish_speed_log(
 
     # --- タクソノミーバリデーション ---
     validate_tags(dynamics_tags, event_tags, genre_tags)
+    _assert_publishable_truth(
+        title=title,
+        html=html,
+        source_urls=source_urls,
+        ghost_url=ghost_url,
+        tags=genre_tags + event_tags + dynamics_tags,
+        status=status,
+    )
 
     all_tags = genre_tags + event_tags + dynamics_tags + ["Deep Pattern"]
 
@@ -952,6 +1021,7 @@ def publish_speed_log(
         title=title,
         html=html,
         tags=all_tags,
+        source_urls=source_urls,
         ghost_url=ghost_url,
         admin_api_key=admin_api_key,
         status=status,

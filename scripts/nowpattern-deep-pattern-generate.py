@@ -27,6 +27,10 @@ import re
 from datetime import datetime
 from pathlib import Path
 
+from article_factcheck_postprocess import fact_check_and_revise_generated_article
+from article_release_guard import evaluate_release_blockers
+from article_truth_guard import evaluate_article_truth
+
 # ===== パス =====
 SCRIPTS_DIR = Path(__file__).parent
 QUEUE_FILE = SCRIPTS_DIR / "rss_article_queue.json"
@@ -448,6 +452,46 @@ def generate_article(entry_index, entry, taxonomy, env):
     if url and not any(u == url for _, u in source_tuples):
         source_tuples.insert(0, (title[:50], url))
 
+    factcheck = fact_check_and_revise_generated_article(
+        data=data,
+        source_urls=source_tuples,
+        lang=lang,
+        mode="deep_pattern",
+        site_url=GHOST_URL,
+    )
+    if not factcheck.get("ok"):
+        log(f"  FACT-CHECK BLOCK: {factcheck.get('issues', [])}")
+        if factcheck.get("summary"):
+            log(f"  FACT-CHECK SUMMARY: {factcheck['summary']}")
+        return False
+    data = factcheck.get("data", data)
+    if factcheck.get("summary"):
+        log(f"  Post-gen fact-check: {factcheck['summary']}")
+
+    source_tuples = [(s["title"], s["url"]) for s in data.get("source_urls", [])]
+    if url and not any(u == url for _, u in source_tuples):
+        source_tuples.insert(0, (title[:50], url))
+
+    truth_errors, ext_urls = evaluate_article_truth(
+        title=data.get("title", title),
+        body_text="\n".join(
+            str(part or "")
+            for part in [
+                data.get("why_it_matters", ""),
+                data.get("big_picture_history", ""),
+                data.get("dynamics_summary", ""),
+                data.get("dynamics_intersection", ""),
+            ]
+        ),
+        source_urls=source_tuples,
+        site_url=GHOST_URL,
+        require_external_sources=True,
+    )
+    if truth_errors:
+        log(f"  TRUTH GUARD FAIL: {truth_errors}")
+        return False
+    log(f"  Truth guard passed with {len(ext_urls)} external source(s)")
+
     html = build_deep_pattern_html(
         title=data.get("title", title),
         why_it_matters=data.get("why_it_matters", ""),
@@ -485,6 +529,28 @@ def generate_article(entry_index, entry, taxonomy, env):
     event_list = [t.strip() for t in data.get("event_tags", "").split(",") if t.strip()]
     dynamics_list = [t.strip() for t in data.get("dynamics_tags", "").split(",") if t.strip()]
 
+    release_block = evaluate_release_blockers(
+        title=data.get("title", title),
+        html=html,
+        source_urls=[u for _, u in source_tuples],
+        tags=genre_list + event_list + dynamics_list + [f"lang-{lang}"],
+        site_url=GHOST_URL,
+        status="published",
+        channel="public",
+        require_external_sources=True,
+        check_source_fetchability=True,
+    )
+    blocking_errors = [
+        err for err in release_block["errors"]
+        if not err.startswith("HUMAN_APPROVAL_REQUIRED:")
+    ]
+    if blocking_errors:
+        log(f"  RELEASE BLOCK: {blocking_errors}")
+        return False
+    if release_block["human_approval_required"] and not release_block["human_approval_present"]:
+        status = "draft"
+        log(f"  High-risk article forced to DRAFT pending human approval: {release_block['risk_flags']}")
+
     result = publish_deep_pattern(
         article_id=article_id,
         title=data.get("title", title),
@@ -492,7 +558,7 @@ def generate_article(entry_index, entry, taxonomy, env):
         genre_tags=genre_list,
         event_tags=event_list,
         dynamics_tags=dynamics_list,
-        source_urls=[url] if url else [],
+        source_urls=[u for _, u in source_tuples],
         ghost_url=GHOST_URL,
         admin_api_key=admin_key,
         status=status,

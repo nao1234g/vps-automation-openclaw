@@ -25,6 +25,8 @@ import requests
 import urllib3
 import jwt
 
+from article_truth_guard import evaluate_article_truth
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 GHOST_URL = "https://nowpattern.com"
@@ -186,6 +188,17 @@ def validate_post(post):
                 "grade": "SKIP", "errors": errors, "warnings": warnings, "info": info}
 
     # 1. 言語タグチェック
+    truth_errors, ext_urls = evaluate_article_truth(
+        title=title,
+        html=html,
+        site_url=GHOST_URL,
+        require_external_sources=True,
+    )
+    if truth_errors:
+        errors.append("source/truth guard: " + ", ".join(truth_errors))
+    else:
+        info.append(f"external_sources={len(ext_urls)}")
+
     if not lang:
         errors.append("言語タグなし（lang-ja / lang-en どちらもない）")
 

@@ -17,6 +17,24 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_HOST = os.environ.get("NOWPATTERN_VPS_HOST", "root@163.44.124.123")
+GHOST_TEXT_TYPE_MARKERS = ("CHAR", "CLOB", "TEXT", "VARCHAR", "JSON")
+GHOST_CONTENT_FIELD_HINTS = {
+    "html",
+    "lexical",
+    "mobiledoc",
+    "custom_excerpt",
+    "canonical_url",
+    "meta_title",
+    "meta_description",
+    "og_title",
+    "og_description",
+    "twitter_title",
+    "twitter_description",
+    "codeinjection_head",
+    "codeinjection_foot",
+    "value",
+}
+GHOST_ACTIVE_HYGIENE_TABLES = {"posts", "settings"}
 
 TARGETS = [
     {
@@ -80,6 +98,12 @@ TARGETS = [
         "remote": "/opt/shared/scripts/live_site_availability_check.py",
     },
     {
+        "name": "check_ghost_article_routes",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "check_ghost_article_routes.py",
+        "remote": "/opt/shared/scripts/check_ghost_article_routes.py",
+    },
+    {
         "name": "site_guard_runner",
         "kind": "text",
         "local": REPO_ROOT / "scripts" / "site_guard_runner.py",
@@ -102,6 +126,12 @@ TARGETS = [
         "kind": "text",
         "local": REPO_ROOT / "scripts" / "install_en_article_route_guard.py",
         "remote": "/opt/shared/scripts/install_en_article_route_guard.py",
+    },
+    {
+        "name": "install_uuid_preview_route_guard",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "install_uuid_preview_route_guard.py",
+        "remote": "/opt/shared/scripts/install_uuid_preview_route_guard.py",
     },
     {
         "name": "ghost_ui_settings",
@@ -213,7 +243,66 @@ def summarize_local_ghost_content_hygiene() -> dict:
         "stale_en_predictions_links": 0,
         "stale_full_en_article_links": 0,
         "settings_stale_hits": 0,
+        "scanned_tables": sorted(GHOST_ACTIVE_HYGIENE_TABLES),
     }
+
+
+def quote_ident(name: str) -> str:
+    return '"' + name.replace('"', '""') + '"'
+
+
+def ghost_text_targets(cur, allowed_tables: set[str] | None = None) -> list[tuple[str, list[str]]]:
+    tables = cur.execute(
+        """
+        SELECT name
+        FROM sqlite_master
+        WHERE type = 'table'
+          AND name NOT LIKE 'sqlite_%'
+        ORDER BY name
+        """
+    ).fetchall()
+    targets: list[tuple[str, list[str]]] = []
+    for row in tables:
+        table_name = row[0]
+        if allowed_tables and table_name not in allowed_tables:
+            continue
+        pragma = list(cur.execute(f"PRAGMA table_info({quote_ident(table_name)})"))
+        columns = []
+        for col in pragma:
+            column_name = col[1]
+            column_type = str(col[2] or "").upper()
+            is_text_like = any(marker in column_type for marker in GHOST_TEXT_TYPE_MARKERS) or column_name in GHOST_CONTENT_FIELD_HINTS
+            if is_text_like:
+                columns.append(column_name)
+        if columns:
+            targets.append((table_name, columns))
+    return targets
+
+
+def summarize_ghost_content_hygiene_connection(con) -> dict:
+    cur = con.cursor()
+    summary = {
+        "kind": "ghost_content_hygiene",
+        "stale_en_article_links": 0,
+        "stale_en_predictions_links": 0,
+        "stale_full_en_article_links": 0,
+        "settings_stale_hits": 0,
+        "scanned_tables": sorted(GHOST_ACTIVE_HYGIENE_TABLES),
+    }
+
+    for table_name, columns in ghost_text_targets(cur, GHOST_ACTIVE_HYGIENE_TABLES):
+        select_sql = "SELECT " + ", ".join(quote_ident(column) for column in columns) + f" FROM {quote_ident(table_name)}"
+        for row in cur.execute(select_sql):
+            for value in row:
+                if not isinstance(value, str) or not value:
+                    continue
+                summary["stale_en_article_links"] += value.count("/en/en-")
+                summary["stale_en_predictions_links"] += value.count("/en-predictions/")
+                summary["stale_full_en_article_links"] += value.lower().count("https://nowpattern.com/en/en-")
+                if table_name == "settings":
+                    summary["settings_stale_hits"] += value.count("/en/en-") + value.count("/en-predictions/")
+
+    return summary
 
 
 def summarize_local(target: dict) -> dict:
@@ -341,37 +430,61 @@ def summarize_ghost_content_hygiene(db_path):
         "stale_en_predictions_links": 0,
         "stale_full_en_article_links": 0,
         "settings_stale_hits": 0,
+        "scanned_tables": sorted({"posts", "settings"}),
     }
 
-    def accumulate_table(table_name):
-        cur.execute(f"PRAGMA table_info({table_name})")
-        columns = {row[1] for row in cur.fetchall()}
-        scan_fields = [
-            field
-            for field in ("html", "lexical", "mobiledoc", "custom_excerpt", "canonical_url", "codeinjection_head", "codeinjection_foot")
-            if field in columns
-        ]
+    def quote_ident(name):
+        return '"' + name.replace('"', '""') + '"'
+
+    rows = cur.execute(
+        "SELECT name FROM sqlite_master "
+        "WHERE type = 'table' AND name NOT LIKE 'sqlite_%' "
+        "ORDER BY name"
+    ).fetchall()
+    table_names = [row[0] for row in rows if isinstance(row[0], str)]
+
+    allowed_tables = {"posts", "settings"}
+    for table_name in table_names:
+        if table_name not in allowed_tables:
+            continue
+        pragma = list(cur.execute(f"PRAGMA table_info({quote_ident(table_name)})"))
+        scan_fields = []
+        for col in pragma:
+            column_name = col[1]
+            column_type = str(col[2] or "").upper()
+            if (
+                any(marker in column_type for marker in ("CHAR", "CLOB", "TEXT", "VARCHAR", "JSON"))
+                or column_name in {
+                    "html",
+                    "lexical",
+                    "mobiledoc",
+                    "custom_excerpt",
+                    "canonical_url",
+                    "meta_title",
+                    "meta_description",
+                    "og_title",
+                    "og_description",
+                    "twitter_title",
+                    "twitter_description",
+                    "codeinjection_head",
+                    "codeinjection_foot",
+                    "value",
+                }
+            ):
+                scan_fields.append(column_name)
         if not scan_fields:
-            return
-        select_sql = "SELECT " + ", ".join(scan_fields) + f" FROM {table_name}"
-        rows = cur.execute(select_sql)
-        for row in rows:
+            continue
+
+        select_sql = "SELECT " + ", ".join(quote_ident(field) for field in scan_fields) + f" FROM {quote_ident(table_name)}"
+        for row in cur.execute(select_sql):
             for value in row:
                 if not isinstance(value, str) or not value:
                     continue
                 summary["stale_en_article_links"] += value.count("/en/en-")
                 summary["stale_en_predictions_links"] += value.count("/en-predictions/")
                 summary["stale_full_en_article_links"] += value.lower().count("https://nowpattern.com/en/en-")
-
-    accumulate_table("posts")
-    accumulate_table("pages")
-
-    for key in ("codeinjection_head", "codeinjection_foot"):
-        cur.execute("SELECT value FROM settings WHERE key = ?", (key,))
-        row = cur.fetchone()
-        value = row[0] if row else ""
-        if isinstance(value, str) and value:
-            summary["settings_stale_hits"] += value.count("/en/en-") + value.count("/en-predictions/")
+                if table_name == "settings":
+                    summary["settings_stale_hits"] += value.count("/en/en-") + value.count("/en-predictions/")
 
     con.close()
     return summary
@@ -483,49 +596,7 @@ def summarize_remote_local_ghost_content_hygiene(db_path: Path) -> dict:
     import sqlite3
 
     con = sqlite3.connect(str(db_path))
-    cur = con.cursor()
-    cur.execute("PRAGMA table_info(posts)")
-    post_columns = {row[1] for row in cur.fetchall()}
-    scan_fields = [
-        field
-        for field in ("html", "lexical", "mobiledoc", "custom_excerpt", "canonical_url", "codeinjection_head", "codeinjection_foot")
-        if field in post_columns
-    ]
-
-    summary = {
-        "kind": "ghost_content_hygiene",
-        "stale_en_article_links": 0,
-        "stale_en_predictions_links": 0,
-        "stale_full_en_article_links": 0,
-        "settings_stale_hits": 0,
-    }
-
-    def accumulate_table(table_name: str) -> None:
-        cur.execute(f"PRAGMA table_info({table_name})")
-        columns = {row[1] for row in cur.fetchall()}
-        fields = [field for field in scan_fields if field in columns]
-        if not fields:
-            return
-        select_sql = "SELECT " + ", ".join(fields) + f" FROM {table_name}"
-        rows = cur.execute(select_sql)
-        for row in rows:
-            for value in row:
-                if not isinstance(value, str) or not value:
-                    continue
-                summary["stale_en_article_links"] += value.count("/en/en-")
-                summary["stale_en_predictions_links"] += value.count("/en-predictions/")
-                summary["stale_full_en_article_links"] += value.lower().count("https://nowpattern.com/en/en-")
-
-    accumulate_table("posts")
-    accumulate_table("pages")
-
-    for key in ("codeinjection_head", "codeinjection_foot"):
-        cur.execute("SELECT value FROM settings WHERE key = ?", (key,))
-        row = cur.fetchone()
-        value = row[0] if row else ""
-        if isinstance(value, str) and value:
-            summary["settings_stale_hits"] += value.count("/en/en-") + value.count("/en-predictions/")
-
+    summary = summarize_ghost_content_hygiene_connection(con)
     con.close()
     return summary
 

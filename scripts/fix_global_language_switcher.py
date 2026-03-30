@@ -11,70 +11,104 @@ import sys
 
 
 DEFAULT_GHOST_DB = "/var/www/nowpattern/content/data/ghost.db"
-LANGUAGE_SWITCHER_MARKER = "Language Switcher v3.2"
+LANGUAGE_SWITCHER_MARKER = "Language Switcher v3.3"
 UI_GUARD_MARKER = "Global UI Guard v1.0"
 DEFAULT_PORTAL_SIGNUP_TEXT = "Join Free"
 DEFAULT_PORTAL_BUTTON_STYLE = "icon-and-text"
 DEFAULT_PORTAL_BUTTON = "true"
 DEFAULT_PORTAL_PLANS = '["free"]'
 
-LANGUAGE_SWITCHER_BLOCK = r"""<!-- Language Switcher v3.2 -->
+LANGUAGE_SWITCHER_BLOCK = r"""<!-- Language Switcher v3.3 -->
 <style>
 .np-lang-bar {
   display: inline-flex;
-  gap: 4px;
+  gap: 6px;
   align-items: center;
-  background: rgba(18,30,48,0.88);
-  border-radius: 6px;
-  padding: 4px 8px;
+  background: rgba(15,23,42,0.96);
+  border: 1px solid rgba(148,163,184,0.26);
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(15,23,42,0.18);
+  padding: 4px;
   margin-right: 6px;
   flex-shrink: 0;
+  min-height: 40px;
 }
 .np-lang-disabled {
-  color: #555;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 3px 7px;
-  border-radius: 4px;
+  color: #cbd5e1 !important;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(148,163,184,0.18);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 6px 10px;
+  border-radius: 10px;
+  min-width: 44px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: default;
-  opacity: 0.5;
+  opacity: 0.88;
+  line-height: 1;
 }
 .np-lang-bar a,
-.np-lang-bar span {
-  color: #e0dcd4;
+.np-lang-bar a:visited,
+.np-lang-bar span,
+.np-lang-bar [data-np-lang] {
+  color: #f8fafc !important;
   text-decoration: none;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 3px 7px;
-  border-radius: 4px;
-  transition: background 0.15s;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 6px 10px;
+  border-radius: 10px;
+  min-width: 44px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  line-height: 1;
+}
+.np-lang-bar a,
+.np-lang-bar a:visited,
+.np-lang-bar [data-np-lang]:not(.np-lang-active):not(.np-lang-disabled) {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(148,163,184,0.18);
 }
 .np-lang-bar .np-lang-active {
-  background: #c9a84c;
-  color: #121e30;
+  background: #f2c94c !important;
+  border: 1px solid #f6dd86 !important;
+  color: #111827 !important;
 }
-.np-lang-bar a:hover {
-  background: rgba(255,255,255,0.15);
+.np-lang-bar a:hover,
+.np-lang-bar a:visited:hover,
+.np-lang-bar a:focus-visible {
+  background: rgba(255,255,255,0.12) !important;
+  border-color: #93c5fd !important;
+  color: #ffffff !important;
+  outline: none;
 }
 .np-lang-sep {
-  color: #555;
-  font-size: 12px;
-  line-height: 24px;
-  padding: 3px 0;
+  color: #94a3b8;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0 2px;
 }
 @media (max-width: 640px) {
   .np-lang-bar {
-    padding: 3px 6px;
+    padding: 3px;
     margin-right: 4px;
+    min-height: 38px;
   }
   .np-lang-bar a,
   .np-lang-bar span,
   .np-lang-sep,
   .np-lang-disabled {
-    font-size: 11px;
-    padding: 2px 5px;
+    font-size: 13px;
+    min-width: 42px;
+    min-height: 30px;
+    padding: 5px 9px;
   }
 }
 </style>
@@ -174,14 +208,26 @@ LANGUAGE_SWITCHER_BLOCK = r"""<!-- Language Switcher v3.2 -->
     var node = document.createElement(active || !enabled ? "span" : "a");
     node.textContent = label;
     node.setAttribute("data-np-lang", label.toLowerCase());
+    node.setAttribute("title", label === "JA" ? "日本語" : "English");
+    node.setAttribute("aria-label", label === "JA" ? "Switch to Japanese" : "Switch to English");
     if (active) {
       node.className = "np-lang-active";
       node.setAttribute("data-np-lang-active", "true");
+      node.setAttribute("aria-current", "page");
+      node.style.setProperty("color", "#111827", "important");
+      node.style.setProperty("background", "#f2c94c", "important");
+      node.style.setProperty("border", "1px solid #f6dd86", "important");
     } else if (!enabled) {
       node.className = "np-lang-disabled";
       node.setAttribute("data-np-lang-disabled", "true");
+      node.style.setProperty("color", "#cbd5e1", "important");
+      node.style.setProperty("background", "rgba(255,255,255,0.06)", "important");
+      node.style.setProperty("border", "1px solid rgba(148,163,184,0.18)", "important");
     } else {
       node.setAttribute("href", href);
+      node.style.setProperty("color", "#f8fafc", "important");
+      node.style.setProperty("background", "rgba(255,255,255,0.04)", "important");
+      node.style.setProperty("border", "1px solid rgba(148,163,184,0.18)", "important");
     }
     return node;
   }
@@ -345,6 +391,58 @@ UI_GUARD_BLOCK = r"""<!-- Global UI Guard v1.0 -->
     }
   }
 
+  function normalizeHrefPath(href) {
+    try {
+      var url = new URL(href, origin);
+      if (url.origin !== origin) return null;
+      var pathname = url.pathname || "/";
+      if (pathname !== "/" && !pathname.endsWith("/") && pathname.indexOf(".", pathname.lastIndexOf("/") + 1) === -1) {
+        pathname += "/";
+      }
+      return pathname;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function isUtilityPath(pathname) {
+    if (!pathname) return true;
+    if (
+      pathname === "/" ||
+      pathname === "/en/" ||
+      pathname === "/about/" ||
+      pathname === "/en/about/" ||
+      pathname === "/taxonomy/" ||
+      pathname === "/en/taxonomy/" ||
+      pathname === "/taxonomy-guide/" ||
+      pathname === "/en/taxonomy-guide/" ||
+      pathname === "/taxonomy-guide-ja/" ||
+      pathname === "/taxonomy-guide-en/" ||
+      pathname === "/predictions/" ||
+      pathname === "/en/predictions/" ||
+      pathname === "/leaderboard/" ||
+      pathname === "/en/leaderboard/" ||
+      pathname === "/my-predictions/" ||
+      pathname === "/en/my-predictions/" ||
+      pathname === "/integrity-audit/" ||
+      pathname === "/en/integrity-audit/"
+    ) {
+      return true;
+    }
+    return pathname.indexOf("/tag/") === 0 || pathname.indexOf("/author/") === 0 || pathname.indexOf("/rss/") === 0;
+  }
+
+  function rewriteSameLanguageCardPath(pathname) {
+    if (!pathname || isUtilityPath(pathname)) return null;
+    if (pathname.indexOf("/en/") === 0) {
+      return isEnPage ? pathname : "/" + pathname.replace(/^\/en\//, "");
+    }
+    if (!isEnPage) return pathname;
+    var slug = pathname.replace(/^\/+|\/+$/g, "");
+    if (!slug || slug.indexOf("/") !== -1) return null;
+    return "/en/" + slug + "/";
+  }
+
   function rewriteStaleInternalLinks() {
     var anchors = document.querySelectorAll('a[href]');
     anchors.forEach(function(anchor) {
@@ -365,6 +463,15 @@ UI_GUARD_BLOCK = r"""<!-- Global UI Guard v1.0 -->
 
       if (normalized.indexOf("/en/en-") === 0) {
         anchor.setAttribute("href", normalized.replace("/en/en-", "/en/"));
+        return;
+      }
+
+      if (!anchor.closest(".gh-card, .post-feed")) return;
+      if (anchor.dataset.npLang || anchor.closest(".np-lang-bar")) return;
+      var path = normalizeHrefPath(normalized);
+      var rewrittenPath = rewriteSameLanguageCardPath(path);
+      if (rewrittenPath && rewrittenPath !== path) {
+        anchor.setAttribute("href", rewrittenPath);
       }
     });
   }

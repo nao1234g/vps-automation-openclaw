@@ -64,6 +64,11 @@ TARGETS = [
         "remote": "/opt/shared/scripts/live_site_availability_check.py",
     },
     {
+        "name": "check_ghost_article_routes",
+        "local": REPO_ROOT / "scripts" / "check_ghost_article_routes.py",
+        "remote": "/opt/shared/scripts/check_ghost_article_routes.py",
+    },
+    {
         "name": "site_guard_runner",
         "local": REPO_ROOT / "scripts" / "site_guard_runner.py",
         "remote": "/opt/shared/scripts/site_guard_runner.py",
@@ -82,6 +87,11 @@ TARGETS = [
         "name": "install_en_article_route_guard",
         "local": REPO_ROOT / "scripts" / "install_en_article_route_guard.py",
         "remote": "/opt/shared/scripts/install_en_article_route_guard.py",
+    },
+    {
+        "name": "install_uuid_preview_route_guard",
+        "local": REPO_ROOT / "scripts" / "install_uuid_preview_route_guard.py",
+        "remote": "/opt/shared/scripts/install_uuid_preview_route_guard.py",
     },
     {
         "name": "check_live_repo_drift",

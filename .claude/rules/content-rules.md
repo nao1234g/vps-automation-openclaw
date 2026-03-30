@@ -114,10 +114,10 @@ MANDATORY_HASHTAGS = ["#Nowpattern", "#ニュース分析"]
      — EN見出し: "🔄 OPEN LOOP"
      — マーカー: np-open-loop
 
-  7. オラクル宣言 / Oracle Statement
+  7. 予測の答え合わせ / Prediction Check
      — 予測追跡ボックス（prediction_db連動記事は必須）
-     — JA見出し: "🎯 オラクル宣言"
-     — EN見出し: "🎯 ORACLE STATEMENT"
+     — JA見出し: "🎯 予測の答え合わせ"
+     — EN見出し: "🎯 PREDICTION CHECK"
      — マーカー: np-oracle
 ```
 
@@ -136,7 +136,7 @@ np-tag-badge     — タグバッジ
 
 **これら6マーカーが欠けた記事は `nowpattern_publisher.py` が強制的にDRAFTに降格する。**
 
-### 12. ORACLE STATEMENT — 予測追跡ボックス（必須条件あり）
+### 12. PREDICTION CHECK — 予測追跡ボックス（必須条件あり）
 
 **prediction_dbに登録した予測がある記事は、記事末尾に必ずこのボックスを挿入すること。**
 （予測のない記事はスキップ可。Quick Predictionカードのある記事も必須。）

@@ -6,6 +6,10 @@ on:
     - cron: "0 4 * * *"
   workflow_dispatch:
 
+concurrency:
+  group: live-site-guard
+  cancel-in-progress: false
+
 jobs:
   availability:
     name: External Availability Probe
@@ -112,6 +116,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [availability, ui-smoke, article-smoke]
     if: always()
+    env:
+      ALERT_WEBHOOK_URL: ${{ secrets.LIVE_SITE_GUARD_WEBHOOK_URL }}
 
     steps:
       - name: Create or update outage issue
@@ -158,6 +164,46 @@ jobs:
               });
             }
 
+      - name: Send webhook failure alert
+        if: (needs.availability.result == 'failure' || needs.ui-smoke.result == 'failure' || needs.article-smoke.result == 'failure') && env.ALERT_WEBHOOK_URL != ''
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          payload = {
+              "text": (
+                  "Nowpattern live-site guard failure\n"
+                  f"availability={os.environ['AVAILABILITY_RESULT']}\n"
+                  f"ui_smoke={os.environ['UI_SMOKE_RESULT']}\n"
+                  f"article_smoke={os.environ['ARTICLE_SMOKE_RESULT']}\n"
+                  f"run={os.environ['RUN_URL']}"
+              ),
+              "content": (
+                  "Nowpattern live-site guard failure\n"
+                  f"availability={os.environ['AVAILABILITY_RESULT']}\n"
+                  f"ui_smoke={os.environ['UI_SMOKE_RESULT']}\n"
+                  f"article_smoke={os.environ['ARTICLE_SMOKE_RESULT']}\n"
+                  f"run={os.environ['RUN_URL']}"
+              ),
+          }
+          data = json.dumps(payload).encode("utf-8")
+          req = urllib.request.Request(
+              os.environ["ALERT_WEBHOOK_URL"],
+              data=data,
+              headers={"Content-Type": "application/json"},
+              method="POST",
+          )
+          with urllib.request.urlopen(req, timeout=20) as response:
+              print(f"webhook status={response.status}")
+          PY
+        env:
+          AVAILABILITY_RESULT: ${{ needs.availability.result }}
+          UI_SMOKE_RESULT: ${{ needs.ui-smoke.result }}
+          ARTICLE_SMOKE_RESULT: ${{ needs.article-smoke.result }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
       - name: Close resolved outage issue
         if: needs.availability.result == 'success' && needs.ui-smoke.result == 'success' && (needs.article-smoke.result == 'success' || needs.article-smoke.result == 'skipped')
         uses: actions/github-script@v7
@@ -187,3 +233,28 @@ jobs:
                 state: 'closed'
               });
             }
+
+      - name: Send webhook recovery alert
+        if: needs.availability.result == 'success' && needs.ui-smoke.result == 'success' && (needs.article-smoke.result == 'success' || needs.article-smoke.result == 'skipped') && env.ALERT_WEBHOOK_URL != ''
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          payload = {
+              "text": f"Nowpattern live-site guard recovered\nrun={os.environ['RUN_URL']}",
+              "content": f"Nowpattern live-site guard recovered\nrun={os.environ['RUN_URL']}",
+          }
+          data = json.dumps(payload).encode("utf-8")
+          req = urllib.request.Request(
+              os.environ["ALERT_WEBHOOK_URL"],
+              data=data,
+              headers={"Content-Type": "application/json"},
+              method="POST",
+          )
+          with urllib.request.urlopen(req, timeout=20) as response:
+              print(f"webhook status={response.status}")
+          PY
+        env:
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

@@ -43,6 +43,8 @@ import sys
 import argparse
 from datetime import datetime, timezone
 
+from article_release_guard import evaluate_release_blockers
+
 QUEUE_FILE = "/opt/shared/scripts/breaking_queue.json"
 SCRIPTS_DIR = "/opt/shared/scripts"
 
@@ -155,6 +157,29 @@ def publish_to_ghost(article_data, html, dry_run=False):
 
     # publish_deep_pattern()がSTRICTバリデーションを行い、
     # 不正タグがあればValueErrorで投稿をブロックする
+    release_block = evaluate_release_blockers(
+        title=article_data["title"],
+        html=html,
+        source_urls=[u[1] if isinstance(u, (list, tuple)) else u for u in article_data.get("source_urls", [])],
+        tags=genre_list + event_list + dynamics_list + [f"lang-{lang}"],
+        site_url=GHOST_URL,
+        status="published",
+        channel="public",
+        require_external_sources=True,
+        check_source_fetchability=True,
+    )
+    blocking_errors = [
+        err for err in release_block["errors"]
+        if not err.startswith("HUMAN_APPROVAL_REQUIRED:")
+    ]
+    if blocking_errors:
+        raise ValueError("release blocker: " + ", ".join(blocking_errors))
+
+    publish_status = "published"
+    if release_block["human_approval_required"] and not release_block["human_approval_present"]:
+        publish_status = "draft"
+        print(f"  High-risk article forced to DRAFT pending human approval: {release_block['risk_flags']}")
+
     result = publish_deep_pattern(
         article_id=article_id,
         title=article_data["title"],
@@ -170,7 +195,7 @@ def publish_to_ghost(article_data, html, dry_run=False):
         title_en=article_data["title"] if lang == "en" else "",
         ghost_url=GHOST_URL,
         admin_api_key=admin_api_key,
-        status="published",
+        status=publish_status,
         index_path="/opt/shared/scripts/nowpattern_article_index.json",
     )
 

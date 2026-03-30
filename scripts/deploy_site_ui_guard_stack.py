@@ -19,10 +19,12 @@ TARGETS = [
     "fix_global_language_switcher",
     "fix_ghost_content_links",
     "live_site_availability_check",
+    "check_ghost_article_routes",
     "site_guard_runner",
     "site_ui_smoke_audit",
     "install_site_ui_guard",
     "install_en_article_route_guard",
+    "install_uuid_preview_route_guard",
     "check_live_repo_drift",
 ]
 
@@ -65,7 +67,9 @@ def main() -> int:
         [
             "python3 /opt/shared/scripts/fix_global_language_switcher.py",
             "python3 /opt/shared/scripts/install_en_article_route_guard.py --quiet",
+            "python3 /opt/shared/scripts/install_uuid_preview_route_guard.py --quiet",
             "python3 /opt/shared/scripts/fix_ghost_content_links.py --quiet",
+            "python3 /opt/shared/scripts/check_ghost_article_routes.py --repair --quiet",
             "python3 /opt/shared/scripts/install_site_ui_guard.py",
             "python3 /opt/shared/scripts/check_live_repo_drift.py --host local",
         ]

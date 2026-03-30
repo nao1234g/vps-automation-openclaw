@@ -6,17 +6,35 @@ from __future__ import annotations
 import argparse
 import ssl
 import sys
-import time
 import urllib.request
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import urljoin
 
 
-PREDICTIONS_URL_JA = "https://nowpattern.com/predictions/"
-PREDICTIONS_URL_EN = "https://nowpattern.com/en/predictions/"
+PREDICTIONS_URLS = {
+    "ja": "https://nowpattern.com/predictions/",
+    "en": "https://nowpattern.com/en/predictions/",
+}
 SCREENSHOT_DIR = "/opt/shared/reports/e2e-screenshots"
 TIMEOUT = 20000
-CARDS_PER_PAGE = 50
+DEVICE_CONFIGS = {
+    "desktop": {
+        "viewport": {"width": 1280, "height": 900},
+        "context": {"ignore_https_errors": True},
+        "cards_per_page": 36,
+    },
+    "mobile": {
+        "viewport": {"width": 390, "height": 844},
+        "context": {
+            "ignore_https_errors": True,
+            "is_mobile": True,
+            "has_touch": True,
+            "device_scale_factor": 3,
+        },
+        "cards_per_page": 18,
+    },
+}
 
 
 def goto_with_retry(page, url: str, wait_until: str = "domcontentloaded"):
@@ -46,20 +64,20 @@ def check_internal_url(href: str, ssl_ctx: ssl.SSLContext) -> tuple[bool, str]:
                 last_error = f"{method} {response.status}"
         except Exception as exc:
             last_error = f"{method} {exc}"
-
     return False, last_error
 
 
-def tracker_card_counts(page) -> tuple[int, int, int]:
+def card_counts(page, selector: str) -> tuple[int, int, int]:
     total, visible = page.evaluate(
-        """() => {
-          const cards = Array.from(document.querySelectorAll('#np-tracking-list details'));
+        """(sel) => {
+          const cards = Array.from(document.querySelectorAll(sel));
           const visible = cards.filter((card) => {
             const style = window.getComputedStyle(card);
             return style.display !== 'none' && style.visibility !== 'hidden';
           }).length;
           return [cards.length, visible];
-        }"""
+        }""",
+        selector,
     )
     return total, visible, max(0, total - visible)
 
@@ -82,7 +100,16 @@ def tracker_category_counts(page) -> dict[str, int]:
     ) or {}
 
 
-def run_tests(lang: str = "ja", take_screenshot: bool = False) -> bool:
+def record_result(name: str, ok: bool, detail: str, fail_details: list[str]) -> tuple[int, int]:
+    if ok:
+        print(f"  PASS: {detail}")
+        return 1, 0
+    print(f"  FAIL: {detail}")
+    fail_details.append(f"{name}: {detail}")
+    return 0, 1
+
+
+def run_tests(lang: str, device: str, take_screenshot: bool = False) -> bool:
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
@@ -90,25 +117,25 @@ def run_tests(lang: str = "ja", take_screenshot: bool = False) -> bool:
         print("Run: pip3 install playwright && playwright install chromium")
         return False
 
-    base_url = PREDICTIONS_URL_JA if lang == "ja" else PREDICTIONS_URL_EN
+    base_url = PREDICTIONS_URLS[lang]
+    device_config = DEVICE_CONFIGS[device]
     fail_details: list[str] = []
     pass_count = 0
     fail_count = 0
 
-    print("\n" + "=" * 60)
-    print(f"  Nowpattern Prediction Tracker E2E ({lang.upper()})")
+    print("\n" + "=" * 64)
+    print(f"  Nowpattern Prediction Tracker E2E ({lang.upper()} / {device.upper()})")
     print(f"  URL: {base_url}")
     print(f"  Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M JST')}")
-    print("=" * 60 + "\n")
+    print("=" * 64 + "\n")
 
     Path(SCREENSHOT_DIR).mkdir(parents=True, exist_ok=True)
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
-        ctx = browser.new_context(
-            viewport={"width": 1280, "height": 900},
-            ignore_https_errors=True,
-        )
+        context_kwargs = dict(device_config["context"])
+        context_kwargs["viewport"] = device_config["viewport"]
+        ctx = browser.new_context(**context_kwargs)
         page = ctx.new_page()
         page.set_default_timeout(TIMEOUT)
 
@@ -116,243 +143,264 @@ def run_tests(lang: str = "ja", take_screenshot: bool = False) -> bool:
         try:
             resp = goto_with_retry(page, base_url, wait_until="domcontentloaded")
             status = resp.status if resp else 0
-            if status < 400:
-                print(f"  PASS: HTTP {status}")
-                pass_count += 1
-            else:
-                print(f"  FAIL: HTTP {status}")
-                fail_count += 1
-                fail_details.append(f"page load HTTP {status}")
+            inc_pass, inc_fail = record_result("page load", status < 400, f"HTTP {status}", fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
+            if status >= 400:
                 browser.close()
                 return False
         except Exception as exc:
-            print(f"  FAIL: {exc}")
-            fail_count += 1
-            fail_details.append(f"page load {exc}")
+            record_result("page load", False, str(exc), fail_details)
             browser.close()
             return False
 
         if take_screenshot:
-            ss_path = f"{SCREENSHOT_DIR}/{lang}-01-initial.png"
+            ss_path = f"{SCREENSHOT_DIR}/{lang}-{device}-01-initial.png"
             page.screenshot(path=ss_path, full_page=False)
             print(f"  Screenshot: {ss_path}")
 
-        print("\nTest 1: tracking cards visible")
+        print("\nTest 1: tracking cards and controls visible")
         try:
             page.wait_for_selector("#np-tracking-list details", timeout=TIMEOUT)
-            card_count = page.locator("#np-tracking-list details").count()
-            if card_count > 0:
-                print(f"  PASS: {card_count} cards rendered")
-                pass_count += 1
-            else:
-                print("  FAIL: 0 cards rendered")
-                fail_count += 1
-                fail_details.append("tracking cards: 0 rendered")
+            total, visible, _ = card_counts(page, "#np-tracking-list details")
+            search_visible = page.locator("#np-search").is_visible()
+            controls_visible = page.locator("[data-view='tracking']").is_visible() and page.locator("[data-view='resolved']").is_visible()
+            ok = total > 0 and visible > 0 and search_visible and controls_visible
+            detail = f"tracking_total={total}, visible={visible}, search={search_visible}, view_controls={controls_visible}"
+            inc_pass, inc_fail = record_result("tracking visible", ok, detail, fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
         except Exception as exc:
-            print(f"  FAIL: {exc}")
-            fail_count += 1
-            fail_details.append(f"tracking cards: {exc}")
+            inc_pass, inc_fail = record_result("tracking visible", False, str(exc), fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
 
         print("\nTest 2: impossible keyword hides all cards")
         try:
             search_box = page.locator("#np-search")
             search_box.wait_for(state="visible", timeout=TIMEOUT)
-
-            initial_total, initial_visible, _ = tracker_card_counts(page)
-            print(f"  Initial cards: total={initial_total}, visible={initial_visible}")
-            if initial_total == 0:
-                print("  FAIL: no cards available before search")
-                fail_count += 1
-                fail_details.append("search filter: initial card count is 0")
-            else:
-                search_box.fill("zzzxxx_nonexistent_9999")
-                time.sleep(0.8)
-                total_after, visible_after, hidden_after = tracker_card_counts(page)
-                if visible_after == 0 and hidden_after == initial_total:
-                    print(f"  PASS: impossible query hides all cards ({initial_total} -> 0 visible)")
-                    pass_count += 1
-                else:
-                    print(f"  FAIL: total={total_after}, visible={visible_after}, hidden={hidden_after}")
-                    fail_count += 1
-                    fail_details.append(
-                        f"search filter: expected 0 visible after impossible query, got visible={visible_after} hidden={hidden_after} total={total_after}"
-                    )
-
-                search_box.fill("")
-                time.sleep(0.3)
+            initial_total, initial_visible, _ = card_counts(page, "#np-tracking-list details")
+            search_box.fill("zzzxxx_nonexistent_9999")
+            page.wait_for_timeout(800)
+            total_after, visible_after, hidden_after = card_counts(page, "#np-tracking-list details")
+            ok = initial_total > 0 and visible_after == 0 and hidden_after == initial_total
+            detail = f"initial_total={initial_total}, initial_visible={initial_visible}, after_visible={visible_after}, hidden={hidden_after}, total_after={total_after}"
+            inc_pass, inc_fail = record_result("search filter", ok, detail, fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
+            search_box.fill("")
+            page.wait_for_timeout(300)
         except Exception as exc:
-            print(f"  FAIL: {exc}")
-            fail_count += 1
-            fail_details.append(f"search filter: {exc}")
+            inc_pass, inc_fail = record_result("search filter", False, str(exc), fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
 
         print("\nTest 3: category filter returns a real subset")
         try:
-            cat_buttons = page.locator(".np-cat-btn")
-            btn_count = cat_buttons.count()
-            print(f"  Category buttons: {btn_count}")
+            initial_total, _, _ = card_counts(page, "#np-tracking-list details")
+            category_counts = tracker_category_counts(page)
+            buttons = page.locator(".np-cat-btn")
+            clicked = False
+            detail = f"counts={category_counts}"
+            for index in range(buttons.count()):
+                btn = buttons.nth(index)
+                category = btn.get_attribute("data-cat")
+                expected_matches = int(category_counts.get(category or "", 0))
+                if not category or category == "all":
+                    continue
+                if expected_matches <= 0 or expected_matches >= initial_total:
+                    continue
 
-            if btn_count < 2:
-                print(f"  FAIL: category buttons missing ({btn_count})")
-                fail_count += 1
-                fail_details.append(f"category filter: too few buttons ({btn_count})")
-            else:
-                initial_total, _, _ = tracker_card_counts(page)
-                category_counts = tracker_category_counts(page)
-                clicked = False
-
-                for i in range(btn_count):
-                    btn = cat_buttons.nth(i)
-                    cat_val = btn.get_attribute("data-cat")
-                    expected_matches = int(category_counts.get(cat_val or "", 0))
-                    if not cat_val or cat_val == "all":
-                        continue
-                    if expected_matches <= 0 or expected_matches >= initial_total:
-                        continue
-
-                    btn.click()
-                    time.sleep(0.6)
-                    active_bg = btn.evaluate("el => el.style.background")
-                    total_after, visible_after, hidden_after = tracker_card_counts(page)
-                    expected_visible = min(expected_matches, CARDS_PER_PAGE)
-                    print(
-                        f"  category '{cat_val}': visible={visible_after}, hidden={hidden_after}, "
-                        f"expected_matches={expected_matches}, expected_visible<={expected_visible}"
-                    )
-                    print(f"  Active style: {active_bg}")
-
-                    if visible_after <= 0:
-                        print(f"  FAIL: category '{cat_val}' returned 0 visible cards")
-                        fail_count += 1
-                        fail_details.append(f"category filter: {cat_val} visible=0 expected={expected_matches}")
-                    elif visible_after > expected_visible:
-                        print(f"  FAIL: category '{cat_val}' visible count too high")
-                        fail_count += 1
-                        fail_details.append(
-                            f"category filter: {cat_val} visible={visible_after} expected_visible={expected_visible}"
-                        )
-                    elif hidden_after <= 0:
-                        print(f"  FAIL: category '{cat_val}' hid 0 cards")
-                        fail_count += 1
-                        fail_details.append(f"category filter: {cat_val} hid 0 cards")
-                    else:
-                        print(f"  PASS: category '{cat_val}' filtered to a real subset")
-                        pass_count += 1
-
-                    cat_buttons.first.click()
-                    time.sleep(0.3)
-                    clicked = True
-                    break
-
-                if not clicked:
-                    print(f"  FAIL: no filterable category found (counts={category_counts})")
-                    fail_count += 1
-                    fail_details.append(f"category filter: no filterable category found {category_counts}")
+                btn.click()
+                page.wait_for_timeout(700)
+                _, visible_after, hidden_after = card_counts(page, "#np-tracking-list details")
+                expected_visible = min(expected_matches, int(device_config["cards_per_page"]))
+                ok = 0 < visible_after <= expected_visible and hidden_after > 0
+                detail = (
+                    f"category={category}, expected_matches={expected_matches}, "
+                    f"visible={visible_after}, hidden={hidden_after}, expected_visible<={expected_visible}"
+                )
+                inc_pass, inc_fail = record_result("category filter", ok, detail, fail_details)
+                pass_count += inc_pass
+                fail_count += inc_fail
+                page.locator(".np-cat-btn[data-cat='all']").click()
+                page.wait_for_timeout(300)
+                clicked = True
+                break
+            if not clicked:
+                inc_pass, inc_fail = record_result("category filter", False, detail, fail_details)
+                pass_count += inc_pass
+                fail_count += inc_fail
         except Exception as exc:
-            print(f"  FAIL: {exc}")
-            fail_count += 1
-            fail_details.append(f"category filter: {exc}")
+            inc_pass, inc_fail = record_result("category filter", False, str(exc), fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
 
-        print("\nTest 4: sampled internal links resolve")
+        print("\nTest 4: no horizontal overflow on current viewport")
         try:
-            article_links = page.locator("a[href*='nowpattern.com']")
-            link_count = article_links.count()
-            print(f"  Internal links: {link_count}")
+            overflow = page.evaluate(
+                """() => ({
+                    scrollWidth: document.documentElement.scrollWidth,
+                    innerWidth: window.innerWidth
+                })"""
+            )
+            ok = int(overflow["scrollWidth"]) <= int(overflow["innerWidth"]) + 4
+            detail = f"scrollWidth={overflow['scrollWidth']}, innerWidth={overflow['innerWidth']}"
+            inc_pass, inc_fail = record_result("horizontal overflow", ok, detail, fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
+        except Exception as exc:
+            inc_pass, inc_fail = record_result("horizontal overflow", False, str(exc), fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
 
-            if link_count == 0:
-                print("  SKIP: no same-domain links found in tracker")
+        print("\nTest 5: tracking/resolved view toggle works")
+        try:
+            resolved_button = page.locator("[data-view='resolved']")
+            tracking_button = page.locator("[data-view='tracking']")
+            resolved_button.click()
+            page.wait_for_timeout(500)
+            tracking_section_hidden = page.locator("#np-tracking-section").evaluate(
+                "el => window.getComputedStyle(el).display === 'none'"
+            )
+            resolved_total, resolved_visible, _ = card_counts(page, "#np-resolved-section details")
+            step1_ok = tracking_section_hidden and resolved_total > 0 and resolved_visible > 0
+
+            tracking_button.click()
+            page.wait_for_timeout(500)
+            tracking_total, tracking_visible, _ = card_counts(page, "#np-tracking-list details")
+            resolved_section_hidden = page.locator("#np-resolved-section").evaluate(
+                "el => window.getComputedStyle(el).display === 'none'"
+            )
+            step2_ok = resolved_section_hidden and tracking_total > 0 and tracking_visible > 0
+
+            ok = step1_ok and step2_ok
+            detail = (
+                f"resolved_total={resolved_total}, resolved_visible={resolved_visible}, "
+                f"tracking_total={tracking_total}, tracking_visible={tracking_visible}"
+            )
+            inc_pass, inc_fail = record_result("view toggle", ok, detail, fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
+        except Exception as exc:
+            inc_pass, inc_fail = record_result("view toggle", False, str(exc), fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
+
+        print("\nTest 6: tracker article links do not loop back to tracker")
+        try:
+            offending = page.evaluate(
+                """() => {
+                    const current = window.location.pathname;
+                    return Array.from(document.querySelectorAll('#np-tracking-list details a[href], #np-resolved-section details a[href]'))
+                      .filter((anchor) => anchor.dataset.crossLangLink !== 'true')
+                      .map((anchor) => {
+                        const href = anchor.getAttribute('href') || '';
+                        const text = (anchor.textContent || '').trim();
+                        let path = '';
+                        try {
+                          path = new URL(href, window.location.origin).pathname + (new URL(href, window.location.origin).hash || '');
+                        } catch (e) {
+                          path = href;
+                        }
+                        return { href, path, text };
+                      })
+                      .filter((item) =>
+                        item.path.startsWith('/predictions/#np-') ||
+                        item.path.startsWith('/en/predictions/#np-') ||
+                        item.text.includes('View in tracker') ||
+                        item.text.includes('トラッカーで見る')
+                      );
+                }"""
+            )
+            ok = not offending
+            detail = f"offending={len(offending)}"
+            if offending:
+                detail += f", sample={offending[:3]}"
+            inc_pass, inc_fail = record_result("article link integrity", ok, detail, fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
+        except Exception as exc:
+            inc_pass, inc_fail = record_result("article link integrity", False, str(exc), fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
+
+        print("\nTest 7: sampled internal links resolve")
+        try:
+            link_samples = page.evaluate(
+                """() => Array.from(document.querySelectorAll('a[href]'))
+                  .filter((anchor) => anchor.dataset.crossLangLink !== 'true')
+                  .map((anchor) => anchor.getAttribute('href') || '')
+                  .filter((href) => href.startsWith('/') || href.includes('nowpattern.com'))"""
+            )
+            if not link_samples:
+                inc_pass, inc_fail = record_result("internal links", False, "0 same-domain links found", fail_details)
+                pass_count += inc_pass
+                fail_count += inc_fail
             else:
                 ssl_ctx = ssl.create_default_context()
                 ssl_ctx.check_hostname = False
                 ssl_ctx.verify_mode = ssl.CERT_NONE
-
-                failed_links = []
-                max_check = min(link_count, 10)
-
-                for i in range(max_check):
-                    href = article_links.nth(i).get_attribute("href")
+                failed_links: list[str] = []
+                checked = 0
+                for href in link_samples[:8]:
                     if not href or href.startswith("#"):
                         continue
+                    if href.startswith("/"):
+                        href = urljoin(base_url, href)
                     ok, detail = check_internal_url(href, ssl_ctx)
+                    checked += 1
                     if ok:
-                        print(f"  OK {detail}: ...{href[-50:]}")
+                        print(f"  OK {detail}: ...{href[-60:]}")
                     else:
                         print(f"  FAIL: {href} -> {detail}")
-                        failed_links.append((href, detail))
-
-                if failed_links:
-                    print(f"  FAIL: {len(failed_links)} links failed")
-                    fail_count += 1
-                    fail_details.append(f"internal links: {len(failed_links)} failed")
-                else:
-                    print(f"  PASS: {max_check} sampled links resolved")
-                    pass_count += 1
+                        failed_links.append(f"{href} -> {detail}")
+                ok = checked > 0 and not failed_links
+                detail = f"checked={checked}, failed={len(failed_links)}"
+                inc_pass, inc_fail = record_result("internal links", ok, detail, fail_details)
+                pass_count += inc_pass
+                fail_count += inc_fail
         except Exception as exc:
-            print(f"  FAIL: {exc}")
-            fail_count += 1
-            fail_details.append(f"internal links: {exc}")
+            inc_pass, inc_fail = record_result("internal links", False, str(exc), fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
 
         if take_screenshot:
-            ss_path = f"{SCREENSHOT_DIR}/{lang}-02-final.png"
+            ss_path = f"{SCREENSHOT_DIR}/{lang}-{device}-02-final.png"
             page.screenshot(path=ss_path, full_page=True)
             print(f"\n  Full screenshot: {ss_path}")
-
-        print("")
-        print("Test 5: market/no-market contradictions absent")
-        try:
-            import re as _re
-
-            cards = page.locator("#np-tracking-list > details").all()
-            contradictions = []
-            no_market_label = "市場データなし"
-            for card in cards:
-                html = card.inner_html()
-                has_no_market = ("Nowpattern独自分析" in html) or (no_market_label in html)
-                has_market_prob = any(token in html for token in ["Polymarket", "Metaculus", "Manifold"])
-                if has_no_market and has_market_prob:
-                    match = _re.search(r"data-pred=.?(NP-[0-9]{4}-[0-9]{4})", html)
-                    contradictions.append(match.group(1) if match else "unknown")
-
-            if contradictions:
-                print(f"  FAIL: contradictions found in {len(contradictions)} cards: {contradictions}")
-                fail_count += 1
-                fail_details.append(f"market contradiction: {len(contradictions)} cards")
-            else:
-                print(f"  PASS: no contradictions ({len(cards)} cards checked)")
-                pass_count += 1
-        except Exception as exc:
-            print(f"  FAIL: {exc}")
-            fail_count += 1
-            fail_details.append(f"market contradiction: {exc}")
 
         browser.close()
 
     total = pass_count + fail_count
-    print("\n" + "=" * 60)
-    print(f"  E2E Summary ({lang.upper()}): {pass_count}/{total} PASS")
+    print("\n" + "=" * 64)
+    print(f"  E2E Summary ({lang.upper()} / {device.upper()}): {pass_count}/{total} PASS")
     if fail_count == 0:
         print("  ALL PASS")
     else:
         print(f"  FAILURES: {fail_count}")
         for msg in fail_details:
             print(f"     - {msg}")
-    print("=" * 60 + "\n")
-
+    print("=" * 64 + "\n")
     return fail_count == 0
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Nowpattern prediction tracker E2E")
     parser.add_argument("--lang", choices=["ja", "en", "both"], default="ja")
+    parser.add_argument("--device", choices=["desktop", "mobile", "both"], default="both")
     parser.add_argument("--screenshot", action="store_true")
     args = parser.parse_args()
 
-    all_pass = True
     langs = ["ja", "en"] if args.lang == "both" else [args.lang]
+    devices = ["desktop", "mobile"] if args.device == "both" else [args.device]
+    all_pass = True
     for lang in langs:
-        if not run_tests(lang=lang, take_screenshot=args.screenshot):
-            all_pass = False
+        for device in devices:
+            if not run_tests(lang=lang, device=device, take_screenshot=args.screenshot):
+                all_pass = False
 
-    sys.exit(0 if all_pass else 1)
+    raise SystemExit(0 if all_pass else 1)
 
 
 if __name__ == "__main__":

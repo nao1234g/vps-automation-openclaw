@@ -28,9 +28,11 @@ import os
 import sys
 import argparse
 from datetime import datetime, timezone
+from urllib.parse import urlparse
 
 PREDICTION_DB = "/opt/shared/scripts/prediction_db.json"
 GHOST_URL = "https://nowpattern.com"
+RELEASE_MANIFEST = "/opt/shared/reports/article_release_manifest.json"
 
 
 # ── ティーザー生成 ──────────────────────────────────────────────
@@ -130,9 +132,30 @@ def load_recent_predictions(count: int = 3) -> list:
     return preds[:count]
 
 
+def load_release_manifest() -> dict:
+    if not os.path.exists(RELEASE_MANIFEST):
+        return {}
+    with open(RELEASE_MANIFEST, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return {row.get("slug", ""): row for row in data.get("posts", [])}
+
+
+def slug_from_url(url: str) -> str:
+    path = urlparse(url or "").path.strip("/")
+    if not path:
+        return ""
+    parts = [p for p in path.split("/") if p]
+    if not parts:
+        return ""
+    if parts[0] == "en" and len(parts) > 1:
+        return "en-" + parts[-1]
+    return parts[-1]
+
+
 def generate_notes(count: int = 3, lang: str = "both"):
     """Substack Notes ティーザーを生成"""
     preds = load_recent_predictions(count)
+    manifest = load_release_manifest()
 
     if not preds:
         print("生成対象の予測がありません。")
@@ -140,6 +163,13 @@ def generate_notes(count: int = 3, lang: str = "both"):
 
     notes = []
     for i, pred in enumerate(preds):
+        ghost_url = pred.get("ghost_url", "")
+        slug = slug_from_url(ghost_url)
+        manifest_row = manifest.get(slug, {})
+        if not ghost_url or not manifest_row.get("distribution_allowed"):
+            print(f"\n[SKIP] distribution blocked: {pred.get('prediction_id', '')} -> {ghost_url or 'no ghost_url'}")
+            continue
+
         print(f"\n{'='*60}")
         print(f"[{i+1}/{len(preds)}] {pred.get('prediction_id', '')} — {pred.get('article_title', '')[:50]}...")
         print(f"{'='*60}")
@@ -148,13 +178,25 @@ def generate_notes(count: int = 3, lang: str = "both"):
             teaser_ja = generate_teaser_ja(pred)
             print("\n--- 日本語 Notes ---")
             print(teaser_ja)
-            notes.append({"lang": "ja", "prediction_id": pred["prediction_id"], "text": teaser_ja})
+            notes.append({
+                "lang": "ja",
+                "prediction_id": pred["prediction_id"],
+                "text": teaser_ja,
+                "ghost_url": ghost_url,
+                "distribution_approved": True,
+            })
 
         if lang in ("en", "both"):
             teaser_en = generate_teaser_en(pred)
             print("\n--- English Notes ---")
             print(teaser_en)
-            notes.append({"lang": "en", "prediction_id": pred["prediction_id"], "text": teaser_en})
+            notes.append({
+                "lang": "en",
+                "prediction_id": pred["prediction_id"],
+                "text": teaser_en,
+                "ghost_url": ghost_url,
+                "distribution_approved": True,
+            })
 
     return notes
 
@@ -168,6 +210,11 @@ def post_to_substack(notes: list, dry_run: bool = False):
       2. 自動: Seleniumで自動投稿（Cookie認証）— 将来実装
       3. API: Substack が Notes API を公開した場合に対応
     """
+    blocked = [note for note in notes if not note.get("distribution_approved")]
+    if blocked:
+        print(f"ERROR: {len(blocked)} note(s) are not approved for distribution")
+        return
+
     if dry_run:
         print("\n[DRY RUN] 投稿をスキップ")
         return

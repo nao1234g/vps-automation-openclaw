@@ -1,0 +1,45 @@
+{
+  "generated_at": "2026-03-30T16:15:26Z",
+  "manifest_generated_at": "2026-03-30T15:34:56Z",
+  "tracker_generated_at": "2026-03-30 23:30 JST",
+  "manifest_counts": {
+    "published_total": 498,
+    "public_truth_allowed": 497,
+    "distribution_allowed": 5,
+    "truth_blocked": 1,
+    "distribution_blocked": 493,
+    "high_risk_unapproved": 493,
+    "drafted_truth_failures": 0,
+    "draft_failures": 0
+  },
+  "tracker_summary": {
+    "ghost_published_posts": 608,
+    "formal_prediction_total": 1121,
+    "orphan_oracle_articles": 193,
+    "coverage": {
+      "ja": {
+        "public_rows": 392,
+        "hidden_no_live_article": 729,
+        "coverage_pct": 34.97
+      },
+      "en": {
+        "public_rows": 392,
+        "hidden_no_live_article": 729,
+        "coverage_pct": 34.97
+      }
+    }
+  },
+  "operational_metrics": {
+    "distribution_allowed_ratio_pct": 1.0,
+    "approval_backlog_ratio_pct": 99.0
+  },
+  "failures": [
+    "manifest_tracker_published_mismatch:498!=608",
+    "truth_blocked_remaining:1"
+  ],
+  "warnings": [
+    "distribution_allowed_very_low:5/498",
+    "high_risk_unapproved_backlog:493/498"
+  ],
+  "ok": false
+}

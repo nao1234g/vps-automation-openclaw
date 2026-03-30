@@ -38,6 +38,7 @@ SWARM_STATE_FILE = SCRIPTS_DIR / "x_swarm_state.json"
 DLQ_FILE = SCRIPTS_DIR / "x_dlq.json"
 PREDICTION_DB = SCRIPTS_DIR / "prediction_db.json"
 BREAKING_QUEUE = SCRIPTS_DIR / "breaking_queue.json"
+RELEASE_MANIFEST = Path("/opt/shared/reports/article_release_manifest.json")
 
 X_API_URL = "https://api.twitter.com/2/tweets"
 X_MAX_CHARS = 1400
@@ -114,6 +115,31 @@ def load_dlq():
 def save_dlq(dlq):
     DLQ_FILE.write_text(
         json.dumps(dlq, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def load_release_manifest():
+    if RELEASE_MANIFEST.exists():
+        data = json.loads(RELEASE_MANIFEST.read_text(encoding="utf-8"))
+        return {row.get("slug", ""): row for row in data.get("posts", [])}
+    return {}
+
+
+def slug_from_url(url: str) -> str:
+    path = (url or "").split("://", 1)[-1]
+    path = path.split("/", 1)[1] if "/" in path else ""
+    parts = [p for p in path.strip("/").split("/") if p]
+    if not parts:
+        return ""
+    if parts[0] == "en" and len(parts) > 1:
+        return "en-" + parts[-1]
+    return parts[-1]
+
+
+def distribution_allowed(manifest, ghost_url: str) -> bool:
+    slug = slug_from_url(ghost_url)
+    if not slug:
+        return False
+    return bool(manifest.get(slug, {}).get("distribution_allowed"))
 
 
 # ─────────── Format Selection ───────────
@@ -210,17 +236,27 @@ def post_thread(auth, texts):
 
 def load_breaking_queue():
     """breaking_queue.jsonから投稿待ちアイテムを取得"""
+    manifest = load_release_manifest()
     if BREAKING_QUEUE.exists():
         items = json.loads(BREAKING_QUEUE.read_text(encoding="utf-8"))
-        return [i for i in items if i.get("status") == "article_ready"]
+        return [
+            i for i in items
+            if i.get("status") == "article_ready"
+            and distribution_allowed(manifest, i.get("ghost_url", ""))
+        ]
     return []
 
 
 def load_predictions():
     """prediction_db.jsonからactive予測を取得"""
+    manifest = load_release_manifest()
     if PREDICTION_DB.exists():
         db = json.loads(PREDICTION_DB.read_text(encoding="utf-8"))
-        return [p for p in db.get("predictions", []) if p.get("status") == "active"]
+        return [
+            p for p in db.get("predictions", [])
+            if p.get("status") == "active"
+            and distribution_allowed(manifest, p.get("ghost_url", ""))
+        ]
     return []
 
 

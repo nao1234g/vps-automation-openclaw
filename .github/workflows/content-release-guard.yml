@@ -1,0 +1,43 @@
+name: Content Release Guard
+
+on:
+  push:
+    paths:
+      - "scripts/**"
+      - ".github/workflows/content-release-guard.yml"
+  workflow_dispatch:
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile release guard stack
+        run: |
+          python -m py_compile \
+            scripts/article_truth_guard.py \
+            scripts/article_release_guard.py \
+            scripts/nowpattern_publisher.py \
+            scripts/nowpattern-deep-pattern-generate.py \
+            scripts/breaking-news-watcher.py \
+            scripts/breaking_pipeline_helper.py \
+            scripts/ghost_webhook_server.py \
+            scripts/ghost_content_gate.py \
+            scripts/qa_sentinel.py \
+            scripts/ghost_to_tweet_queue.py \
+            scripts/auto_tweet.py \
+            scripts/substack_notes_poster.py \
+            scripts/x_swarm_dispatcher.py \
+            scripts/build_article_release_manifest.py \
+            scripts/prediction_deploy_gate.py \
+            scripts/mark_article_human_approved.py \
+            scripts/scrub_distribution_queues.py \
+            scripts/publish_path_guard_audit.py \
+            scripts/test_article_release_guard.py
+      - name: Audit active publish paths
+        run: python scripts/publish_path_guard_audit.py
+      - name: Run truth-first regression checks
+        run: python scripts/test_article_release_guard.py

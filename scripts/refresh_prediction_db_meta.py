@@ -9,7 +9,12 @@ import math
 from datetime import datetime, timezone
 from pathlib import Path
 
-from prediction_state_utils import canonical_prediction_status, normalize_score_tier, normalize_verdict
+from prediction_state_utils import (
+    canonical_prediction_status,
+    infer_final_verdict,
+    normalize_score_tier,
+    normalize_verdict,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -28,6 +33,14 @@ def canonicalize_prediction_statuses(payload: dict) -> int:
     preds = payload.get("predictions", [])
     changed = 0
     for pred in preds:
+        inferred_verdict = infer_final_verdict(pred)
+        if inferred_verdict and inferred_verdict != normalize_verdict(pred.get("verdict")):
+            pred["verdict"] = inferred_verdict
+            if inferred_verdict == "HIT" and not pred.get("hit_miss"):
+                pred["hit_miss"] = "correct"
+            elif inferred_verdict == "MISS" and not pred.get("hit_miss"):
+                pred["hit_miss"] = "incorrect"
+            changed += 1
         canonical_status = canonical_prediction_status(pred)
         if pred.get("status") != canonical_status:
             pred["status"] = canonical_status

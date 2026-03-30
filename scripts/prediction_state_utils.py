@@ -10,11 +10,13 @@ These helpers define the canonical truth model for prediction status:
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping
 from typing import Any
 
 
 FINAL_VERDICTS = {"HIT", "MISS", "NOT_SCORED"}
+_YES_NO_RE = re.compile(r"(?i)(?:判定|verdict|resolved as|outcome|result)\s*[:：]\s*(YES|NO|VOID|NOT[_ -]?SCORED)")
 
 _CANONICAL_STATUS_ALIASES = {
     "open": "OPEN",
@@ -91,6 +93,35 @@ def is_prediction_resolved(prediction: Mapping[str, Any] | None) -> bool:
 def normalize_score_tier(score_tier: Any) -> str:
     tier = _clean_text(score_tier).upper()
     return tier or "NONE"
+
+
+def infer_final_verdict(prediction: Mapping[str, Any] | None) -> str:
+    current = normalize_verdict((prediction or {}).get("verdict"))
+    if is_final_verdict(current):
+        return current
+    if not has_resolution_markers(prediction):
+        return current
+
+    if normalize_score_tier((prediction or {}).get("official_score_tier")) == "NOT_SCORABLE":
+        return "NOT_SCORED"
+
+    hit_miss = _clean_text((prediction or {}).get("hit_miss")).lower()
+    if hit_miss in {"correct", "hit"}:
+        return "HIT"
+    if hit_miss in {"incorrect", "miss"}:
+        return "MISS"
+
+    resolution_note = _clean_text((prediction or {}).get("resolution_note")).upper()
+    match = _YES_NO_RE.search(resolution_note)
+    resolved_outcome = match.group(1).replace("-", "_") if match else ""
+    if resolved_outcome in {"VOID", "NOT_SCORED"}:
+        return "NOT_SCORED"
+
+    our_pick = _clean_text((prediction or {}).get("our_pick")).upper()
+    if resolved_outcome in {"YES", "NO"} and our_pick in {"YES", "NO"}:
+        return "HIT" if resolved_outcome == our_pick else "MISS"
+
+    return current
 
 
 def is_prediction_publicly_scorable(prediction: Mapping[str, Any] | None) -> bool:

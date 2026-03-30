@@ -8,15 +8,19 @@ from pathlib import Path
 
 
 CRON_LINES = [
-    "*/15 * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_runner.py --job lang >> /opt/shared/logs/fix_global_language_switcher.log 2>&1 # np-ui-guard-lang",
-    "*/15 * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_runner.py --job en-routes >> /opt/shared/logs/install_en_article_route_guard.log 2>&1 # np-ui-guard-en-routes",
-    "*/30 * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_runner.py --job source-links >> /opt/shared/logs/fix_ghost_content_links.log 2>&1 # np-ui-guard-source-links",
-    "*/30 * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_runner.py --job smoke >> /opt/shared/logs/site_ui_smoke_audit.log 2>&1 # np-ui-smoke-audit",
+    "7,37 * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_runner.py --job lang >> /opt/shared/logs/fix_global_language_switcher.log 2>&1 # np-ui-guard-lang",
+    "13,43 * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_runner.py --job en-routes >> /opt/shared/logs/install_en_article_route_guard.log 2>&1 # np-ui-guard-en-routes",
+    "2,17,32,47 * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_runner.py --job ghost-routes >> /opt/shared/logs/check_ghost_article_routes.log 2>&1 # np-ui-guard-ghost-routes",
+    "22 * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_runner.py --job preview-routes >> /opt/shared/logs/install_uuid_preview_route_guard.log 2>&1 # np-ui-guard-preview-routes",
+    "28 * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_runner.py --job source-links >> /opt/shared/logs/fix_ghost_content_links.log 2>&1 # np-ui-guard-source-links",
+    "52 * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_runner.py --job smoke >> /opt/shared/logs/site_ui_smoke_audit.log 2>&1 # np-ui-smoke-audit",
 ]
 
 CRON_TAGS = [
     "# np-ui-guard-lang",
     "# np-ui-guard-en-routes",
+    "# np-ui-guard-ghost-routes",
+    "# np-ui-guard-preview-routes",
     "# np-ui-guard-source-links",
     "# np-ui-smoke-audit",
 ]

@@ -6,6 +6,17 @@
 
 ---
 
+### 2026-03-31: 虚偽の frontier AI リリース記事が source 0本のまま public に到達した（GPT-6 事故）
+
+- **症状**: `GPT-6` が「発表された / リリースされた」と断定する記事が、外部ソース URL `0本`、壊れた source section、human approval なしのまま public に出た。ホーム導線・記事導線・外部配信候補にも乗る余地があった。
+- **根本原因**: content pipeline が `fail-open` だった。生成モデルは「もっともらしい文」を埋める性質があるのに、publish 前に `truth/source/human approval` を強制する共通 blocker が全経路に入っていなかった。さらに量産 cron が品質より本数を押し上げていた。
+- **正しい解決策**: `article_truth_guard.py` で `NO_EXTERNAL_SOURCES / BROKEN_SOURCE_SECTION / UNSUPPORTED_FRONTIER_RELEASE_CLAIM` を検出し、`article_release_guard.py` で `human-approved` なし高リスク記事を `human_review_required` に落とす。publish 前、publish 直後、定期 QA、X/Substack queue、投稿直前の全段で同じ blocker を適用する。frontier model の release claim は vendor 公式ソース必須。
+- **教訓**: 「ソース節がある」ことと「真実である」ことは別。生成 AI は truth engine ではない。`AI を信じる運用` ではなく `AI が間違えても public に出せない運用` にしない限り、同じ種類の事故は再発する。
+- **再発防止コード**: `scripts/article_truth_guard.py`, `scripts/article_release_guard.py`, `scripts/test_article_release_guard.py`, `scripts/publish_path_guard_audit.py`, `.github/workflows/content-release-guard.yml`
+- **GUARD_PATTERN**: `{"pattern": "(?:GPT-6|ChatGPT-6|Claude ?5|Claude ?6|Gemini ?3|Gemini ?4|Grok ?4).*(?:released|launch|launched|announced|発表|リリース).*(?:source|ソース|official|公式).*(?:0本|なし|無い|missing|without)", "feedback": "⛔ FRONTIER_RELEASE_WITHOUT_VENDOR_SOURCE: frontier model release claim は vendor公式ソースが必須です。source 0本 / 壊れた source section / 非公式ソースのみでは public も distribution も禁止です。article_truth_guard.py + article_release_guard.py + regression test を通してください。", "name": "FRONTIER_RELEASE_WITHOUT_VENDOR_SOURCE", "added_at": "2026-03-31", "source": "gpt6-incident-2026-03-31"}`
+
+---
+
 ### 2026-03-29: 「書いただけでは強制できない」ルール自体がテキストでしか書かれていなかった（Naoto要求 — 永久刻印）
 
 - **症状**: 全セッション・全エージェントが「KNOWN_MISTAKES.mdに追記しました、完了です」と報告し、mistake_patterns.json のコードガードを追加しないまま終わっていた。何度指摘されても繰り返した。

@@ -328,6 +328,43 @@ def check_gate_f_provisional_labels(html_content):
 
     return True
 
+
+def check_tracker_public_ui_integrity(html_content):
+    """
+    Block deploy if tracker pages leak internal audit/debug copy or
+    if article CTAs point back to tracker anchors instead of article pages.
+    """
+    import re
+
+    forbidden_copy = (
+        "日本語記事リンク",
+        "英語分析フォールバック",
+        "live 記事未確認",
+        "Japanese article links",
+        "English analysis fallback",
+        "hidden due to live article mismatch",
+        "→ トラッカーで見る",
+        "→ View in tracker",
+    )
+    for marker in forbidden_copy:
+        if marker in html_content:
+            raise AssertionError(
+                f"Tracker UI gate FAIL: internal/public-debug copy leaked: {marker}"
+            )
+
+    bad_tracker_href = re.findall(
+        r"""href=['"](?:https?://(?:www\.)?nowpattern\.com)?/(?:en/)?predictions/#np-[^'"]+['"]""",
+        html_content,
+        flags=re.IGNORECASE,
+    )
+    if bad_tracker_href:
+        sample = bad_tracker_href[:3]
+        raise AssertionError(
+            f"Tracker UI gate FAIL: article link points back to tracker: {sample}"
+        )
+
+    return True
+
 CRON_ENV = "/opt/cron-env.sh"
 GHOST_URL = "https://nowpattern.com"
 PREDICTION_DB = "/opt/shared/scripts/prediction_db.json"
@@ -337,6 +374,20 @@ PREDICTIONS_SLUG_JA = "predictions"
 PREDICTIONS_SLUG_EN = "en-predictions"
 MARKET_HISTORY_DB = "/opt/shared/market_history/market_history.db"
 GEMINI_FLASH_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+_LOCAL_REPORT_DIR = os.path.join(os.path.dirname(_SCRIPT_DIR), "reports")
+TRACKER_INTEGRITY_OUTPUT = (
+    "/opt/shared/reports/prediction_article_integrity.json"
+    if os.path.exists("/opt/shared")
+    else os.path.join(_LOCAL_REPORT_DIR, "prediction_article_integrity.json")
+)
+RELEASE_MANIFEST_OUTPUT = (
+    "/opt/shared/reports/article_release_manifest.json"
+    if os.path.exists("/opt/shared")
+    else os.path.join(_LOCAL_REPORT_DIR, "article_release_manifest.json")
+)
+PREDICTION_INTEGRITY_POLICY = os.path.join(_SCRIPT_DIR, "prediction_integrity_policy.json")
+TRACKER_INTEGRITY_REPORT: dict[str, dict] = {}
 
 POLY_TO_GHOST = {
     "crypto": "crypto", "geopolitics": "geopolitics",
@@ -1067,6 +1118,189 @@ def _select_any_live_ghost_url(pred: dict, ghost_slug_url_map: dict, ghost_url_s
     return candidates[0]["url"] if candidates else ""
 
 
+def _tracker_page_path(lang: str) -> str:
+    return "/en/predictions/" if lang == "en" else "/predictions/"
+
+
+def _normalize_public_article_href(value: str) -> str:
+    href = (value or "").strip()
+    if not href:
+        return ""
+    href = href.replace("__GHOST_URL__", "https://nowpattern.com")
+    href = re.sub(r"(?i)https?://(?:www\.)?nowpattern\.com/en/en-", "https://nowpattern.com/en/", href)
+    href = href.replace("/en-predictions/", "/en/predictions/")
+    href = re.sub(r"(?<![A-Za-z0-9_-])/en/en-", "/en/", href)
+    return href
+
+
+def _prediction_anchor_href(prediction_id: str, lang: str) -> str:
+    pred_id = (prediction_id or "").strip().lower()
+    if not pred_id:
+        return ""
+    return f"{_tracker_page_path(lang)}#{pred_id}"
+
+
+def _primary_analysis_href(row: dict, lang: str) -> str:
+    same_lang_url = _normalize_public_article_href(row.get("same_lang_url") or "")
+    if same_lang_url:
+        return same_lang_url
+    return ""
+
+
+def _secondary_cross_lang_href(row: dict) -> str:
+    if not row.get("analysis_is_fallback"):
+        return ""
+    return _normalize_public_article_href(row.get("fallback_url") or row.get("ghost_url") or "")
+
+
+_GENRE_KEY_ALIASES = {
+    "economy": "economy",
+    "経済・貿易": "economy",
+    "economy-trade": "economy",
+    "geopolitics": "geopolitics",
+    "地政学・安全保障": "geopolitics",
+    "security": "geopolitics",
+    "technology": "technology",
+    "テクノロジー": "technology",
+    "finance": "finance",
+    "金融・市場": "finance",
+    "crypto": "finance",
+    "暗号資産": "finance",
+}
+
+
+def _canonical_genre_key(value: str) -> str:
+    raw = str(value or "").strip()
+    if not raw:
+        return ""
+    return _GENRE_KEY_ALIASES.get(raw, _GENRE_KEY_ALIASES.get(raw.lower(), raw.lower()))
+
+
+def _genre_data_values(row: dict) -> list[str]:
+    raw = row.get("genres")
+    values: list[str] = []
+    if isinstance(raw, list):
+        values = [_canonical_genre_key(item) for item in raw if str(item).strip()]
+    elif isinstance(raw, str) and raw.strip():
+        values = [_canonical_genre_key(item) for item in raw.split(",") if item.strip()]
+    if not values:
+        raw = row.get("genre_tags") or ""
+        if isinstance(raw, str) and raw.strip():
+            values = [_canonical_genre_key(item) for item in raw.split(",") if item.strip()]
+    values = [value for value in values if value]
+    return values or ["all"]
+
+
+def _genre_data_attr(row: dict) -> str:
+    return ",".join(_genre_data_values(row))
+
+
+def _write_tracker_integrity_report(payload: dict) -> None:
+    try:
+        os.makedirs(os.path.dirname(TRACKER_INTEGRITY_OUTPUT), exist_ok=True)
+        with open(TRACKER_INTEGRITY_OUTPUT, "w", encoding="utf-8") as fh:
+            json.dump(payload, fh, ensure_ascii=False, indent=2)
+    except Exception as exc:
+        print(f"[INTEGRITY REPORT] write failed: {exc}")
+
+
+def _read_json_if_exists(path: str) -> dict:
+    try:
+        if path and os.path.exists(path):
+            with open(path, encoding="utf-8") as fh:
+                return json.load(fh)
+    except Exception as exc:
+        print(f"[INTEGRITY REPORT] read failed {path}: {exc}")
+    return {}
+
+
+def _load_prediction_integrity_policy() -> dict:
+    default_policy = {
+        "required_langs": ["ja", "en"],
+        "max_orphan_oracle_articles": 197,
+    }
+    payload = _read_json_if_exists(PREDICTION_INTEGRITY_POLICY)
+    if isinstance(payload, dict):
+        merged = dict(default_policy)
+        merged.update(payload)
+        return merged
+    return default_policy
+
+
+def _build_tracker_integrity_payload(
+    *,
+    ghost_posts: list[dict],
+    pred_db: dict,
+    orphan_oracle_articles: list[dict],
+    integrity_langs: list[str],
+    requested_lang: str,
+) -> dict:
+    manifest = _read_json_if_exists(RELEASE_MANIFEST_OUTPUT)
+    policy = _load_prediction_integrity_policy()
+    return {
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M JST"),
+        "requested_lang": requested_lang,
+        "integrity_langs": integrity_langs,
+        "ghost_published_posts": len(ghost_posts),
+        "formal_prediction_total": len(pred_db.get("predictions", [])),
+        "orphan_oracle_articles": {
+            "count": len(orphan_oracle_articles),
+            "samples": orphan_oracle_articles[:50],
+        },
+        "release_manifest_counts": manifest.get("counts", {}) if isinstance(manifest, dict) else {},
+        "release_manifest_generated_at": manifest.get("generated_at", "") if isinstance(manifest, dict) else "",
+        "policy": policy,
+        "langs": {lang: TRACKER_INTEGRITY_REPORT.get(lang, {}) for lang in integrity_langs},
+    }
+
+
+def _assert_tracker_integrity_payload_complete(payload: dict) -> None:
+    required_langs = payload.get("policy", {}).get("required_langs", ["ja", "en"])
+    langs = payload.get("langs") or {}
+    missing = [lang for lang in required_langs if lang not in langs]
+    if missing:
+        raise AssertionError(f"Missing tracker integrity languages: {', '.join(missing)}")
+    for lang in required_langs:
+        lang_payload = langs.get(lang) or {}
+        for key in ("public_rows", "hidden_no_live_article", "same_lang_analysis", "cross_lang_fallback"):
+            if key not in lang_payload:
+                raise AssertionError(f"Tracker integrity missing {lang}.{key}")
+
+
+def _find_orphan_oracle_articles(pred_db: dict, ghost_posts: list[dict]) -> list[dict]:
+    ghost_slug_url_map = {}
+    ghost_url_set = set()
+    for post in ghost_posts:
+        slug = post.get("slug", "")
+        resolved_url = _resolve_ghost_url(post.get("url", ""), slug)
+        if slug and resolved_url:
+            ghost_slug_url_map[slug] = resolved_url
+            ghost_url_set.add(_normalize_public_url(resolved_url))
+
+    linked_slugs: set[str] = set()
+    for pred in pred_db.get("predictions", []):
+        for candidate in _iter_live_ghost_candidates(pred, ghost_slug_url_map, ghost_url_set):
+            slug = (candidate.get("slug") or candidate.get("url", "").rstrip("/").split("/")[-1]).strip()
+            if slug:
+                linked_slugs.add(slug)
+
+    orphans = []
+    for post in ghost_posts:
+        slug = (post.get("slug") or "").strip()
+        html = post.get("html") or ""
+        if not slug or slug in linked_slugs:
+            continue
+        if "np-oracle" not in html:
+            continue
+        orphans.append({
+            "slug": slug,
+            "title": post.get("title", ""),
+            "url": _resolve_ghost_url(post.get("url", ""), slug),
+            "published_at": post.get("published_at", ""),
+        })
+    return orphans
+
+
 def _display_title_for_lang(pred: dict, lang: str) -> str:
     article_title = (pred.get("article_title") or "").strip()
     if lang == "ja":
@@ -1099,6 +1333,14 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
     rows = []
     seen_slugs = set()
     seen_titles = set()
+    audit = {
+        "lang": lang,
+        "formal_predictions_seen": 0,
+        "same_lang_analysis": 0,
+        "cross_lang_fallback": 0,
+        "hidden_no_live_article": 0,
+        "hidden_samples": [],
+    }
 
     # Load market_history.db nowpattern_links (Pattern A data)
     linked_markets = load_linked_markets()
@@ -1117,12 +1359,27 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
 
     # Source 1: prediction_db.json (authoritative)
     for pred in pred_db.get("predictions", []):
+        audit["formal_predictions_seen"] += 1
         title = _display_title_for_lang(pred, lang)
         same_lang_url = _select_live_ghost_url(pred, _ghost_slug_url_map, _ghost_url_set, lang)
         fallback_url = "" if same_lang_url else _select_any_live_ghost_url(pred, _ghost_slug_url_map, _ghost_url_set)
         url_for_lang = same_lang_url or fallback_url
         analysis_lang = _infer_url_lang(url_for_lang)
         analysis_is_fallback = bool(url_for_lang and not same_lang_url)
+        if same_lang_url:
+            audit["same_lang_analysis"] += 1
+        elif fallback_url:
+            audit["cross_lang_fallback"] += 1
+        else:
+            audit["hidden_no_live_article"] += 1
+            if len(audit["hidden_samples"]) < 50:
+                audit["hidden_samples"].append({
+                    "prediction_id": pred.get("prediction_id", ""),
+                    "title": title,
+                    "article_slug": pred.get("article_slug", ""),
+                    "ghost_url": pred.get("ghost_url", ""),
+                })
+            continue
 
         scenarios = pred.get("scenarios", [])
         base = opt = pess = None
@@ -1357,6 +1614,8 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
     # 理由: 必須フィールド（scenarios_labeled, trigger_date_display等）が
     #       ghost_htmlソースでは埋まらず、カード構造が不完全になるため。
 
+    audit["public_rows"] = len([r for r in rows if r.get("source") == "prediction_db"])
+    TRACKER_INTEGRITY_REPORT[lang] = audit
     return rows
 
 
@@ -1833,9 +2092,7 @@ def _build_error_card(r, lang, missing_fields):
     """
     pred_id = r.get("prediction_id", "???") or "???"
     title = r.get("title", "Unknown")[:80]
-    genre_str = r.get("dynamics_str", "") or r.get("genres", "")
-    if isinstance(genre_str, list):
-        genre_str = ",".join(genre_str)
+    genre_str = _genre_data_attr(r)
     if lang == "ja":
         header = "⚠️ データ不完全 — Oracle Guardian により公開停止"
         footer = "このカードは必須データが揃うまで掲載できません。prediction_db.json に不足フィールドを追加してください。"
@@ -1965,7 +2222,8 @@ def _build_card(r, lang):
     base_content = r.get("base_content", "")
     opt_content  = r.get("opt_content", "")
     title        = r.get("title", "")
-    url          = r.get("url", "#")
+    url          = _primary_analysis_href(r, lang)
+    fallback_url = _secondary_cross_lang_href(r)
     trigger_date = r.get("trigger_date", "")
     genres       = r.get("genres", [])
     published_at = r.get("published_at", "")
@@ -2039,8 +2297,6 @@ def _build_card(r, lang):
         pending_note  = "Tracking until deadline"
 
     analysis_is_fallback = bool(r.get("analysis_is_fallback"))
-    if analysis_is_fallback:
-        read_label = "\u2192 English analysis" if lang == "ja" else "\u2192 日本語分析"
 
     # === Resolved-specific data ===
     is_hit = False
@@ -2471,7 +2727,7 @@ def _build_card(r, lang):
     pick_header_html = stance_collapsed_html + market_collapsed_html
 
     # === Collapsed bottom chips ===
-    genre_str = ",".join(genres) if genres else "all"
+    genre_str = _genre_data_attr(r)
 
     if is_resolved:
         outcome_en = outcome_map.get(outcome, outcome) or ""
@@ -2873,6 +3129,14 @@ def _build_card(r, lang):
             f'font-size:0.84em;font-weight:600;text-decoration:none;'
             f'background:#fff8e1;color:#b8860b;border:1px solid #e6c86a">{read_label}</a>'
         )
+    if analysis_is_fallback and fallback_url and fallback_url != url:
+        _fallback_label = "\u2192 English analysis \u2197" if lang == "ja" else "\u2192 日本語分析 \u2197"
+        footer_links += (
+            f'<a href="{fallback_url}" target="_blank" rel="noopener" data-cross-lang-link="true" '
+            f'style="display:inline-block;padding:6px 14px;border-radius:6px;'
+            f'font-size:0.84em;font-weight:600;text-decoration:none;'
+            f'background:#f8fafc;color:#475569;border:1px solid #cbd5e1">{_fallback_label}</a>'
+        )
     if is_resolved and market_url:
         _mkt_nav = "\u2192 \u5e02\u5834\u30da\u30fc\u30b8\u3092\u898b\u308b \u2197" if lang == "ja" else "\u2192 View market page \u2197"
         footer_links += (
@@ -2950,8 +3214,7 @@ def _build_compact_row(r, lang):
         title = r.get('title', '')
     title_short = title[:80] + '...' if len(title) > 80 else title
 
-    genre_str = r.get('genre_tags', '')
-    genre_data = ','.join(g.strip().lower() for g in genre_str.split(',')) if genre_str else 'all'
+    genre_data = _genre_data_attr(r)
 
     pick_prob = r.get('our_pick_prob')
     pick_yn   = r.get('our_pick', '')
@@ -2977,9 +3240,10 @@ def _build_compact_row(r, lang):
         if dl_short else ''
     )
 
-    url = r.get('url', '') or r.get('ghost_url', '')
+    url = _primary_analysis_href(r, lang)
     if url and not url.startswith('http'):
         url = 'https://nowpattern.com' + url
+    fallback_url = _secondary_cross_lang_href(r)
     analysis_is_fallback = bool(r.get("analysis_is_fallback"))
 
     status_lbl = '結果待ち' if lang == 'ja' else 'Resolving'
@@ -2991,7 +3255,7 @@ def _build_compact_row(r, lang):
 
     if url:
         title_html = (
-            f"<a href='{url}' target='_blank' rel='noopener' "
+            f"<a href='{url}' rel='noopener' "
             f"style='flex:1;font-size:0.84em;color:#333;font-weight:500;"
             f"text-decoration:none;line-height:1.4'>{title_short}</a>"
         )
@@ -3002,14 +3266,16 @@ def _build_compact_row(r, lang):
         )
 
     read_lbl = '→ 記事を読む' if lang == 'ja' else '→ Read article'
-    if analysis_is_fallback:
-        read_lbl = '→ English analysis' if lang == 'ja' else '→ 日本語分析'
-    else:
-        read_lbl = '→ 記事を読む' if lang == 'ja' else '→ Read article'
     article_link = (
-        f"<a href='{url}' target='_blank' rel='noopener' "
+        f"<a href='{url}' rel='noopener' "
         f"style='font-size:0.8em;color:#b8860b;text-decoration:none'>{read_lbl}</a>"
         if url else ''
+    )
+    fallback_link = (
+        f" <a href='{fallback_url}' target='_blank' rel='noopener' data-cross-lang-link='true' "
+        f"style='font-size:0.78em;color:#64748b;text-decoration:none'>"
+        f"{'→ English analysis ↗' if lang == 'ja' else '→ 日本語分析 ↗'}</a>"
+        if analysis_is_fallback and fallback_url and fallback_url != url else ''
     )
 
     _anchor_id = r.get('prediction_id', '').lower()
@@ -3025,7 +3291,7 @@ def _build_compact_row(r, lang):
         f"{prob_badge}"
         "</summary>"
         "<div style='padding:6px 16px 10px;font-size:0.82em;color:#666'>"
-        f"{article_link}"
+        f"{article_link}{fallback_link}"
         "</div>"
         "</details>"
     )
@@ -3046,10 +3312,6 @@ def build_page_html(rows, stats, lang="ja"):
     # ── BLOCK 1: Scoreboard (formal predictions only) ──
     block1 = _scoreboard_block(rows, lang)
     total_predictions = len(formal_rows)
-    same_lang_analysis = sum(1 for r in formal_rows if r.get("same_lang_url"))
-    cross_lang_analysis = sum(1 for r in formal_rows if r.get("analysis_is_fallback"))
-    no_article_analysis = sum(1 for r in formal_rows if not r.get("url"))
-
     if lang == "ja":
         view_toolbar = (
             '<div id="np-view-toolbar" style="position:sticky;top:12px;z-index:20;margin-bottom:18px;'
@@ -3061,8 +3323,6 @@ def build_page_html(rows, stats, lang="ja"):
             f'<button class="np-view-btn" data-view="tracking">追跡中 <span>{len(tracking)}</span></button>'
             f'<button class="np-view-btn" data-view="resolved">解決済み <span>{len(resolved)}</span></button>'
             '</div>'
-            f'<div style="font-size:0.78em;color:#64748b">同じ <strong>{total_predictions} 件</strong> の予測を JA/EN 両方で表示します。'
-            f' 日本語記事リンク {same_lang_analysis} 件 / 英語分析フォールバック {cross_lang_analysis} 件 / 記事未接続 {no_article_analysis} 件。</div>'
             '</div>'
             '</div>'
         )
@@ -3077,8 +3337,6 @@ def build_page_html(rows, stats, lang="ja"):
             f'<button class="np-view-btn" data-view="tracking">Tracking <span>{len(tracking)}</span></button>'
             f'<button class="np-view-btn" data-view="resolved">Resolved <span>{len(resolved)}</span></button>'
             '</div>'
-            f'<div style="font-size:0.78em;color:#64748b">Both JA and EN trackers now list the same <strong>{total_predictions}</strong> predictions.'
-            f' Same-language analysis {same_lang_analysis} / cross-language fallback {cross_lang_analysis} / no article yet {no_article_analysis}.</div>'
             '</div>'
             '</div>'
         )
@@ -3636,14 +3894,18 @@ def _update_dataset_in_head(api_key, slug, stats, lang="ja", predictions=None):
     page_id = p["id"]
     updated_at = p["updated_at"]
     head = p.get("codeinjection_head") or ""
-    # Remove existing Dataset AND FAQPage blocks (block-aware finditer, re-inject both)
+    # Remove existing Dataset / FAQPage / ClaimReview blocks before re-injecting.
     _ld_blocks = list(_re.finditer(
         r'<script[^>]*application/ld\+json[^>]*>[\s\S]*?</script>',
         head, _re.IGNORECASE,
     ))
     head_clean = head
     for _m in reversed(_ld_blocks):
-        if '"Dataset"' in _m.group() or '"FAQPage"' in _m.group():
+        if (
+            '"Dataset"' in _m.group()
+            or '"FAQPage"' in _m.group()
+            or '"ClaimReview"' in _m.group()
+        ):
             head_clean = head_clean[:_m.start()] + head_clean[_m.end():]
     head_clean = head_clean.strip()
     dataset_block = _build_dataset_ld(stats, lang)
@@ -3652,6 +3914,9 @@ def _update_dataset_in_head(api_key, slug, stats, lang="ja", predictions=None):
     blocks = [b for b in [dataset_block, faqpage_block, claimreview_block] if b]
     new_head = (head_clean + chr(10) + chr(10).join(blocks)
                 if head_clean else chr(10).join(blocks))
+    if new_head == head:
+        print("[Dataset+FAQPage] codeinjection_head unchanged for slug=" + slug)
+        return
     payload = {"pages": [{"codeinjection_head": new_head, "updated_at": updated_at}]}
     ghost_request("PUT", "/pages/" + page_id + "/", api_key, payload)
     print("[Dataset+FAQPage] Updated codeinjection_head for slug=" + slug + " (" + lang + ")")
@@ -3797,6 +4062,8 @@ def main():
     parser.add_argument("--report", action="store_true", help="Report only")
     parser.add_argument("--update", action="store_true", help="Update Ghost page")
     parser.add_argument("--force", action="store_true", help="Skip link checker")
+    parser.add_argument("--integrity-only", action="store_true", help="Refresh tracker integrity report only")
+    parser.add_argument("--skip-deploy-gate", action="store_true", help="Skip deploy gate (for gate-internal refreshes)")
     parser.add_argument("--lang", choices=["ja", "en", "both"], default="both",
                         help="Language to update (default: both)")
     args = parser.parse_args()
@@ -3817,22 +4084,25 @@ def main():
     import subprocess as _sp
     _refresh_script = os.path.join(_scripts_dir, "refresh_prediction_db_meta.py")
     _state_gate_script = os.path.join(_scripts_dir, "prediction_state_integrity_gate.py")
-    if os.path.exists(_refresh_script) and os.path.exists(_db_path) and not args.report:
+    if os.path.exists(_refresh_script) and os.path.exists(_db_path) and not args.report and not args.integrity_only:
         print("[STATE REFRESH] Canonicalizing prediction DB status/meta...")
         _refresh_result = _sp.run([sys.executable, _refresh_script, "--db", _db_path], capture_output=False)
         if _refresh_result.returncode != 0:
             print("[STATE REFRESH] FAILED -- fix refresh_prediction_db_meta.py before deploying.")
             sys.exit(_refresh_result.returncode or 1)
-    if os.path.exists(_state_gate_script) and os.path.exists(_db_path) and not args.report:
+    if os.path.exists(_state_gate_script) and os.path.exists(_db_path) and not args.report and not args.integrity_only:
         print("[STATE GATE] Running prediction state integrity gate...")
         _state_gate_result = _sp.run([sys.executable, _state_gate_script, "--db", _db_path], capture_output=False)
         if _state_gate_result.returncode != 0:
             print("[STATE GATE] BLOCKED -- fix prediction_db state/scoring mismatches before deploying.")
             sys.exit(_state_gate_result.returncode or 2)
-    _gate_script = "/opt/shared/scripts/prediction_deploy_gate.py"
-    if os.path.exists(_gate_script) and not (hasattr(args, "report") and args.report):
+    _gate_script = os.path.join(_scripts_dir, "prediction_deploy_gate.py")
+    if os.path.exists(_gate_script) and not args.report and not args.integrity_only and not args.skip_deploy_gate:
         print("[DEPLOY GATE] Running pre-build integrity gates...")
-        _gate_result = _sp.run([sys.executable, _gate_script], capture_output=False)
+        _gate_result = _sp.run(
+            [sys.executable, _gate_script, "--refresh", "--check-source-fetchability"],
+            capture_output=False,
+        )
         if _gate_result.returncode == 2:
             print("[DEPLOY GATE] BLOCKED -- fix FAILs before deploying.")
             sys.exit(2)
@@ -3841,7 +4111,7 @@ def main():
         else:
             print("[DEPLOY GATE] WARNs present (non-blocking). Proceeding.")
     else:
-        print("[DEPLOY GATE] Skipped (report mode or gate script not found)")
+        print("[DEPLOY GATE] Skipped (report/integrity mode, explicit skip, or gate script not found)")
 
     # Load data sources
     pred_db = load_prediction_db()
@@ -3878,14 +4148,30 @@ def main():
         api_key)
     ghost_posts = ghost_result.get("posts", [])
     print(f"Ghost articles: {len(ghost_posts)}")
+    orphan_oracle_articles = _find_orphan_oracle_articles(pred_db, ghost_posts)
+    print(f"Orphan oracle articles: {len(orphan_oracle_articles)}")
 
-    langs = ["ja", "en"] if args.lang == "both" else [args.lang]
-    rows_by_lang = {lang: build_rows(pred_db, ghost_posts, embed_data, lang) for lang in langs}
+    TRACKER_INTEGRITY_REPORT.clear()
+    integrity_langs = ["ja", "en"]
+    page_langs = ["ja", "en"] if args.lang == "both" else [args.lang]
+    rows_by_lang = {lang: build_rows(pred_db, ghost_posts, embed_data, lang) for lang in integrity_langs}
+    integrity_payload = _build_tracker_integrity_payload(
+        ghost_posts=ghost_posts,
+        pred_db=pred_db,
+        orphan_oracle_articles=orphan_oracle_articles,
+        integrity_langs=integrity_langs,
+        requested_lang=args.lang,
+    )
+    _assert_tracker_integrity_payload_complete(integrity_payload)
+    _write_tracker_integrity_report(integrity_payload)
     if "ja" in rows_by_lang and "en" in rows_by_lang:
         assert_prediction_language_parity(rows_by_lang["ja"], rows_by_lang["en"])
         print(f"[PARITY] JA/EN tracker rows aligned: {len(rows_by_lang['ja'])} / {len(rows_by_lang['en'])}")
+    if args.integrity_only:
+        print("[INTEGRITY] Report refreshed only; skipping page build/update.")
+        sys.exit(0)
 
-    for lang in langs:
+    for lang in page_langs:
         print(f"\n{'='*40}")
         print(f"Building {lang.upper()} page...")
         print(f"{'='*40}")
@@ -3896,6 +4182,7 @@ def main():
         print(f"    From prediction_db: {sum(1 for r in rows if r['source'] == 'prediction_db')}")
         print(f"    From Ghost HTML: 0 (ghost_html source removed — prediction_db only)")
         print(f"    With Polymarket match: {sum(1 for r in rows if r.get('polymarket'))}")
+        print(f"    Hidden (no live article): {TRACKER_INTEGRITY_REPORT.get(lang, {}).get('hidden_no_live_article', 0)}")
 
         for r in rows:
             pm_str = f"PM={r['polymarket']['probability']:.0f}%" if r.get("polymarket") else "—"
@@ -3907,8 +4194,10 @@ def main():
         try:
             check_gate_f_provisional_labels(page_html)
             print("  [GATE F] Score label / disclaimer check PASSED")
+            check_tracker_public_ui_integrity(page_html)
+            print("  [TRACKER UI GATE] Public copy / article-link integrity PASSED")
         except AssertionError as gate_exc:
-            print(f"  [GATE F FAIL] {gate_exc}")
+            print(f"  [GATE FAIL] {gate_exc}")
             if args.report:
                 sys.exit(2)
             continue
@@ -3957,6 +4246,8 @@ def main():
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M JST"),
         "rows": all_rows_ja,
         "stats": pred_db.get("stats", {}),
+        "integrity": TRACKER_INTEGRITY_REPORT,
+        "orphan_oracle_articles": orphan_oracle_articles[:50],
     }
     with open(TRACKER_OUTPUT, "w", encoding="utf-8") as f:
         json.dump(output_data, f, ensure_ascii=False, indent=2)
@@ -3969,7 +4260,7 @@ def main():
         print("=" * 60)
         import subprocess as _subprocess
         e2e_script = "/opt/shared/scripts/playwright_e2e_predictions.py"
-        e2e_langs = args.lang if hasattr(args, "lang") and args.lang != "both" else "ja"
+        e2e_langs = args.lang if hasattr(args, "lang") else "both"
         try:
             result = _subprocess.run(
                 ["python3", e2e_script, "--lang", e2e_langs, "--screenshot"],
