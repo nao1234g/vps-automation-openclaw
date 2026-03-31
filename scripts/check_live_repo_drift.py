@@ -8,6 +8,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
 import shlex
 import shutil
 import subprocess
@@ -35,8 +36,53 @@ GHOST_CONTENT_FIELD_HINTS = {
     "value",
 }
 GHOST_ACTIVE_HYGIENE_TABLES = {"posts", "settings"}
+STALE_EN_ARTICLE_RE = re.compile(r"(?<![A-Za-z0-9_-])/en/en-", flags=re.IGNORECASE)
+STALE_EN_PREDICTIONS_RE = re.compile(r"(?<![A-Za-z0-9_-])/en/en-predictions/", flags=re.IGNORECASE)
+STALE_FULL_EN_ARTICLE_RE = re.compile(r"https?://(?:www\.)?nowpattern\.com/en/en-", flags=re.IGNORECASE)
 
 TARGETS = [
+    {
+        "name": "mission_contract",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "mission_contract.py",
+        "remote": "/opt/shared/scripts/mission_contract.py",
+    },
+    {
+        "name": "mission_contract_audit",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "mission_contract_audit.py",
+        "remote": "/opt/shared/scripts/mission_contract_audit.py",
+    },
+    {
+        "name": "agent_bootstrap_context",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "agent_bootstrap_context.py",
+        "remote": "/opt/shared/scripts/agent_bootstrap_context.py",
+    },
+    {
+        "name": "product_lexicon",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "product_lexicon.py",
+        "remote": "/opt/shared/scripts/product_lexicon.py",
+    },
+    {
+        "name": "public_lexicon_compat",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "public_lexicon.py",
+        "remote": "/opt/shared/scripts/public_lexicon.py",
+    },
+    {
+        "name": "public_lexicon",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "canonical_public_lexicon.py",
+        "remote": "/opt/shared/scripts/canonical_public_lexicon.py",
+    },
+    {
+        "name": "release_governor",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "release_governor.py",
+        "remote": "/opt/shared/scripts/release_governor.py",
+    },
     {
         "name": "prediction_db",
         "kind": "json_prediction_db",
@@ -72,6 +118,48 @@ TARGETS = [
         "kind": "text",
         "local": REPO_ROOT / "scripts" / "prediction_state_integrity_gate.py",
         "remote": "/opt/shared/scripts/prediction_state_integrity_gate.py",
+    },
+    {
+        "name": "prediction_deploy_gate",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "prediction_deploy_gate.py",
+        "remote": "/opt/shared/scripts/prediction_deploy_gate.py",
+    },
+    {
+        "name": "prediction_integrity_policy",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "prediction_integrity_policy.json",
+        "remote": "/opt/shared/scripts/prediction_integrity_policy.json",
+    },
+    {
+        "name": "build_article_release_manifest",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "build_article_release_manifest.py",
+        "remote": "/opt/shared/scripts/build_article_release_manifest.py",
+    },
+    {
+        "name": "publish_path_guard_audit",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "publish_path_guard_audit.py",
+        "remote": "/opt/shared/scripts/publish_path_guard_audit.py",
+    },
+    {
+        "name": "article_truth_guard",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "article_truth_guard.py",
+        "remote": "/opt/shared/scripts/article_truth_guard.py",
+    },
+    {
+        "name": "article_factcheck_postprocess",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "article_factcheck_postprocess.py",
+        "remote": "/opt/shared/scripts/article_factcheck_postprocess.py",
+    },
+    {
+        "name": "article_release_guard",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "article_release_guard.py",
+        "remote": "/opt/shared/scripts/article_release_guard.py",
     },
     {
         "name": "playwright_e2e_predictions",
@@ -134,6 +222,84 @@ TARGETS = [
         "remote": "/opt/shared/scripts/install_uuid_preview_route_guard.py",
     },
     {
+        "name": "ghost_write_surface_audit",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "ghost_write_surface_audit.py",
+        "remote": "/opt/shared/scripts/ghost_write_surface_audit.py",
+    },
+    {
+        "name": "release_guard_canary",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "release_guard_canary.py",
+        "remote": "/opt/shared/scripts/release_guard_canary.py",
+    },
+    {
+        "name": "ecosystem_governance_audit",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "ecosystem_governance_audit.py",
+        "remote": "/opt/shared/scripts/ecosystem_governance_audit.py",
+    },
+    {
+        "name": "lexicon_contract_audit",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "lexicon_contract_audit.py",
+        "remote": "/opt/shared/scripts/lexicon_contract_audit.py",
+    },
+    {
+        "name": "cron_governance_audit",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "cron_governance_audit.py",
+        "remote": "/opt/shared/scripts/cron_governance_audit.py",
+    },
+    {
+        "name": "site_article_source_audit",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "site_article_source_audit.py",
+        "remote": "/opt/shared/scripts/site_article_source_audit.py",
+    },
+    {
+        "name": "auto_tweet",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "auto_tweet.py",
+        "remote": "/opt/shared/scripts/auto_tweet.py",
+    },
+    {
+        "name": "x_swarm_dispatcher",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "x_swarm_dispatcher.py",
+        "remote": "/opt/shared/scripts/x_swarm_dispatcher.py",
+    },
+    {
+        "name": "substack_notes_poster",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "substack_notes_poster.py",
+        "remote": "/opt/shared/scripts/substack_notes_poster.py",
+    },
+    {
+        "name": "neo_queue_dispatcher",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "neo_queue_dispatcher.py",
+        "remote": "/opt/shared/scripts/neo_queue_dispatcher.py",
+    },
+    {
+        "name": "test_mission_contract",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_mission_contract.py",
+        "remote": "/opt/shared/scripts/test_mission_contract.py",
+    },
+    {
+        "name": "test_agent_bootstrap_context",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_agent_bootstrap_context.py",
+        "remote": "/opt/shared/scripts/test_agent_bootstrap_context.py",
+    },
+    {
+        "name": "test_public_lexicon",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_public_lexicon.py",
+        "remote": "/opt/shared/scripts/test_public_lexicon.py",
+    },
+    {
         "name": "ghost_ui_settings",
         "kind": "ghost_ui_settings",
         "local": REPO_ROOT / "scripts" / "fix_global_language_switcher.py",
@@ -146,6 +312,18 @@ TARGETS = [
         "remote": "/var/www/nowpattern/content/data/ghost.db",
     },
 ]
+
+
+def count_stale_en_article_links(value: str) -> int:
+    return len(STALE_EN_ARTICLE_RE.findall(value))
+
+
+def count_stale_en_predictions_links(value: str) -> int:
+    return len(STALE_EN_PREDICTIONS_RE.findall(value))
+
+
+def count_stale_full_en_article_links(value: str) -> int:
+    return len(STALE_FULL_EN_ARTICLE_RE.findall(value))
 
 
 def choose_ssh_bin() -> str:
@@ -296,11 +474,13 @@ def summarize_ghost_content_hygiene_connection(con) -> dict:
             for value in row:
                 if not isinstance(value, str) or not value:
                     continue
-                summary["stale_en_article_links"] += value.count("/en/en-")
-                summary["stale_en_predictions_links"] += value.count("/en-predictions/")
-                summary["stale_full_en_article_links"] += value.lower().count("https://nowpattern.com/en/en-")
+                summary["stale_en_article_links"] += count_stale_en_article_links(value)
+                summary["stale_en_predictions_links"] += count_stale_en_predictions_links(value)
+                summary["stale_full_en_article_links"] += count_stale_full_en_article_links(value)
                 if table_name == "settings":
-                    summary["settings_stale_hits"] += value.count("/en/en-") + value.count("/en-predictions/")
+                    summary["settings_stale_hits"] += (
+                        count_stale_en_article_links(value) + count_stale_en_predictions_links(value)
+                    )
 
     return summary
 
@@ -397,6 +577,15 @@ def summarize_text(raw):
         "lines": text.count("\n") + (0 if not text else 1),
     }
 
+def count_stale_en_article_links(value):
+    return value.count("/en/en-")
+
+def count_stale_en_predictions_links(value):
+    return value.count("/en-predictions/")
+
+def count_stale_full_en_article_links(value):
+    return value.count("https://nowpattern.com/en/en-")
+
 def summarize_ghost_ui_settings(db_path):
     con = sqlite3.connect(str(db_path))
     cur = con.cursor()
@@ -480,11 +669,13 @@ def summarize_ghost_content_hygiene(db_path):
             for value in row:
                 if not isinstance(value, str) or not value:
                     continue
-                summary["stale_en_article_links"] += value.count("/en/en-")
-                summary["stale_en_predictions_links"] += value.count("/en-predictions/")
-                summary["stale_full_en_article_links"] += value.lower().count("https://nowpattern.com/en/en-")
+                summary["stale_en_article_links"] += count_stale_en_article_links(value)
+                summary["stale_en_predictions_links"] += count_stale_en_predictions_links(value)
+                summary["stale_full_en_article_links"] += count_stale_full_en_article_links(value)
                 if table_name == "settings":
-                    summary["settings_stale_hits"] += value.count("/en/en-") + value.count("/en-predictions/")
+                    summary["settings_stale_hits"] += (
+                        count_stale_en_article_links(value) + count_stale_en_predictions_links(value)
+                    )
 
     con.close()
     return summary

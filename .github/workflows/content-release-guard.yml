@@ -18,8 +18,19 @@ jobs:
       - name: Compile release guard stack
         run: |
           python -m py_compile \
+            scripts/content_release_scope.py \
             scripts/article_truth_guard.py \
             scripts/article_release_guard.py \
+            scripts/release_governor.py \
+            scripts/release_guard_canary.py \
+            scripts/ghost_write_surface_audit.py \
+            scripts/ecosystem_governance_audit.py \
+            scripts/article_anchor_integrity_audit.py \
+            scripts/site_dev_page_audit.py \
+            scripts/ecosystem_mission_control.py \
+            scripts/install_ecosystem_mission_control.py \
+            scripts/cron_governance_audit.py \
+            scripts/site_article_source_audit.py \
             scripts/nowpattern_publisher.py \
             scripts/nowpattern-deep-pattern-generate.py \
             scripts/breaking-news-watcher.py \
@@ -36,8 +47,25 @@ jobs:
             scripts/mark_article_human_approved.py \
             scripts/scrub_distribution_queues.py \
             scripts/publish_path_guard_audit.py \
-            scripts/test_article_release_guard.py
+            scripts/test_article_release_guard.py \
+            scripts/test_release_governor.py \
+            scripts/test_prediction_tracker_regressions.py \
+            scripts/test_prediction_deploy_gate.py \
+            scripts/test_cron_governance_audit.py \
+            scripts/test_mistake_guard_contracts.py
       - name: Audit active publish paths
         run: python scripts/publish_path_guard_audit.py
+      - name: Audit Ghost write surfaces
+        run: python scripts/ghost_write_surface_audit.py
+      - name: Run runtime release canaries
+        run: python scripts/release_guard_canary.py
+      - name: Run ecosystem governance audit
+        run: python scripts/ecosystem_governance_audit.py
       - name: Run truth-first regression checks
-        run: python scripts/test_article_release_guard.py
+        run: |
+          python scripts/test_article_release_guard.py
+          python scripts/test_release_governor.py
+          python scripts/test_prediction_tracker_regressions.py
+          python scripts/test_prediction_deploy_gate.py
+          python scripts/test_cron_governance_audit.py
+          python scripts/test_mistake_guard_contracts.py

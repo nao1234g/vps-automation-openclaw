@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-30T16:15:26Z",
+  "generated_at": "2026-03-31T12:17:49Z",
   "manifest_generated_at": "2026-03-30T15:34:56Z",
   "tracker_generated_at": "2026-03-30 23:30 JST",
   "manifest_counts": {
@@ -13,17 +13,24 @@
     "draft_failures": 0
   },
   "tracker_summary": {
-    "ghost_published_posts": 608,
+    "ghost_published_posts_total": null,
+    "ghost_published_posts_release_scope": null,
     "formal_prediction_total": 1121,
     "orphan_oracle_articles": 193,
     "coverage": {
       "ja": {
         "public_rows": 392,
+        "public_in_play_rows": 0,
+        "public_awaiting_rows": 0,
+        "public_resolved_rows": 0,
         "hidden_no_live_article": 729,
         "coverage_pct": 34.97
       },
       "en": {
         "public_rows": 392,
+        "public_in_play_rows": 0,
+        "public_awaiting_rows": 0,
+        "public_resolved_rows": 0,
         "hidden_no_live_article": 729,
         "coverage_pct": 34.97
       }
@@ -34,10 +41,24 @@
     "approval_backlog_ratio_pct": 99.0
   },
   "failures": [
-    "manifest_tracker_published_mismatch:498!=608",
-    "truth_blocked_remaining:1"
+    "manifest_refresh_failed:1",
+    "tracker_refresh_failed:1",
+    "governance_refresh_failed:1",
+    "governance_audit_failed:1",
+    "manifest_tracker_published_mismatch:498!=0",
+    "truth_blocked_remaining:1",
+    "missing_tracker_field:ja.public_in_play_rows",
+    "missing_tracker_field:ja.public_awaiting_rows",
+    "missing_tracker_field:ja.public_resolved_rows",
+    "missing_tracker_field:en.public_in_play_rows",
+    "missing_tracker_field:en.public_awaiting_rows",
+    "missing_tracker_field:en.public_resolved_rows",
+    "report_timestamp_delta_exceeded:3896>1800"
   ],
   "warnings": [
+    "manifest_refresh_output:Traceback (most recent call last):\n  File \"C:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\scripts\\build_article_release_manifest.py\", line 239, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"C:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\scripts\\build_article_release_manifest.py\", line 117, in main\n    con = sqlite3.connect(GHOST_DB)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^\nsqlite3.OperationalError: unable to open database file",
+    "tracker_refresh_output:Traceback (most recent call last):\n  File \"C:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\scripts\\prediction_page_builder.py\", line 4692, in <module>\n    main()\n  File \"C:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\scripts\\prediction_page_builder.py\", line 4404, in main\n    import fcntl as _fcntl\nModuleNotFoundError: No module named 'fcntl'",
+    "governance_refresh_output:Traceback (most recent call last):\n  File \"C:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\scripts\\ecosystem_governance_audit.py\", line 85, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"C:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\scripts\\ecosystem_governance_audit.py\", line 76, in main\n    print(payload)\nUnicodeEncodeError: 'cp932' codec can't encode character '\\ufffd' in position 22119: illegal multibyte sequence",
     "distribution_allowed_very_low:5/498",
     "high_risk_unapproved_backlog:493/498"
   ],

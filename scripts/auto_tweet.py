@@ -22,6 +22,12 @@ from datetime import datetime
 from requests_oauthlib import OAuth1
 import requests
 
+from mission_contract import assert_mission_handshake
+
+MISSION_HANDSHAKE = assert_mission_handshake(
+    "auto_tweet",
+    "post only distribution-approved content while honoring the shared founder mission contract",
+)
 # Load env
 CRON_ENV = "/opt/cron-env.sh"
 if os.path.exists(CRON_ENV):

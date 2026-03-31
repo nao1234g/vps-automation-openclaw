@@ -29,6 +29,8 @@ import ssl
 import urllib.request
 from datetime import datetime, timezone
 
+from canonical_public_lexicon import get_brand_copy
+
 # ── Config ─────────────────────────────────────────────────────
 CRON_ENV = "/opt/cron-env.sh"
 GHOST_URL = "https://nowpattern.com"
@@ -92,6 +94,16 @@ def _ghost_api(method, endpoint, api_key, data=None):
 
 def generate_organization_jsonld() -> str:
     """Organization + WebSite の JSON-LD（Ghost Header Code Injection用）"""
+    ja_brand = get_brand_copy("ja")
+    en_brand = get_brand_copy("en")
+    en_description = (
+        f"{en_brand['platform_name']} — pattern-driven news analysis with public forecasts, "
+        "resolution records, and verified Brier Score track records."
+    )
+    ja_description = (
+        f"{ja_brand['platform_name']} — 力学分析から予測を公開し、"
+        "判定記録とBrier Scoreトラックレコードまで追跡する公開基盤。"
+    )
     schema = [
         {
             "@context": "https://schema.org",
@@ -99,7 +111,7 @@ def generate_organization_jsonld() -> str:
             "name": "Nowpattern",
             "url": "https://nowpattern.com",
             "logo": "https://nowpattern.com/content/images/nowpattern-logo.png",
-            "description": "Prediction Oracle platform — pattern-driven news analysis with verified Brier Score track records. The only bilingual (JA/EN) prediction platform combining deep force-dynamics analysis with automated accuracy tracking.",
+            "description": en_description,
             "sameAs": [
                 "https://x.com/nowpattern"
             ],
@@ -120,7 +132,7 @@ def generate_organization_jsonld() -> str:
             "@type": "WebSite",
             "name": "Nowpattern",
             "url": "https://nowpattern.com",
-            "description": "予測オラクルプラットフォーム — 力学分析 × 検証可能な予測 × Brier Scoreトラックレコード",
+            "description": ja_description,
             "inLanguage": ["ja", "en"],
             "potentialAction": {
                 "@type": "SearchAction",
@@ -252,6 +264,7 @@ Sitemap: https://nowpattern.com/sitemap.xml
 
 def generate_llms_txt() -> str:
     """llms.txt — AIエージェント向けサイト概要"""
+    en_brand = get_brand_copy("en")
     # prediction_db.json の統計
     stats = {"total": 0, "resolved": 0, "avg_brier_score": None}
     if os.path.exists(PREDICTION_DB):
@@ -265,7 +278,7 @@ def generate_llms_txt() -> str:
 
     return f"""# Nowpattern
 
-> Prediction Oracle platform — pattern-driven news analysis with verified Brier Score track records.
+> {en_brand['platform_name']} — pattern-driven news analysis with public forecasts, resolution records, and verified Brier Score track records.
 
 Nowpattern is the only bilingual (Japanese/English) prediction platform that combines deep force-dynamics analysis with every prediction tracked, auto-verified, and scored. We analyze geopolitics, economics, technology, crypto, and energy using a unique 3-layer taxonomy (Genre / Event / Dynamics) to identify recurring power patterns.
 

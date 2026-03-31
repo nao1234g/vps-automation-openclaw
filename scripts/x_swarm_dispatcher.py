@@ -31,6 +31,12 @@ from pathlib import Path
 
 import requests
 from requests_oauthlib import OAuth1
+from mission_contract import assert_mission_handshake
+
+MISSION_HANDSHAKE = assert_mission_handshake(
+    "x_swarm_dispatcher",
+    "dispatch X content only when it remains aligned with the shared founder mission contract",
+)
 
 # ─────────── Config ───────────
 SCRIPTS_DIR = Path("/opt/shared/scripts")

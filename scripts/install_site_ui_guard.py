@@ -14,6 +14,7 @@ CRON_LINES = [
     "22 * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_runner.py --job preview-routes >> /opt/shared/logs/install_uuid_preview_route_guard.log 2>&1 # np-ui-guard-preview-routes",
     "28 * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_runner.py --job source-links >> /opt/shared/logs/fix_ghost_content_links.log 2>&1 # np-ui-guard-source-links",
     "52 * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_runner.py --job smoke >> /opt/shared/logs/site_ui_smoke_audit.log 2>&1 # np-ui-smoke-audit",
+    "11 */2 * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_runner.py --job governance >> /opt/shared/logs/ecosystem_governance_audit.log 2>&1 # np-ecosystem-governance",
 ]
 
 CRON_TAGS = [
@@ -23,6 +24,7 @@ CRON_TAGS = [
     "# np-ui-guard-preview-routes",
     "# np-ui-guard-source-links",
     "# np-ui-smoke-audit",
+    "# np-ecosystem-governance",
 ]
 
 

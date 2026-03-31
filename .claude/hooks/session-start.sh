@@ -27,6 +27,18 @@ rm -f "$STATE_DIR/intent_needs_confirmation.flag"
 
 echo "=== SESSION START: MANDATORY CONTEXT ==="
 echo ""
+MISSION_CONTRACT_SCRIPT="$PROJECT_DIR/scripts/mission_contract.py"
+if [ -f "$MISSION_CONTRACT_SCRIPT" ]; then
+    echo "--- MISSION CONTRACT (authoritative) ---"
+    python "$MISSION_CONTRACT_SCRIPT" --summary 2>/dev/null || true
+    echo ""
+fi
+BOOTSTRAP_CONTEXT_SCRIPT="$PROJECT_DIR/scripts/agent_bootstrap_context.py"
+if [ -f "$BOOTSTRAP_CONTEXT_SCRIPT" ]; then
+    echo "--- AGENT BOOTSTRAP CONTEXT (authoritative) ---"
+    python "$BOOTSTRAP_CONTEXT_SCRIPT" --summary 2>/dev/null || true
+    echo ""
+fi
 
 # ── NAOTO OS PRIMARY ANCHOR（Resume Guard — project drift 防止） ──────────────
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

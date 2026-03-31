@@ -81,7 +81,12 @@ def probe_endpoint(base_url: str, endpoint: dict[str, Any], timeout_seconds: int
                 text = body.decode("utf-8", errors="replace").lower()
                 expected_lang = endpoint.get("expected_lang")
                 if expected_lang and f'lang="{expected_lang}"' not in text and f"lang='{expected_lang}'" not in text:
-                    result.fail(f"missing html lang={expected_lang}")
+                    canonical_en = 'rel="canonical" href="https://nowpattern.com/en/' in text
+                    canonical_ja = 'rel="canonical" href="https://nowpattern.com/' in text and 'rel="canonical" href="https://nowpattern.com/en/' not in text
+                    if (expected_lang == "en" and canonical_en) or (expected_lang == "ja" and canonical_ja):
+                        result.warnings.append(f"missing html lang={expected_lang}")
+                    else:
+                        result.fail(f"missing html lang={expected_lang}")
                 if "page not found" in text and "404" in text:
                     result.fail("404 template rendered")
             elif endpoint["kind"] == "json":

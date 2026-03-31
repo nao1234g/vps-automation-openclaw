@@ -11,6 +11,12 @@ import sys
 import time
 from pathlib import Path
 
+from mission_contract import assert_mission_handshake
+
+MISSION_HANDSHAKE = assert_mission_handshake(
+    "site_guard_runner",
+    "run recurring self-check and self-heal jobs under the shared founder mission contract",
+)
 
 LOCK_DIR = Path("/opt/shared/locks")
 STATE_DIR = Path("/opt/shared/reports/site_guard")
@@ -68,6 +74,17 @@ JOBS = {
         "timeout": 480,
         "load_guard": True,
         "health_guard": True,
+    },
+    "governance": {
+        "command": [
+            "python3",
+            str(SCRIPT_DIR / "ecosystem_governance_audit.py"),
+            "--json-out",
+            "/opt/shared/reports/site_guard/ecosystem_governance.json",
+        ],
+        "timeout": 300,
+        "load_guard": True,
+        "health_guard": False,
     },
 }
 

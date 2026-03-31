@@ -21,6 +21,12 @@ import logging
 from datetime import datetime, timezone
 from collections import defaultdict
 
+from mission_contract import assert_mission_handshake
+
+MISSION_HANDSHAKE = assert_mission_handshake(
+    "neo_queue_dispatcher",
+    "dispatch queued repair tasks only under the shared founder mission contract",
+)
 # ===== 設定 =====
 QUEUE_FILE   = "/opt/shared/neo_task_queue.json"
 SEND_SCRIPT  = "/opt/shared/scripts/send-to-neo.py"

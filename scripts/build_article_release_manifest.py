@@ -13,7 +13,10 @@ import urllib.request
 from collections import Counter
 from urllib.parse import urlparse
 
-from article_release_guard import evaluate_release_blockers
+from content_release_scope import SKIP_SLUGS
+from mission_contract import MISSION_CONTRACT_VERSION, mission_contract_hash
+from canonical_public_lexicon import LEXICON_VERSION
+from release_governor import evaluate_governed_release
 
 GHOST_DB = "/var/www/nowpattern/content/data/ghost.db"
 CRON_ENV = "/opt/cron-env.sh"
@@ -25,21 +28,6 @@ MANIFEST_PATH = (
     if os.path.exists("/opt/shared")
     else os.path.join(_LOCAL_REPORT_DIR, "article_release_manifest.json")
 )
-SKIP_SLUGS = {
-    "about",
-    "en-about",
-    "predictions",
-    "en-predictions",
-    "members",
-    "en-members",
-    "taxonomy",
-    "en-taxonomy",
-    "taxonomy-guide",
-    "en-taxonomy-guide",
-    "taxonomy-ja",
-}
-
-
 def load_env() -> dict[str, str]:
     env: dict[str, str] = {}
     if os.path.exists(CRON_ENV):
@@ -164,7 +152,7 @@ def main() -> int:
         if slug in SKIP_SLUGS:
             continue
         tag_slugs = set((row["tag_slugs"] or "").split())
-        release = evaluate_release_blockers(
+        release = evaluate_governed_release(
             title=row["title"] or "",
             html=row["html"] or "",
             tags=tag_slugs,
@@ -182,7 +170,6 @@ def main() -> int:
 
         entry = {
             "slug": slug,
-            "title": row["title"] or "",
             "url": build_public_url(slug, tag_slugs),
             "tag_slugs": sorted(tag_slugs),
             "public_truth_allowed": public_truth_allowed,
@@ -201,7 +188,6 @@ def main() -> int:
             review_queue_samples.append(
                 {
                     "slug": slug,
-                    "title": row["title"] or "",
                     "url": entry["url"],
                     "risk_flags": release["risk_flags"],
                     "release_errors": release["errors"],
@@ -231,6 +217,9 @@ def main() -> int:
     manifest = {
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "site_host": urlparse(GHOST_URL).netloc,
+        "mission_contract_version": MISSION_CONTRACT_VERSION,
+        "mission_contract_hash": mission_contract_hash(),
+        "lexicon_version": LEXICON_VERSION,
         "check_source_fetchability": args.check_source_fetchability,
         "counts": counts,
         "lane_counts": dict(sorted(lane_counts.items())),

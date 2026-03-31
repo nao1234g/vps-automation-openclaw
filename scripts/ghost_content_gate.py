@@ -18,8 +18,13 @@ import json, re, os, sys, time, urllib.request, ssl, hmac, hashlib, base64
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from threading import Thread
 
-from article_release_guard import evaluate_release_blockers
+from mission_contract import assert_mission_handshake
+from release_governor import evaluate_governed_release
 
+MISSION_HANDSHAKE = assert_mission_handshake(
+    "ghost_content_gate",
+    "reject published Ghost content that violates the shared founder mission contract",
+)
 
 def load_env():
     env = {}
@@ -167,7 +172,7 @@ def validate_article(post):
             errors.append('LINK WARNING: EN article has JA-root links: ' + str(bad[:5]))
             # warning only, do not draft
 
-    release_block = evaluate_release_blockers(
+    release_block = evaluate_governed_release(
         title=title,
         html=html,
         tags=tag_slugs,

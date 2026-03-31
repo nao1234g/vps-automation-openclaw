@@ -33,6 +33,10 @@ import ssl
 import math
 from datetime import datetime, timezone
 
+from content_release_scope import count_release_scope_posts
+from mission_contract import MISSION_CONTRACT_VERSION, mission_contract_hash
+from canonical_public_lexicon import LEXICON_VERSION
+from canonical_public_lexicon import get_tracker_copy
 from prediction_state_utils import is_prediction_resolved, normalize_public_status, public_prediction_status
 
 if sys.stdout.encoding != "utf-8":
@@ -572,6 +576,20 @@ LABELS = {
         ),
     },
 }
+
+
+def _tracker_copy(lang: str) -> dict:
+    copy = get_tracker_copy(lang)
+    if lang in LABELS:
+        LABELS[lang].update(
+            {
+                "tracking_section_title": copy["section_in_play"],
+                "resolved_heading": copy["section_resolved"],
+                "stat_tracking": copy["view_in_play"],
+                "stat_resolved": copy["view_resolved"],
+            }
+        )
+    return copy
 
 
 # ── Ghost API ──────────────────────────────────────────────────
@@ -1239,9 +1257,13 @@ def _build_tracker_integrity_payload(
     policy = _load_prediction_integrity_policy()
     return {
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M JST"),
+        "mission_contract_version": MISSION_CONTRACT_VERSION,
+        "mission_contract_hash": mission_contract_hash(),
+        "lexicon_version": LEXICON_VERSION,
         "requested_lang": requested_lang,
         "integrity_langs": integrity_langs,
-        "ghost_published_posts": len(ghost_posts),
+        "ghost_published_posts_total": len(ghost_posts),
+        "ghost_published_posts_release_scope": count_release_scope_posts(ghost_posts),
         "formal_prediction_total": len(pred_db.get("predictions", [])),
         "orphan_oracle_articles": {
             "count": len(orphan_oracle_articles),
@@ -1262,7 +1284,16 @@ def _assert_tracker_integrity_payload_complete(payload: dict) -> None:
         raise AssertionError(f"Missing tracker integrity languages: {', '.join(missing)}")
     for lang in required_langs:
         lang_payload = langs.get(lang) or {}
-        for key in ("public_rows", "hidden_no_live_article", "same_lang_analysis", "cross_lang_fallback"):
+        for key in (
+            "public_rows",
+            "public_in_play_rows",
+            "public_awaiting_rows",
+            "public_resolved_rows",
+            "hidden_no_live_article",
+            "hidden_cross_lang_only",
+            "same_lang_analysis",
+            "cross_lang_fallback",
+        ):
             if key not in lang_payload:
                 raise AssertionError(f"Tracker integrity missing {lang}.{key}")
 
@@ -1294,7 +1325,6 @@ def _find_orphan_oracle_articles(pred_db: dict, ghost_posts: list[dict]) -> list
             continue
         orphans.append({
             "slug": slug,
-            "title": post.get("title", ""),
             "url": _resolve_ghost_url(post.get("url", ""), slug),
             "published_at": post.get("published_at", ""),
         })
@@ -1338,7 +1368,11 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
         "formal_predictions_seen": 0,
         "same_lang_analysis": 0,
         "cross_lang_fallback": 0,
+        "hidden_cross_lang_only": 0,
         "hidden_no_live_article": 0,
+        "public_in_play_rows": 0,
+        "public_awaiting_rows": 0,
+        "public_resolved_rows": 0,
         "hidden_samples": [],
     }
 
@@ -1369,7 +1403,17 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
         if same_lang_url:
             audit["same_lang_analysis"] += 1
         elif fallback_url:
-            audit["cross_lang_fallback"] += 1
+            audit["hidden_cross_lang_only"] += 1
+            audit["hidden_no_live_article"] += 1
+            if len(audit["hidden_samples"]) < 50:
+                audit["hidden_samples"].append({
+                    "prediction_id": pred.get("prediction_id", ""),
+                    "title": title,
+                    "article_slug": pred.get("article_slug", ""),
+                    "ghost_url": pred.get("ghost_url", ""),
+                    "reason": "cross_lang_only",
+                })
+            continue
         else:
             audit["hidden_no_live_article"] += 1
             if len(audit["hidden_samples"]) < 50:
@@ -1378,6 +1422,7 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
                     "title": title,
                     "article_slug": pred.get("article_slug", ""),
                     "ghost_url": pred.get("ghost_url", ""),
+                    "reason": "no_live_article",
                 })
             continue
 
@@ -1614,7 +1659,11 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
     # 理由: 必須フィールド（scenarios_labeled, trigger_date_display等）が
     #       ghost_htmlソースでは埋まらず、カード構造が不完全になるため。
 
-    audit["public_rows"] = len([r for r in rows if r.get("source") == "prediction_db"])
+    public_rows = [r for r in rows if r.get("source") == "prediction_db"]
+    audit["public_rows"] = len(public_rows)
+    audit["public_in_play_rows"] = len([r for r in public_rows if _normalize_status_value(r) in ("active", "open")])
+    audit["public_awaiting_rows"] = len([r for r in public_rows if _normalize_status_value(r) == "resolving"])
+    audit["public_resolved_rows"] = len([r for r in public_rows if _is_resolved_status(r)])
     TRACKER_INTEGRITY_REPORT[lang] = audit
     return rows
 
@@ -2213,6 +2262,7 @@ def _build_card(r, lang):
 
     # ── Layer 3: normalize_payload — 欠損フィールドを補完 ─────────────────
     r = normalize_payload(r, lang)
+    ui = _tracker_copy(lang)
 
     # === Data extraction (common) ===
     pess = r.get("pessimistic")
@@ -2323,6 +2373,13 @@ def _build_card(r, lang):
     else:
         _sb_bg, _sb_clr = "#e0f2fe", "#0284c7"
         _sb_txt = "\u23f3 " + ("\u8ffd\u8de1\u4e2d" if lang == "ja" else "Tracking")
+        _public_state = _normalize_status_value(r)
+        if _public_state == "resolving":
+            _sb_bg, _sb_clr = "#e8f0fe", "#1a73e8"
+            _sb_txt = "\u23f3 " + ui["compact_status"]
+        elif _public_state in ("active", "open"):
+            _sb_bg, _sb_clr = "#e0f2fe", "#0284c7"
+            _sb_txt = "\u23f3 " + ui["view_in_play"]
     _status_badge = (
         f'<span style="display:inline-block;background:{_sb_bg};color:{_sb_clr};'
         f'font-size:0.72em;font-weight:700;padding:2px 10px;border-radius:12px;'
@@ -3151,6 +3208,12 @@ def _build_card(r, lang):
         "border-left:3px solid #EF4444!important;"
         "background:linear-gradient(135deg,#FFF5F5 0%,#FFF 70%)!important;"
     ) if is_alpha_alert else ""
+    fallback_link = (
+        f" <a href='{fallback_url}' target='_blank' rel='noopener' data-cross-lang-link='true' "
+        f"style='font-size:0.78em;color:#64748b;text-decoration:none'>{ui['compact_fallback_link']}</a>"
+        if analysis_is_fallback and fallback_url and fallback_url != url else ''
+    )
+
     _anchor_id = r.get('prediction_id', '').lower()
     _id_attr = f' id="{_anchor_id}"' if _anchor_id else ''
     return (
@@ -3204,6 +3267,7 @@ def _build_compact_row(r, lang):
     # Compact row for resolving predictions.
     # ~400 bytes vs ~4000 bytes for full card => 91% EN page size reduction.
     # Uses <details> so existing JS filter (data-genres, textContent) still works.
+    ui = _tracker_copy(lang)
     if lang == 'en':
         title = (r.get('title_en', '') or
                  r.get('article_title_en', '') or
@@ -3253,6 +3317,13 @@ def _build_compact_row(r, lang):
         f"{status_lbl}</span>"
     )
 
+    status_lbl = ui["compact_status"]
+    status_badge = (
+        f"<span style='background:#e8f0fe;color:#1a73e8;font-size:0.68em;"
+        f"font-weight:600;padding:2px 6px;border-radius:8px;white-space:nowrap'>"
+        f"{status_lbl}</span>"
+    )
+
     if url:
         title_html = (
             f"<a href='{url}' rel='noopener' "
@@ -3266,6 +3337,7 @@ def _build_compact_row(r, lang):
         )
 
     read_lbl = '→ 記事を読む' if lang == 'ja' else '→ Read article'
+    read_lbl = ui["compact_article_link"]
     article_link = (
         f"<a href='{url}' rel='noopener' "
         f"style='font-size:0.8em;color:#b8860b;text-decoration:none'>{read_lbl}</a>"
@@ -3300,13 +3372,12 @@ def _build_compact_row(r, lang):
 def build_page_html(rows, stats, lang="ja"):
     """Build predictions page HTML — 4 blocks: scoreboard + tracking + resolved + automation."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M JST")
+    ui = _tracker_copy(lang)
 
-    # B2: Split formal predictions vs Ghost article analysis
     formal_rows = [r for r in rows if r.get("source") == "prediction_db"]
-    analysis_rows = [r for r in rows if r.get("source") != "prediction_db"]
-
-    analysis_rows_tracking = [r for r in analysis_rows if not _is_resolved_status(r)]
-    tracking = [r for r in formal_rows if not _is_resolved_status(r)] + analysis_rows_tracking
+    tracking = [r for r in formal_rows if not _is_resolved_status(r)]
+    in_play = [r for r in tracking if _normalize_status_value(r) in ("active", "open")]
+    awaiting = [r for r in tracking if _normalize_status_value(r) == "resolving"]
     resolved = [r for r in formal_rows if _is_resolved_status(r)]
 
     # ── BLOCK 1: Scoreboard (formal predictions only) ──
@@ -3357,7 +3428,14 @@ def build_page_html(rows, stats, lang="ja"):
         search_placeholder = "🔍  Filter by keyword..."
         auto_updated = f"Last updated: {now}"
 
-    # Category filter buttons
+    # Category filter buttons (only show categories that actually exist in the visible tracking dataset)
+    visible_category_counts = {cat_key: 0 for cat_key, _ in CATEGORY_LABELS[lang] if cat_key != "all"}
+    for row in tracking:
+        for genre in row.get("genres", []) or []:
+            genre_key = str(genre or "").strip().lower()
+            if genre_key in visible_category_counts:
+                visible_category_counts[genre_key] += 1
+
     cat_buttons = ""
     for cat_key, cat_name in CATEGORY_LABELS[lang]:
         if cat_key == "all":
@@ -3368,6 +3446,8 @@ def build_page_html(rows, stats, lang="ja"):
                 f'{cat_name}</button>'
             )
         else:
+            if visible_category_counts.get(cat_key, 0) <= 0:
+                continue
             cat_buttons += (
                 f'<button class="np-cat-btn" data-cat="{cat_key}" '
                 f'style="padding:5px 12px;border-radius:16px;border:1px solid #ddd;'
@@ -3609,6 +3689,284 @@ details[open] .chevron { transform:rotate(180deg); }
 })();
 </script>"""
 
+    total_predictions = len(formal_rows)
+    search_placeholder = ui["search_placeholder"]
+    auto_updated = ui["last_updated"].format(now=now)
+    cards_word = "件" if lang == "ja" else "cards"
+
+    view_toolbar = (
+        '<div id="np-view-toolbar" style="position:sticky;top:12px;z-index:20;margin-bottom:18px;'
+        'background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-radius:14px;'
+        'padding:18px 20px;box-shadow:0 8px 28px rgba(15,23,42,.08)">'
+        '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">'
+        '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+        f'<button class="np-view-btn active" data-view="all">{ui["view_all"]} <span>{total_predictions}</span></button>'
+        f'<button class="np-view-btn" data-view="inplay">{ui["view_in_play"]} <span>{len(in_play)}</span></button>'
+        f'<button class="np-view-btn" data-view="awaiting">{ui["view_awaiting"]} <span>{len(awaiting)}</span></button>'
+        f'<button class="np-view-btn" data-view="resolved">{ui["view_resolved"]} <span>{len(resolved)}</span></button>'
+        '</div>'
+        '</div>'
+        '</div>'
+    )
+
+    visible_category_counts = {cat_key: 0 for cat_key, _ in CATEGORY_LABELS[lang] if cat_key != "all"}
+    for row in tracking:
+        for genre in row.get("genres", []) or []:
+            genre_key = str(genre or "").strip().lower()
+            if genre_key in visible_category_counts:
+                visible_category_counts[genre_key] += 1
+
+    cat_buttons = ""
+    for cat_key, cat_name in CATEGORY_LABELS[lang]:
+        if cat_key == "all":
+            cat_buttons += (
+                f'<button class="np-cat-btn" data-cat="all" '
+                f'style="padding:5px 12px;border-radius:16px;border:2px solid #b8860b;'
+                f'background:#b8860b;color:#fff;font-size:0.8em;cursor:pointer;font-weight:600">{cat_name}</button>'
+            )
+            continue
+        if visible_category_counts.get(cat_key, 0) <= 0:
+            continue
+        cat_buttons += (
+            f'<button class="np-cat-btn" data-cat="{cat_key}" '
+            f'style="padding:5px 12px;border-radius:16px;border:1px solid #ddd;'
+            f'background:#fff;color:#555;font-size:0.8em;cursor:pointer">{cat_name}</button>'
+        )
+
+    in_play_cards = "\n".join(_build_card(r, lang) for r in in_play)
+    awaiting_cards = "\n".join(_build_compact_row(r, lang) for r in awaiting)
+    resolved_cards = "\n".join(_build_card(r, lang) for r in resolved)
+
+    awaiting_group = ""
+    if awaiting:
+        awaiting_group = (
+            '<div id="np-awaiting-group" style="margin-top:18px;padding-top:16px;border-top:2px solid #f0ece4">'
+            f'<h3 style="font-size:0.95em;color:#334155;margin:0 0 6px 0">{ui["section_awaiting"]} '
+            f'<span style="font-size:0.86em;color:#94a3b8;font-weight:600">{len(awaiting)}</span></h3>'
+            f'<p style="font-size:0.8em;color:#64748b;margin:0 0 10px 0">{ui["section_awaiting_note"]}</p>'
+            f'<div id="np-awaiting-list">{awaiting_cards}</div>'
+            '</div>'
+        )
+
+    block2 = (
+        '<div id="np-tracking-section" style="margin-bottom:24px;background:#fff;border-radius:12px;'
+        'padding:24px 28px;box-shadow:0 2px 8px rgba(0,0,0,.08)">'
+        f'<h2 style="color:#333;font-size:1.1em;border-left:4px solid #b8860b;'
+        f'padding-left:10px;margin:0 0 16px 0">{ui["section_in_play"]} '
+        f'<span style="font-size:0.8em;color:#888;font-weight:400">{len(in_play)}</span></h2>'
+        '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">'
+        f'<input type="text" id="np-search" placeholder="{search_placeholder}" '
+        f'style="flex:1;min-width:200px;padding:7px 12px;border:1px solid #ddd;'
+        f'border-radius:6px;font-size:0.9em;outline:none">'
+        f'<div style="display:flex;gap:6px;flex-wrap:wrap">{cat_buttons}</div>'
+        '</div>'
+        f'<div id="np-inplay-group"><div id="np-inplay-list">{in_play_cards}</div></div>'
+        f'{awaiting_group}'
+        '<div id="np-pagination" style="display:flex;justify-content:center;'
+        'align-items:center;gap:6px;margin-top:16px;font-size:0.85em"></div>'
+        f'<div style="font-size:0.78em;color:#aaa;margin-top:8px;text-align:right">{auto_updated}</div>'
+        '</div>'
+    )
+
+    resolved_desc = "クリックで詳細を見る" if lang == "ja" else "Click to expand details"
+    no_resolved_text = "まだ判定済みの予測はありません。" if lang == "ja" else "No resolved predictions yet."
+    block3 = (
+        '<div id="np-resolved-section" style="margin-bottom:24px;background:#fff;border-radius:12px;'
+        'padding:24px 28px;box-shadow:0 2px 8px rgba(0,0,0,.08)">'
+        f'<h2 style="color:#333;font-size:1.1em;border-left:4px solid #b8860b;'
+        f'padding-left:10px;margin:0 0 8px 0">{ui["section_resolved"]} '
+        f'<span style="font-size:0.8em;color:#888;font-weight:400">{len(resolved)}</span></h2>'
+        f'<p style="font-size:0.82em;color:#888;margin:0 0 14px 0">{resolved_desc}</p>'
+        f'{resolved_cards if resolved else f"<p style=\"color:#888;font-size:0.9em\">{no_resolved_text}</p>"}'
+        '</div>'
+    )
+
+    inline_code = f"""<style>
+details > summary {{ list-style:none; cursor:pointer; }}
+details > summary::-webkit-details-marker {{ display:none; }}
+.chevron {{ transition:transform .2s; display:inline-block; }}
+details[open] .chevron {{ transform:rotate(180deg); }}
+.np-cat-btn:focus {{ outline:none; }}
+.np-view-btn {{ min-height:44px;padding:10px 14px;border-radius:9999px;border:1px solid #d6dce5;background:#f8fafc;color:#334155;font-size:0.88em;font-weight:700;cursor:pointer;display:inline-flex;gap:8px;align-items:center; }}
+.np-view-btn span {{ display:inline-flex;min-width:24px;justify-content:center;padding:2px 7px;border-radius:9999px;background:#e2e8f0;color:#334155;font-size:0.82em;font-weight:700; }}
+.np-view-btn.active {{ background:#0f172a;color:#fff;border-color:#0f172a;box-shadow:0 6px 18px rgba(15,23,42,.14); }}
+.np-view-btn.active span {{ background:#f59e0b;color:#1f2937; }}
+.np-view-btn:hover {{ background:#eef2f7; }}
+.np-view-btn.active:hover {{ background:#111827; }}
+.np-cat-btn {{ min-height:40px; }}
+.np-page-btn {{ padding:4px 10px;border-radius:4px;border:1px solid #ddd;background:#fff;color:#555;font-size:0.85em;cursor:pointer;font-family:inherit; }}
+.np-page-btn.active {{ background:#b8860b;color:#fff;border-color:#b8860b;font-weight:600; }}
+.np-page-btn:hover {{ background:#f5f0e0; }}
+.np-page-btn.active:hover {{ background:#a07a0a; }}
+.score-tier-label {{ white-space:nowrap; }}
+.score-disclaimer a:hover {{ opacity:.85; }}
+@media (max-width: 640px) {{
+  .np-card-grid {{ grid-template-columns: 1fr !important; }}
+  .np-view-btn {{ flex:1 1 calc(50% - 6px); justify-content:center; padding:10px 8px; font-size:0.8em; }}
+  #np-view-toolbar > div {{ gap:12px !important; }}
+}}
+</style>
+<script>
+(function(){{
+  var CARDS_PER_PAGE = window.innerWidth <= 640 ? 18 : 36;
+  var currentPage = 1;
+  var filteredCards = [];
+  var currentView = 'all';
+  var cats = document.querySelectorAll('.np-cat-btn');
+  var viewButtons = document.querySelectorAll('.np-view-btn');
+  var searchEl = document.getElementById('np-search');
+  var inPlaySection = document.getElementById('np-inplay-group');
+  var awaitingSection = document.getElementById('np-awaiting-group');
+  var trackingSection = document.getElementById('np-tracking-section');
+  var resolvedSection = document.getElementById('np-resolved-section');
+  var inPlayCards = Array.from(document.querySelectorAll('#np-inplay-list details'));
+  var awaitingCards = Array.from(document.querySelectorAll('#np-awaiting-list details'));
+  var trackingCards = inPlayCards.concat(awaitingCards);
+
+  function setView(view){{
+    currentView = view || 'all';
+    viewButtons.forEach(function(btn) {{
+      btn.classList.toggle('active', btn.dataset.view === currentView);
+    }});
+    if (trackingSection) {{
+      trackingSection.style.display = currentView === 'resolved' ? 'none' : '';
+    }}
+    if (resolvedSection) {{
+      resolvedSection.style.display = (currentView === 'resolved' || currentView === 'all') ? '' : 'none';
+    }}
+    if (inPlaySection) {{
+      inPlaySection.style.display = (currentView === 'all' || currentView === 'inplay') ? '' : 'none';
+    }}
+    if (awaitingSection) {{
+      awaitingSection.style.display = (currentView === 'all' || currentView === 'awaiting') ? '' : 'none';
+    }}
+    var pagination = document.getElementById('np-pagination');
+    if (pagination && currentView !== 'all' && currentView !== 'inplay') {{
+      pagination.innerHTML = '';
+    }}
+  }}
+
+  viewButtons.forEach(function(btn){{
+    btn.addEventListener('click', function(){{
+      setView(this.dataset.view);
+      if(this.dataset.view !== 'resolved'){{
+        filterCards();
+      }}
+    }});
+  }});
+
+  cats.forEach(function(btn){{
+    btn.addEventListener('click', function(){{
+      cats.forEach(function(b){{
+        b.style.background='#fff'; b.style.color='#555';
+        b.style.border='1px solid #ddd'; b.style.fontWeight='400';
+      }});
+      this.style.background='#b8860b'; this.style.color='#fff';
+      this.style.border='2px solid #b8860b'; this.style.fontWeight='600';
+      currentPage = 1;
+      filterCards();
+    }});
+  }});
+
+  if(searchEl) searchEl.addEventListener('input', function(){{ currentPage=1; filterCards(); }});
+
+  function filterCards(){{
+    var activeCat = 'all';
+    cats.forEach(function(b){{
+      if(b.style.background==='rgb(184, 134, 11)' || b.style.background==='#b8860b')
+        activeCat = b.dataset.cat;
+    }});
+    var kw = searchEl ? searchEl.value.toLowerCase() : '';
+    var candidateCards = trackingCards;
+    if (currentView === 'inplay') candidateCards = inPlayCards;
+    if (currentView === 'awaiting') candidateCards = awaitingCards;
+    filteredCards = [];
+    trackingCards.forEach(function(d){{
+      d.style.display = 'none';
+    }});
+    candidateCards.forEach(function(d){{
+      var genres = (d.dataset.genres || '').split(',');
+      var matchCat = activeCat==='all' || genres.indexOf(activeCat)>=0;
+      var matchKw = !kw || d.textContent.toLowerCase().indexOf(kw)>=0;
+      if(matchCat && matchKw) filteredCards.push(d);
+    }});
+    showPage(currentPage);
+  }}
+
+  function showPage(page){{
+    currentPage = page;
+    var total = filteredCards.length;
+    var totalPages = Math.max(1, Math.ceil(total / CARDS_PER_PAGE));
+    if(currentPage > totalPages) currentPage = totalPages;
+    var start = (currentPage - 1) * CARDS_PER_PAGE;
+    var end = start + CARDS_PER_PAGE;
+    filteredCards.forEach(function(d, i){{
+      d.style.display = (i >= start && i < end) ? '' : 'none';
+    }});
+    renderPagination(totalPages, total);
+  }}
+
+  function renderPagination(totalPages, total){{
+    var pag = document.getElementById('np-pagination');
+    if(!pag) return;
+    if(currentView === 'resolved') {{ pag.innerHTML = ''; return; }}
+    if(totalPages <= 1){{ pag.innerHTML = '<span style="color:#888;font-size:0.85em">'+total+' {cards_word}</span>'; return; }}
+    var html = '';
+    var pages = [];
+    pages.push(1);
+    var lo = Math.max(2, currentPage - 2);
+    var hi = Math.min(totalPages - 1, currentPage + 2);
+    if(lo > 2) pages.push(-1);
+    for(var i = lo; i <= hi; i++) pages.push(i);
+    if(hi < totalPages - 1) pages.push(-1);
+    if(totalPages > 1) pages.push(totalPages);
+    pages.forEach(function(p){{
+      if(p === -1){{ html += '<span style="color:#888">...</span> '; }}
+      else {{ html += '<button class="np-page-btn'+(p===currentPage?' active':'')+'" onclick="window._npGoPage('+p+')">'+p+'</button> '; }}
+    }});
+    html += '<span style="color:#888;font-size:0.85em;margin-left:8px">'+total+' {cards_word}</span>';
+    pag.innerHTML = html;
+  }}
+
+  window._npGoPage = function(p){{
+    showPage(p);
+    var el = document.getElementById(currentView === 'awaiting' ? 'np-awaiting-list' : 'np-tracking-section');
+    if(el) el.scrollIntoView({{behavior:'smooth',block:'start'}});
+  }};
+
+  setView('all');
+  filterCards();
+
+  (function(){{
+    function npLand(){{
+      var h=window.location.hash;
+      if(!h||h.indexOf('np-')<0)return;
+      var el=document.querySelector(h);
+      if(!el)return;
+      if (resolvedSection && resolvedSection.contains(el)) {{
+        setView('resolved');
+      }} else if (awaitingSection && awaitingSection.contains(el)) {{
+        setView('awaiting');
+      }} else {{
+        setView('all');
+        if(el.style.display==='none'){{
+          var idx=filteredCards.indexOf(el);
+          if(idx>=0)showPage(Math.floor(idx/CARDS_PER_PAGE)+1);
+        }}
+      }}
+      el.open=true;
+      setTimeout(function(){{
+        el.scrollIntoView({{behavior:'smooth',block:'center'}});
+        el.style.outline='3px solid #b8860b';
+        setTimeout(function(){{el.style.outline='';}},2500);
+      }},150);
+    }}
+    npLand();
+    window.addEventListener('hashchange',npLand);
+  }})();
+}})();
+</script>"""
+
     return (
         '<div class="np-tracker">'
         + block1
@@ -3621,14 +3979,52 @@ details[open] .chevron { transform:rotate(180deg); }
     )
 
 
-def assert_prediction_language_parity(rows_ja, rows_en):
-    ja_ids = {r.get("prediction_id") for r in rows_ja if r.get("source") == "prediction_db" and r.get("prediction_id")}
-    en_ids = {r.get("prediction_id") for r in rows_en if r.get("source") == "prediction_db" and r.get("prediction_id")}
-    if ja_ids != en_ids:
-        only_ja = sorted(ja_ids - en_ids)[:10]
-        only_en = sorted(en_ids - ja_ids)[:10]
+def assert_prediction_language_article_integrity(rows: list[dict], lang: str) -> None:
+    from urllib.parse import urlparse
+
+    expected_prefix = "/en/" if lang == "en" else "/"
+    bad_rows = []
+    for row in rows:
+        if row.get("source") != "prediction_db":
+            bad_rows.append({
+                "prediction_id": row.get("prediction_id", ""),
+                "reason": "non_prediction_source",
+                "url": row.get("url", ""),
+            })
+            continue
+        url = row.get("url", "") or ""
+        if not url:
+            bad_rows.append({
+                "prediction_id": row.get("prediction_id", ""),
+                "reason": "missing_article_url",
+                "url": "",
+            })
+            continue
+        normalized = _normalize_public_url(url)
+        path = urlparse(normalized).path or ""
+        if lang == "en":
+            if not path.startswith(expected_prefix):
+                bad_rows.append({
+                    "prediction_id": row.get("prediction_id", ""),
+                    "reason": "cross_lang_or_invalid_url",
+                    "url": normalized,
+                })
+        else:
+            if not path.startswith("/") or path.startswith("/en/"):
+                bad_rows.append({
+                    "prediction_id": row.get("prediction_id", ""),
+                    "reason": "cross_lang_or_invalid_url",
+                    "url": normalized,
+                })
+        if row.get("analysis_is_fallback"):
+            bad_rows.append({
+                "prediction_id": row.get("prediction_id", ""),
+                "reason": "cross_lang_fallback_visible",
+                "url": normalized,
+            })
+    if bad_rows:
         raise AssertionError(
-            f"JA/EN tracker prediction_id mismatch: only_ja={only_ja} only_en={only_en}"
+            f"{lang.upper()} tracker article integrity mismatch: sample={bad_rows[:10]}"
         )
 
 
@@ -4165,8 +4561,12 @@ def main():
     _assert_tracker_integrity_payload_complete(integrity_payload)
     _write_tracker_integrity_report(integrity_payload)
     if "ja" in rows_by_lang and "en" in rows_by_lang:
-        assert_prediction_language_parity(rows_by_lang["ja"], rows_by_lang["en"])
-        print(f"[PARITY] JA/EN tracker rows aligned: {len(rows_by_lang['ja'])} / {len(rows_by_lang['en'])}")
+        assert_prediction_language_article_integrity(rows_by_lang["ja"], "ja")
+        assert_prediction_language_article_integrity(rows_by_lang["en"], "en")
+        print(
+            f"[TRACKER INTEGRITY] same-language article mapping OK: "
+            f"JA={len(rows_by_lang['ja'])} EN={len(rows_by_lang['en'])}"
+        )
     if args.integrity_only:
         print("[INTEGRITY] Report refreshed only; skipping page build/update.")
         sys.exit(0)

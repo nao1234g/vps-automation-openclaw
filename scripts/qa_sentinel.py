@@ -20,7 +20,13 @@ NEOキュー委譲（AIが必要な修正）:
 import os, sys, json, sqlite3, subprocess, tempfile, time, urllib.request, ssl, re, hashlib
 from datetime import datetime, timezone
 
-from article_release_guard import evaluate_release_blockers
+from mission_contract import assert_mission_handshake
+from release_governor import evaluate_governed_release
+
+MISSION_HANDSHAKE = assert_mission_handshake(
+    "qa_sentinel",
+    "audit published content against the shared mission contract and quarantine violations",
+)
 
 DRY_RUN     = "--dry-run" in sys.argv
 REPORT_ONLY = "--report-only" in sys.argv
@@ -623,7 +629,7 @@ def main():
                 neo_issues.append("missing_oracle")
 
         # ── NEO委譲 ─────────────────────────────────────────────────────────
-        release_block = evaluate_release_blockers(
+        release_block = evaluate_governed_release(
             title=title,
             html=html,
             tags=list(tags),

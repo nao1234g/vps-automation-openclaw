@@ -16,6 +16,7 @@ PREDICTIONS_URLS = {
     "ja": "https://nowpattern.com/predictions/",
     "en": "https://nowpattern.com/en/predictions/",
 }
+TRACKING_SELECTOR = "#np-inplay-list details, #np-awaiting-list details"
 SCREENSHOT_DIR = "/opt/shared/reports/e2e-screenshots"
 TIMEOUT = 20000
 DEVICE_CONFIGS = {
@@ -86,7 +87,7 @@ def tracker_category_counts(page) -> dict[str, int]:
     return page.evaluate(
         """() => {
           const counts = {};
-          for (const card of document.querySelectorAll('#np-tracking-list details')) {
+          for (const card of document.querySelectorAll('#np-inplay-list details, #np-awaiting-list details')) {
             const genres = (card.dataset.genres || '')
               .split(',')
               .map((item) => item.trim())
@@ -161,10 +162,18 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> bool:
 
         print("\nTest 1: tracking cards and controls visible")
         try:
-            page.wait_for_selector("#np-tracking-list details", timeout=TIMEOUT)
-            total, visible, _ = card_counts(page, "#np-tracking-list details")
+            page.wait_for_function(
+                "() => document.querySelectorAll('#np-inplay-list details, #np-awaiting-list details').length > 0",
+                timeout=TIMEOUT,
+            )
+            total, visible, _ = card_counts(page, TRACKING_SELECTOR)
             search_visible = page.locator("#np-search").is_visible()
-            controls_visible = page.locator("[data-view='tracking']").is_visible() and page.locator("[data-view='resolved']").is_visible()
+            controls_visible = (
+                page.locator("[data-view='all']").is_visible()
+                and page.locator("[data-view='inplay']").is_visible()
+                and page.locator("[data-view='awaiting']").is_visible()
+                and page.locator("[data-view='resolved']").is_visible()
+            )
             ok = total > 0 and visible > 0 and search_visible and controls_visible
             detail = f"tracking_total={total}, visible={visible}, search={search_visible}, view_controls={controls_visible}"
             inc_pass, inc_fail = record_result("tracking visible", ok, detail, fail_details)
@@ -179,10 +188,10 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> bool:
         try:
             search_box = page.locator("#np-search")
             search_box.wait_for(state="visible", timeout=TIMEOUT)
-            initial_total, initial_visible, _ = card_counts(page, "#np-tracking-list details")
+            initial_total, initial_visible, _ = card_counts(page, TRACKING_SELECTOR)
             search_box.fill("zzzxxx_nonexistent_9999")
             page.wait_for_timeout(800)
-            total_after, visible_after, hidden_after = card_counts(page, "#np-tracking-list details")
+            total_after, visible_after, hidden_after = card_counts(page, TRACKING_SELECTOR)
             ok = initial_total > 0 and visible_after == 0 and hidden_after == initial_total
             detail = f"initial_total={initial_total}, initial_visible={initial_visible}, after_visible={visible_after}, hidden={hidden_after}, total_after={total_after}"
             inc_pass, inc_fail = record_result("search filter", ok, detail, fail_details)
@@ -197,7 +206,7 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> bool:
 
         print("\nTest 3: category filter returns a real subset")
         try:
-            initial_total, _, _ = card_counts(page, "#np-tracking-list details")
+            initial_total, _, _ = card_counts(page, TRACKING_SELECTOR)
             category_counts = tracker_category_counts(page)
             buttons = page.locator(".np-cat-btn")
             clicked = False
@@ -213,7 +222,7 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> bool:
 
                 btn.click()
                 page.wait_for_timeout(700)
-                _, visible_after, hidden_after = card_counts(page, "#np-tracking-list details")
+                _, visible_after, hidden_after = card_counts(page, TRACKING_SELECTOR)
                 expected_visible = min(expected_matches, int(device_config["cards_per_page"]))
                 ok = 0 < visible_after <= expected_visible and hidden_after > 0
                 detail = (
@@ -228,7 +237,12 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> bool:
                 clicked = True
                 break
             if not clicked:
-                inc_pass, inc_fail = record_result("category filter", False, detail, fail_details)
+                non_all_categories = [key for key in category_counts.keys() if key and key != "all"]
+                if buttons.count() <= 1 or not non_all_categories:
+                    detail = f"no non-all categories exposed: counts={category_counts}"
+                    inc_pass, inc_fail = record_result("category filter", True, detail, fail_details)
+                else:
+                    inc_pass, inc_fail = record_result("category filter", False, detail, fail_details)
                 pass_count += inc_pass
                 fail_count += inc_fail
         except Exception as exc:
@@ -254,10 +268,12 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> bool:
             pass_count += inc_pass
             fail_count += inc_fail
 
-        print("\nTest 5: tracking/resolved view toggle works")
+        print("\nTest 5: in-play / awaiting / resolved view toggle works")
         try:
             resolved_button = page.locator("[data-view='resolved']")
-            tracking_button = page.locator("[data-view='tracking']")
+            awaiting_button = page.locator("[data-view='awaiting']")
+            inplay_button = page.locator("[data-view='inplay']")
+            all_button = page.locator("[data-view='all']")
             resolved_button.click()
             page.wait_for_timeout(500)
             tracking_section_hidden = page.locator("#np-tracking-section").evaluate(
@@ -266,18 +282,47 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> bool:
             resolved_total, resolved_visible, _ = card_counts(page, "#np-resolved-section details")
             step1_ok = tracking_section_hidden and resolved_total > 0 and resolved_visible > 0
 
-            tracking_button.click()
+            awaiting_button.click()
             page.wait_for_timeout(500)
-            tracking_total, tracking_visible, _ = card_counts(page, "#np-tracking-list details")
+            awaiting_section_visible = page.locator("#np-awaiting-group").evaluate(
+                "el => window.getComputedStyle(el).display !== 'none'"
+            )
+            awaiting_total, awaiting_visible, _ = card_counts(page, "#np-awaiting-list details")
+            inplay_section_hidden = page.locator("#np-inplay-group").evaluate(
+                "el => window.getComputedStyle(el).display === 'none'"
+            )
             resolved_section_hidden = page.locator("#np-resolved-section").evaluate(
                 "el => window.getComputedStyle(el).display === 'none'"
             )
-            step2_ok = resolved_section_hidden and tracking_total > 0 and tracking_visible > 0
+            step2_ok = awaiting_section_visible and awaiting_total > 0 and awaiting_visible > 0 and inplay_section_hidden and resolved_section_hidden
 
-            ok = step1_ok and step2_ok
+            inplay_button.click()
+            page.wait_for_timeout(500)
+            inplay_total, inplay_visible, _ = card_counts(page, "#np-inplay-list details")
+            expected_inplay = int(page.locator("[data-view='inplay'] span").inner_text().strip() or "0")
+            awaiting_section_hidden = page.locator("#np-awaiting-group").evaluate(
+                "el => window.getComputedStyle(el).display === 'none'"
+            )
+            resolved_section_hidden_again = page.locator("#np-resolved-section").evaluate(
+                "el => window.getComputedStyle(el).display === 'none'"
+            )
+            step3_ok = awaiting_section_hidden and resolved_section_hidden_again and (
+                (expected_inplay == 0 and inplay_total == 0 and inplay_visible == 0)
+                or (expected_inplay > 0 and inplay_total > 0 and inplay_visible > 0)
+            )
+
+            all_button.click()
+            page.wait_for_timeout(500)
+            step4_ok = (
+                page.locator("#np-tracking-section").evaluate("el => window.getComputedStyle(el).display !== 'none'")
+                and page.locator("#np-resolved-section").evaluate("el => window.getComputedStyle(el).display !== 'none'")
+            )
+
+            ok = step1_ok and step2_ok and step3_ok and step4_ok
             detail = (
                 f"resolved_total={resolved_total}, resolved_visible={resolved_visible}, "
-                f"tracking_total={tracking_total}, tracking_visible={tracking_visible}"
+                f"awaiting_total={awaiting_total}, awaiting_visible={awaiting_visible}, "
+                f"inplay_total={inplay_total}, inplay_visible={inplay_visible}, expected_inplay={expected_inplay}"
             )
             inc_pass, inc_fail = record_result("view toggle", ok, detail, fail_details)
             pass_count += inc_pass
@@ -292,7 +337,7 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> bool:
             offending = page.evaluate(
                 """() => {
                     const current = window.location.pathname;
-                    return Array.from(document.querySelectorAll('#np-tracking-list details a[href], #np-resolved-section details a[href]'))
+                    return Array.from(document.querySelectorAll('#np-inplay-list details a[href], #np-awaiting-list details a[href], #np-resolved-section details a[href]'))
                       .filter((anchor) => anchor.dataset.crossLangLink !== 'true')
                       .map((anchor) => {
                         const href = anchor.getAttribute('href') || '';
@@ -322,6 +367,81 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> bool:
             fail_count += inc_fail
         except Exception as exc:
             inc_pass, inc_fail = record_result("article link integrity", False, str(exc), fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
+
+        print("\nTest 6b: tracker cards keep same-language article integrity")
+        try:
+            link_audit = page.evaluate(
+                """() => {
+                    const isEnPage = window.location.pathname === '/en/predictions/' || window.location.pathname.startsWith('/en/');
+                    const current = window.location.pathname;
+                    const cards = Array.from(document.querySelectorAll('#np-inplay-list > details, #np-awaiting-list > details, #np-resolved-section > details'));
+                    const offending = [];
+                    const missing = [];
+
+                    const toPath = (href) => {
+                      try {
+                        const url = new URL(href, window.location.origin);
+                        return url.pathname + (url.hash || '');
+                      } catch (e) {
+                        return href || '';
+                      }
+                    };
+
+                    for (const card of cards) {
+                      const title = (card.querySelector('summary')?.innerText || '').trim().replace(/\\s+/g, ' ').slice(0, 140);
+                      const anchors = Array.from(card.querySelectorAll('a[href]')).map((anchor) => {
+                        const href = anchor.getAttribute('href') || '';
+                        const path = toPath(href);
+                        return {
+                          href,
+                          path,
+                          text: (anchor.textContent || '').trim(),
+                          cross: anchor.dataset.crossLangLink === 'true',
+                        };
+                      });
+
+                      const sameLangAnchors = anchors.filter((item) => {
+                        if (item.cross) return false;
+                        if (item.path.startsWith('/predictions/#np-') || item.path.startsWith('/en/predictions/#np-')) return false;
+                        if (isEnPage) return item.path.startsWith('/en/') && item.path !== current;
+                        return item.path.startsWith('/') && !item.path.startsWith('/en/') && item.path !== current;
+                      });
+
+                      const badAnchors = anchors.filter((item) =>
+                        item.cross ||
+                        item.path.startsWith('/predictions/#np-') ||
+                        item.path.startsWith('/en/predictions/#np-') ||
+                        item.text.includes('View in tracker') ||
+                        item.text.includes('トラッカーで見る')
+                      );
+
+                      if (badAnchors.length) {
+                        offending.push({ title, anchors: badAnchors.slice(0, 3) });
+                      }
+                      if (!sameLangAnchors.length) {
+                        missing.push({ title, anchors: anchors.slice(0, 3) });
+                      }
+                    }
+
+                    return { cards: cards.length, offending, missing };
+                }"""
+            )
+            ok = not link_audit["offending"] and not link_audit["missing"] and int(link_audit["cards"]) > 0
+            detail = (
+                f"cards={link_audit['cards']}, offending={len(link_audit['offending'])}, "
+                f"missing_same_lang={len(link_audit['missing'])}"
+            )
+            if link_audit["offending"]:
+                detail += f", offending_sample={link_audit['offending'][:2]}"
+            if link_audit["missing"]:
+                detail += f", missing_sample={link_audit['missing'][:2]}"
+            inc_pass, inc_fail = record_result("same-language article integrity", ok, detail, fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
+        except Exception as exc:
+            inc_pass, inc_fail = record_result("same-language article integrity", False, str(exc), fail_details)
             pass_count += inc_pass
             fail_count += inc_fail
 

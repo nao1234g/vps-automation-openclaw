@@ -28,9 +28,14 @@ from datetime import datetime
 from pathlib import Path
 
 from article_factcheck_postprocess import fact_check_and_revise_generated_article
-from article_release_guard import evaluate_release_blockers
+from mission_contract import assert_mission_handshake
+from release_governor import evaluate_governed_release
 from article_truth_guard import evaluate_article_truth
 
+MISSION_HANDSHAKE = assert_mission_handshake(
+    "nowpattern-deep-pattern-generate",
+    "generate Deep Pattern articles under the shared founder mission contract before publication",
+)
 # ===== パス =====
 SCRIPTS_DIR = Path(__file__).parent
 QUEUE_FILE = SCRIPTS_DIR / "rss_article_queue.json"
@@ -529,7 +534,7 @@ def generate_article(entry_index, entry, taxonomy, env):
     event_list = [t.strip() for t in data.get("event_tags", "").split(",") if t.strip()]
     dynamics_list = [t.strip() for t in data.get("dynamics_tags", "").split(",") if t.strip()]
 
-    release_block = evaluate_release_blockers(
+    release_block = evaluate_governed_release(
         title=data.get("title", title),
         html=html,
         source_urls=[u for _, u in source_tuples],

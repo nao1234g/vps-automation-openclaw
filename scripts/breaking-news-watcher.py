@@ -30,9 +30,14 @@ from pathlib import Path
 from email.utils import parsedate_to_datetime
 
 from article_factcheck_postprocess import fact_check_and_revise_generated_article
-from article_release_guard import evaluate_release_blockers
+from mission_contract import assert_mission_handshake
+from release_governor import evaluate_governed_release
 from article_truth_guard import evaluate_article_truth
 
+MISSION_HANDSHAKE = assert_mission_handshake(
+    "breaking-news-watcher",
+    "watch and generate breaking news only inside the shared founder mission contract",
+)
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
@@ -824,7 +829,7 @@ def main():
         event_tags = [t.strip() for t in data.get("event_tags", "structural-shift").split(",") if t.strip()]
         dynamics_tags = [t.strip() for t in data.get("dynamics_tags", "platform-power").split(",") if t.strip()]
 
-        release_block = evaluate_release_blockers(
+        release_block = evaluate_governed_release(
             title=article_title,
             html=html,
             source_urls=[url],

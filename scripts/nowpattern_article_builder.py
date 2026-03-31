@@ -726,9 +726,9 @@ def _build_pattern_history_html(pattern_history: list[dict], history_pattern_sum
     parts = []
     for case in pattern_history:
         year = case.get("year", "")
-        title = case.get("title", "")
-        content = case.get("content", "")
-        similarity = case.get("similarity", "")
+        title = case.get("event", "") or case.get("title", "")
+        content = case.get("pattern", "") or case.get("content", "")
+        similarity = case.get("lesson", "") or case.get("similarity", "")
         if language == "ja":
             parts.append(f'<h3 {_STYLES["h2"]}>{year}年: {title}</h3>')
         else:

@@ -1,0 +1,326 @@
+{
+  "total": 6,
+  "failed": 1,
+  "results": [
+    {
+      "name": "publish_path_guard",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\n  \"checked\": 12,\n  \"failures\": []\n}",
+      "json": {
+        "checked": 12,
+        "failures": []
+      }
+    },
+    {
+      "name": "ghost_write_surface",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\n  \"discovered_total\": 41,\n  \"classified_total\": 82,\n  \"class_counts\": {\n    \"audited_active_guard\": 3,\n    \"audited_active_release\": 2,\n    \"dormant_batch\": 3,\n    \"emergency_repair\": 11,\n    \"instructional_only\": 1,\n    \"manual_maintenance\": 21\n  },\n  \"failures\": [],\n  \"warnings\": [\n    {\n      \"path\": \"scripts/a1-bulk-en-translator.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/a3-schema-injector.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/a3_feature_image.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/a4-hreflang-injector.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/a4-hreflang-reset.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/ai_redteam.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/article_schema_self_test.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/batch_format_upgrade.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/c1-newsletter-setup.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/dedup2.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/dedup_articles.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/fix_article_tags.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/ghost_contract_test.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/ghost_integrity_check.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/ghost_tag_updater.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/image_audit_autofix.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/internal-link-builder.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/internal_link_enhancer.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/jp_en_pairing_checker.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/link_integrity_checker.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/manifold_widget_injector.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/meta_desc_batch.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/migrate_prediction_links.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/news-analyst-pipeline.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/nowpattern-ghost-post.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/nowpattern_post_audit.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/nowpattern_publish_gateway.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/phase7_public_rules_pages.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/prediction_auto_update.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/prediction_ogp_generator.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/publish_predictions_articles.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/regen_pattern_history.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/register_ghost_webhook.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/repair_article_tags.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/repair_speed_log_tags.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/rollback_meta_desc.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/semantic_qa.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/slug_repair.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/slug_repair2.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/translation_qa.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/unsplash_image_assigner.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    }\n  ],\n  \"discovered\": [\n    \"scripts/_dedup_articles.py\",\n    \"scripts/_fix_404_articles.py\",\n    \"scripts/_fix_404_republish.py\",\n    \"scripts/_fix_404_tags.py\",\n    \"scripts/_fix_existing_articles.py\",\n    \"scripts/_fix_existing_articles_tags.py\",\n    \"scripts/_fix_existing_articles_v2.py\",\n    \"scripts/_fix_ghost_tags.py\",\n    \"scripts/_ghost_setup_disclaimer_predictions.py\",\n    \"scripts/_recreate_404_articles.py\",\n    \"scripts/assign_tags_to_posts.py\",\n    \"scripts/build_article_release_manifest.py\",\n    \"scripts/builder_patch_faqpage.py\",\n    \"scripts/create_tag_pages.py\",\n    \"scripts/create_taxonomy_guide.py\",\n    \"scripts/deep_pattern_batch1.py\",\n    \"scripts/deep_pattern_batch2.py\",\n    \"scripts/deep_pattern_batch3.py\",\n    \"scripts/draft_rescue.py\",\n    \"scripts/fix_article_tags_footer.py\",\n    \"scripts/fix_broken_article.py\",\n    \"scripts/fix_hormuz_lexical.py\",\n    \"scripts/fix_ja_headings.py\",\n    \"scripts/fix_missing_ghost_tags.py\",\n    \"scripts/fix_tag_urls.py\",\n    \"scripts/ghost_tag_setup_v3.py\",\n    \"scripts/ghost_webhook_server.py\",\n    \"scripts/ghost_write_surface_audit.py\",\n    \"scripts/mark_article_human_approved.py\",\n    \"scripts/neo_queue_dispatcher.py\",\n    \"scripts/nowpattern_article_patcher.py\",\n    \"scripts/nowpattern_publisher.py\",\n    \"scripts/patch_stakeholder_table.py\",\n    \"scripts/prediction_page_builder.py\",\n    \"scripts/qa_sentinel.py\",\n    \"scripts/quarantine_unverifiable_articles.py\",\n    \"scripts/reformat_articles.py\",\n    \"scripts/update_article_titles.py\",\n    \"scripts/update_integrity_audit_pages.py\",\n    \"scripts/update_predictions_page.py\",\n    \"scripts/update_taxonomy_pages.py\"\n  ]\n}",
+      "json": {
+        "discovered_total": 41,
+        "classified_total": 82,
+        "class_counts": {
+          "audited_active_guard": 3,
+          "audited_active_release": 2,
+          "dormant_batch": 3,
+          "emergency_repair": 11,
+          "instructional_only": 1,
+          "manual_maintenance": 21
+        },
+        "failures": [],
+        "warnings": [
+          {
+            "path": "scripts/a1-bulk-en-translator.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/a3-schema-injector.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/a3_feature_image.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/a4-hreflang-injector.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/a4-hreflang-reset.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/ai_redteam.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/article_schema_self_test.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/batch_format_upgrade.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/c1-newsletter-setup.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/dedup2.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/dedup_articles.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/fix_article_tags.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/ghost_contract_test.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/ghost_integrity_check.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/ghost_tag_updater.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/image_audit_autofix.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/internal-link-builder.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/internal_link_enhancer.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/jp_en_pairing_checker.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/link_integrity_checker.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/manifold_widget_injector.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/meta_desc_batch.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/migrate_prediction_links.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/news-analyst-pipeline.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/nowpattern-ghost-post.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/nowpattern_post_audit.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/nowpattern_publish_gateway.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/phase7_public_rules_pages.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/prediction_auto_update.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/prediction_ogp_generator.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/publish_predictions_articles.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/regen_pattern_history.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/register_ghost_webhook.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/repair_article_tags.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/repair_speed_log_tags.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/rollback_meta_desc.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/semantic_qa.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/slug_repair.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/slug_repair2.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/translation_qa.py",
+            "warning": "classified_surface_not_currently_detected"
+          },
+          {
+            "path": "scripts/unsplash_image_assigner.py",
+            "warning": "classified_surface_not_currently_detected"
+          }
+        ],
+        "discovered": [
+          "scripts/_dedup_articles.py",
+          "scripts/_fix_404_articles.py",
+          "scripts/_fix_404_republish.py",
+          "scripts/_fix_404_tags.py",
+          "scripts/_fix_existing_articles.py",
+          "scripts/_fix_existing_articles_tags.py",
+          "scripts/_fix_existing_articles_v2.py",
+          "scripts/_fix_ghost_tags.py",
+          "scripts/_ghost_setup_disclaimer_predictions.py",
+          "scripts/_recreate_404_articles.py",
+          "scripts/assign_tags_to_posts.py",
+          "scripts/build_article_release_manifest.py",
+          "scripts/builder_patch_faqpage.py",
+          "scripts/create_tag_pages.py",
+          "scripts/create_taxonomy_guide.py",
+          "scripts/deep_pattern_batch1.py",
+          "scripts/deep_pattern_batch2.py",
+          "scripts/deep_pattern_batch3.py",
+          "scripts/draft_rescue.py",
+          "scripts/fix_article_tags_footer.py",
+          "scripts/fix_broken_article.py",
+          "scripts/fix_hormuz_lexical.py",
+          "scripts/fix_ja_headings.py",
+          "scripts/fix_missing_ghost_tags.py",
+          "scripts/fix_tag_urls.py",
+          "scripts/ghost_tag_setup_v3.py",
+          "scripts/ghost_webhook_server.py",
+          "scripts/ghost_write_surface_audit.py",
+          "scripts/mark_article_human_approved.py",
+          "scripts/neo_queue_dispatcher.py",
+          "scripts/nowpattern_article_patcher.py",
+          "scripts/nowpattern_publisher.py",
+          "scripts/patch_stakeholder_table.py",
+          "scripts/prediction_page_builder.py",
+          "scripts/qa_sentinel.py",
+          "scripts/quarantine_unverifiable_articles.py",
+          "scripts/reformat_articles.py",
+          "scripts/update_article_titles.py",
+          "scripts/update_integrity_audit_pages.py",
+          "scripts/update_predictions_page.py",
+          "scripts/update_taxonomy_pages.py"
+        ]
+      }
+    },
+    {
+      "name": "release_guard_canary",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\n  \"total\": 6,\n  \"passed\": 6,\n  \"failed\": 0,\n  \"checks\": [\n    {\n      \"name\": \"frontier_claim_without_sources_blocked\",\n      \"ok\": true,\n      \"errors\": [\n        \"NO_EXTERNAL_SOURCES\",\n        \"BROKEN_SOURCE_SECTION\",\n        \"UNSUPPORTED_FRONTIER_RELEASE_CLAIM\",\n        \"OpenAI frontier model release claims require an official OpenAI source\",\n        \"HUMAN_APPROVAL_REQUIRED:FRONTIER_AI\"\n      ]\n    },\n    {\n      \"name\": \"frontier_claim_without_vendor_source_blocked\",\n      \"ok\": true,\n      \"errors\": [\n        \"NO_EXTERNAL_SOURCES\",\n        \"UNSUPPORTED_FRONTIER_RELEASE_CLAIM\",\n        \"OpenAI frontier model release claims require an official OpenAI source\",\n        \"HUMAN_APPROVAL_REQUIRED:FRONTIER_AI\"\n      ]\n    },\n    {\n      \"name\": \"broken_source_section_blocked\",\n      \"ok\": true,\n      \"errors\": [\n        \"NO_EXTERNAL_SOURCES\",\n        \"BROKEN_SOURCE_SECTION\"\n      ]\n    },\n    {\n      \"name\": \"high_risk_article_requires_human_approval\",\n      \"ok\": true,\n      \"errors\": [\n        \"HUMAN_APPROVAL_REQUIRED:WAR_CONFLICT\"\n      ]\n    },\n    {\n      \"name\": \"high_risk_article_with_human_approval_can_pass\",\n      \"ok\": true,\n      \"errors\": []\n    },\n    {\n      \"name\": \"assert_release_ready_raises_on_invalid_frontier_claim\",\n      \"ok\": true,\n      \"errors\": [\n        \"release blocker: NO_EXTERNAL_SOURCES, UNSUPPORTED_FRONTIER_RELEASE_CLAIM, Anthropic frontier model release claims require an official Anthropic source, HUMAN_APPROVAL_REQUIRED:FRONTIER_AI\"\n      ]\n    }\n  ]\n}",
+      "json": {
+        "total": 6,
+        "passed": 6,
+        "failed": 0,
+        "checks": [
+          {
+            "name": "frontier_claim_without_sources_blocked",
+            "ok": true,
+            "errors": [
+              "NO_EXTERNAL_SOURCES",
+              "BROKEN_SOURCE_SECTION",
+              "UNSUPPORTED_FRONTIER_RELEASE_CLAIM",
+              "OpenAI frontier model release claims require an official OpenAI source",
+              "HUMAN_APPROVAL_REQUIRED:FRONTIER_AI"
+            ]
+          },
+          {
+            "name": "frontier_claim_without_vendor_source_blocked",
+            "ok": true,
+            "errors": [
+              "NO_EXTERNAL_SOURCES",
+              "UNSUPPORTED_FRONTIER_RELEASE_CLAIM",
+              "OpenAI frontier model release claims require an official OpenAI source",
+              "HUMAN_APPROVAL_REQUIRED:FRONTIER_AI"
+            ]
+          },
+          {
+            "name": "broken_source_section_blocked",
+            "ok": true,
+            "errors": [
+              "NO_EXTERNAL_SOURCES",
+              "BROKEN_SOURCE_SECTION"
+            ]
+          },
+          {
+            "name": "high_risk_article_requires_human_approval",
+            "ok": true,
+            "errors": [
+              "HUMAN_APPROVAL_REQUIRED:WAR_CONFLICT"
+            ]
+          },
+          {
+            "name": "high_risk_article_with_human_approval_can_pass",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "name": "assert_release_ready_raises_on_invalid_frontier_claim",
+            "ok": true,
+            "errors": [
+              "release blocker: NO_EXTERNAL_SOURCES, UNSUPPORTED_FRONTIER_RELEASE_CLAIM, Anthropic frontier model release claims require an official Anthropic source, HUMAN_APPROVAL_REQUIRED:FRONTIER_AI"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "article_anchor_integrity",
+      "ok": false,
+      "returncode": 1,
+      "output": "{\"total\": 10, \"failed\": 3, \"passed\": 7}\nFAIL predictions: broken_anchor_pattern:/predictions/#np-2026- | broken_anchor_pattern:#np-2026-\nFAIL en/predictions: broken_anchor_pattern:/predictions/#np-2026- | broken_anchor_pattern:#np-2026-\nFAIL webmentions/receive: fetch_failed:HTTP Error 404: Not Found",
+      "json": null
+    },
+    {
+      "name": "site_dev_pages",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\"dev_pages_found\": 0}\nPASS: no published dev pages detected",
+      "json": null
+    },
+    {
+      "name": "site_article_source",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\"total\": 2, \"failed\": 0, \"passed\": 2}\nPASS: article source audit",
+      "json": null
+    }
+  ]
+}

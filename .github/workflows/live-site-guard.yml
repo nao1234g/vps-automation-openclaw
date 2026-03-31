@@ -103,6 +103,12 @@ jobs:
             --json-out reports/live_site_guard/site_ui_smoke_articles.json \
             --screenshot-dir reports/live_site_guard/article-screenshots
 
+      - name: Run article source audit
+        run: |
+          python scripts/site_article_source_audit.py \
+            --base-url https://nowpattern.com \
+            --json-out reports/live_site_guard/article_source_audit.json
+
       - name: Upload article smoke report
         if: always()
         uses: actions/upload-artifact@v4

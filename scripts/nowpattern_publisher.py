@@ -37,14 +37,21 @@ import json
 import hashlib
 import hmac
 import os
+import re
 import time
 import sys
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-from article_release_guard import assert_release_ready
+from mission_contract import assert_mission_handshake
+from release_governor import assert_governed_release_ready
 from article_truth_guard import evaluate_article_truth
 
+MISSION_HANDSHAKE = assert_mission_handshake(
+    "nowpattern_publisher",
+    "publish Ghost articles only after passing the shared mission contract and release governor",
+)
 
 # ---------------------------------------------------------------------------
 # Genre-based URL structure (v4.0: routes.yaml collection routing)
@@ -293,7 +300,7 @@ def _assert_publishable_truth(
             raise ValueError("truth/source guard blocked publish: " + ", ".join(truth_errors))
         return
 
-    assert_release_ready(
+    assert_governed_release_ready(
         title=title,
         html=html,
         source_urls=source_urls or [],
@@ -304,6 +311,69 @@ def _assert_publishable_truth(
         require_external_sources=True,
         check_source_fetchability=True,
     )
+
+
+_UUID_PUBLIC_URL_RE = re.compile(r"/p/[0-9a-f-]{36}/", re.IGNORECASE)
+
+
+def verify_public_url(url: str, timeout: int = 8) -> bool:
+    """Return True only when the public URL is externally reachable."""
+    if not url:
+        return False
+    if _UUID_PUBLIC_URL_RE.search(url):
+        return False
+    headers = {"User-Agent": "nowpattern-public-url-verify/1.0"}
+    for method in ("HEAD", "GET"):
+        try:
+            req = urllib.request.Request(url, method=method, headers=headers)
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                if 200 <= getattr(resp, "status", 0) < 400:
+                    return True
+        except Exception:
+            continue
+    return False
+
+
+def _infer_publish_language(title: str, title_en: str = "") -> str:
+    if title_en and title_en == title:
+        return "en"
+    return "ja"
+
+
+def _candidate_public_urls(
+    *,
+    ghost_url: str,
+    slug: str,
+    primary_genre: str = "",
+    language: str = "ja",
+) -> list[str]:
+    if not slug:
+        return []
+    if language == "en":
+        if primary_genre:
+            return [f"{ghost_url}/en/{primary_genre}/{slug}/", f"{ghost_url}/en/{slug}/"]
+        return [f"{ghost_url}/en/{slug}/"]
+    if primary_genre:
+        return [f"{ghost_url}/{primary_genre}/{slug}/", f"{ghost_url}/{slug}/"]
+    return [f"{ghost_url}/{slug}/"]
+
+
+def _resolve_verified_public_url(
+    *,
+    published_url: str,
+    fallback_candidates: list[str],
+    status: str,
+) -> str:
+    if (status or "").lower() != "published":
+        return ""
+    seen: set[str] = set()
+    for candidate in [published_url, *fallback_candidates]:
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        if verify_public_url(candidate):
+            return candidate
+    raise ValueError("404 detected before delivery: no verified public URL candidate")
 
 
 def generate_organization_jsonld(
@@ -875,6 +945,7 @@ def publish_deep_pattern(
         ghost_url=ghost_url,
     )
 
+    language = _infer_publish_language(title, title_en)
     ghost_result = post_to_ghost(
         title=title,
         html=html,
@@ -890,8 +961,19 @@ def publish_deep_pattern(
     # 実際のGhost URLを使用（slug truncationによる404を防止）
     slug = ghost_result.get("slug", "")
     ghost_id = ghost_result.get("id", "")
-    url = ghost_result.get("url", "")
-    if not url and slug:
+    genre_slugs = [t["slug"] for t in genre_resolved]
+    primary_genre = get_primary_genre_url(genre_slugs)
+    url = _resolve_verified_public_url(
+        published_url=ghost_result.get("url", ""),
+        fallback_candidates=_candidate_public_urls(
+            ghost_url=ghost_url,
+            slug=slug,
+            primary_genre=primary_genre,
+            language=language,
+        ),
+        status=status,
+    )
+    if False and not url and slug:
         # フォールバック: routes.yamlのジャンルベースURL構造に合わせる
         genre_slugs = [t["slug"] for t in genre_resolved]
         primary_genre = get_primary_genre_url(genre_slugs)
@@ -1027,9 +1109,19 @@ def publish_speed_log(
         status=status,
     )
 
+    genre_resolved = resolve_tag_list(genre_tags, "genre")
     slug = ghost_result.get("slug", "")
     ghost_id = ghost_result.get("id", "")
-    url = f"{ghost_url}/{slug}/" if slug else ""
+    url = _resolve_verified_public_url(
+        published_url=ghost_result.get("url", ""),
+        fallback_candidates=_candidate_public_urls(
+            ghost_url=ghost_url,
+            slug=slug,
+            primary_genre=get_primary_genre_url([t["slug"] for t in genre_resolved]),
+            language="ja",
+        ),
+        status=status,
+    )
 
     index = load_index(index_path)
     index = add_article_to_index(

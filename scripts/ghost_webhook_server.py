@@ -17,7 +17,13 @@ import urllib.request, ssl
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from datetime import datetime, timezone
 
-from article_release_guard import evaluate_release_blockers
+from mission_contract import assert_mission_handshake
+from release_governor import evaluate_governed_release
+
+MISSION_HANDSHAKE = assert_mission_handshake(
+    "ghost_webhook_server",
+    "govern post-publish article changes under the shared founder mission contract",
+)
 
 # ── 環境変数 ─────────────────────────────────────────────────────────────
 
@@ -400,7 +406,7 @@ def run_qa_on_post(post_id, event_type="post.published"):
             rec["oracle_ok"] = 0
             neo_issues.append("missing_oracle_statement")
 
-    release_block = evaluate_release_blockers(
+    release_block = evaluate_governed_release(
         title=title,
         html=html,
         tags=list(tags),

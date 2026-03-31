@@ -43,8 +43,13 @@ import sys
 import argparse
 from datetime import datetime, timezone
 
-from article_release_guard import evaluate_release_blockers
+from mission_contract import assert_mission_handshake
+from release_governor import evaluate_governed_release
 
+MISSION_HANDSHAKE = assert_mission_handshake(
+    "breaking_pipeline_helper",
+    "complete breaking article publishing only through the shared mission contract",
+)
 QUEUE_FILE = "/opt/shared/scripts/breaking_queue.json"
 SCRIPTS_DIR = "/opt/shared/scripts"
 
@@ -157,7 +162,7 @@ def publish_to_ghost(article_data, html, dry_run=False):
 
     # publish_deep_pattern()がSTRICTバリデーションを行い、
     # 不正タグがあればValueErrorで投稿をブロックする
-    release_block = evaluate_release_blockers(
+    release_block = evaluate_governed_release(
         title=article_data["title"],
         html=html,
         source_urls=[u[1] if isinstance(u, (list, tuple)) else u for u in article_data.get("source_urls", [])],

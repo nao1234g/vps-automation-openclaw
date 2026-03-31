@@ -8,7 +8,11 @@ import json
 import os
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+import re
+
+from mission_contract import MISSION_CONTRACT_VERSION, mission_contract_hash
+from canonical_public_lexicon import LEXICON_VERSION
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPORT_DIR = (
@@ -20,6 +24,7 @@ MANIFEST_PATH = os.path.join(REPORT_DIR, "article_release_manifest.json")
 TRACKER_PATH = os.path.join(REPORT_DIR, "prediction_article_integrity.json")
 SNAPSHOT_PATH = os.path.join(REPORT_DIR, "content_release_snapshot.json")
 POLICY_PATH = os.path.join(SCRIPT_DIR, "prediction_integrity_policy.json")
+GOVERNANCE_PATH = os.path.join(REPORT_DIR, "ecosystem_governance_audit.json")
 
 
 def _load_json(path: str) -> dict:
@@ -40,6 +45,8 @@ def _load_policy(tracker: dict) -> dict:
         "required_langs": ["ja", "en"],
         "max_orphan_oracle_articles": 197,
         "max_manifest_tracker_count_delta": 0,
+        "max_report_timestamp_delta_seconds": 1800,
+        "max_mojibake_strings": 0,
     }
     disk = _load_json(POLICY_PATH)
     if isinstance(disk, dict):
@@ -48,6 +55,38 @@ def _load_policy(tracker: dict) -> dict:
     if isinstance(tracker_policy, dict):
         policy.update({k: v for k, v in tracker_policy.items() if v is not None})
     return policy
+
+
+ISO_TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+JST_TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2} JST$")
+MOJIBAKE_TOKENS = ("繧", "縺", "繝", "譌", "蛻", "逶", "荳", "鬮", "驥", "豁ｩ")
+
+
+def _parse_report_timestamp(value: str) -> datetime | None:
+    if not value or not isinstance(value, str):
+        return None
+    if ISO_TS_RE.match(value):
+        return datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    if JST_TS_RE.match(value):
+        jst = timezone(timedelta(hours=9))
+        return datetime.strptime(value, "%Y-%m-%d %H:%M JST").replace(tzinfo=jst).astimezone(timezone.utc)
+    return None
+
+
+def _count_suspicious_mojibake(value) -> int:
+    total = 0
+    if isinstance(value, dict):
+        for item in value.values():
+            total += _count_suspicious_mojibake(item)
+        return total
+    if isinstance(value, list):
+        for item in value:
+            total += _count_suspicious_mojibake(item)
+        return total
+    if not isinstance(value, str):
+        return 0
+    score = sum(value.count(token) for token in MOJIBAKE_TOKENS)
+    return 1 if score >= 3 else 0
 
 
 def _build_snapshot(manifest: dict, tracker: dict, failures: list[str], warnings: list[str]) -> dict:
@@ -65,16 +104,23 @@ def _build_snapshot(manifest: dict, tracker: dict, failures: list[str], warnings
         hidden_rows = int(payload.get("hidden_no_live_article") or 0)
         coverage[lang] = {
             "public_rows": public_rows,
+            "public_in_play_rows": int(payload.get("public_in_play_rows") or 0),
+            "public_awaiting_rows": int(payload.get("public_awaiting_rows") or 0),
+            "public_resolved_rows": int(payload.get("public_resolved_rows") or 0),
             "hidden_no_live_article": hidden_rows,
             "coverage_pct": round((public_rows / formal_prediction_total) * 100, 2) if formal_prediction_total else 0.0,
         }
     return {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "mission_contract_version": MISSION_CONTRACT_VERSION,
+        "mission_contract_hash": mission_contract_hash(),
+        "lexicon_version": LEXICON_VERSION,
         "manifest_generated_at": manifest.get("generated_at", ""),
         "tracker_generated_at": tracker.get("generated_at", ""),
         "manifest_counts": manifest_counts,
         "tracker_summary": {
-            "ghost_published_posts": tracker.get("ghost_published_posts"),
+            "ghost_published_posts_total": tracker.get("ghost_published_posts_total"),
+            "ghost_published_posts_release_scope": tracker.get("ghost_published_posts_release_scope"),
             "formal_prediction_total": tracker.get("formal_prediction_total"),
             "orphan_oracle_articles": (tracker.get("orphan_oracle_articles") or {}).get("count"),
             "coverage": coverage,
@@ -122,23 +168,40 @@ def main() -> int:
             if out:
                 warnings.append(f"tracker_refresh_output:{out[:500]}")
 
+        governance_cmd = [
+            sys.executable,
+            os.path.join(SCRIPT_DIR, "ecosystem_governance_audit.py"),
+            "--json-out",
+            GOVERNANCE_PATH,
+        ]
+        rc, out = _run(governance_cmd)
+        if rc != 0:
+            failures.append(f"governance_refresh_failed:{rc}")
+            if out:
+                warnings.append(f"governance_refresh_output:{out[:500]}")
+
     manifest = _load_json(MANIFEST_PATH)
     tracker = _load_json(TRACKER_PATH)
+    governance = _load_json(GOVERNANCE_PATH)
     if not manifest:
         failures.append("missing_article_release_manifest")
     if not tracker:
         failures.append("missing_prediction_article_integrity")
+    if governance and int(governance.get("failed") or 0) > 0:
+        failures.append(f"governance_audit_failed:{governance.get('failed')}")
 
     policy = _load_policy(tracker)
     required_langs = policy.get("required_langs") or ["ja", "en"]
     max_delta = int(policy.get("max_manifest_tracker_count_delta", 0))
     max_orphans = int(policy.get("max_orphan_oracle_articles", 0))
+    max_report_timestamp_delta_seconds = int(policy.get("max_report_timestamp_delta_seconds", 1800))
+    max_mojibake_strings = int(policy.get("max_mojibake_strings", 0))
 
     manifest_counts = manifest.get("counts", {}) if isinstance(manifest, dict) else {}
     tracker_langs = tracker.get("langs", {}) if isinstance(tracker, dict) else {}
 
     published_total = int(manifest_counts.get("published_total") or 0)
-    tracker_published = int(tracker.get("ghost_published_posts") or 0)
+    tracker_published = int(tracker.get("ghost_published_posts_release_scope") or 0)
     if abs(published_total - tracker_published) > max_delta:
         failures.append(
             f"manifest_tracker_published_mismatch:{published_total}!={tracker_published}"
@@ -154,13 +217,36 @@ def main() -> int:
 
     for lang in required_langs:
         payload = tracker_langs.get(lang) or {}
-        for key in ("public_rows", "hidden_no_live_article", "same_lang_analysis", "cross_lang_fallback"):
+        for key in (
+            "public_rows",
+            "public_in_play_rows",
+            "public_awaiting_rows",
+            "public_resolved_rows",
+            "hidden_no_live_article",
+            "same_lang_analysis",
+            "cross_lang_fallback",
+        ):
             if key not in payload:
                 failures.append(f"missing_tracker_field:{lang}.{key}")
 
     orphan_count = int((tracker.get("orphan_oracle_articles") or {}).get("count") or 0)
     if orphan_count > max_orphans:
         failures.append(f"orphan_oracle_articles_exceeded:{orphan_count}>{max_orphans}")
+
+    manifest_ts = _parse_report_timestamp(manifest.get("generated_at", ""))
+    tracker_ts = _parse_report_timestamp(tracker.get("generated_at", ""))
+    if manifest_ts and tracker_ts:
+        ts_delta = abs(int((manifest_ts - tracker_ts).total_seconds()))
+        if ts_delta > max_report_timestamp_delta_seconds:
+            failures.append(
+                f"report_timestamp_delta_exceeded:{ts_delta}>{max_report_timestamp_delta_seconds}"
+            )
+    else:
+        warnings.append("report_timestamp_unparseable")
+
+    mojibake_hits = _count_suspicious_mojibake(manifest) + _count_suspicious_mojibake(tracker)
+    if mojibake_hits > max_mojibake_strings:
+        failures.append(f"mojibake_strings_exceeded:{mojibake_hits}>{max_mojibake_strings}")
 
     distribution_allowed = int(manifest_counts.get("distribution_allowed") or 0)
     high_risk_unapproved = int(manifest_counts.get("high_risk_unapproved") or 0)

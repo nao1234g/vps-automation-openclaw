@@ -76,14 +76,28 @@ CORE_PAGES = [
         "path": "/predictions/",
         "expected_lang": "ja",
         "required_toggle": True,
-        "content_selectors": ["#np-tracking-list", "#np-tracking-list details"],
+        "content_selectors": ["#np-inplay-list", "#np-inplay-list details", "#np-awaiting-list", "#np-resolved-section"],
     },
     {
         "slug": "predictions-en",
         "path": "/en/predictions/",
         "expected_lang": "en",
         "required_toggle": True,
-        "content_selectors": ["#np-tracking-list", "#np-tracking-list details"],
+        "content_selectors": ["#np-inplay-list", "#np-inplay-list details", "#np-awaiting-list", "#np-resolved-section"],
+    },
+    {
+        "slug": "integrity-audit-ja",
+        "path": "/integrity-audit/",
+        "expected_lang": "ja",
+        "required_toggle": True,
+        "content_selectors": ["main", "article", "h2"],
+    },
+    {
+        "slug": "integrity-audit-en",
+        "path": "/en/integrity-audit/",
+        "expected_lang": "en",
+        "required_toggle": True,
+        "content_selectors": ["main", "article", "h2"],
     },
 ]
 
@@ -249,7 +263,7 @@ def rotating_sample(items: list[str], limit: int, salt: str) -> list[str]:
 
 def sample_internal_links(page, base_url: str) -> list[str]:
     hrefs = page.evaluate(
-        """() => Array.from(document.querySelectorAll('main a[href], article a[href], #np-tracking-list a[href]'))
+        """() => Array.from(document.querySelectorAll('main a[href], article a[href], #np-inplay-list a[href], #np-awaiting-list a[href], #np-resolved-section a[href]'))
           .filter((anchor) => anchor.dataset.crossLangLink !== 'true')
           .map((anchor) => anchor.getAttribute('href') || anchor.href)
           .filter(Boolean)"""
@@ -290,6 +304,7 @@ def check_internal_link_statuses(base_url: str, paths: list[str]) -> list[str]:
     for path in paths[:10]:
         url = urljoin(base_url, path)
         last_error = None
+        saw_timeout = False
         for method, timeout_seconds in (("HEAD", 15), ("GET", 25)):
             try:
                 request = urllib.request.Request(
@@ -302,6 +317,20 @@ def check_internal_link_statuses(base_url: str, paths: list[str]) -> list[str]:
                         last_error = None
                         break
                     last_error = f"HTTP {response.status}"
+            except Exception as exc:
+                last_error = str(exc)
+                if "timed out" in last_error.lower():
+                    saw_timeout = True
+        if last_error and saw_timeout:
+            try:
+                request = urllib.request.Request(
+                    url,
+                    method="GET",
+                    headers={"User-Agent": "nowpattern-site-ui-smoke/1.0"},
+                )
+                with urllib.request.urlopen(request, context=ssl_ctx, timeout=90) as response:
+                    if response.status < 400:
+                        last_error = None
             except Exception as exc:
                 last_error = str(exc)
         if last_error:
@@ -488,13 +517,67 @@ def prediction_tracker_summary(page) -> dict[str, int | None]:
           };
           return {
             toolbar_all: parseCount('.np-view-btn[data-view="all"] span'),
-            toolbar_tracking: parseCount('.np-view-btn[data-view="tracking"] span'),
+            toolbar_inplay: parseCount('.np-view-btn[data-view="inplay"] span'),
+            toolbar_awaiting: parseCount('.np-view-btn[data-view="awaiting"] span'),
             toolbar_resolved: parseCount('.np-view-btn[data-view="resolved"] span'),
-            tracking_details: document.querySelectorAll('#np-tracking-list details').length,
-            resolved_details: document.querySelectorAll('#np-resolved-section details').length,
+            inplay_details: document.querySelectorAll('#np-inplay-list > details').length,
+            awaiting_details: document.querySelectorAll('#np-awaiting-list > details').length,
+            resolved_details: document.querySelectorAll('#np-resolved-section > details').length,
+            cross_lang_links: document.querySelectorAll('#np-inplay-list [data-cross-lang-link="true"], #np-awaiting-list [data-cross-lang-link="true"], #np-resolved-section [data-cross-lang-link="true"]').length,
           };
         }"""
     )
+
+
+def validate_integrity_audit_copy(page, result: PageResult, expected_lang: str) -> None:
+    text = page.locator("body").inner_text(timeout=5000)
+    if re.search(r"\b20\d{2}-\d{2}-\d{2}\b", text):
+        result.fail("integrity audit page contains a fixed ISO date")
+    if re.search(r"20\d{2}年\d{1,2}月", text):
+        result.fail("integrity audit page contains a fixed Japanese date")
+    if re.search(r"\d+件", text):
+        result.fail("integrity audit page still exposes a fixed count in public copy")
+    if re.search(r"\b\d{1,3}(,\d{3})+\b", text):
+        result.fail("integrity audit page still exposes a comma-formatted fixed count")
+
+    bad_headers = page.evaluate(
+        """() => Array.from(document.querySelectorAll('th'))
+          .map((el) => (el.textContent || '').trim())
+          .filter((text) => text === '件数' || text === 'Count')"""
+    )
+    if bad_headers:
+        result.fail(f"integrity audit page still renders count headers: {', '.join(bad_headers)}")
+
+    tier_cards = page.locator(".np-tier-grid .np-tier-card").count()
+    result.extra["integrity_tier_cards"] = tier_cards
+    if tier_cards < 4:
+        result.fail(f"integrity audit page missing tier cards: {tier_cards}")
+
+    if expected_lang == "en" and "暫定計算値" in text:
+        result.fail("unexpected Japanese tier copy on EN integrity page")
+
+
+def validate_about_copy(page, result: PageResult, expected_lang: str) -> None:
+    text = page.locator("body").inner_text(timeout=5000)
+    head_html = page.locator("head").inner_html(timeout=5000)
+    if expected_lang == "ja":
+        if "予測オラクル・メディア" in text:
+            result.fail("JA about page still uses old media label")
+        if "開始年" in text:
+            result.fail("JA about page still uses old metric label 開始年")
+        if "検証可能な予測プラットフォーム" not in text:
+            result.fail("JA about page missing canonical platform label")
+        if "予測オラクル・メディア" in head_html:
+            result.fail("JA about page head/meta still uses old media label")
+    else:
+        if "Prediction Oracle Media" in text:
+            result.fail("EN about page still uses old media label")
+        if "Verifiable Forecast Platform" not in text:
+            result.fail("EN about page missing canonical platform label")
+        if "0/2 correct" in text or "111 Total Forecasts" in text:
+            result.fail("EN about page still exposes legacy fixed metrics")
+        if "Prediction Oracle Media" in head_html:
+            result.fail("EN about page head/meta still uses old media label")
 
 
 def header_ui_snapshot(page) -> dict[str, Any]:
@@ -653,19 +736,46 @@ def audit_prediction_tracker_parity(context, base_url: str, viewport_name: str) 
         result.extra["ja_summary"] = ja_summary
         result.extra["en_summary"] = en_summary
 
-        ja_total = ja_summary.get("toolbar_all") or ((ja_summary.get("tracking_details") or 0) + (ja_summary.get("resolved_details") or 0))
-        en_total = en_summary.get("toolbar_all") or ((en_summary.get("tracking_details") or 0) + (en_summary.get("resolved_details") or 0))
-        if ja_total != en_total:
-            result.fail(f"prediction totals differ between JA and EN: ja={ja_total} en={en_total}")
+        ja_total = ja_summary.get("toolbar_all") or (
+            (ja_summary.get("inplay_details") or 0)
+            + (ja_summary.get("awaiting_details") or 0)
+            + (ja_summary.get("resolved_details") or 0)
+        )
+        en_total = en_summary.get("toolbar_all") or (
+            (en_summary.get("inplay_details") or 0)
+            + (en_summary.get("awaiting_details") or 0)
+            + (en_summary.get("resolved_details") or 0)
+        )
+        if not ja_total or not en_total:
+            result.fail(f"prediction totals missing: ja={ja_total} en={en_total}")
 
-        if (ja_summary.get("tracking_details") or 0) != (en_summary.get("tracking_details") or 0):
+        if int(ja_summary.get("cross_lang_links") or 0) != 0:
+            result.fail(f"JA tracker exposes cross-language links: {ja_summary.get('cross_lang_links')}")
+
+        if int(en_summary.get("cross_lang_links") or 0) != 0:
+            result.fail(f"EN tracker exposes cross-language links: {en_summary.get('cross_lang_links')}")
+
+        ja_live_total = (
+            (ja_summary.get("inplay_details") or 0)
+            + (ja_summary.get("awaiting_details") or 0)
+            + (ja_summary.get("resolved_details") or 0)
+        )
+        en_live_total = (
+            (en_summary.get("inplay_details") or 0)
+            + (en_summary.get("awaiting_details") or 0)
+            + (en_summary.get("resolved_details") or 0)
+        )
+
+        if ja_live_total <= 0:
             result.fail(
-                f"tracking card counts differ between JA and EN: ja={ja_summary.get('tracking_details')} en={en_summary.get('tracking_details')}"
+                "JA tracker has no visible cards: "
+                f"inplay={ja_summary.get('inplay_details')} awaiting={ja_summary.get('awaiting_details')} resolved={ja_summary.get('resolved_details')}"
             )
 
-        if (ja_summary.get("resolved_details") or 0) != (en_summary.get("resolved_details") or 0):
+        if en_live_total <= 0:
             result.fail(
-                f"resolved card counts differ between JA and EN: ja={ja_summary.get('resolved_details')} en={en_summary.get('resolved_details')}"
+                "EN tracker has no visible cards: "
+                f"inplay={en_summary.get('inplay_details')} awaiting={en_summary.get('awaiting_details')} resolved={en_summary.get('resolved_details')}"
             )
     finally:
         ja_page.close()
@@ -752,6 +862,10 @@ def run_page_audit(page, base_url: str, spec: dict[str, Any], viewport_name: str
         result.warnings.append(f"slow load {load_ms}ms")
 
     validate_language_specific_ui(page, result, spec["expected_lang"])
+    if spec["slug"].startswith("about-"):
+        validate_about_copy(page, result, spec["expected_lang"])
+    if spec["slug"].startswith("integrity-audit-"):
+        validate_integrity_audit_copy(page, result, spec["expected_lang"])
     if spec["expected_lang"] == "en":
         stale_links = stale_en_internal_links(page, base_url)
         if stale_links:

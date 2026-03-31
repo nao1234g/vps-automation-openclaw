@@ -4,5 +4,7 @@
     "en"
   ],
   "max_orphan_oracle_articles": 197,
-  "max_manifest_tracker_count_delta": 0
+  "max_manifest_tracker_count_delta": 0,
+  "max_report_timestamp_delta_seconds": 1800,
+  "max_mojibake_strings": 0
 }

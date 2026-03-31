@@ -30,6 +30,12 @@ import argparse
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 
+from mission_contract import assert_mission_handshake
+
+MISSION_HANDSHAKE = assert_mission_handshake(
+    "substack_notes_poster",
+    "generate or post Substack notes only under the shared founder mission contract",
+)
 PREDICTION_DB = "/opt/shared/scripts/prediction_db.json"
 GHOST_URL = "https://nowpattern.com"
 RELEASE_MANIFEST = "/opt/shared/reports/article_release_manifest.json"
