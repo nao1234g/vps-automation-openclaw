@@ -45,8 +45,8 @@ _HERE = Path(__file__).parent
 REPO_ROOT = Path(os.environ.get("CLAUDE_PROJECT_DIR", str(_HERE.parent)))
 
 NORTH_STAR_PATH = REPO_ROOT / ".claude" / "rules" / "NORTH_STAR.md"
-OPERATING_PRINCIPLES_PATH = REPO_ROOT / ".claude" / "rules" / "OPERATING_PRINCIPLES.md"
-IMPLEMENTATION_REF_PATH = REPO_ROOT / ".claude" / "rules" / "IMPLEMENTATION_REF.md"
+OPERATING_PRINCIPLES_PATH = REPO_ROOT / ".claude" / "reference" / "OPERATING_PRINCIPLES.md"
+IMPLEMENTATION_REF_PATH = REPO_ROOT / ".claude" / "reference" / "IMPLEMENTATION_REF.md"
 TASK_LEDGER_PATH = REPO_ROOT / ".claude" / "state" / "task_ledger.json"
 ACTIVE_TASK_ID_PATH = REPO_ROOT / ".claude" / "hooks" / "state" / "active_task_id.txt"
 FAILURE_MEMORY_PATH = REPO_ROOT / ".claude" / "state" / "failure_memory.json"
@@ -165,7 +165,7 @@ def build_section2_operating_principles() -> str:
     out = [
         "## SECTION 2: OPERATING PRINCIPLES（見出し圧縮ビュー）",
         "",
-        "詳細は `.claude/rules/OPERATING_PRINCIPLES.md` を参照。以下は構造の概要:",
+        "詳細は `.claude/reference/OPERATING_PRINCIPLES.md` を参照。以下は構造の概要:",
         "",
     ]
     for h in headings[:50]:
@@ -173,7 +173,7 @@ def build_section2_operating_principles() -> str:
     out.append("")
 
     sha = _file_sha256(OPERATING_PRINCIPLES_PATH)
-    out.append(f"> 原本: `.claude/rules/OPERATING_PRINCIPLES.md` (sha256: `{sha}`)")
+    out.append(f"> 原本: `.claude/reference/OPERATING_PRINCIPLES.md` (sha256: `{sha}`)")
 
     return "\n".join(out)
 
@@ -217,7 +217,7 @@ def build_section3_governance_rules() -> str:
         out.append("")
 
     sha = _file_sha256(IMPLEMENTATION_REF_PATH)
-    out.append(f"> 原本: `.claude/rules/IMPLEMENTATION_REF.md` (sha256: `{sha}`)")
+    out.append(f"> 原本: `.claude/reference/IMPLEMENTATION_REF.md` (sha256: `{sha}`)")
 
     return "\n".join(out)
 

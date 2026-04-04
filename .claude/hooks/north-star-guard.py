@@ -39,13 +39,58 @@ hook_event = data.get("hook_event_name", "")
 tool_name = data.get("tool_name", "")
 tool_input = data.get("tool_input", {})
 
-# ── [B2] Read Comprehension Gate: セッション初期化前のEdit/Writeをブロック ──
+# ── [P2] Anti-Sprawl Bash Monitor: cp/mv/tee/> で .claude/rules/ への書き込みをブロック ──
+if tool_name == "Bash" and hook_event == "PreToolUse":
+    command = tool_input.get("command", "")
+    # .claude/rules/ に .md ファイルを書き込む Bash コマンドを検知
+    # cp, mv, tee, リダイレクト(>) をチェック
+    BASH_WRITE_PATTERN = re.compile(
+        r'(?:cp|mv|tee)\s+.*\.claude/rules/\S+\.md'
+        r'|>\s*\S*\.claude/rules/\S+\.md'
+        r'|\.claude/rules/\S+\.md\s*$'  # tee target at end
+    )
+    if BASH_WRITE_PATTERN.search(command):
+        # north_star.md への正当な操作は許可
+        if "north_star" not in command.lower() or any(
+            x in command.lower() for x in ["operating_principles", "implementation_ref"]
+        ):
+            # OP/IR が rules/ に戻されようとしている → ブロック
+            if "operating_principles" in command.lower() or "implementation_ref" in command.lower():
+                print(
+                    "\n"
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                    "🚫 [ANTI-SPRAWL / BASH] .claude/rules/ への Bash 書き込みをブロック\n"
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                    f"  コマンド: {command[:120]}\n"
+                    "\n"
+                    "  OPERATING_PRINCIPLES.md と IMPLEMENTATION_REF.md は\n"
+                    "  .claude/reference/ に移動済みです。\n"
+                    "  .claude/rules/ には NORTH_STAR.md のみ存在すべきです。\n"
+                    "\n"
+                    "  Write/Edit ツールだけでなく、Bash (cp/mv/tee/>) も監視しています。\n"
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                )
+                sys.exit(2)
+            # その他の新規 .md → ブロック
+            basename = command.split(".claude/rules/")[-1].split()[0].split('"')[0].split("'")[0].lower()
+            if basename.endswith(".md") and basename != "north_star.md":
+                print(
+                    "\n"
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                    "🚫 [ANTI-SPRAWL / BASH] .claude/rules/ への新規 .md をブロック\n"
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                    f"  コマンド: {command[:120]}\n"
+                    "\n"
+                    "  .claude/rules/ には NORTH_STAR.md のみ許可されています。\n"
+                    "  Bash コマンドによるバイパスも監視しています。\n"
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                )
+                sys.exit(2)
+
+# ── [P4] Read Comprehension Gate (hash-enhanced): セッション初期化+ハッシュ検証 ──
 if tool_name in ("Write", "Edit") and hook_event == "PreToolUse":
     flag_path = PROJECT_DIR / ".claude" / "hooks" / "state" / "north_star_loaded.flag"
     if not flag_path.exists():
-        today = date.today().strftime("%Y-%m-%d")
-        # フラグがない = session-start.sh が未実行 = NORTH_STAR未読み込み
-        # ただし手動フラグ作成も許可（テスト用）
         print(
             "\n"
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
@@ -60,6 +105,31 @@ if tool_name in ("Write", "Edit") and hook_event == "PreToolUse":
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
         )
         sys.exit(2)
+    else:
+        # P4: ハッシュ検証 — フラグのハッシュと現在のNORTH_STAR.mdが一致するか確認
+        import hashlib
+        flag_content = flag_path.read_text(encoding="utf-8").strip()
+        if ":" in flag_content:
+            _flag_date, flag_hash = flag_content.split(":", 1)
+            ns_path = PROJECT_DIR / ".claude" / "rules" / "NORTH_STAR.md"
+            if ns_path.exists() and flag_hash not in ("nohash", "missing"):
+                current_hash = hashlib.sha256(ns_path.read_bytes()).hexdigest()[:16]
+                if flag_hash != current_hash:
+                    print(
+                        "\n"
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                        "⚠️  [READ COMPREHENSION GATE] NORTH_STAR.md が変更されています\n"
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                        "\n"
+                        "  セッション開始時のハッシュ: " + flag_hash + "\n"
+                        "  現在のハッシュ:             " + current_hash + "\n"
+                        "\n"
+                        "  NORTH_STAR.md がセッション中に変更されました。\n"
+                        "  最新の意図・哲学を反映するため、セッションの再起動を推奨します。\n"
+                        "  続行する場合は session-start.sh を再実行してフラグを更新してください。\n"
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                    )
+                    sys.exit(2)
 
 # ── [PreToolUse] Write: docs/ への新規 .md 作成をブロック ────────────────
 # ── [PreToolUse] Write: NORTH_STAR / OPERATING_PRINCIPLES への全体上書きをブロック ──
@@ -72,8 +142,8 @@ if tool_name == "Write":
     # ── 永遠の三原則 保護: 憲法ファイルを Write でブロック ──
     PROTECTED_FILES = [
         "/.claude/rules/north_star.md",
-        "/.claude/rules/operating_principles.md",
-        "/.claude/rules/implementation_ref.md",
+        "/.claude/reference/operating_principles.md",
+        "/.claude/reference/implementation_ref.md",
         "/.claude/hooks/state/regression_floor.json",  # T036-P5: フロア改ざん防止
     ]
     for pf in PROTECTED_FILES:
@@ -100,8 +170,6 @@ if tool_name == "Write":
     # 4ファイル体制（NORTH_STAR / OPERATING_PRINCIPLES / IMPLEMENTATION_REF + CLAUDE.md）以外は禁止
     CANONICAL_RULES = [
         "north_star.md",
-        "operating_principles.md",
-        "implementation_ref.md",
     ]
     if "/.claude/rules/" in normalized and normalized.endswith(".md"):
         basename = normalized.rsplit("/", 1)[-1]
@@ -243,7 +311,7 @@ if tool_name == "Edit" and hook_event == "PostToolUse":
     # CHANGELOG強制対象ファイル（小文字で照合）
     CHANGELOG_FILES = {
         "north_star.md": PROJECT_DIR / ".claude" / "rules" / "NORTH_STAR.md",
-        "operating_principles.md": PROJECT_DIR / ".claude" / "rules" / "OPERATING_PRINCIPLES.md",
+        "operating_principles.md": PROJECT_DIR / ".claude" / "reference" / "OPERATING_PRINCIPLES.md",
     }
 
     # 対象ファイルか確認

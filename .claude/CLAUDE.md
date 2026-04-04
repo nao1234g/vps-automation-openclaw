@@ -12,8 +12,8 @@ Nowpattern = 世界No.1予測プラットフォーム（唯一の最重要プロ
 | 階層 | 場所 | 読み込み |
 |------|------|---------|
 | 意図・哲学 | `.claude/rules/NORTH_STAR.md` | **自動（@import）** |
-| 行動規範 | `.claude/rules/OPERATING_PRINCIPLES.md` | JIT（必要時にRead） |
-| 実装参照 | `.claude/rules/IMPLEMENTATION_REF.md` | JIT（必要時にRead） |
+| 行動規範 | `.claude/reference/OPERATING_PRINCIPLES.md` | JIT（必要時にRead） |
+| 実装参照 | `.claude/reference/IMPLEMENTATION_REF.md` | JIT（必要時にRead） |
 | プロジェクト | `projects/nowpattern/` | JIT |
 
 ---
@@ -56,14 +56,14 @@ Nowpattern = 世界No.1予測プラットフォーム（唯一の最重要プロ
 
 | いつ読むか | ファイル |
 |-----------|---------|
-| コンテンツ・タグ・X投稿 | `OPERATING_PRINCIPLES.md` §4-7 |
-| NEO・Docker・VPS操作 | `IMPLEMENTATION_REF.md` §5-8 |
-| 統治レベル・承認フロー | `OPERATING_PRINCIPLES.md` §5-7 |
-| 予測ページUI変更 | `IMPLEMENTATION_REF.md` §10-13 |
-| フック・強制の実装 | `IMPLEMENTATION_REF.md` §1-4 |
+| コンテンツ・タグ・X投稿 | `.claude/reference/OPERATING_PRINCIPLES.md` §9-11 |
+| NEO・Docker・VPS操作 | `.claude/reference/IMPLEMENTATION_REF.md` §5-8 |
+| 統治レベル・承認フロー | `.claude/reference/OPERATING_PRINCIPLES.md` §4-7 |
+| 予測ページUI変更 | `.claude/reference/IMPLEMENTATION_REF.md` §10-13 |
+| フック・強制の実装 | `.claude/reference/IMPLEMENTATION_REF.md` §1-4 |
 | 既知のミス | `docs/KNOWN_MISTAKES.md` |
 | 蓄積された知恵 | `docs/AGENT_WISDOM.md` |
 
 ---
 
-*最終更新: 2026-04-04 — Thin Root化: @import 3→1（NORTH_STARのみ）、行動ルール最小限インライン、他はJIT参照*
+*最終更新: 2026-04-04 — Real JIT化: OP+IRを.claude/reference/に移動。.claude/rules/にはNORTH_STARのみ残留。74%トークン削減*

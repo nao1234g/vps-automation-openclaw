@@ -123,8 +123,8 @@ class Doctor:
         """consolidated doctrine files (archived originals → 4 canonical files)"""
         canonical = [
             (".claude/rules/NORTH_STAR.md", REPO_ROOT / ".claude" / "rules" / "NORTH_STAR.md"),
-            (".claude/rules/OPERATING_PRINCIPLES.md", REPO_ROOT / ".claude" / "rules" / "OPERATING_PRINCIPLES.md"),
-            (".claude/rules/IMPLEMENTATION_REF.md", REPO_ROOT / ".claude" / "rules" / "IMPLEMENTATION_REF.md"),
+            (".claude/reference/OPERATING_PRINCIPLES.md", REPO_ROOT / ".claude" / "reference" / "OPERATING_PRINCIPLES.md"),
+            (".claude/reference/IMPLEMENTATION_REF.md", REPO_ROOT / ".claude" / "reference" / "IMPLEMENTATION_REF.md"),
             (".claude/CLAUDE.md", REPO_ROOT / ".claude" / "CLAUDE.md"),
         ]
         for label, p in canonical:
@@ -167,35 +167,36 @@ class Doctor:
                    "" if p_ns.exists() else f"NORTH_STAR.md が存在しない: {p_ns}",
                    "ERROR" if not p_ns.exists() else "INFO")
 
-        # 2. L1: OPERATING_PRINCIPLES.md 存在（正式復活確認）
-        p_op = rules_dir / "OPERATING_PRINCIPLES.md"
-        self.check("3layer-L1: OPERATING_PRINCIPLES.md 存在 (.claude/rules/)",
+        # 2. L2: OPERATING_PRINCIPLES.md 存在（.claude/reference/ に移動済み）
+        ref_dir = REPO_ROOT / ".claude" / "reference"
+        p_op = ref_dir / "OPERATING_PRINCIPLES.md"
+        self.check("3layer-L2: OPERATING_PRINCIPLES.md 存在 (.claude/reference/)",
                    "PASS" if p_op.exists() else "FAIL",
-                   "" if p_op.exists() else f"OPERATING_PRINCIPLES.md が .claude/rules/ に存在しない — T012 要件未充足",
+                   "" if p_op.exists() else f"OPERATING_PRINCIPLES.md が .claude/reference/ に存在しない",
                    "ERROR" if not p_op.exists() else "INFO")
 
-        # 3. CLAUDE.md が OPERATING_PRINCIPLES.md を @import しているか
+        # 3. CLAUDE.md が JIT参照テーブルで OPERATING_PRINCIPLES.md を参照しているか
         if claude_md.exists():
             claude_content = claude_md.read_text(encoding="utf-8")
-            has_op_import = "@.claude/rules/OPERATING_PRINCIPLES.md" in claude_content
-            self.check("3layer: CLAUDE.md @import OPERATING_PRINCIPLES.md",
-                       "PASS" if has_op_import else "FAIL",
-                       "" if has_op_import else "CLAUDE.md が @.claude/rules/OPERATING_PRINCIPLES.md を import していない",
-                       "ERROR" if not has_op_import else "INFO")
+            has_op_ref = ".claude/reference/OPERATING_PRINCIPLES.md" in claude_content
+            self.check("3layer: CLAUDE.md JIT参照 OPERATING_PRINCIPLES.md",
+                       "PASS" if has_op_ref else "FAIL",
+                       "" if has_op_ref else "CLAUDE.md が .claude/reference/OPERATING_PRINCIPLES.md を参照していない",
+                       "ERROR" if not has_op_ref else "INFO")
         else:
-            self.check("3layer: CLAUDE.md @import", "FAIL", "CLAUDE.md が存在しない", "ERROR")
+            self.check("3layer: CLAUDE.md JIT参照", "FAIL", "CLAUDE.md が存在しない", "ERROR")
 
         # 4. north-star-guard.py が新パスを保護しているか
         if guard.exists():
             guard_content = guard.read_text(encoding="utf-8")
-            has_new_path = "/.claude/rules/operating_principles.md" in guard_content
-            has_old_path = "/docs/archive/operating_principles.md" in guard_content
+            has_new_path = "/.claude/reference/operating_principles.md" in guard_content
+            has_old_path = "/.claude/rules/operating_principles.md" in guard_content
             if has_new_path and not has_old_path:
                 self.check("3layer: north-star-guard.py パス更新", "PASS",
-                           "/.claude/rules/operating_principles.md を保護")
+                           "/.claude/reference/operating_principles.md を保護")
             elif has_old_path:
                 self.check("3layer: north-star-guard.py パス更新", "FAIL",
-                           "古いパス /docs/archive/operating_principles.md が残存 — 更新が必要",
+                           "古いパス /.claude/rules/operating_principles.md が残存 — .claude/reference/ に更新が必要",
                            "ERROR")
             else:
                 self.check("3layer: north-star-guard.py パス更新", "WARN",
@@ -340,7 +341,7 @@ class Doctor:
         for doc in [
             ".claude/SYSTEM_MAP.md",
             ".claude/rules/NORTH_STAR.md",
-            ".claude/rules/IMPLEMENTATION_REF.md",
+            ".claude/reference/IMPLEMENTATION_REF.md",
         ]:
             p = REPO_ROOT / doc
             self.check(f"doc: {doc}", "PASS" if p.exists() else "WARN",

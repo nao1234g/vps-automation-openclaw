@@ -98,7 +98,7 @@ def test_m018_substack_api_guard_documented() -> None:
 
 def test_m019_openclaw_pairing_guard_documented() -> None:
     text = _read(".claude/CLAUDE.md")
-    infra = _read(".claude/rules/IMPLEMENTATION_REF.md")
+    infra = _read(".claude/reference/IMPLEMENTATION_REF.md")
     assert "openclaw.json" in text
     assert "CLIフラグではない" in text
     assert "OpenClaw設定" in infra

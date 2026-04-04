@@ -19,9 +19,16 @@ cat > "$STATE_DIR/session.json" << 'STATEJSON'
 {"research_done":true,"search_count":0,"errors":[],"task_started":false}
 STATEJSON
 
-# B2: Read Comprehension Gate — NORTH_STAR.md が @import で読み込まれたことを記録
+# P4: Read Comprehension Gate (hash-enhanced) — NORTH_STAR.md の内容ハッシュも記録
 # このフラグが存在しないとEdit/Writeがブロックされる（north-star-guard.py が検証）
-echo "$(date +%Y-%m-%d)" > "$STATE_DIR/north_star_loaded.flag"
+# ハッシュが現在のファイルと一致しない場合もブロック（staleセッション検知）
+NS_FILE="$PROJECT_DIR/.claude/rules/NORTH_STAR.md"
+if [ -f "$NS_FILE" ]; then
+    NS_HASH=$(python -c "import hashlib; print(hashlib.sha256(open(r'$NS_FILE','rb').read()).hexdigest()[:16])" 2>/dev/null || echo "nohash")
+else
+    NS_HASH="missing"
+fi
+echo "$(date +%Y-%m-%d):${NS_HASH}" > "$STATE_DIR/north_star_loaded.flag"
 
 # PVQE-P: セッション開始時にクリア（新セッション = 新しいP定義が必要）
 rm -f "$STATE_DIR/pvqe_p.json"

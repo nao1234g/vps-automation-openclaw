@@ -56,8 +56,8 @@ BUILD_TASKS = [
         "type": "vps_sync",
         "local_files": [
             ".claude/rules/NORTH_STAR.md",
-            ".claude/rules/OPERATING_PRINCIPLES.md",
-            ".claude/rules/IMPLEMENTATION_REF.md",
+            ".claude/reference/OPERATING_PRINCIPLES.md",
+            ".claude/reference/IMPLEMENTATION_REF.md",
         ],
         "remote_dir": "/opt/shared/rules/",
         "requires_vps": True,

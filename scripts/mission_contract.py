@@ -52,8 +52,8 @@ MISSION_CONTRACT: dict[str, Any] = {
         },
         "principle_docs": [
             ".claude/rules/NORTH_STAR.md",
-            ".claude/rules/OPERATING_PRINCIPLES.md",
-            ".claude/rules/IMPLEMENTATION_REF.md",
+            ".claude/reference/OPERATING_PRINCIPLES.md",
+            ".claude/reference/IMPLEMENTATION_REF.md",
             "docs/AGENT_WISDOM.md",
         ],
     },
@@ -93,8 +93,8 @@ MISSION_CONTRACT: dict[str, Any] = {
     },
     "source_docs": [
         ".claude/rules/NORTH_STAR.md",
-        ".claude/rules/OPERATING_PRINCIPLES.md",
-        ".claude/rules/IMPLEMENTATION_REF.md",
+        ".claude/reference/OPERATING_PRINCIPLES.md",
+        ".claude/reference/IMPLEMENTATION_REF.md",
         ".claude/CLAUDE.md",
         "docs/AGENT_WISDOM.md",
     ],
