@@ -268,6 +268,18 @@ NEO-ONE/TWO セッション開始
   - Anderson (2006) The Long Tail ← ニッチ市場の集合パワー
 ```
 
+### Superforecaster 7原則（Tetlock）— 完全版
+
+| # | 原則 | 意味 | NowPatternでの実装 |
+|---|------|------|-------------------|
+| 1 | **Outside View（基準率）** | 個別事例を見る前に「類似ケースの歴史的確率」を確認する | Historian Agent の `find_parallels()` が自動で基準率を検索。prediction_similarity_search.py で過去の類似予測を検索 |
+| 2 | **Inside View更新** | ケース固有の要因でベースレートを調整する | 各専門エージェントが独立分析。Strategist(地政学)/Economist(市場)/Scientist(因果)の視点で調整 |
+| 3 | **粒度のある確率** | 「かなり可能性がある」ではなく「63%」。5%刻みで表現する | prediction_db.json の `our_pick_prob` は5刻み(5,10,15...90,95)。曖昧語禁止 |
+| 4 | **クロスカッティング** | 複数の独立したアプローチで同じ問いに答える | AI Civilization の6エージェントが独立分析 → 加重平均。1つのアプローチだけに頼らない |
+| 5 | **ベイズ更新** | 新しいシグナル（ニュース・データ）→ 即座に確率を更新する | NEO-ONE/TWOが新シグナル検出 → prediction_tracker.py で確率更新提案 → Naoto承認 |
+| 6 | **校正（Calibration）** | 「80%と言ったことが実際に80%の頻度で起きているか」を追跡する | category_brier_analysis.py が確率帯別の的中率を分析。evolution_loop.py で毎週フィードバック |
+| 7 | **エラーから学ぶ** | 外れた予測を分析し「なぜ外れたか」に答える。答えられなければ次も外れる | MISS判定 → AGENT_WISDOM.md に教訓記録 → evolution_loop.py が分析 → 次の予測で適用 |
+
 ### 知識陳腐化ルール
 
 - **6ヶ月以上前の市場データ**: 上書き確認されるまで使用禁止。市場は動いている
@@ -303,9 +315,56 @@ NEO-ONE/TWO セッション開始
 | 正念（Right Mindfulness） | P | 1タスク1集中 | マルチタスクは精度を下げる。深い集中で1つずつ |
 | 正定（Right Concentration） | P/V | weekly-analysis=デジタル版正定 | 毎週の振り返りが方向修正のタイミング |
 
+### 10の普遍的原則（完全版 — 原則・核心・典拠・AIへの適用）
+
+| # | 原則 | 核心 | 典拠 | AIへの具体的適用 |
+|---|------|------|------|----------------|
+| 1 | **First Principles** | 常識を疑い最小単位まで分解しゼロから組み立てる | Musk, Feynman | 「前回こうだったから」で判断しない。毎回データから再検証する |
+| 2 | **Customer Obsession** | 顧客から逆算してすべてを設計する（Peak-End Rule） | Bezos | 読者が「また来たい」と感じる体験を設計する。技術的正しさより読者価値 |
+| 3 | **Rapid Iteration** | 小さく作って素早く試す。学習速度を最大化する | Toyota, Lean Startup | 完璧な設計より動くMVP。Type 2（可逆）は即決して実行 |
+| 4 | **Ruthless Prioritization** | 80/20。重要度の低い99%を捨てる勇気 | Buffett | LTV Score 15点未満は実施しない。トラックレコードに貢献しない作業は断る |
+| 5 | **Radical Transparency** | 情報を隠さず共有。問題の早期表面化=早期解決 | Dalio, Torvalds | エラー即報告（ノーサプライズ）。外れた予測も全件公開。隠蔽禁止(INVARIANT 3) |
+| 6 | **Long-term Thinking** | 短期の痛みを受け入れ複利の力を信じる | Bezos, Buffett | 今日の記事1本=3年後のトラックレコード1件。消耗品ではなく永続資産として扱う |
+| 7 | **Systems Thinking** | 問題の根本はシステムにある（94%はシステム、6%が個人） | Deming, Toyota | バグ→個人を責めない→システム(hooks/cron/test)で再発防止。ECC原則の根拠 |
+| 8 | **Intellectual Humility** | 「わかった」が最も危険。逆のケースを3つ探す | Munger, Feynman | 確率5-95%制限（0%/100%禁止）。Auditor(-5)が全員の結論に反論する設計 |
+| 9 | **Radical Simplicity** | 複雑さは失敗の種。単純なものだけが規模を持てる | Jobs | 4ファイル体制（増殖禁止）。3秒理解テスト。UXから複雑さを排除 |
+| 10 | **Self-Correction Loop** | 前進より方向が重要。定期的に振り返り修正する | Amazon WBR | evolution_loop.py(毎週日曜)。category_brier_analysis.py。KNOWN_MISTAKES更新 |
+
+### 人間心理の5つの真理（完全版 — 真理・核心・典拠・NowPatternでの活用）
+
+| # | 真理 | 核心 | 典拠 | NowPatternでの活用 |
+|---|------|------|------|-------------------|
+| 1 | **感情の変化にお金を払う** | 人は機能ではなくBefore→Afterの感情変化に対価を払う | Kahneman Peak-End Rule | 読者のBefore:「何が起きるか不安」→After:「力学を理解し判断できる」。この感情変化が価値 |
+| 2 | **進歩の感覚が継続を生む** | 「近づいている感覚」が最高のモチベーション | Amabile (Progress Principle) | 読者投票→的中/外れの結果が返る→「予測力が上がっている」実感→継続利用。Brier Scoreの可視化 |
+| 3 | **認知的流暢性=信頼感** | わかりやすいものを人は「正しい」と感じる | Reber (Processing Fluency) | 3秒理解テスト。専門用語禁止。モバイルファースト。canonical_public_lexiconで語彙統一 |
+| 4 | **損失回避2.5x** | 利益より損失を2.5倍強く感じる | Kahneman & Tversky (Prospect Theory) | 「投資判断を間違えるリスク」を強調。P3損失回避型X投稿パターン。読者の損失回避を予測参加のトリガーに |
+| 5 | **自己決定理論** | 自律性+有能感+関係性=最高パフォーマンス | Deci & Ryan (SDT) | 匿名投票(自律性)+Brier Score(有能感の数値化)+コミュニティ(関係性)。3要素を全てPFに組み込む |
+
 ---
 
 ## §12 詳細: 読者参加型予測プラットフォーム — AI Notion・TIER・マネタイズ
+
+### 展開ロードマップ（完全版）
+
+| Phase | 対象 | 内容 | 実装状態 |
+|-------|------|------|---------|
+| **JA（今ここ）** | 日本語圏 | 日本語でBrier Score+OTSの信頼構築。nowpattern.com + /predictions/ | ✅ 稼働中 |
+| **EN（同時進行）** | 英語圏 | /en/predictions/で英語ユーザー取り込み。同一prediction_db、同一投票API | ✅ 稼働中 |
+| **GLOBAL（Year 2+）** | 国際 | 公開API。国際Superforecasterとの比較ランキング。多言語対応 | ❌ 未実装 |
+
+### 実装済みの基盤（触るな・壊すな）— 完全リスト
+
+```
+reader_prediction_api.py    — FastAPI+SQLite port 8766。読者投票の受付・集計
+prediction_db.json          — 予測データベース（全予測の唯一の真実）
+prediction_page_builder.py  — 毎日07:00 JST cron。/predictions/ と /en/predictions/ のHTML生成
+prediction_auto_verifier.py — Grok検索+Opus判定。2件以上の独立ソース一致で自動解決
+prediction_timestamper.py   — OTS毎時。Bitcoin上に予測のタイムスタンプを記録
+prediction_tracker.py       — 新規予測の登録・更新・publication_hash付与
+/predictions/               — JA版予測一覧ページ（Ghost）
+/en/predictions/            — EN版予測一覧ページ（Ghost）
+ghost_page_guardian.py      — port 8765。predictions/en-predictionsの編集を監視→Telegram即通知
+```
 
 ### NowPattern = AIのNotion（判断の第二の脳）— 完全版
 
@@ -473,7 +532,41 @@ prediction_db.add(consensus, audit_result, ots_timestamp)
 
 ---
 
-## §14 詳細: Truth Protocol — 例外ケース・Prediction Integrity
+## §14 詳細: Truth Protocol — Brier計算・品質基準・例外ケース・Prediction Integrity
+
+### Brier Score 計算（実装コード）
+
+```python
+def calculate_brier(probability: float, outcome: bool) -> float:
+    """Brier Score計算。0-1、低いほど良い。解決後は変更禁止。
+
+    Args:
+        probability: 予測確率（0-100）。our_pick_prob の値
+        outcome: 結果（True=的中, False=外れ）
+
+    Returns:
+        Brier Score（0.0000 - 1.0000）
+
+    Examples:
+        calculate_brier(90, True)  → 0.01  (90%で的中 = EXCEPTIONAL)
+        calculate_brier(90, False) → 0.81  (90%で外れ = POOR)
+        calculate_brier(50, True)  → 0.25  (50%で的中 = AVERAGE)
+        calculate_brier(50, False) → 0.25  (50%で外れ = AVERAGE)
+    """
+    p = probability / 100.0
+    o = 1.0 if outcome else 0.0
+    return round((p - o) ** 2, 4)
+```
+
+### 予測品質の最低基準（全5条件。1つでも未達でValueError）
+
+| # | 条件 | チェック内容 | 違反例 |
+|---|------|------------|--------|
+| 1 | `has_resolution_question` | 明確な判定質問があるか | ❌「AIが進歩する」（何をもって判定？） |
+| 2 | `has_deadline` | 期限(triggers[0].date)があるか | ❌「いつか起きる」（検証不能） |
+| 3 | `probability_in_range(5-95%)` | 確率が5-95%の範囲内か | ❌ 0%/100%（認識論的謙虚さの欠如） |
+| 4 | `evidence_quality_not_wishful` | 根拠がL5(Wishful Fact)でないか | ❌「AIが正しいと判断した」（検証不能） |
+| 5 | `has_hit_condition` | 的中条件(hit_condition)が明示されているか | ❌ 結果判明後に「当たった」と自称 |
 
 ### 例外ケースの対処（完全版）
 
@@ -510,6 +603,20 @@ prediction_db.add(consensus, audit_result, ots_timestamp)
 ---
 
 ## §15 詳細: Long-Term Value Doctrine — 7 Powers・時間軸・LTV計算
+
+### LTV 7次元スコアリング — 完全定義テーブル（各0-3点、合計21点）
+
+| 次元 | 定義 | 0点（無価値） | 1点（低） | 2点（中） | 3点（高） |
+|------|------|-------------|----------|----------|----------|
+| **T（トラックレコード）** | 予測記録・検証・Brier更新への貢献 | トラックレコード増加なし | 間接的に寄与 | データ量5%+増加 | データ量10%+増加 |
+| **M（モート強化）** | コピーできない競争優位の構築 | 誰でもコピー可能 | コピーに時間がかかる | コピーに1年+ | 後発が追えない資産 |
+| **Q（品質）** | 情報の正確さ・Brier校正効果 | 品質に無関係 | 微小な改善 | 測定可能な改善 | Brier 5%+改善 |
+| **R（読者参加）** | 読者投票・コミュニティ形成 | 読者参加に無関係 | 間接的に寄与 | 月100票+に貢献 | 月1,000票以上に貢献 |
+| **S（スケーラビリティ）** | 人手ゼロで拡大できるか | 手作業が増える | 半自動 | ほぼ自動 | 完全自動 |
+| **E（英語圏到達）** | EN記事・英語読者への波及 | JA専用 | JA優先だがEN対応可 | JA+EN同時対応 | EN専用（新市場開拓） |
+| **C（コスト妥当性）** | ROI = 効果/コスト | コスト>効果 | コスト≒効果 | 効果>コスト（2倍+） | 効果>>コスト（5倍+） |
+
+**判定基準**: 18-21点→即実施 / 15-17点→実施 / 12-14点→Naoto確認 / 9-11点→代替案を検討 / 0-8点→却下
 
 ### LTV Score 計算シート（テンプレート）
 
@@ -659,3 +766,4 @@ checks = [
 |------|---------|
 | 2026-04-04 | 初版作成。NORTH_STAR.md 2段階化に伴い、全セクションの詳細版をJIT参照ファイルとして分離 |
 | 2026-04-04 | 未復元8項目を追加: LTV計算シート、4つの勝てる領域、Munger Mental Models、system_governor_check、エージェント間関係、文書変更ルール、隠蔽禁止、タスクログ義務 |
+| 2026-04-05 | 7つの脱落コンテンツ復元: Tetlock7原則フルテーブル(§7)、10の普遍的原則フルテーブル(§8)、人間心理5真理フルテーブル(§8)、展開ロードマップ(§12)、実装済み基盤コードブロック(§12)、Brier計算Pythonコード+品質最低基準(§14)、LTV7次元完全定義テーブル(§15) |
