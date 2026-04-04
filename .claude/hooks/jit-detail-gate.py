@@ -1,29 +1,33 @@
 #!/usr/bin/env python3
 """
-JIT DETAIL GATE — PreToolUse + PostToolUse Hook
-================================================
+JIT DETAIL GATE — PreToolUse + PostToolUse Hook (v2)
+====================================================
 JIT強制: 予測クリティカルファイルを編集する前に NORTH_STAR_DETAIL.md を
-読んでいることを強制する。
+十分に読んでいることを強制する。
 
-[PostToolUse / Read] → NORTH_STAR_DETAIL.md の読み込みを検知 → state に記録
-[PreToolUse / Edit|Write] → 予測クリティカルファイル編集時に DETAIL 未読ならブロック
+[PostToolUse / Read] → NORTH_STAR_DETAIL.md の読み込みを検知 → 読み込み行数を累積記録
+[PreToolUse / Edit|Write] → 予測クリティカルファイル編集時に十分なDETAIL読み込み済みか確認
 
-設計根拠:
-  NORTH_STAR.md はサマリー版で毎セッション自動読み込みされるが、
-  DETAIL はJIT参照。予測・検証・LTV系ファイルを編集するには
-  §12/§13/§14/§15 の詳細知識が必要。このhookがそれを強制する。
+v2 改善（致命的欠陥修正）:
+  - セッション単位リセット: session-start.sh が detail_loaded.json を毎回削除
+  - Read量チェック: limit=1 でヘッダーだけ読んでもパスできない。累積100行以上を要求
+  - offset/limit 追跡: どの範囲を���んだかを記録し、十分な量を読んだかを判定
 """
 import json
 import sys
 import os
-import re
 from pathlib import Path
 from datetime import datetime
 
 PROJECT_DIR = Path(os.environ.get("CLAUDE_PROJECT_DIR", "."))
 STATE_DIR = PROJECT_DIR / ".claude" / "hooks" / "state"
 STATE_FILE = STATE_DIR / "detail_loaded.json"
-DETAIL_PATH = ".claude/reference/NORTH_STAR_DETAIL.md"
+
+# DETAIL ファイルの実体パス（行数計算用）
+DETAIL_FILE = PROJECT_DIR / ".claude" / "reference" / "NORTH_STAR_DETAIL.md"
+
+# 十分な読み込みと判定する最低行数（DETAILは約780行。100行 ≈ 13%以上を要求）
+MIN_LINES_READ = 100
 
 # ── 予測クリティカルファイル → 必要なDETAILセクション ──────────────────
 # パターン: (ファイルパスの部分一致, 必要な§番号, 理由)
@@ -63,12 +67,10 @@ tool_input = data.get("tool_input", {})
 
 
 def ensure_state_dir():
-    """state ディレクトリが存在することを確認"""
     STATE_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def load_state() -> dict:
-    """state ファイルを読み込む"""
     if STATE_FILE.exists():
         try:
             with open(STATE_FILE, "r", encoding="utf-8") as f:
@@ -79,25 +81,21 @@ def load_state() -> dict:
 
 
 def save_state(state: dict):
-    """state ファイルを保存"""
     ensure_state_dir()
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, indent=2, ensure_ascii=False)
 
 
 def normalize_path(file_path: str) -> str:
-    """パスを正規化して比較しやすくする"""
     return file_path.replace("\\", "/").lower()
 
 
-def is_detail_read(file_path: str) -> bool:
-    """読み込まれたファイルが NORTH_STAR_DETAIL.md かどうか"""
+def is_detail_path(file_path: str) -> bool:
     norm = normalize_path(file_path)
     return "north_star_detail.md" in norm
 
 
-def get_required_section(file_path: str) -> tuple[str, str] | None:
-    """ファイルパスから必要なDETAILセクションを返す"""
+def get_required_section(file_path: str):
     norm = normalize_path(file_path)
     basename = norm.split("/")[-1] if "/" in norm else norm
     for pattern, section, reason in CRITICAL_FILES:
@@ -106,29 +104,58 @@ def get_required_section(file_path: str) -> tuple[str, str] | None:
     return None
 
 
+def estimate_lines_read(tool_input: dict) -> int:
+    """Read toolのinputから読み込み行数を推定する"""
+    limit = tool_input.get("limit")
+    offset = tool_input.get("offset", 0)
+
+    if limit is not None:
+        # 明示的なlimit指定あり
+        return int(limit)
+
+    # limitなし = デフォルト2000行（Read toolのデフォルト）
+    # ただし実ファイル行数を超えない
+    if DETAIL_FILE.exists():
+        try:
+            total = sum(1 for _ in open(DETAIL_FILE, encoding="utf-8"))
+            return max(0, total - int(offset or 0))
+        except Exception:
+            pass
+    return 2000  # フォールバック
+
+
 # ═══════════════════════════════════════════════════════════════════════
-# PostToolUse / Read → DETAIL 読み込みを記録
+# PostToolUse / Read → DETAIL 読み込み行数を累積記録
 # ═══════════════════════════════════════════════════════════════════════
 if hook_event == "PostToolUse" and tool_name == "Read":
     file_path = tool_input.get("file_path", "")
-    if is_detail_read(file_path):
+    if is_detail_path(file_path):
+        lines_this_read = estimate_lines_read(tool_input)
         state = load_state()
-        state["loaded"] = True
-        state["timestamp"] = datetime.now().isoformat()
-        state["file_path"] = file_path
-        # セッション内で読み込まれた回数を追跡
+        state["total_lines_read"] = state.get("total_lines_read", 0) + lines_this_read
         state["read_count"] = state.get("read_count", 0) + 1
+        state["last_read"] = datetime.now().isoformat()
+        state["loaded"] = state["total_lines_read"] >= MIN_LINES_READ
+        # 読み込み履歴（デバッグ用）
+        reads = state.get("reads", [])
+        reads.append({
+            "offset": tool_input.get("offset", 0),
+            "limit": tool_input.get("limit"),
+            "lines": lines_this_read,
+            "at": datetime.now().isoformat(),
+        })
+        state["reads"] = reads[-20:]  # 最新20件まで保持
         save_state(state)
     sys.exit(0)
 
 # ═══════════════════════════════════════════════════════════════════════
-# PreToolUse / Edit|Write → クリティカルファイル編集時にDETAIL読み込み済みか確認
+# PreToolUse / Edit|Write → 十分なDETAIL読み込み済みか確認
 # ═══════════════════════════════════════════════════════════════════════
 if hook_event == "PreToolUse" and tool_name in ("Edit", "Write"):
     file_path = tool_input.get("file_path", "")
 
     # DETAIL自体の編集は常に許可（自己参照ループ防止）
-    if is_detail_read(file_path):
+    if is_detail_path(file_path):
         sys.exit(0)
 
     # NORTH_STAR.md の編集は常に許可（north-star-guard.py が管理）
@@ -139,34 +166,49 @@ if hook_event == "PreToolUse" and tool_name in ("Edit", "Write"):
     # クリティカルファイルかチェック
     required = get_required_section(file_path)
     if required is None:
-        sys.exit(0)  # クリティカルでないファイルは素通り
+        sys.exit(0)
 
     section, reason = required
 
-    # DETAIL が読み込まれているかチェック
+    # DETAIL が十分に読み込まれているかチェック
     state = load_state()
-    if state.get("loaded"):
-        sys.exit(0)  # 読み込み済み → 許可
+    total_lines = state.get("total_lines_read", 0)
 
-    # ブロック: DETAIL未読でクリティカルファイル編集
+    if state.get("loaded") and total_lines >= MIN_LINES_READ:
+        sys.exit(0)  # ���分な量を読み込み済み → 許可
+
+    # ブロック: DETAIL未読 or 読み込み不足
     basename = file_path.split("/")[-1].split("\\")[-1]
+    if total_lines > 0:
+        # 読んだが不十分
+        status_msg = f"  現在の読み込み: {total_lines}行 / 必要: {MIN_LINES_READ}行以上"
+        action_msg = (
+            "  DETAILをもっと読んでください（offset/limitを変えて追加Read）:\n"
+            "  例: Read .claude/reference/NORTH_STAR_DETAIL.md offset=200 limit=200"
+        )
+    else:
+        # 全く読んでいない
+        status_msg = "  現在の読み込み: 0行（未読）"
+        action_msg = (
+            "  編集する前に NORTH_STAR_DETAIL.md を Read してください:\n"
+            "  Read .claude/reference/NORTH_STAR_DETAIL.md"
+        )
+
     print(
         "\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-        "⚠️  [JIT DETAIL GATE] NORTH_STAR_DETAIL.md 未読\n"
+        "⚠️  [JIT DETAIL GATE] NORTH_STAR_DETAIL.md 読み込み不足\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
         f"  編集対象: {basename}\n"
         f"  必要セクション: {section}\n"
         f"  理由: {reason}\n"
         "\n"
-        "  このファイルは予測クリティカルファイルです。\n"
-        "  編集する前に NORTH_STAR_DETAIL.md を Read してください:\n"
+        f"{status_msg}\n"
         "\n"
-        "  Read .claude/reference/NORTH_STAR_DETAIL.md\n"
+        f"{action_msg}\n"
         "\n"
-        "  JIT参照設計: サマリー(NORTH_STAR.md)は自動読み込みされますが、\n"
-        "  詳細版(DETAIL)は必要時にReadする設計です。\n"
-        "  予測系ファイルの編集にはDETAILの知識が必要です。\n"
+        "  JIT参照設計: セッション内でDETAILを100行以上読むと解除されます。\n"
+        "  ヘッダーだけ読んでも通過できません（v2: Read量チェック）。\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
     )
     sys.exit(2)

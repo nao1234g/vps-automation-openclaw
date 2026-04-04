@@ -496,26 +496,74 @@ def main():
         sys.exit(1)
 
     # 検索エンジン選択
+    # B' ハイブリッドデフォルト: GEMINI_API_KEY が存在すれば自動で
+    # 0.7*TF-IDF + 0.3*embedding のハイブリッドスコアリングを使用。
+    # --embed フラグで embedding 100% に切り替え可能。
+    gemini_available = _init_genai()
+    use_hybrid = gemini_available and not args.embed  # --embed時は純embedding
+
     if args.embed:
-        if not _init_genai():
+        if not gemini_available:
             print("WARNING: Gemini API not available. Falling back to TF-IDF.", file=sys.stderr)
             engine = TFIDFEngine(predictions)
             min_score = args.min_score or 0.01
+            mode = "TF-IDF"
         else:
             print("Using Gemini embedding search...", file=sys.stderr)
             engine = EmbeddingEngine(predictions)
             min_score = args.min_score or 0.3
+            mode = "Gemini Embedding"
+    elif use_hybrid:
+        print("Using hybrid search (0.7*TF-IDF + 0.3*Embedding)...", file=sys.stderr)
+        tfidf_engine = TFIDFEngine(predictions)
+        embed_engine = EmbeddingEngine(predictions)
+        min_score = args.min_score or 0.01
+        mode = "Hybrid (TF-IDF + Embedding)"
     else:
         engine = TFIDFEngine(predictions)
         min_score = args.min_score or 0.01
+        mode = "TF-IDF"
 
-    results = engine.search(
-        query=args.query,
-        top_n=args.top,
-        category=args.category,
-        resolved_only=args.resolved_only,
-        min_score=min_score,
-    )
+    # ハイブリッド検索: TF-IDFとEmbeddingの結果を結合
+    if use_hybrid:
+        tfidf_results = tfidf_engine.search(
+            query=args.query, top_n=args.top * 3,
+            category=args.category, resolved_only=args.resolved_only,
+            min_score=0.001,
+        )
+        embed_results = embed_engine.search(
+            query=args.query, top_n=args.top * 3,
+            category=args.category, resolved_only=args.resolved_only,
+            min_score=0.1,
+        )
+
+        # スコア正規化 + 加重結合
+        tfidf_max = max((s for _, s in tfidf_results), default=1.0) or 1.0
+        embed_max = max((s for _, s in embed_results), default=1.0) or 1.0
+
+        combined: dict[str, tuple[dict, float]] = {}
+        for pred, score in tfidf_results:
+            pid = pred.get("id", id(pred))
+            norm_score = score / tfidf_max
+            combined[pid] = (pred, 0.7 * norm_score)
+        for pred, score in embed_results:
+            pid = pred.get("id", id(pred))
+            norm_score = score / embed_max
+            if pid in combined:
+                combined[pid] = (combined[pid][0], combined[pid][1] + 0.3 * norm_score)
+            else:
+                combined[pid] = (pred, 0.3 * norm_score)
+
+        results = sorted(combined.values(), key=lambda x: x[1], reverse=True)
+        results = [(p, s) for p, s in results if s >= min_score][:args.top]
+    else:
+        results = engine.search(
+            query=args.query,
+            top_n=args.top,
+            category=args.category,
+            resolved_only=args.resolved_only,
+            min_score=min_score,
+        )
 
     if not results:
         print(f"No similar predictions found for: '{args.query}'")
@@ -539,7 +587,6 @@ def main():
             output.append(entry)
         print(json.dumps(output, ensure_ascii=False, indent=2))
     else:
-        mode = "Gemini Embedding" if (args.embed and _genai_client) else "TF-IDF"
         print(f"=== Similar predictions for: '{args.query}' [{mode}] ({len(results)} results) ===\n")
         for i, (pred, score) in enumerate(results, 1):
             print(f"[{i}]")

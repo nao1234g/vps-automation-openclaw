@@ -354,4 +354,37 @@ if tool_name == "Edit" and hook_event == "PostToolUse":
         )
         sys.exit(2)
 
+    # ── NORTH_STAR.md 編集後: DETAIL同期チェック（非ブロック、警告のみ）───
+    if normalized.lower().endswith("north_star.md"):
+        sync_script = PROJECT_DIR / "scripts" / "detail_sync_check.py"
+        if sync_script.exists():
+            import subprocess
+            try:
+                result = subprocess.run(
+                    [sys.executable, str(sync_script), "--json"],
+                    capture_output=True, text=True, timeout=10,
+                    encoding="utf-8", errors="replace",
+                )
+                if result.returncode == 0:
+                    sync_data = json.loads(result.stdout)
+                    warnings = sync_data.get("warnings", [])
+                    if warnings:
+                        print(
+                            "\n"
+                            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                            "ℹ️  [SYNC CHECK] NORTH_STAR ↔ DETAIL 同期警告\n"
+                            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                        )
+                        for w in warnings:
+                            print(f"  ⚠️  {w}")
+                        print(
+                            "\n"
+                            "  DETAIL も更新が必要かもしれません。\n"
+                            "  確認: python scripts/detail_sync_check.py --fix\n"
+                            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                        )
+                        # 警告のみ、ブロックしない（exit 0）
+            except Exception:
+                pass  # sync check失敗でもブロックしない
+
 sys.exit(0)

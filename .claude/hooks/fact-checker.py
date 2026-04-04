@@ -205,6 +205,16 @@ KNOWN_ERRORS = [
         "feedback": "⛔ FACT ERROR: @aisaintelは廃止されたXアカウントです。現在は存在しません。",
         "name": "AISAINTEL_GHOST"
     },
+    {
+        "pattern": r"(AI推論|AI\s*reasoning|AI\s*inference).{0,120}(根拠|evidence|エビデンス|判断の?基盤|sole\s*basis|唯一の?根拠)",
+        "feedback": "⛔ L5 VIOLATION: (AI推論)マーク付きデータを予測の唯一の根拠にしてはいけません。L1-L3（実測値・一次文献・実践者証言）と組み合わせてください。NORTH_STAR §7 知恵階層を参照。",
+        "name": "L5_SOLE_EVIDENCE"
+    },
+    {
+        "pattern": r"(推測(で|に)生成|AIが推測|AI\s*specul).{0,80}(予測(確率|の根拠)|probability|確率.{0,20}(設定|決定))",
+        "feedback": "⛔ L5 VIOLATION: AIが推測で生成した情報（L5）を予測確率の根拠にしてはいけません。必ずL1-L3の検証可能な事実と照合してください。",
+        "name": "L5_SPECULATIVE_PROBABILITY"
+    },
 ]
 
 # ── ECC Pipeline: mistake_patterns.json から動的ロード ────────────────────────

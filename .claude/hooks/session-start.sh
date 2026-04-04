@@ -35,6 +35,8 @@ rm -f "$STATE_DIR/pvqe_p.json"
 # intent_confirmed.flag もクリア（前セッションの確認は引き継がない）
 rm -f "$STATE_DIR/intent_confirmed.flag"
 rm -f "$STATE_DIR/intent_needs_confirmation.flag"
+# JIT DETAIL GATE: 毎セッションリセット（永久パス防止。前セッションのDETAIL読み込みは引き継がない）
+rm -f "$STATE_DIR/detail_loaded.json"
 
 echo "=== SESSION START: MANDATORY CONTEXT ==="
 echo ""
