@@ -39,6 +39,28 @@ hook_event = data.get("hook_event_name", "")
 tool_name = data.get("tool_name", "")
 tool_input = data.get("tool_input", {})
 
+# ── [B2] Read Comprehension Gate: セッション初期化前のEdit/Writeをブロック ──
+if tool_name in ("Write", "Edit") and hook_event == "PreToolUse":
+    flag_path = PROJECT_DIR / ".claude" / "hooks" / "state" / "north_star_loaded.flag"
+    if not flag_path.exists():
+        today = date.today().strftime("%Y-%m-%d")
+        # フラグがない = session-start.sh が未実行 = NORTH_STAR未読み込み
+        # ただし手動フラグ作成も許可（テスト用）
+        print(
+            "\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "🔒 [READ COMPREHENSION GATE] セッション未初期化\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "\n"
+            "  session-start.sh が完了していません。\n"
+            "  NORTH_STAR.md（意図・哲学）の読み込みが確認できません。\n"
+            "\n"
+            "  Edit/Write を実行する前にセッション初期化が必要です。\n"
+            "  通常はセッション開始時に自動実行されます。\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        )
+        sys.exit(2)
+
 # ── [PreToolUse] Write: docs/ への新規 .md 作成をブロック ────────────────
 # ── [PreToolUse] Write: NORTH_STAR / OPERATING_PRINCIPLES への全体上書きをブロック ──
 if tool_name == "Write":
@@ -47,10 +69,11 @@ if tool_name == "Write":
     # パスを正規化（バックスラッシュ → スラッシュ）
     normalized = file_path.replace("\\", "/").lower()
 
-    # ── 永遠の三原則 保護: NORTH_STAR.md / OPERATING_PRINCIPLES.md を Write でブロック ──
+    # ── 永遠の三原則 保護: 憲法ファイルを Write でブロック ──
     PROTECTED_FILES = [
         "/.claude/rules/north_star.md",
         "/.claude/rules/operating_principles.md",
+        "/.claude/rules/implementation_ref.md",
         "/.claude/hooks/state/regression_floor.json",  # T036-P5: フロア改ざん防止
     ]
     for pf in PROTECTED_FILES:
@@ -72,6 +95,58 @@ if tool_name == "Write":
                 "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             )
             sys.exit(2)
+
+    # ── Anti-Sprawl Enforcement: .claude/rules/ への新規 .md 作成をブロック ──
+    # 4ファイル体制（NORTH_STAR / OPERATING_PRINCIPLES / IMPLEMENTATION_REF + CLAUDE.md）以外は禁止
+    CANONICAL_RULES = [
+        "north_star.md",
+        "operating_principles.md",
+        "implementation_ref.md",
+    ]
+    if "/.claude/rules/" in normalized and normalized.endswith(".md"):
+        basename = normalized.rsplit("/", 1)[-1]
+        if basename not in CANONICAL_RULES and "/archive/" not in normalized:
+            print(
+                "\n"
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                "🚫 [ANTI-SPRAWL] .claude/rules/ への新規 .md 作成をブロック\n"
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                f"  対象ファイル: {file_path}\n"
+                "\n"
+                "  4ファイル体制（増殖禁止）:\n"
+                "    1. NORTH_STAR.md（意図・哲学）\n"
+                "    2. OPERATING_PRINCIPLES.md（行動規範）\n"
+                "    3. IMPLEMENTATION_REF.md（技術実装参照）\n"
+                "    4. CLAUDE.md（エントリーポイント）\n"
+                "\n"
+                "  ✅ 新しいルールは既存ファイルに追記してください。\n"
+                "  ❌ 新規ファイル作成は禁止です。\n"
+                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            )
+            sys.exit(2)
+
+    # ── Anti-Sprawl Enforcement: docs/ への哲学ファイル再増殖をブロック ──
+    # DOCTRINE / CONSTITUTION / PROTOCOL / MODEL は統合済み。再作成を禁止。
+    SPRAWL_PATTERNS = ["doctrine", "constitution", "protocol", "model"]
+    if "/docs/" in normalized and normalized.endswith(".md") and "/archive/" not in normalized:
+        for pattern in SPRAWL_PATTERNS:
+            if pattern in normalized:
+                print(
+                    "\n"
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                    "🚫 [ANTI-SPRAWL] 統合済み哲学ファイルの再作成をブロック\n"
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                    f"  対象ファイル: {file_path}\n"
+                    f"  検出パターン: *{pattern}*\n"
+                    "\n"
+                    "  DOCTRINE / CONSTITUTION / PROTOCOL / MODEL は\n"
+                    "  すべて NORTH_STAR.md に統合済みです。\n"
+                    "  新規作成は4ファイル体制に違反します。\n"
+                    "\n"
+                    "  ✅ 内容を NORTH_STAR.md に追記してください。\n"
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+                )
+                sys.exit(2)
 
     # docs/ 配下の .md ファイルか？
     # - docs/archive/ は許可（アーカイブ移動）

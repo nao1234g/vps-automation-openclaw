@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-04-04T05:31:16Z",
-  "generated_at_epoch": 1775280676,
+  "generated_at": "2026-04-04T11:48:17Z",
+  "generated_at_epoch": 1775303297,
   "mission_contract_version": "2026-03-31-naoto-mission-v3",
   "mission_contract_hash": "1e8a9d10265289a622e4149ac2d6b9eef7f721c7dd27c3de6f72140852819b18",
   "lexicon_version": "2026-03-31-public-lexicon-v4",
-  "manifest_generated_at": "2026-04-04T05:22:06Z",
-  "tracker_generated_at": "2026-04-04 14:00 JST",
+  "manifest_generated_at": "2026-04-04T11:38:56Z",
+  "tracker_generated_at": "2026-04-04 19:52 JST",
   "manifest_counts": {
     "published_total": 474,
     "public_truth_allowed": 474,
@@ -25,20 +25,20 @@
     "orphan_oracle_articles": 0,
     "coverage": {
       "ja": {
-        "public_rows": 99,
-        "public_in_play_rows": 3,
-        "public_awaiting_rows": 84,
-        "public_resolved_rows": 12,
+        "public_rows": 1121,
+        "public_in_play_rows": 488,
+        "public_awaiting_rows": 575,
+        "public_resolved_rows": 58,
         "hidden_no_live_article": 1022,
-        "coverage_pct": 8.83
+        "coverage_pct": 100.0
       },
       "en": {
-        "public_rows": 197,
-        "public_in_play_rows": 0,
-        "public_awaiting_rows": 193,
-        "public_resolved_rows": 4,
+        "public_rows": 1121,
+        "public_in_play_rows": 487,
+        "public_awaiting_rows": 576,
+        "public_resolved_rows": 58,
         "hidden_no_live_article": 924,
-        "coverage_pct": 17.57
+        "coverage_pct": 100.0
       }
     }
   },
@@ -47,11 +47,8 @@
     "approval_backlog_ratio_pct": 0.0
   },
   "failures": [
-    "governance_refresh_failed:1",
-    "governance_audit_failed:2"
+    "report_timestamp_delta_exceeded:2816>1800"
   ],
-  "warnings": [
-    "governance_refresh_output:{\n  \"generated_at\": \"2026-04-04T05:31:14Z\",\n  \"generated_at_epoch\": 1775280674,\n  \"total\": 20,\n  \"failed\": 2,\n  \"results\": [\n    {\n      \"name\": \"mission_contract\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"output\": \"{\\n  \\\"checked\\\": 16,\\n  \\\"failures\\\": []\\n}\",\n      \"json\": {\n        \"checked\": 16,\n        \"failures\": []\n      }\n    },\n    {\n      \"name\": \"lexicon_contract\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"output\": \"{\\n  \\\"checked\\\": 12,\\n  \\\"failures\\\": []\\n}\",\n      \"j"
-  ],
+  "warnings": [],
   "ok": false
 }

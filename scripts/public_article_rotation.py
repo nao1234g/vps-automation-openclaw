@@ -42,10 +42,16 @@ SKIP_PREFIXES = (
     "/en/taxonomy-guide-en",
     "/about/",
     "/integrity-audit/",
+    "/forecasting-methodology/",
+    "/forecast-scoring-and-resolution/",
+    "/forecast-integrity-and-audit/",
     "/predictions/",
     "/en/predictions/",
     "/en/about/",
     "/en/integrity-audit/",
+    "/en/forecasting-methodology/",
+    "/en/forecast-scoring-and-resolution/",
+    "/en/forecast-integrity-and-audit/",
 )
 
 HIDDEN_PATH_PREFIXES = (

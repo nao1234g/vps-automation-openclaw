@@ -5,7 +5,7 @@ scripts/build_runtime_execution_packet.py
 RUNTIME_EXECUTION_PACKET.md を生成するスクリプト。
 
 役割: このスクリプトが AI Civilization OS の "compiled artifact" を生成する。
-     NORTH_STAR.md + OPERATING_PRINCIPLES.md + SYSTEM_GOVERNOR.md +
+     NORTH_STAR.md + OPERATING_PRINCIPLES.md + IMPLEMENTATION_REF.md +
      現在のタスク + 既知の失敗パターンを一つのパケットに圧縮する。
 
 設計原則:
@@ -46,7 +46,7 @@ REPO_ROOT = Path(os.environ.get("CLAUDE_PROJECT_DIR", str(_HERE.parent)))
 
 NORTH_STAR_PATH = REPO_ROOT / ".claude" / "rules" / "NORTH_STAR.md"
 OPERATING_PRINCIPLES_PATH = REPO_ROOT / ".claude" / "rules" / "OPERATING_PRINCIPLES.md"
-SYSTEM_GOVERNOR_PATH = REPO_ROOT / ".claude" / "rules" / "SYSTEM_GOVERNOR.md"
+IMPLEMENTATION_REF_PATH = REPO_ROOT / ".claude" / "rules" / "IMPLEMENTATION_REF.md"
 TASK_LEDGER_PATH = REPO_ROOT / ".claude" / "state" / "task_ledger.json"
 ACTIVE_TASK_ID_PATH = REPO_ROOT / ".claude" / "hooks" / "state" / "active_task_id.txt"
 FAILURE_MEMORY_PATH = REPO_ROOT / ".claude" / "state" / "failure_memory.json"
@@ -179,10 +179,10 @@ def build_section2_operating_principles() -> str:
 
 
 def build_section3_governance_rules() -> str:
-    """SECTION 3: GOVERNANCE RULES — SYSTEM_GOVERNOR.md から LEVEL / INVARIANTS"""
-    content = _read_text(SYSTEM_GOVERNOR_PATH)
+    """SECTION 3: GOVERNANCE RULES — IMPLEMENTATION_REF.md から LEVEL / INVARIANTS"""
+    content = _read_text(IMPLEMENTATION_REF_PATH)
     if not content:
-        return "## SECTION 3: GOVERNANCE RULES\n\n⚠️  SYSTEM_GOVERNOR.md が見つかりません\n"
+        return "## SECTION 3: GOVERNANCE RULES\n\n⚠️  IMPLEMENTATION_REF.md が見つかりません\n"
 
     out = ["## SECTION 3: GOVERNANCE RULES（抜粋）", ""]
 
@@ -216,8 +216,8 @@ def build_section3_governance_rules() -> str:
         out.extend(agent_principles[:15])
         out.append("")
 
-    sha = _file_sha256(SYSTEM_GOVERNOR_PATH)
-    out.append(f"> 原本: `.claude/rules/SYSTEM_GOVERNOR.md` (sha256: `{sha}`)")
+    sha = _file_sha256(IMPLEMENTATION_REF_PATH)
+    out.append(f"> 原本: `.claude/rules/IMPLEMENTATION_REF.md` (sha256: `{sha}`)")
 
     return "\n".join(out)
 
@@ -451,7 +451,7 @@ def build_packet() -> int:
     sources = {
         "NORTH_STAR.md": NORTH_STAR_PATH,
         "OPERATING_PRINCIPLES.md": OPERATING_PRINCIPLES_PATH,
-        "SYSTEM_GOVERNOR.md": SYSTEM_GOVERNOR_PATH,
+        "IMPLEMENTATION_REF.md": IMPLEMENTATION_REF_PATH,
         "task_ledger.json": TASK_LEDGER_PATH,
         "failure_memory.json": FAILURE_MEMORY_PATH,
         "mistake_patterns.json": MISTAKE_PATTERNS_PATH,

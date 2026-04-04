@@ -25,6 +25,9 @@ SYNTHETIC_VOTER_PREFIXES = (
     "test-",
     "migrated_",
 )
+HUMAN_PUBLIC_MIN_VOTERS = 25
+HUMAN_PUBLIC_MIN_TOTAL_VOTES = 200
+HUMAN_PUBLIC_MIN_RESOLVED_VOTES = 20
 
 
 def is_synthetic_voter(voter_uuid: str) -> bool:
@@ -34,6 +37,23 @@ def is_synthetic_voter(voter_uuid: str) -> bool:
         if voter_uuid.startswith(prefix):
             return True
     return False
+
+
+def human_competition_snapshot(unique_voters: int, total_votes: int, resolved_votes: int) -> dict:
+    ready = (
+        unique_voters >= HUMAN_PUBLIC_MIN_VOTERS
+        and total_votes >= HUMAN_PUBLIC_MIN_TOTAL_VOTES
+        and resolved_votes >= HUMAN_PUBLIC_MIN_RESOLVED_VOTES
+    )
+    return {
+        "ready": ready,
+        "state": "live_human_ranking" if ready else "beta_ai_benchmark_only",
+        "sample": {
+            "unique_voters": unique_voters,
+            "total_votes": total_votes,
+            "resolved_votes": resolved_votes,
+        },
+    }
 
 
 # Try importing from actual module to verify sync
@@ -156,10 +176,64 @@ def test_leaderboard_aggregate_excludes_synthetic():
     assert len(human_uuids) == 2, f"total_voters should be 2, got {len(human_uuids)}"
 
 
+def test_community_stats_exclude_synthetic_votes():
+    """Community bars should reflect humans only, not AI/test/migrated votes."""
+    all_votes = [
+        {"voter_uuid": "neo-one-ai-player", "scenario": "optimistic", "probability": 75},
+        {"voter_uuid": "test-uuid-12345", "scenario": "base", "probability": 50},
+        {"voter_uuid": "migrated_xyz", "scenario": "pessimistic", "probability": 20},
+        {"voter_uuid": "human-a", "scenario": "optimistic", "probability": 70},
+        {"voter_uuid": "human-b", "scenario": "pessimistic", "probability": 25},
+    ]
+    human_votes = [v for v in all_votes if not is_synthetic_voter(v["voter_uuid"])]
+    total = len(human_votes)
+    buckets = {"optimistic": [], "base": [], "pessimistic": []}
+    for vote in human_votes:
+        buckets[vote["scenario"]].append(vote["probability"])
+
+    assert total == 2
+    assert buckets["optimistic"] == [70]
+    assert buckets["base"] == []
+    assert buckets["pessimistic"] == [25]
+
+
+def test_stats_bulk_drops_predictions_with_only_synthetic_votes():
+    """stats-bulk should not expose empty human stats for synthetic-only predictions."""
+    votes_by_prediction = {
+        "NP-0001": [
+            {"voter_uuid": "neo-one-ai-player"},
+            {"voter_uuid": "test-uuid-12345"},
+        ],
+        "NP-0002": [
+            {"voter_uuid": "human-a"},
+            {"voter_uuid": "neo-one-ai-player"},
+        ],
+    }
+    visible_predictions = [
+        pred_id
+        for pred_id, rows in votes_by_prediction.items()
+        if any(not is_synthetic_voter(row["voter_uuid"]) for row in rows)
+    ]
+    assert visible_predictions == ["NP-0002"], visible_predictions
+
+
 def test_my_stats_unaffected():
     """my-stats is per-UUID and should work for any UUID including synthetic."""
     for uid in ["neo-one-ai-player", "test-uuid-12345", "human-a"]:
         _ = is_synthetic_voter(uid)
+
+
+def test_human_competition_snapshot_stays_beta_below_threshold():
+    snap = human_competition_snapshot(9, 9, 1)
+    assert snap["ready"] is False
+    assert snap["state"] == "beta_ai_benchmark_only"
+    assert snap["sample"] == {"unique_voters": 9, "total_votes": 9, "resolved_votes": 1}
+
+
+def test_human_competition_snapshot_turns_live_at_threshold():
+    snap = human_competition_snapshot(25, 200, 20)
+    assert snap["ready"] is True
+    assert snap["state"] == "live_human_ranking"
 
 
 # ── Runner ───────────────────────────────────────────────────────────────────
@@ -174,7 +248,11 @@ def main():
         test_human_vote_filtering,
         test_top_forecasters_loop,
         test_leaderboard_aggregate_excludes_synthetic,
+        test_community_stats_exclude_synthetic_votes,
+        test_stats_bulk_drops_predictions_with_only_synthetic_votes,
         test_my_stats_unaffected,
+        test_human_competition_snapshot_stays_beta_below_threshold,
+        test_human_competition_snapshot_turns_live_at_threshold,
     ]
     passed = 0
     failed = 0

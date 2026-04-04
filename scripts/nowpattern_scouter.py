@@ -524,10 +524,10 @@ def score_uiux_quality(dry_run: bool = False) -> dict:
         else:
             score += 1.5
 
-    # design-system check (prediction-design-system.md 存在確認)
-    design_system = _BASE.parent / ".claude" / "rules" / "prediction-design-system.md" if not _IS_VPS else Path("/opt/shared/rules/prediction-design-system.md")
+    # design-system check (IMPLEMENTATION_REF.md 存在確認 — prediction-design-system archived)
+    design_system = _BASE.parent / ".claude" / "rules" / "IMPLEMENTATION_REF.md" if not _IS_VPS else Path("/opt/shared/rules/IMPLEMENTATION_REF.md")
     if not _IS_VPS:
-        design_system = Path(__file__).parent.parent / ".claude" / "rules" / "prediction-design-system.md"
+        design_system = Path(__file__).parent.parent / ".claude" / "rules" / "IMPLEMENTATION_REF.md"
     if design_system.exists():
         evidence.append("Prediction design system: defined ✅")
         score += 1.0

@@ -29,6 +29,9 @@ from prediction_state_utils import (
 
 DB_PATH = "/opt/shared/reader_predictions.db"
 PUBLIC_LEADERBOARD_MIN_RESOLVED = 5
+HUMAN_PUBLIC_MIN_VOTERS = 25
+HUMAN_PUBLIC_MIN_TOTAL_VOTES = 200
+HUMAN_PUBLIC_MIN_RESOLVED_VOTES = 20
 
 # ── Synthetic / system voter detection ───────────────────────────────────────
 # These UUIDs are AI players, test seeds, or migration artefacts.
@@ -86,6 +89,30 @@ def brier_index(raw_brier: Optional[float]) -> Optional[float]:
         return None
     score = max(0.0, min(1.0, score))
     return round((1.0 - math.sqrt(score)) * 100.0, 1)
+
+
+def human_competition_snapshot(unique_voters: int, total_votes: int, resolved_votes: int) -> dict:
+    ready = (
+        unique_voters >= HUMAN_PUBLIC_MIN_VOTERS
+        and total_votes >= HUMAN_PUBLIC_MIN_TOTAL_VOTES
+        and resolved_votes >= HUMAN_PUBLIC_MIN_RESOLVED_VOTES
+    )
+    return {
+        "ready": ready,
+        "state": "live_human_ranking" if ready else "beta_ai_benchmark_only",
+        "display_mode": "public_human_ranking" if ready else "ai_benchmark_only",
+        "thresholds": {
+            "min_unique_voters": HUMAN_PUBLIC_MIN_VOTERS,
+            "min_total_votes": HUMAN_PUBLIC_MIN_TOTAL_VOTES,
+            "min_resolved_votes": HUMAN_PUBLIC_MIN_RESOLVED_VOTES,
+            "min_resolved_per_forecaster": PUBLIC_LEADERBOARD_MIN_RESOLVED,
+        },
+        "sample": {
+            "unique_voters": unique_voters,
+            "total_votes": total_votes,
+            "resolved_votes": resolved_votes,
+        },
+    }
 
 
 # ── Database setup ────────────────────────────────────────────────────────────
@@ -217,14 +244,16 @@ class TrackerEntry(BaseModel):
 # ── Business logic ────────────────────────────────────────────────────────────
 
 def compute_stats(prediction_id: str) -> CommunityStats:
-    """Compute community distribution for a given prediction ID."""
+    """Compute human community distribution for a given prediction ID."""
     with db() as con:
         rows = con.execute(
-            "SELECT scenario, probability FROM reader_votes WHERE prediction_id=?",
+            "SELECT voter_uuid, scenario, probability FROM reader_votes WHERE prediction_id=?",
             (prediction_id,)
         ).fetchall()
 
-    if not rows:
+    human_rows = [row for row in rows if not is_synthetic_voter(row["voter_uuid"])]
+
+    if not human_rows:
         return CommunityStats(
             total=0, avg_probability=None,
             pct_optimistic=0, pct_base=0, pct_pessimistic=0,
@@ -236,10 +265,10 @@ def compute_stats(prediction_id: str) -> CommunityStats:
         )
 
     buckets: Dict[str, List[int]] = {"optimistic": [], "base": [], "pessimistic": []}
-    for r in rows:
+    for r in human_rows:
         buckets[r["scenario"]].append(r["probability"])
 
-    total = len(rows)
+    total = len(human_rows)
     dist: Dict[str, ScenarioDist] = {}
     for sc, probs in buckets.items():
         count = len(probs)
@@ -249,7 +278,7 @@ def compute_stats(prediction_id: str) -> CommunityStats:
             pct=round(count * 100 / total) if total else 0,
         )
 
-    all_probs = [r["probability"] for r in rows]
+    all_probs = [r["probability"] for r in human_rows]
     avg_all = round(sum(all_probs) / len(all_probs)) if all_probs else None
 
     return CommunityStats(
@@ -325,7 +354,12 @@ def stats_bulk():
         pred_ids = [r[0] for r in con.execute(
             "SELECT DISTINCT prediction_id FROM reader_votes"
         ).fetchall()]
-    return {pid: compute_stats(pid).model_dump() for pid in pred_ids}
+    stats_map = {}
+    for pid in pred_ids:
+        stats = compute_stats(pid)
+        if stats.total > 0:
+            stats_map[pid] = stats.model_dump()
+    return stats_map
 
 
 @app.get("/reader-predict/my-votes/{voter_uuid}", response_model=List[TrackerEntry])
@@ -380,10 +414,16 @@ def leaderboard():
     reader_avg_brier = round(sum(reader_brier_scores) / len(reader_brier_scores), 4) if reader_brier_scores else None
     reader_accuracy = round(reader_correct / reader_resolved_votes * 100, 1) if reader_resolved_votes > 0 else None
     data_status = "live" if reader_resolved_votes > 0 else "accumulating"
+    human_competition = human_competition_snapshot(
+        reader_total_voters,
+        reader_total_votes,
+        reader_resolved_votes,
+    )
 
     return {
         "public_min_resolved": PUBLIC_LEADERBOARD_MIN_RESOLVED,
         "score_display": "brier_index_public_raw_brier_internal",
+        "human_competition": human_competition,
         "ai": {
             "name": "Nowpattern AI",
             "score_basis": "official_prediction_record",
@@ -408,6 +448,9 @@ def leaderboard():
             "data_status": data_status,
             "score_basis": "reader_vote_brier",
             "public_leaderboard_eligible": reader_resolved_votes >= PUBLIC_LEADERBOARD_MIN_RESOLVED,
+            "human_public_ready": human_competition["ready"],
+            "human_competition_state": human_competition["state"],
+            "human_public_thresholds": human_competition["thresholds"],
         },
     }
 
@@ -510,12 +553,26 @@ def top_forecasters():
             r["public_rank"] = None
 
     public_forecasters = [r for r in ranked if r["public_leaderboard_eligible"]]
+    human_public_forecasters = [r for r in public_forecasters if not r["is_ai"]]
+    human_total_votes = sum(s["votes"] for s in voter_stats.values())
+    human_resolved_votes = sum(s["resolved"] for s in voter_stats.values())
+    human_competition = human_competition_snapshot(
+        len(voter_stats),
+        human_total_votes,
+        human_resolved_votes,
+    )
     return {
         "forecasters": ranked,
         "public_forecasters": public_forecasters,
+        "human_public_forecasters": human_public_forecasters,
         "total": len(ranked),
         "public_total": len(public_forecasters),
         "public_min_resolved": PUBLIC_LEADERBOARD_MIN_RESOLVED,
+        "human_competition": human_competition,
+        "human_public_ready": human_competition["ready"],
+        "human_competition_state": human_competition["state"],
+        "human_public_thresholds": human_competition["thresholds"],
+        "human_sample": human_competition["sample"],
     }
 
 class PredictionSummary(BaseModel):

@@ -94,7 +94,7 @@ BLOCKED_CONTENT_PATTERNS = [
 # ─────────────────────────────────────────────
 KNOWN_ALLOWLIST = {
     # ファイルパス（前方一致）: 許容するパターンラベルのセット
-    ".claude/rules/infrastructure.md": {"VPS IP address"},
+    ".claude/rules/IMPLEMENTATION_REF.md": {"VPS IP address"},
     ".claude/rules/NORTH_STAR.md": set(),  # ルールファイルは内容チェックスキップ
     "scripts/sync-neo-token.ps1": {"VPS IP address"},
     "scripts/sync-nowpattern-vps.ps1": {"VPS IP address"},

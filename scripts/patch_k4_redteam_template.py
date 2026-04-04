@@ -2,7 +2,7 @@
 """K4: x_swarm_dispatcher.py の generate_redteam_content() を
 YES-派/NO-派フォーマットに更新
 
-content-rules.md Section 4 準拠:
+IMPLEMENTATION_REF.md (formerly content-rules.md) Section 4 準拠:
   「予測は70%でYES — しかし30%のNOシナリオはこうだ」
   Poll: YES / NO / まだわからない / 分析を読む
 """
@@ -52,7 +52,7 @@ OLD1 = '''def generate_redteam_content(item):
 NEW1 = '''def generate_redteam_content(item):
     """RED-TEAM型: YES-派/NO-派の討論スレッド + Poll
 
-    content-rules.md Section 4 準拠:
+    IMPLEMENTATION_REF.md (formerly content-rules.md) Section 4 準拠:
     「予測は70%でYES — しかし30%のNOシナリオはこうだ」
     Poll: YES / NO / まだわからない / 分析を読む
     """

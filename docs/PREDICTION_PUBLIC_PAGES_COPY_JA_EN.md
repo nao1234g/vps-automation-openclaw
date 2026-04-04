@@ -4,6 +4,17 @@
 > These pages are live on nowpattern.com as of 2026-03-29.
 > Last updated: 2026-03-29
 
+> Historical note (2026-04-04): this file covers the legacy fixed pages
+> `/forecast-rules/`, `/scoring-guide/`, and `/integrity-audit/`.
+> The newer reader-facing methodology set
+> `/forecasting-methodology/`,
+> `/forecast-scoring-and-resolution/`,
+> `/forecast-integrity-and-audit/`
+> is now tracked separately in
+> [`docs/PREDICTION_READER_PAGES_SPEC.md`](/mnt/c/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/docs/PREDICTION_READER_PAGES_SPEC.md)
+> and the source-controlled updater
+> [`scripts/update_prediction_methodology_pages.py`](/mnt/c/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/scripts/update_prediction_methodology_pages.py).
+
 ---
 
 ## Page Inventory

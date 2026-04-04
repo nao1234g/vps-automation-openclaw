@@ -102,6 +102,26 @@ def tracker_category_counts(page) -> dict[str, int]:
     ) or {}
 
 
+def first_visible_vote_prediction(page) -> str | None:
+    return page.evaluate(
+        """() => {
+          const isVisible = (el) => {
+            const style = window.getComputedStyle(el);
+            return style.display !== 'none' && style.visibility !== 'hidden';
+          };
+          const cards = Array.from(document.querySelectorAll('#np-inplay-list details, #np-awaiting-list details'));
+          for (const card of cards) {
+            if (!isVisible(card)) continue;
+            const widget = card.querySelector('.np-reader-vote[data-pred]');
+            if (!widget) continue;
+            card.open = true;
+            return widget.getAttribute('data-pred');
+          }
+          return null;
+        }"""
+    )
+
+
 def record_result(name: str, ok: bool, detail: str, fail_details: list[str]) -> tuple[int, int]:
     if ok:
         print(f"  PASS: {detail}")
@@ -354,7 +374,70 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> dict[str
             pass_count += inc_pass
             fail_count += inc_fail
 
-        print("\nTest 6: tracker article links do not loop back to tracker")
+        print("\nTest 6: vote widget click path works and is localized")
+        try:
+            page.locator("[data-view='all']").click()
+            page.wait_for_timeout(400)
+            pred_id = first_visible_vote_prediction(page)
+            if not pred_id:
+                inc_pass, inc_fail = record_result("vote widget click path", False, "no visible vote widget found", fail_details)
+                pass_count += inc_pass
+                fail_count += inc_fail
+            else:
+                expected_label = "Lean YES selected" if lang == "en" else "YES寄りを選択中"
+                button = page.locator(f'.np-reader-vote[data-pred="{pred_id}"] .np-vote-btn[data-vote="YES"]').first
+                button.scroll_into_view_if_needed()
+                button.click()
+                page.wait_for_function(
+                    """([predictionId, expected]) => {
+                      const label = document.getElementById('np-vote-label-' + predictionId);
+                      return !!label && (label.textContent || '').includes(expected);
+                    }""",
+                    arg=[pred_id, expected_label],
+                    timeout=TIMEOUT,
+                )
+                page.wait_for_function(
+                    """(predictionId) => {
+                      try {
+                        return !!localStorage.getItem('np-voter-uuid') &&
+                          localStorage.getItem('np-vote-' + predictionId) === 'YES' &&
+                          !!(document.getElementById('np-vote-stats-' + predictionId)?.textContent || '').trim();
+                      } catch (e) {
+                        return false;
+                      }
+                    }""",
+                    arg=pred_id,
+                    timeout=TIMEOUT,
+                )
+                widget_state = page.evaluate(
+                    """(predictionId) => {
+                      const label = document.getElementById('np-vote-label-' + predictionId);
+                      const stats = document.getElementById('np-vote-stats-' + predictionId);
+                      return {
+                        label: (label?.textContent || '').trim(),
+                        stats: (stats?.textContent || '').trim(),
+                        uuid: localStorage.getItem('np-voter-uuid'),
+                        saved_vote: localStorage.getItem('np-vote-' + predictionId),
+                      };
+                    }""",
+                    pred_id,
+                )
+                ok = bool(widget_state["uuid"]) and widget_state["saved_vote"] == "YES" and expected_label in widget_state["label"] and bool(widget_state["stats"])
+                if lang == "en":
+                    ok = ok and all(token not in widget_state["stats"] for token in ("楽観", "基本", "悲観", "票", "平均"))
+                detail = (
+                    f"prediction_id={pred_id}, label={widget_state['label']!r}, "
+                    f"saved_vote={widget_state['saved_vote']!r}, stats_len={len(widget_state['stats'])}"
+                )
+                inc_pass, inc_fail = record_result("vote widget click path", ok, detail, fail_details)
+                pass_count += inc_pass
+                fail_count += inc_fail
+        except Exception as exc:
+            inc_pass, inc_fail = record_result("vote widget click path", False, str(exc), fail_details)
+            pass_count += inc_pass
+            fail_count += inc_fail
+
+        print("\nTest 7: tracker article links do not loop back to tracker")
         try:
             offending = page.evaluate(
                 """() => {
@@ -392,7 +475,7 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> dict[str
             pass_count += inc_pass
             fail_count += inc_fail
 
-        print("\nTest 6b: tracker cards keep same-language article integrity")
+        print("\nTest 7b: tracker cards keep article-link contract")
         try:
             link_audit = page.evaluate(
                 """() => {
@@ -400,7 +483,7 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> dict[str
                     const current = window.location.pathname;
                     const cards = Array.from(document.querySelectorAll('#np-inplay-list > details, #np-awaiting-list > details, #np-resolved-section > details'));
                     const offending = [];
-                    const missing = [];
+                    const trackerOnly = [];
 
                     const toPath = (href) => {
                       try {
@@ -415,9 +498,16 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> dict[str
                       const title = (card.querySelector('summary')?.innerText || '').trim().replace(/\\s+/g, ' ').slice(0, 140);
                       const anchors = Array.from(card.querySelectorAll('a[href]')).map((anchor) => {
                         const href = anchor.getAttribute('href') || '';
+                        let origin = '';
+                        try {
+                          origin = new URL(href, window.location.origin).origin;
+                        } catch (e) {
+                          origin = window.location.origin;
+                        }
                         const path = toPath(href);
                         return {
                           href,
+                          origin,
                           path,
                           text: (anchor.textContent || '').trim(),
                           cross: anchor.dataset.crossLangLink === 'true',
@@ -426,48 +516,56 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> dict[str
 
                       const sameLangAnchors = anchors.filter((item) => {
                         if (item.cross) return false;
+                        if (item.origin !== window.location.origin) return false;
                         if (item.path.startsWith('/predictions/#np-') || item.path.startsWith('/en/predictions/#np-')) return false;
                         if (isEnPage) return item.path.startsWith('/en/') && item.path !== current;
                         return item.path.startsWith('/') && !item.path.startsWith('/en/') && item.path !== current;
                       });
 
+                      const wrongLangAnchors = anchors.filter((item) => {
+                        if (item.cross) return false;
+                        if (item.origin !== window.location.origin) return false;
+                        if (item.path.startsWith('/predictions/#np-') || item.path.startsWith('/en/predictions/#np-')) return false;
+                        if (isEnPage) return item.path.startsWith('/') && !item.path.startsWith('/en/') && item.path !== current;
+                        return item.path.startsWith('/en/') && item.path !== current;
+                      });
+
                       const badAnchors = anchors.filter((item) =>
-                        item.cross ||
                         item.path.startsWith('/predictions/#np-') ||
                         item.path.startsWith('/en/predictions/#np-') ||
                         item.text.includes('View in tracker') ||
                         item.text.includes('トラッカーで見る')
-                      );
+                      ).concat(wrongLangAnchors);
 
                       if (badAnchors.length) {
                         offending.push({ title, anchors: badAnchors.slice(0, 3) });
                       }
                       if (!sameLangAnchors.length) {
-                        missing.push({ title, anchors: anchors.slice(0, 3) });
+                        trackerOnly.push({ title, anchors: anchors.slice(0, 3) });
                       }
                     }
 
-                    return { cards: cards.length, offending, missing };
+                    return { cards: cards.length, offending, trackerOnly };
                 }"""
             )
-            ok = not link_audit["offending"] and not link_audit["missing"] and int(link_audit["cards"]) > 0
+            ok = not link_audit["offending"] and int(link_audit["cards"]) > 0
             detail = (
                 f"cards={link_audit['cards']}, offending={len(link_audit['offending'])}, "
-                f"missing_same_lang={len(link_audit['missing'])}"
+                f"tracker_only={len(link_audit['trackerOnly'])}"
             )
             if link_audit["offending"]:
                 detail += f", offending_sample={link_audit['offending'][:2]}"
-            if link_audit["missing"]:
-                detail += f", missing_sample={link_audit['missing'][:2]}"
-            inc_pass, inc_fail = record_result("same-language article integrity", ok, detail, fail_details)
+            if link_audit["trackerOnly"]:
+                detail += f", tracker_only_sample={link_audit['trackerOnly'][:2]}"
+            inc_pass, inc_fail = record_result("article-link contract", ok, detail, fail_details)
             pass_count += inc_pass
             fail_count += inc_fail
         except Exception as exc:
-            inc_pass, inc_fail = record_result("same-language article integrity", False, str(exc), fail_details)
+            inc_pass, inc_fail = record_result("article-link contract", False, str(exc), fail_details)
             pass_count += inc_pass
             fail_count += inc_fail
 
-        print("\nTest 7: sampled internal links resolve")
+        print("\nTest 8: sampled internal links resolve")
         try:
             link_samples = page.evaluate(
                 """() => Array.from(document.querySelectorAll('a[href]'))

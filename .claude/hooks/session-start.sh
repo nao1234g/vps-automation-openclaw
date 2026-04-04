@@ -19,6 +19,10 @@ cat > "$STATE_DIR/session.json" << 'STATEJSON'
 {"research_done":true,"search_count":0,"errors":[],"task_started":false}
 STATEJSON
 
+# B2: Read Comprehension Gate — NORTH_STAR.md が @import で読み込まれたことを記録
+# このフラグが存在しないとEdit/Writeがブロックされる（north-star-guard.py が検証）
+echo "$(date +%Y-%m-%d)" > "$STATE_DIR/north_star_loaded.flag"
+
 # PVQE-P: セッション開始時にクリア（新セッション = 新しいP定義が必要）
 rm -f "$STATE_DIR/pvqe_p.json"
 # intent_confirmed.flag もクリア（前セッションの確認は引き継がない）
@@ -424,6 +428,94 @@ echo "6. 長期記憶: memory_search.py で過去の知識を検索可能"
 echo "7. 新規コード作成前に TodoWrite でタスク計画を書くこと（書かないと物理ブロック）"
 echo "8. ★ 新しいタスクを約束したら docs/BACKLOG.md に追加すること（完了まで追跡）"
 echo "=== END MANDATORY CONTEXT ==="
+
+# ── MAILBOX + BOARD + RESUME: Codex統合設計に基づく必読ファイル ──────────────
+# 読み込み順: global truth → cross-agent handoff → self-resume（Codex推奨順序）
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "📬 CROSS-AGENT MAILBOX & RESUME STATE"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# 1. task_ledger.json（global truth: タスク台帳）
+TASK_LEDGER="$PROJECT_DIR/.claude/state/task_ledger.json"
+if [ -f "$TASK_LEDGER" ]; then
+    LEDGER_SUMMARY=$(python -c "
+import json
+try:
+    d = json.load(open('$TASK_LEDGER', encoding='utf-8'))
+    tasks = d.get('tasks', [])
+    active = [t for t in tasks if t.get('status') in ('active', 'in_progress')]
+    blocked = [t for t in tasks if t.get('status') == 'blocked']
+    done = [t for t in tasks if t.get('status') == 'done']
+    print(f'  タスク台帳: active={len(active)}, blocked={len(blocked)}, done={len(done)}')
+    for t in active[:3]:
+        tid = t.get('task_id', t.get('id', '?'))
+        title = t.get('title', t.get('description', ''))[:60]
+        print(f'    🔄 {tid}: {title}')
+    for t in blocked[:2]:
+        tid = t.get('task_id', t.get('id', '?'))
+        reason = t.get('blocking_reason', '')[:50]
+        print(f'    ⛔ {tid}: {reason}')
+except Exception as e:
+    print(f'  [WARN] task_ledger.json 読み込み失敗: {e}')
+" 2>/dev/null)
+    [ -n "$LEDGER_SUMMARY" ] && echo "$LEDGER_SUMMARY"
+fi
+
+# 2. PREDICTION_EXECUTION_BOARD.md（global truth: 全体進捗）
+EXEC_BOARD="$PROJECT_DIR/docs/PREDICTION_EXECUTION_BOARD.md"
+if [ -f "$EXEC_BOARD" ]; then
+    BOARD_SUMMARY=$(head -30 "$EXEC_BOARD" 2>/dev/null | grep -E "^(##|Progress|Status|Done|Phase|Current)" | head -5)
+    if [ -n "$BOARD_SUMMARY" ]; then
+        echo "  📊 Execution Board:"
+        echo "$BOARD_SUMMARY" | sed 's/^/    /'
+    fi
+fi
+
+# 3. codex-to-claude.md（cross-agent: Codexからの最新メッセージ）
+# まずVPSから最新版をpull（Codex dispatcherが書いた回答を取得）
+scp -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=no \
+    root@163.44.124.123:/opt/shared/agent-mailbox/codex-to-claude.md \
+    "$PROJECT_DIR/.agent-mailbox/codex-to-claude.md" 2>/dev/null && \
+    echo "  📥 Codex回答をVPSからpull完了"
+CODEX_MSG="$PROJECT_DIR/.agent-mailbox/codex-to-claude.md"
+if [ -f "$CODEX_MSG" ]; then
+    CODEX_DATE=$(head -3 "$CODEX_MSG" 2>/dev/null | grep -oE "[0-9]{4}-[0-9]{2}-[0-9]{2}" | head -1)
+    CODEX_TITLE=$(head -5 "$CODEX_MSG" 2>/dev/null | grep "^##" | head -1)
+    echo "  📩 Codex → Claude (${CODEX_DATE:-unknown}):"
+    echo "    ${CODEX_TITLE:-（タイトルなし）}"
+    # 最初の要点だけ表示（長すぎるメッセージは省略）
+    CODEX_SUMMARY=$(sed -n '1,30p' "$CODEX_MSG" 2>/dev/null | grep -E "^(###|- )" | head -5)
+    [ -n "$CODEX_SUMMARY" ] && echo "$CODEX_SUMMARY" | sed 's/^/    /'
+    echo "    → 全文: .agent-mailbox/codex-to-claude.md"
+fi
+
+# 4. claude-to-codex.md（cross-agent: 前回Claudeが送った内容）
+CLAUDE_MSG="$PROJECT_DIR/.agent-mailbox/claude-to-codex.md"
+if [ -f "$CLAUDE_MSG" ]; then
+    CLAUDE_DATE=$(head -3 "$CLAUDE_MSG" 2>/dev/null | grep -oE "[0-9]{4}-[0-9]{2}-[0-9]{2}" | head -1)
+    CLAUDE_TITLE=$(head -5 "$CLAUDE_MSG" 2>/dev/null | grep "^##" | head -1)
+    echo "  📤 Claude → Codex (${CLAUDE_DATE:-unknown}):"
+    echo "    ${CLAUDE_TITLE:-（タイトルなし）}"
+fi
+
+# 5. resume_prompt.txt（self-resume: 前回の再開ポイント）
+RESUME_FILE="$PROJECT_DIR/reports/claude_sidecar/resume_prompt.txt"
+if [ -f "$RESUME_FILE" ]; then
+    RESUME_TASK=$(grep "^TASK:" "$RESUME_FILE" 2>/dev/null | head -1)
+    RESUME_NOW=$(grep "^NOW DOING:" "$RESUME_FILE" 2>/dev/null | head -1)
+    RESUME_NEXT=$(grep "^NEXT EXACT STEP:" "$RESUME_FILE" 2>/dev/null | head -1)
+    RESUME_BLOCKER=$(grep "^BLOCKER:" "$RESUME_FILE" 2>/dev/null | head -1)
+    if [ -n "$RESUME_TASK" ] || [ -n "$RESUME_NOW" ]; then
+        echo "  🔄 Resume State:"
+        [ -n "$RESUME_TASK" ] && echo "    $RESUME_TASK"
+        [ -n "$RESUME_NOW" ] && echo "    $RESUME_NOW"
+        [ -n "$RESUME_NEXT" ] && echo "    $RESUME_NEXT"
+        [ -n "$RESUME_BLOCKER" ] && [ "$RESUME_BLOCKER" != "BLOCKER:" ] && [ "$RESUME_BLOCKER" != "BLOCKER: none" ] && echo "    $RESUME_BLOCKER"
+    fi
+fi
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
 
 # ── タスクダッシュボードの状態を表示 ──────────────────────────────────────
 DASHBOARD_HTML="$HOME/.claude/tasks/dashboard.html"

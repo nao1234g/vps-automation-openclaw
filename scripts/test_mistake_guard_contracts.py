@@ -20,7 +20,7 @@ def test_m001_ghost_settings_sqlite_guard_documented() -> None:
 
 
 def test_m002_m020_lowercase_oracle_anchor_guard_present() -> None:
-    content_rules = _read(".claude/rules/content-rules.md")
+    content_rules = _read(".claude/rules/archive/content-rules.md")
     tracker_test = _read("scripts/test_prediction_tracker_regressions.py")
     assert "nowpattern.com/predictions/#np-2026-0042" in content_rules
     assert "/predictions/#np-2026-0042" in tracker_test
@@ -98,7 +98,7 @@ def test_m018_substack_api_guard_documented() -> None:
 
 def test_m019_openclaw_pairing_guard_documented() -> None:
     text = _read(".claude/CLAUDE.md")
-    infra = _read(".claude/rules/infrastructure.md")
+    infra = _read(".claude/rules/IMPLEMENTATION_REF.md")
     assert "openclaw.json" in text
     assert "CLIフラグではない" in text
     assert "OpenClaw設定" in infra

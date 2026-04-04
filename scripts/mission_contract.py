@@ -53,7 +53,7 @@ MISSION_CONTRACT: dict[str, Any] = {
         "principle_docs": [
             ".claude/rules/NORTH_STAR.md",
             ".claude/rules/OPERATING_PRINCIPLES.md",
-            "docs/TRUTH_PROTOCOL.md",
+            ".claude/rules/IMPLEMENTATION_REF.md",
             "docs/AGENT_WISDOM.md",
         ],
     },
@@ -92,12 +92,10 @@ MISSION_CONTRACT: dict[str, Any] = {
         "known_mistakes": "docs/KNOWN_MISTAKES.md",
     },
     "source_docs": [
-        "docs/NAOTO_OS_OPERATING_STACK.md",
-        "docs/FOUNDER_CONSTITUTION.md",
-        "docs/AGENT_CONSTITUTION.md",
         ".claude/rules/NORTH_STAR.md",
-        "docs/TRUTH_PROTOCOL.md",
-        "docs/PREDICTION_SYSTEM_NORTH_STAR.md",
+        ".claude/rules/OPERATING_PRINCIPLES.md",
+        ".claude/rules/IMPLEMENTATION_REF.md",
+        ".claude/CLAUDE.md",
         "docs/AGENT_WISDOM.md",
     ],
 }

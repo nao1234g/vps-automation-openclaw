@@ -29,7 +29,7 @@ Silent stops are not allowed.
 
 ## Read Order
 
-1. `docs/NAOTO_OS_OPERATING_STACK.md`
+1. `.claude/rules/NORTH_STAR.md`
 2. `scripts/mission_contract.py`
 3. `scripts/agent_bootstrap_context.py`
 4. `reports/content_release_snapshot.json`

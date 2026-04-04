@@ -141,7 +141,16 @@
       "Bash(\"/c/Program Files/Python312/python.exe\" dossier.py --list)",
       "Bash(\"/c/Program Files/Python312/python.exe\" dossier.py \"日銀\")",
       "Bash(wsl -d Ubuntu -e bash -c 'sleep 35 && tmux capture-pane -t agents:0.1 -p -S -60')",
-      "Bash(wsl -d Ubuntu -e bash -c 'sleep 40 && tmux capture-pane -t agents:0.1 -p -S -50')"
+      "Bash(wsl -d Ubuntu -e bash -c 'sleep 40 && tmux capture-pane -t agents:0.1 -p -S -50')",
+      "Bash(wc -l \"./.claude/rules\"/*.md)",
+      "Bash(chmod +x /opt/shared/scripts/codex_auth_manage.sh)",
+      "Read(//c/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/$HOME/.codex/**)",
+      "Read(//c/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/Local/codex/**)",
+      "Read(//c/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/$HOME/.config/codex/**)",
+      "Bash(cp \".claude/rules/NORTH_STAR_v2.md\" \".claude/rules/NORTH_STAR.md\")",
+      "Bash(cp \".claude/rules/OPERATING_PRINCIPLES_v2.md\" \".claude/rules/OPERATING_PRINCIPLES.md\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''$f'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''OK''\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 python -c \"import ast; ast.parse\\(open\\(''.claude/hooks/north-star-guard.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''north-star-guard.py syntax OK''\\)\")"
     ],
     "deny": [
       "Read(**/.env)",

@@ -90,7 +90,7 @@ ABOUT_COPY = {
         "hero_body": (
             "公開トラッカー、分析記事、判定基準、整合性監査のすべてが、"
             "同じ語彙と同じ公開ルールでつながっています。"
-            "公開トラッカーには、その言語でlive記事に結びつく予測だけを表示します。"
+            "公開トラッカーでは予測自体を先に公開し、同じ言語の記事リンクは利用可能になり次第表示します。"
         ),
         "metric_registered": "全登録予測数",
         "metric_public_cards": "公開中の予測カード",
@@ -109,6 +109,7 @@ ABOUT_COPY = {
         "footer_links": [
             ("予測トラッカー", "/predictions/"),
             ("力学で探す", "/taxonomy/"),
+            ("予測手法", "/forecasting-methodology/"),
             ("整合性・監査", "/integrity-audit/"),
         ],
     },
@@ -120,8 +121,8 @@ ABOUT_COPY = {
         ),
         "hero_body": (
             "Public tracker cards, source articles, resolution rules, and integrity pages all follow "
-            "the same vocabulary and the same public release rules. The public tracker only shows "
-            "forecasts that are linked to live articles in the same language."
+            "the same vocabulary and the same public release rules. The public tracker can show the "
+            "forecast before article publication, and same-language article links appear as they go live."
         ),
         "metric_registered": "Registered Forecasts",
         "metric_public_cards": "Public Tracker Cards",
@@ -140,6 +141,7 @@ ABOUT_COPY = {
         "footer_links": [
             ("Prediction Tracker", "/en/predictions/"),
             ("Explore Dynamics", "/en/taxonomy/"),
+            ("Forecasting Methodology", "/en/forecasting-methodology/"),
             ("Integrity & Audit", "/en/integrity-audit/"),
         ],
     },

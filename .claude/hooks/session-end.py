@@ -231,7 +231,176 @@ try:
 except Exception:
     pass  # VPS不達でも続行
 
-# 7. Coordination タスク完了（セッション終了時）
+# 7. claude-to-codex.md 自動更新（双方向エージェント通信）
+# 毎セッション終了時にClaudeが何をしたかをCodexに報告する
+try:
+    mailbox_dir = PROJECT_DIR / ".agent-mailbox"
+    mailbox_dir.mkdir(parents=True, exist_ok=True)
+    claude_to_codex = mailbox_dir / "claude-to-codex.md"
+
+    # 自動収集できるメタデータ
+    branch = ""
+    commit_sha = ""
+    try:
+        branch_result = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            capture_output=True, text=True, timeout=5, cwd=str(PROJECT_DIR)
+        )
+        branch = branch_result.stdout.strip() if branch_result.returncode == 0 else ""
+        sha_result = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            capture_output=True, text=True, timeout=5, cwd=str(PROJECT_DIR)
+        )
+        commit_sha = sha_result.stdout.strip() if sha_result.returncode == 0 else ""
+    except Exception:
+        pass
+
+    changed_files = ""
+    try:
+        diff_result = subprocess.run(
+            ["git", "diff", "--name-only", "HEAD~1"],
+            capture_output=True, text=True, timeout=5, cwd=str(PROJECT_DIR)
+        )
+        if diff_result.returncode == 0:
+            files = diff_result.stdout.strip().split("\n")[:15]
+            changed_files = "\n".join(f"- {f}" for f in files if f)
+    except Exception:
+        pass
+
+    active_task = ""
+    try:
+        ledger_path = PROJECT_DIR / ".claude" / "state" / "task_ledger.json"
+        if ledger_path.exists():
+            ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+            active_tasks = [
+                t for t in ledger.get("tasks", [])
+                if t.get("status") in ("active", "in_progress")
+            ]
+            if active_tasks:
+                active_task = active_tasks[0].get("task_id", active_tasks[0].get("id", ""))
+    except Exception:
+        pass
+
+    completed_str = ", ".join(completed_today) if completed_today else "(none)"
+
+    # テンプレートを生成（自動フィールド + 手動フィールドのプレースホルダー）
+    handoff_content = f"""# Claude → Codex Message ({date_header})
+
+## Auto-generated Session Report
+
+### Metadata (auto-filled)
+- **timestamp**: {datetime.now().isoformat()}
+- **branch**: {branch}
+- **commit**: {commit_sha}
+- **active_task_id**: {active_task}
+- **completed_tasks**: {completed_str}
+- **searches**: {search_count}, **errors**: {error_count}
+
+### Changed Files
+{changed_files if changed_files else "(no file changes detected)"}
+
+### What Changed (session-end auto-summary)
+- Session with {search_count} searches, {error_count} errors
+- Completed tasks: {completed_str}
+
+### Unfinished Items
+(To be filled by Claude during session or by next session-start review)
+
+### Next Steps for Codex
+(To be filled by Claude when delegating work to Codex)
+"""
+
+    # 品質ゲート: 既存の手動メッセージがある場合は上書きしない
+    # 同日の自動レポートのみ上書き（手動メッセージは保護）
+    should_write = True
+    if claude_to_codex.exists():
+        existing = claude_to_codex.read_text(encoding="utf-8")
+        # 手動メッセージ（"Auto-generated Session Report"を含まない）は保護
+        if "Auto-generated Session Report" not in existing:
+            # 手動メッセージが今日より新しい場合は上書きしない
+            if date_header in existing.split("\n")[0]:
+                should_write = False  # 同日の手動メッセージを保護
+            else:
+                # 古い手動メッセージは保持しつつ、新しいセッションレポートを追記
+                handoff_content = existing + "\n---\n\n" + handoff_content
+                should_write = True
+
+    if should_write:
+        claude_to_codex.write_text(handoff_content, encoding="utf-8")
+        print("📬 claude-to-codex.md を更新しました（Codexへのセッションレポート）")
+        # SCP push to VPS → Codex dispatcher will pick it up
+        try:
+            scp_result = subprocess.run(
+                ['scp', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8',
+                 '-o', 'StrictHostKeyChecking=no',
+                 str(claude_to_codex),
+                 'root@163.44.124.123:/opt/shared/agent-mailbox/claude-to-codex.md'],
+                capture_output=True, timeout=15
+            )
+            if scp_result.returncode == 0:
+                print("📤 claude-to-codex.md → VPS にプッシュ完了")
+            else:
+                print(f"⚠️ VPS push失敗: {scp_result.stderr.decode()[:100]}")
+        except Exception as scp_e:
+            print(f"⚠️ VPS push スキップ: {scp_e}")
+
+except Exception as e:
+    print(f"⚠️ claude-to-codex.md 更新スキップ: {e}")
+
+# 8. resume_prompt.txt をCodex推奨スキーマで更新
+try:
+    resume_dir = PROJECT_DIR / "reports" / "claude_sidecar"
+    resume_dir.mkdir(parents=True, exist_ok=True)
+    resume_file = resume_dir / "resume_prompt.txt"
+
+    # sidecar session_status.json からアクティブタスク情報を取得
+    sidecar_status = ""
+    sidecar_task = ""
+    sidecar_next = ""
+    sidecar_blocker = ""
+    session_status_file = resume_dir / "session_status.json"
+    if session_status_file.exists():
+        try:
+            ss = json.loads(session_status_file.read_text(encoding="utf-8"))
+            sidecar_status = ss.get("status", "")
+            sidecar_task = ss.get("task_id", "")
+            sidecar_next = ss.get("next_exact_step", "")
+            sidecar_blocker = ss.get("blocking_reason", "")
+        except Exception:
+            pass
+
+    # 完了タスクがある場合はそのサマリーをTASKに
+    task_line = sidecar_task or active_task or "(no active task)"
+    now_doing = f"Session ended. Status: {sidecar_status}" if sidecar_status else "Session ended normally"
+    blocker = sidecar_blocker or "none"
+    next_step = sidecar_next or "Review session report in claude-to-codex.md"
+
+    # ファイルリスト（変更があったファイル上位5件）
+    files_list = ""
+    if changed_files:
+        top_files = [f.strip("- ") for f in changed_files.split("\n") if f.strip("- ")][:5]
+        files_list = ", ".join(top_files)
+    else:
+        files_list = "(none)"
+
+    resume_content = f"""TASK: {task_line}
+NOW DOING: {now_doing}
+LAST VERIFIED FACT: Session ended at {date_short} with {search_count} searches, {error_count} errors. Completed: {completed_str}
+BLOCKER: {blocker}
+NEXT EXACT STEP: {next_step}
+NEXT EXACT COMMAND: cat .agent-mailbox/codex-to-claude.md
+FILES TO OPEN FIRST: {files_list}
+"""
+
+    # sidecarがin_progressの場合はresume_prompt.txtを上書きしない（sidecar自身が管理）
+    if sidecar_status not in ("in_progress",):
+        resume_file.write_text(resume_content, encoding="utf-8")
+        print("📝 resume_prompt.txt を標準スキーマで更新しました")
+
+except Exception as e:
+    print(f"⚠️ resume_prompt.txt 更新スキップ: {e}")
+
+# 9. Coordination タスク完了（セッション終了時）
 try:
     coord_state_file = PROJECT_DIR / ".claude" / "hooks" / "state" / "coord_session_task.json"
     if coord_state_file.exists():

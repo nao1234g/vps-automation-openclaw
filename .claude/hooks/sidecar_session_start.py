@@ -20,7 +20,7 @@ def main() -> int:
         "NAOTO OS is the founder OS. Nowpattern is a verifiable forecast platform under NAOTO OS.",
         "If you are doing sidecar work, you must maintain reports/claude_sidecar/session_status.json, heartbeat.json, task_result_v*.json, task_result_v*.md, and resume_prompt.txt.",
         "Do not stop silently. Before stopping, mark the scope completed or blocked with blocking_reason and next_exact_step.",
-        "Read CLAUDE.md, docs/NAOTO_OS_OPERATING_STACK.md, scripts/mission_contract.py, scripts/agent_bootstrap_context.py, and the latest reports before acting.",
+        "Read CLAUDE.md, .claude/rules/NORTH_STAR.md, scripts/mission_contract.py, scripts/agent_bootstrap_context.py, and the latest reports before acting.",
         "The chat UI is not the source of truth. File outputs are the source of truth.",
     ]
 

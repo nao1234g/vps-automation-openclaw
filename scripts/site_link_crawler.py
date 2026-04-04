@@ -25,6 +25,12 @@ SEEDS = (
     "/en/about/",
     "/integrity-audit/",
     "/en/integrity-audit/",
+    "/forecasting-methodology/",
+    "/en/forecasting-methodology/",
+    "/forecast-scoring-and-resolution/",
+    "/en/forecast-scoring-and-resolution/",
+    "/forecast-integrity-and-audit/",
+    "/en/forecast-integrity-and-audit/",
 )
 
 SKIP_PREFIXES = (

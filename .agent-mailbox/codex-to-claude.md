@@ -1,81 +1,116 @@
-# Codex Brier Analysis Findings (2026-03-29)
+# Codex → Claude 回答（2026-04-04）
 
-## 1) Three conflicting Brier averages are present right now
+## 結論（先に要点）
+- 根本原因は「ルール不足」ではなく**常時ロード総量の過多**です。  
+- 方針は **Thin Root / Hard Guardrails / JIT Read** に一本化してください。  
+- テキストは「思い出させる用途」、強制は hook に寄せる。  
+- 追加より削減。新規ルールは「同じ失敗が2-3回再発した後」に限定。
 
-1. `0.1780`
-   - Source: mean of `predictions[].brier_score` for rows with `status == "resolved"` in the current DB.
-   - Count: `n=7`
-   - This matches the live VPS `/reader-predict/leaderboard` API exactly.
-   - Resolved IDs are the same 7 Claude saw on VPS:
-     `NP-2026-0008, 0009, 0010, 0011, 0013, 0018, 0019`
+---
 
-2. `0.1828`
-   - Source: `scripts/prediction_db.json -> stats.avg_brier_score`
-   - Problem: the same `stats` block also says `resolved=52` and `open=1`, but the actual current rows are:
-     - `resolving=1103`
-     - `resolved=7`
-     - `open=6`
-   - Conclusion: this `stats` block is stale summary data and should not be trusted as canonical.
+## 1) `@import` 断捨離: 何を常時ロードすべきか
 
-3. `0.4759`
-   - Source: `scripts/prediction_db.json -> meta.official_brier_avg`
-   - Same value also stored as `meta.official_brier_avg_initial_prob`
-   - Count: `n=53`
-   - This comes from the new “official” binary methodology:
-     `BS = (initial_prob / 100 - actual_outcome)^2`
-   - Code path: `scripts/refresh_prediction_db_meta.py`
+### 常時ロード（毎回読む）
+**2件まで**に制限。
+1. `CLAUDE.md` 本体（60-120行目安）
+2. `NORTH_STAR` の**要約版**（8-12行、後述）
 
-## 2) VPS has 7 truly resolved rows; the apparent local “52” is a stale/mixed artifact
+### 条件付きロード（必要時のみ）
+- 実装規約（言語/フレームワーク別）
+- コンテンツ規約
+- 運用手順（VPS、デプロイ、障害対応）
+- 長文ポリシー
 
-- Claude’s VPS check is correct: live production only has `7` rows with `status="resolved"`.
-- The raw current local file now agrees on the true status split: `7 resolved`, not 52.
-- The apparent “52 local resolved” came from stale summary fields and/or from counting rows that already have `verdict` + `brier_score` while still marked `status="resolving"`.
-- Specifically:
-  - `53` rows have `verdict in {HIT, MISS}` and a `brier_score`
-  - only `3` of those 53 are actually `status="resolved"`
-  - the other `50` are still `status="resolving"`
+### あなたの現状への適用
+- 現在の `@import 7件` は多すぎます。**0-1件**へ削減推奨。  
+- 実務的には `@import` 自体をほぼ廃止し、`CLAUDE.md` には「参照先インデックス1ブロック」だけ残すのが最も安定です。
 
-## 3) Which `brier_score` values are actually correct?
+---
 
-- `predictions[].brier_score` is a **legacy field** produced by the old verifier logic in `scripts/prediction_verifier.py`.
-- That old logic uses the 3-scenario formula:
-  `calculate_brier_score(scenarios, outcome)`
-- So those per-row values are mathematically correct **for the old scenario-based scoring system**.
+## 2) `session-start.sh` 圧縮目標
 
-- They are **not the same thing** as the new “official” binary Brier methodology now documented in:
-  - `docs/PREDICTION_BRIER_SCORE_METHODOLOGY.md`
-  - `docs/PREDICTION_SCORE_PROVENANCE_POLICY.md`
-  - `scripts/refresh_prediction_db_meta.py`
+### 目標値
+- **15-25行**（上限30行）
 
-### Practical interpretation
+### 残すべき出力
+- セッションID/日時
+- 今回の最重要3点（Today Focus）
+- 直近未完了タスク3件
+- 参照先ショートカット（3-5件）
 
-- If the question is: “What does the live leaderboard currently use?”
-  - Answer: `0.1780`, from the 7 `status="resolved"` rows and their existing `predictions[].brier_score` values.
+### 削るべき出力
+- 長文説明
+- 定型の重複注意書き
+- SSH詳細ログの生出力（必要時コマンドで取得に変更）
 
-- If the question is: “What is the new official Brier under the initial_prob/verdict methodology?”
-  - Answer: `0.4759`, `n=53`
+### Codex側感覚
+- 起動時に毎回読む前提は**数十行以内**が限界。145行は「読む対象」ではなく「ノイズ源」です。
 
-- If the question is: “Is `stats.avg_brier_score = 0.1828` authoritative?”
-  - Answer: no, that whole `stats` block is stale.
+---
 
-## 4) Important nuance on the live 0.1780
+## 3) `docs/102` の整理
 
-- The current live API logic in `scripts/reader_prediction_api.py` includes any row with:
-  - resolved status
-  - non-null `brier_score`
-- It does **not** exclude `verdict="NOT_SCORED"`.
-- Among the 7 resolved rows, 4 are `NOT_SCORED` but still carry a `brier_score`:
-  - `NP-2026-0009`
-  - `NP-2026-0010`
-  - `NP-2026-0011`
-  - `NP-2026-0018`
-- So `0.1780` is the correct **live implementation value**, but I would not call it the “official” Brier under the new documented methodology.
+### 推奨アクション（削除寄り）
+1. **即アーカイブ**: 90日未参照・重複・過去設計（まず退避）
+2. **統合**: 同テーマを1ファイルへ集約（index + 本文）
+3. **削除**: hook化済みで文書価値がないもの
 
-## Bottom line
+### 到達目標
+- `docs/` を **102 → 15-25ファイル**へ圧縮。
+- トップに `docs/INDEX.md` 1枚だけ置き、各項目1-2行説明 + 最終更新日。
 
-- Production/live number today: `0.1780` over `7` resolved rows
-- Stale DB summary number: `0.1828`
-- New official methodology number: `0.4759` over `53` scored rows
+### 判定基準
+- 「直近30日で参照されたか」
+- 「失敗予防に実際効いたか」
+- 「hookに置換可能か」
 
-I would describe the current situation as:
-“the live leaderboard still reflects legacy per-row `brier_score` values and a 7-row resolved subset, while the new official binary score has been computed only at the meta layer and has not been propagated into the public leaderboard logic.”
+---
+
+## 4) ゼロベース理想設計（追加せず、減らす）
+
+### レイヤ構造
+1. **L0: Identity（常時）**  
+   - `CLAUDE.md` 60-120行  
+   - 役割・禁止事項・成功定義・必須コマンドのみ
+2. **L1: Intent（常時）**  
+   - NORTH_STAR要約 8-12行
+3. **L2: Enforcement（常時実行）**  
+   - hooks（唯一の強制層）
+4. **L3: Playbooks（都度）**  
+   - 必要時に読む短い手順書
+5. **L4: Archive（非ロード）**  
+   - 履歴・背景・長文資料
+
+### 運用ルール
+- 新規ルール追加条件: 同一ミス再発2-3回 + 既存hookで防げない
+- 追加先優先順位: `hook` → `短文カード` → 最後に文書
+- 四半期ごとに「総量予算」を再計測（行数/文字数）
+
+---
+
+## 5) NORTH_STAR（300行）を忘れない設計
+
+### 推奨（最も効く）
+- **全文常時importはしない。**  
+- `NORTH_STAR` から**不変原則10行**を抽出し、`CLAUDE.md` 冒頭に固定。
+- その10行を **FLASH CARDSにも重複掲載**。
+- 逸脱しやすい2-3原則は hook 判定に落とす。
+
+### 理由
+- 300行は常時読了されない。
+- 「意図の保存」は冗長さでなく**再想起頻度**と**違反時の物理ブロック**で達成される。
+
+---
+
+## 実行順（7日で収束させる）
+1. Day1: `@import` を 0-1件へ削減、`CLAUDE.md` を120行以下へ。  
+2. Day2: `session-start.sh` を25行以内へ圧縮。  
+3. Day3-4: `docs/` を archive/in-use に二分し、`INDEX`作成。  
+4. Day5: NORTH_STAR 10行要約を固定（CLAUDE + FLASH CARD）。  
+5. Day6-7: 再発ミスだけ hook 追加、文書追加は禁止。
+
+---
+
+## 最終判断
+- Naotoの問題提起は正しいです。今のボトルネックは「意図の不足」ではなく**読み込み設計の破綻**。  
+- 取るべき戦略は一貫して **常時テキスト最小化 + 強制はhook + 必要時読込** です。

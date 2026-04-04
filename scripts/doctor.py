@@ -120,20 +120,18 @@ class Doctor:
                        "settings.local.json が存在しない（settings.local.example.json を参考に作成を推奨）", "WARNING")
 
     def check_doctrine_files(self):
-        """doctrine 5本"""
-        doctrines = [
-            "FOUNDER_CONSTITUTION.md",
-            "DECISION_DOCTRINE.md",
-            "WISDOM_INGESTION_DOCTRINE.md",
-            "LONG_TERM_VALUE_DOCTRINE.md",
-            "DISSENT_DOCTRINE.md",
+        """consolidated doctrine files (archived originals → 4 canonical files)"""
+        canonical = [
+            (".claude/rules/NORTH_STAR.md", REPO_ROOT / ".claude" / "rules" / "NORTH_STAR.md"),
+            (".claude/rules/OPERATING_PRINCIPLES.md", REPO_ROOT / ".claude" / "rules" / "OPERATING_PRINCIPLES.md"),
+            (".claude/rules/IMPLEMENTATION_REF.md", REPO_ROOT / ".claude" / "rules" / "IMPLEMENTATION_REF.md"),
+            (".claude/CLAUDE.md", REPO_ROOT / ".claude" / "CLAUDE.md"),
         ]
-        for doc in doctrines:
-            p = DOCS_DIR / doc
+        for label, p in canonical:
             if p.exists():
-                self.check(f"docs/{doc}", "PASS")
+                self.check(f"{label}", "PASS")
             else:
-                self.check(f"docs/{doc}", "WARN", f"doctrine が存在しない: {p}", "WARNING")
+                self.check(f"{label}", "WARN", f"canonical file が存在しない: {p}", "WARNING")
 
     def check_north_star(self):
         """NORTH_STAR.md の存在と Eternal Directives の存在確認"""
@@ -155,7 +153,7 @@ class Doctor:
 
     def check_three_layer_constitution(self):
         """三層憲法ヒエラルキー整合性チェック
-        NORTH_STAR（価値）→ OPERATING_PRINCIPLES（原則）→ SYSTEM_GOVERNOR（統治）
+        NORTH_STAR（価値）→ OPERATING_PRINCIPLES（原則）→ IMPLEMENTATION_REF（技術参照）
         """
         rules_dir = REPO_ROOT / ".claude" / "rules"
         claude_md = REPO_ROOT / ".claude" / "CLAUDE.md"
@@ -215,23 +213,23 @@ class Doctor:
                 if l1:
                     l1_files = l1.get("files", [])
                     has_op_l1 = any("OPERATING_PRINCIPLES" in f for f in l1_files)
-                    sg_in_l1 = any("SYSTEM_GOVERNOR" in f for f in l1_files)
+                    ir_in_l1 = any("IMPLEMENTATION_REF" in f for f in l1_files)
                     self.check("3layer: memory_routing_rules L1 OPERATING_PRINCIPLES",
                                "PASS" if has_op_l1 else "FAIL",
                                "" if has_op_l1 else "L1 に OPERATING_PRINCIPLES.md が含まれていない",
                                "ERROR" if not has_op_l1 else "INFO")
-                    if sg_in_l1:
-                        self.check("3layer: memory_routing_rules SYSTEM_GOVERNOR L1誤配置",
-                                   "FAIL", "SYSTEM_GOVERNOR.md が L1 に残存 — L2 に移動が必要", "ERROR")
+                    if ir_in_l1:
+                        self.check("3layer: memory_routing_rules IMPLEMENTATION_REF L1誤配置",
+                                   "FAIL", "IMPLEMENTATION_REF.md が L1 に残存 — L2 に移動が必要", "ERROR")
                     else:
-                        self.check("3layer: memory_routing_rules SYSTEM_GOVERNOR L1から除去", "PASS")
+                        self.check("3layer: memory_routing_rules IMPLEMENTATION_REF L1から除去", "PASS")
                 if l2:
                     l2_files = l2.get("files", [])
-                    sg_in_l2 = any("SYSTEM_GOVERNOR" in f for f in l2_files)
-                    self.check("3layer: memory_routing_rules L2 SYSTEM_GOVERNOR",
-                               "PASS" if sg_in_l2 else "WARN",
-                               "" if sg_in_l2 else "L2 に SYSTEM_GOVERNOR.md が含まれていない（推奨）",
-                               "WARNING" if not sg_in_l2 else "INFO")
+                    ir_in_l2 = any("IMPLEMENTATION_REF" in f for f in l2_files)
+                    self.check("3layer: memory_routing_rules L2 IMPLEMENTATION_REF",
+                               "PASS" if ir_in_l2 else "WARN",
+                               "" if ir_in_l2 else "L2 に IMPLEMENTATION_REF.md が含まれていない（推奨）",
+                               "WARNING" if not ir_in_l2 else "INFO")
             except Exception as e:
                 self.check("3layer: memory_routing_rules.json パース", "WARN",
                            f"パースエラー: {e}", "WARNING")
@@ -342,7 +340,7 @@ class Doctor:
         for doc in [
             ".claude/SYSTEM_MAP.md",
             ".claude/rules/NORTH_STAR.md",
-            ".claude/rules/SYSTEM_GOVERNOR.md",
+            ".claude/rules/IMPLEMENTATION_REF.md",
         ]:
             p = REPO_ROOT / doc
             self.check(f"doc: {doc}", "PASS" if p.exists() else "WARN",
@@ -482,20 +480,14 @@ class Doctor:
                 "ERROR" if not p.exists() else "INFO",
             )
 
-        # L1→L2 整合性: SYSTEM_GOVERNOR.md は L1 ではなく L2（Operating Rules）
-        p_sg = rules_dir / "SYSTEM_GOVERNOR.md"
-        if p_sg.exists():
-            content_sg = p_sg.read_text(encoding="utf-8")
-            if "このファイルは `.claude/rules/OPERATING_PRINCIPLES.md` の実装統治仕様です" in content_sg:
-                self.check("memory-L1→L2: SYSTEM_GOVERNOR配置宣言", "PASS",
-                           "SYSTEM_GOVERNOR.md に OPERATING_PRINCIPLES の実装統治仕様であることが宣言済み")
-            else:
-                self.check("memory-L1→L2: SYSTEM_GOVERNOR配置宣言", "FAIL",
-                           "SYSTEM_GOVERNOR.md の冒頭に実装統治仕様宣言がない — T012要件未充足",
-                           "ERROR")
+        # L1→L2 整合性: IMPLEMENTATION_REF.md は L1 ではなく L2（Operating Rules）
+        p_ir = rules_dir / "IMPLEMENTATION_REF.md"
+        if p_ir.exists():
+            self.check("memory-L1→L2: IMPLEMENTATION_REF存在", "PASS",
+                       "IMPLEMENTATION_REF.md が存在する（consolidated technical reference）")
         else:
-            self.check("memory-L1→L2: SYSTEM_GOVERNOR.md 存在", "FAIL",
-                       f"SYSTEM_GOVERNOR.md が存在しない: {p_sg}", "ERROR")
+            self.check("memory-L1→L2: IMPLEMENTATION_REF.md 存在", "FAIL",
+                       f"IMPLEMENTATION_REF.md が存在しない: {p_ir}", "ERROR")
 
         # L2: Operating Rules — CLAUDE.md
         p_claude = REPO_ROOT / ".claude" / "CLAUDE.md"
@@ -746,7 +738,7 @@ class Doctor:
         ssot_paths = [
             REPO_ROOT / ".claude" / "rules" / "NORTH_STAR.md",
             REPO_ROOT / ".claude" / "rules" / "OPERATING_PRINCIPLES.md",
-            REPO_ROOT / ".claude" / "rules" / "SYSTEM_GOVERNOR.md",
+            REPO_ROOT / ".claude" / "rules" / "IMPLEMENTATION_REF.md",
         ]
         active_id_path = REPO_ROOT / ".claude" / "hooks" / "state" / "active_task_id.txt"
 
