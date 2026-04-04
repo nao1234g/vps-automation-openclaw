@@ -11,7 +11,8 @@ Nowpattern = 世界No.1予測プラットフォーム（唯一の最重要プロ
 
 | 階層 | 場所 | 読み込み |
 |------|------|---------|
-| 意図・哲学 | `.claude/rules/NORTH_STAR.md` | **自動（@import）** |
+| 意図・哲学（サマリー） | `.claude/rules/NORTH_STAR.md` | **自動（@import）** |
+| 意図・哲学（詳細版） | `.claude/reference/NORTH_STAR_DETAIL.md` | JIT（必要時にRead） |
 | 行動規範 | `.claude/reference/OPERATING_PRINCIPLES.md` | JIT（必要時にRead） |
 | 実装参照 | `.claude/reference/IMPLEMENTATION_REF.md` | JIT（必要時にRead） |
 | プロジェクト | `projects/nowpattern/` | JIT |
@@ -56,6 +57,7 @@ Nowpattern = 世界No.1予測プラットフォーム（唯一の最重要プロ
 
 | いつ読むか | ファイル |
 |-----------|---------|
+| NORTH_STAR各セクションの詳細（実践ガイド・テンプレート） | `.claude/reference/NORTH_STAR_DETAIL.md` |
 | コンテンツ・タグ・X投稿 | `.claude/reference/OPERATING_PRINCIPLES.md` §9-11 |
 | NEO・Docker・VPS操作 | `.claude/reference/IMPLEMENTATION_REF.md` §5-8 |
 | 統治レベル・承認フロー | `.claude/reference/OPERATING_PRINCIPLES.md` §4-7 |
@@ -63,7 +65,8 @@ Nowpattern = 世界No.1予測プラットフォーム（唯一の最重要プロ
 | フック・強制の実装 | `.claude/reference/IMPLEMENTATION_REF.md` §1-4 |
 | 既知のミス | `docs/KNOWN_MISTAKES.md` |
 | 蓄積された知恵 | `docs/AGENT_WISDOM.md` |
+| 類似予測検索（AI Notion） | `scripts/prediction_similarity_search.py` |
 
 ---
 
-*最終更新: 2026-04-04 — Real JIT化: OP+IRを.claude/reference/に移動。.claude/rules/にはNORTH_STARのみ残留。74%トークン削減*
+*最終更新: 2026-04-04 — NORTH_STAR 2段階化(サマリー+DETAIL)。NORTH_STAR_DETAIL.md+prediction_similarity_search.py追加。全エージェント共通AGENTS.md作成*
