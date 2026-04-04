@@ -4,10 +4,11 @@
 from __future__ import annotations
 
 import argparse
+import json
 import ssl
 import sys
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urljoin
 
@@ -110,13 +111,20 @@ def record_result(name: str, ok: bool, detail: str, fail_details: list[str]) -> 
     return 0, 1
 
 
-def run_tests(lang: str, device: str, take_screenshot: bool = False) -> bool:
+def run_tests(lang: str, device: str, take_screenshot: bool = False) -> dict[str, object]:
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
         print("ERROR: playwright not installed.")
         print("Run: pip3 install playwright && playwright install chromium")
-        return False
+        return {
+            "lang": lang,
+            "device": device,
+            "ok": False,
+            "pass_count": 0,
+            "fail_count": 1,
+            "fail_details": ["playwright_not_installed"],
+        }
 
     base_url = PREDICTIONS_URLS[lang]
     device_config = DEVICE_CONFIGS[device]
@@ -149,11 +157,25 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> bool:
             fail_count += inc_fail
             if status >= 400:
                 browser.close()
-                return False
+                return {
+                    "lang": lang,
+                    "device": device,
+                    "ok": False,
+                    "pass_count": pass_count,
+                    "fail_count": fail_count + 1,
+                    "fail_details": fail_details + [str(status)],
+                }
         except Exception as exc:
             record_result("page load", False, str(exc), fail_details)
             browser.close()
-            return False
+            return {
+                "lang": lang,
+                "device": device,
+                "ok": False,
+                "pass_count": pass_count,
+                "fail_count": fail_count + 1,
+                "fail_details": fail_details + [str(exc)],
+            }
 
         if take_screenshot:
             ss_path = f"{SCREENSHOT_DIR}/{lang}-{device}-01-initial.png"
@@ -502,7 +524,15 @@ def run_tests(lang: str, device: str, take_screenshot: bool = False) -> bool:
         for msg in fail_details:
             print(f"     - {msg}")
     print("=" * 64 + "\n")
-    return fail_count == 0
+    return {
+        "lang": lang,
+        "device": device,
+        "ok": fail_count == 0,
+        "pass_count": pass_count,
+        "fail_count": fail_count,
+        "fail_details": fail_details,
+        "total": total,
+    }
 
 
 def main() -> None:
@@ -510,15 +540,35 @@ def main() -> None:
     parser.add_argument("--lang", choices=["ja", "en", "both"], default="ja")
     parser.add_argument("--device", choices=["desktop", "mobile", "both"], default="both")
     parser.add_argument("--screenshot", action="store_true")
+    parser.add_argument("--json-out")
     args = parser.parse_args()
 
     langs = ["ja", "en"] if args.lang == "both" else [args.lang]
     devices = ["desktop", "mobile"] if args.device == "both" else [args.device]
     all_pass = True
+    results: list[dict[str, object]] = []
     for lang in langs:
         for device in devices:
-            if not run_tests(lang=lang, device=device, take_screenshot=args.screenshot):
+            result = run_tests(lang=lang, device=device, take_screenshot=args.screenshot)
+            results.append(result)
+            if not bool(result["ok"]):
                 all_pass = False
+
+    if args.json_out:
+        out_path = Path(args.json_out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "generated_at_epoch": int(datetime.now(timezone.utc).timestamp()),
+            "results": results,
+            "summary": {
+                "total_runs": len(results),
+                "failed_runs": sum(1 for item in results if not bool(item["ok"])),
+                "passed_runs": sum(1 for item in results if bool(item["ok"])),
+            },
+            "ok": all_pass,
+        }
+        out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     raise SystemExit(0 if all_pass else 1)
 

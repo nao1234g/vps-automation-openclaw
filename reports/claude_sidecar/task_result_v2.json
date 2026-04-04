@@ -1,0 +1,2497 @@
+{
+  "generated_at": "2026-04-04T05:30:00Z",
+  "agent": "claude-code-sidecar",
+  "model": "claude-opus-4-6",
+  "version": "v2",
+  "mission_contract_version": "2026-03-31-naoto-mission-v3",
+  "lexicon_version": "2026-03-31-public-lexicon-v4",
+  "task_id": "sidecar-20260404-distribution-audit-v2",
+  "manifest_source": "reports/article_release_manifest.json",
+  "manifest_post_count": 474,
+  "manifest_fields_available": [
+    "distribution_allowed",
+    "human_approval_present",
+    "human_approval_required",
+    "public_truth_allowed",
+    "release_errors",
+    "release_lane",
+    "release_warnings",
+    "risk_flags",
+    "slug",
+    "tag_slugs",
+    "truth_only_errors",
+    "url"
+  ],
+  "manifest_fields_not_available": [
+    "external_url_count",
+    "verified_external_source_count",
+    "title",
+    "html",
+    "plaintext"
+  ],
+  "distribution_summary": {
+    "published_total": 474,
+    "distribution_allowed": 212,
+    "distribution_blocked": 262,
+    "distribution_allowed_ratio_pct": 44.73,
+    "truth_blocked": 0,
+    "policy_minimum_pct": 30.0
+  },
+  "ic1": {
+    "id": "IC-1",
+    "title": "dual-flag (WAR_CONFLICT + FINANCIAL_CRISIS) verified_count threshold relaxation",
+    "description": "All 196 posts have both WAR_CONFLICT and FINANCIAL_CRISIS flags. Blocked by classify_release_lane L86-89: dual AUTO_SAFE flags require verified_count >= 2. Most posts have 0-1 verified sources.",
+    "blocking_rule": "article_release_guard.py L86-89: if len(risk_flags) >= 2 and set(risk_flags).issubset(AUTO_SAFE_SINGLE_RISK_FLAGS) and verified_count >= 2",
+    "proposed_change": "Lower threshold from verified_count >= 2 to >= 1; return editorial_review_advised (distribution_allowed=true with warning)",
+    "risk": "low",
+    "count": 196,
+    "lang_distribution": {
+      "lang-ja": 45,
+      "lang-en": 151
+    },
+    "slugs": [
+      "24-us-states-tariff-lawsuits-constitutional",
+      "attack-on-iranian-energy-facilities-middle-east",
+      "australias-middle-east-evacuation-domestic-politics-weaponize-a-repatriation-crisis",
+      "bei-zhao-xian-no-zhan-zheng-jing-ji-2zhao-yuan-zhi-cai-ti-zhi-wowu-li-hua-surujun-shi-manenogou-zao-zhuan-huan",
+      "between-lines-what-reports-arent-saying",
+      "bitcoin-breaks-72k-against-strong-dollar-the-decoupling-signal",
+      "bitcoin-decouples-at-72k-digital-gold-thesis-survives-the-strong-dollar",
+      "bitcoins-70k-breach-energy-shock-meets-monetary-paralysis",
+      "bitcoins-dollar-defiance-crypto-decouples-from-risk-assets",
+      "bitcoins-geopolitical-stress-test-oil-shocks-meet-digital-safe-haven",
+      "bitcoins-war-premium-safe-haven-narrative-rewrites-the-crisis-playbook",
+      "boj-holds-rates-amid-hormuz-crisis",
+      "boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit-2",
+      "boj-keeps-rates-unchanged-amid-hormuz-crisis-ge",
+      "bojs-iran-dilemma-when-geopolitical-oil-shocks-collide-with-monetary-normalization",
+      "btcgas-p500tojin-nilie-hou-dezitarugorudo-shen-hua-beng-huai-gabao-kuben-dang-nozheng-ti",
+      "bundesbank-president-backs-euro-stablecoins-europe-declares-digital-monetary",
+      "central-bank-super-week-seven-rate-decisions-collide-with-inflation-shock",
+      "concerns-over-prolongation-of-us-iran-military-operations",
+      "crude-oil-breaks",
+      "crypto-for-the-stateless-when-financial-infrastructure-becomes-geopolitical-refuge",
+      "cryptos-f1-gamble-war-exposes-the-fragility-of-gulf-sportswashing-deals",
+      "demand-for-dispatch-of-warships-to-the-strait-of-horm",
+      "ecb-holds-at-2-for-sixth-straight-meeting-path-dependency-traps-europes-central-bank",
+      "ecb-holds-interest-rates-for-sixth-consecutive-time",
+      "ecbjin-li-ju-ezhi-ki6lian-sok-enerugiwei-ji-gapo-ruzheng-ce-zhuan-huan-nofen-shui-ling",
+      "en-24-states-vs-trump-tariffs-federalism-strikes-back-at-trade-unilateralism",
+      "en-australias-16-5b-war-exposure-energy-dependency-meets-geopolitical-contagion",
+      "en-bitcoin-breaks-72k-against-strong-dollar-the-decoupling-signal",
+      "en-bitcoins-70k-breach-energy-shock-meets-monetary-paralysis",
+      "en-bitcoins-dollar-defiance-crypto-decouples-from-equities-in-2026",
+      "en-bitcoins-geopolitical-stress-test-oil-shocks-meet-digital-safe-haven-thesis",
+      "en-bitcoins-geopolitical-stress-test-oil-shocks-meet-digital-safe-havens",
+      "en-boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit",
+      "en-boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit-2-2",
+      "en-chinas-alliance-deficit-the-middle-east-war-reveals-a-superpower-without-partners",
+      "en-chinas-energy-fortress-strategic-reserves-turn-crisis-into-leverage",
+      "en-diego-garcia-strike-exit-signals-iran-tests-reach-as-us-seeks-off-ramp",
+      "en-fed-holds-rates-amid-iran-energy-shock-path-dependency-traps-powell",
+      "en-fed-holds-rates-steady-twice-middle-east-uncertainty-freezes-monetary-policy",
+      "en-feds-iran-war-rate-freeze-when-geopolitics-traps-monetary-policy",
+      "en-frbli-xia-gejian-song-rilian-sok-zhong-dong-risukutoinhurezai-ran-gafu-rujin-rong-zheng-ce-nojing-lu-yi-cun",
+      "en-gulf-migrant-labor-crisis-when-geopolitics-exposes-the-kafala-systems-moral-hazard",
+      "en-hormuz-chokepoint-crushes-south-asia-the-contagion-cascade-of-energy-dependence",
+      "en-hormuz-strait-burden-sharing-trumps-naval-ultimatum-strains-allied-order",
+      "en-hormuz-strait-crisis-trumps-burden-sharing-gambit-strains-alliances",
+      "en-hormuz-strait-crisis-trumps-burden-sharing-ultimatum-reshapes-maritime-security",
+      "en-hormuz-strait-ultimatum-trumps-48-hour-threat-triggers-escalation-spiral-with-iran",
+      "en-iran-energy-infrastructure-under-fire-the-escalation-spiral-threatening-global-oil-markets",
+      "en-iran-strikes-energy-shock-geopolitical-war-premium-returns-to-global-markets",
+      "en-iran-war-energy-shock-the-contagion-cascade-toward-global-recession",
+      "en-iran-war-oil-shock-the-contagion-cascade-threatening-global-growth",
+      "en-iran-war-oil-shock-the-escalation-spiral-threatening-global-growth",
+      "en-iran-wars-asian-shockwaves-how-a-gulf-conflict-rewires-indo-pacific-power",
+      "en-japan-u-s-defense-talks-on-iran-the-hormuz-chokepoint-reshapes-alliance-dynamics",
+      "en-japans-budget-gridlock-coalition-weakness-meets-fiscal-deadline-pressure",
+      "en-japans-budget-impasse-coalition-fragility-meets-fiscal-deadline-pressure",
+      "en-japans-oda-overhaul-strategic-aid-as-the-new-geopolitical-currency",
+      "en-kelloggs-exit-interview-ceasefire-hinges-on-putins-land-calculus",
+      "en-koizumi-hegseth-call-on-iran-alliance-coordination-under-strait-pressure",
+      "en-koizumi-hegseth-call-on-iran-the-strait-of-hormuz-as-alliance-stress-test",
+      "en-new-zealands-fuel-subsidy-when-energy-crises-birth-new-welfare-states",
+      "en-new-zealands-fuel-subsidy-when-energy-crises-rewrite-the-social-contract",
+      "en-oman-breaks-silence-on-iran-war-imperial-overreach-meets-alliance-strain",
+      "en-orbans-eu90bn-veto-how-one-leader-holds-eu-unity-hostage",
+      "en-pakistans-solar-leapfrog-when-grid-failure-births-distributed-energy-revolution",
+      "en-pakistans-solar-leapfrog-when-grid-failure-sparks-a-decentralized-energy-revolution",
+      "en-strait-of-hormuz-crisis-atlantic-alliance-fractures-over-iran-war",
+      "en-strait-of-hormuz-crisis-europe-defects-from-us-imperial-overreach",
+      "en-strait-of-hormuz-threat-irans-chokepoint-gambit-risks-global-energy-crisis",
+      "en-transatlantic-fracture-europe-defies-trump-on-iran-and-redraws-alliance-lines",
+      "en-trump-rejects-allied-support-on-iran-imperial-overreach-meets-alliance-fracture",
+      "en-trumps-hormuz-ultimatum-alliance-strain-meets-energy-chokepoint-crisis",
+      "en-trumps-voter-id-push-meets-congressional-reality-imperial-agenda-strains-alliance-architecture",
+      "en-uk-breaks-ranks-on-iran-alliance-strain-exposes-imperial-overreach",
+      "en-uk-oil-rationing-playbook-when-war-rewrites-the-rules-of-the-road",
+      "en-us-china-paris-trade-talks-rare-earth-leverage-meets-tariff-escalation",
+      "en-us-china-paris-trade-talks-rare-earths-as-the-new-leverage-battleground",
+      "en-us-eases-iran-oil-sanctions-mid-war-escalation-meets-energy-realpolitik",
+      "en-us-india-oil-waiver-sanctions-flexibility-reveals-empires-energy-dilemma",
+      "en-us-iran-escalation-spiral-when-total-destruction-claims-meet-defiant-retaliation",
+      "en-us-iran-war-exit-pressure-imperial-overreach-meets-internal-dissent",
+      "en-us-oil-waiver-for-india-sanctions-flexibility-reveals-imperial-overreach-2",
+      "en-us-rolls-back-russia-oil-sanctions-alliance-strain-meets-energy-realpolitik",
+      "en-wti-crude-crashes-14-trumps-iran-pause-exposes-oils-geopolitical-fragility",
+      "eu-australia-fta-concluded-the-structure-of",
+      "eu-middle-east-paralysis-alliance-strain-exposes-europes-strategic-void",
+      "eus-mica-crackdown-on-stablecoins-regulatory-capture-reshapes-global-crypto",
+      "eus-middle-east-paralysis-alliance-strain-meets-institutional-decay",
+      "fed-holds-interest-rates-iran-crisis-structurally-obstructs",
+      "fed-holds-off-on-rate-cuts-for-second-consecutive",
+      "frb2hui-he-lian-sok-li-xia-gejian-song-ri-zhong-dong-risukutoinhurezai-ran-gamiao-kujin-rong-zheng-ce-nojing-lu-yi-cun",
+      "frbjin-li-ju-ezhi-ki-iranwei-ji-gali-xia-gelu-xian-wogou-zao-de-nizu-mudi-zheng-xue-risukunolian-suo",
+      "frbli-xia-gedong-jie-noshen-ceng-zhong-dong-risukutoinhurezai-ran-gafu-rujin-rong-zheng-ce-nojing-lu-yi-cun",
+      "frbli-xia-gedong-jie-noshen-ceng-zhong-dong-risukutoinhurezai-ran-gamiao-kujin-rong-zheng-ce-nojing-lu-yi-cun",
+      "frbli-xia-gejian-song-rilian-sok-zhong-dong-risukutoinhurezai-ran-gafu-rujin-rong-zheng-ce-nojing-lu-yi-cun",
+      "frbzheng-ce-jin-li-ju-ezhi-ki-iranwei-ji-gali-xia-gejing-lu-wofeng-zirugou-zao-de-zirenma",
+      "gao-shi-shou-xiang-no-cheng-chang-zhan-lue-ximfwai-jiao-ri-ben-jing-ji-zheng-ce-nogou-zao-zhuan-huan-toguo-ji-jiao-she-nojiao-chai-dian",
+      "gaza-ping-he-ping-yi-hui-guo-lian-chu-bao-gao-zheng-tong-xing-nakitong-zhi-gasheng-muzhong-dong-zhi-xu-nokong-bai",
+      "guan-ce-rogu-0012-rubio-wang-yi-hui-tan-dui-hua-toxie-li-woqiang-hua-toiuyan-xie-noli-de-4yue-nofang-zhong-nixiang-ketadi-narasigajin-mu-guan-shui-tai-wan-ban-dao-ti-donowen-ti-woxian-n",
+      "hegseths-hormuz-dismissal-imperial-overreach-meets-energy-reality",
+      "hormuz-chokepoint-crushes-south-asia-the-contagion-cascade-of-energy-dependence",
+      "hormuz-escalation-spiral-when-oil-chokepoints-become-battlefields",
+      "hormuz-strait-attacks-oils-chokepoint-triggers-global-escalation-spiral",
+      "hormuz-strait-attacks-the-escalation-spiral-that-reprices-global-energy",
+      "hormuz-strait-blockade-imperial-overreach-meets-energy-contagion-cascade",
+      "hormuz-strait-ultimatum-trumps-48-hour-threat-triggers-escalation-spiral-with-iran",
+      "horumuzuhai-xia-feng-suo-nochang-qi-hua-quan-li-noguo-shen-zhan-gazhao-kuenerugizhi-xu-nobeng-huai",
+      "horumuzuhai-xia-henojian-chuan-pai-qian-yao-qiu-ri-mi-tong-meng-no-dui-jia-gazhong-dong-nikuo-zhang-sarerugou-zao-zhuan-huan",
+      "horumuzuhai-xia-jian-chuan-pai-qian-wen-ti-tong-meng-nogui-lie-gabao-kuenerugian-bao-nogou-zao-de-cui-ruo-xing",
+      "horumuzuhai-xia-wei-ji-totoranpuno-fu-dan-gong-you-ya-li-tong-meng-gui-lie-gazi-yuan-wei-ji-wozeng-fu-surugou-zao",
+      "iea-oil-reserve-release-energy-shock-doctrine-reshapes-crypto-corridors",
+      "ieas-record-oil-release-strategic-reserves-as-geopolitical-currency",
+      "ieas-record-oil-reserve-release-energy-crisis-meets-crypto-safe-haven",
+      "imf-warns-on-middle-east-crisis-energy-shock-threatens-global-recovery",
+      "iran-energy-infrastructure-under-fire-the-escalation-spiral-threatening-global-oil-markets",
+      "iran-overreach-trap-how-us-middle-east-escalation-hands-china-a-strategic-gift",
+      "iran-strikes-energy-shock-geopolitical-war-premium-returns-to-global-markets",
+      "iran-strikes-taiwan-drift-how-us-overreach-hands-china-a-strategic-opening",
+      "iran-strikes-trigger-australias-energy-deja-vu-the-contagion-cascade-returns",
+      "iran-war-exit-pressure-imperial-overreach-meets-internal-dissent",
+      "iran-war-oil-shock-americas-sanctions-dilemma-reveals-the-limits-of-maximum",
+      "iran-war-ripples-through-asia-energy-shock-exposes-alliance-fragility",
+      "iran-war-stockpile-crisis-imperial-overreach-meets-logistical-reality",
+      "iran-wars-asian-shockwaves-how-a-gulf-conflict-rewires-indo-pacific-power",
+      "israels-successor-hunt-decapitation-strategy-meets-imperial-overreach",
+      "japan-us-defense-chiefs-discuss-iran-crisis",
+      "japans-iran-diplomacy-gambit-energy-dependence-meets-alliance-strain",
+      "kelloggs-exit-interview-ceasefire-hinges-on-putins-land-calculus",
+      "kharg-island-strikes-the-escalation-spiral-that-rewrites-the-oil-order",
+      "largest-sewage-spill-in-us-history-the-federal-government-owns-the-facility-its",
+      "mi-iranjun-shi-chong-tu-nochang-qi-hua-tozheng-quan-nei-che-tui-lun-quan-li-noguo-shen-zhan-gazhao-kuzhong-dong-zhi-xu-nogou-zao-zhuan-huan",
+      "mi-iranzhan-zheng-nochu-kou-nakimi-lu-toranpuzheng-quan-nei-bu-nizou-ru-quan-li-noguo-shen-zhan-nogui-lie",
+      "mi-rodian-hua-hui-tan-toiranqing-shi-da-guo-jian-xie-diao-noli-niqian-muzhong-dong-zhi-xu-zai-bian-nogou-zao-li-xue",
+      "new-zealands-fuel-subsidy-when-energy-crises-birth-new-welfare-states",
+      "oil-vs-ai-how-middle-east-war-threatens-the-data-center-boom",
+      "oman-breaks-silence-on-iran-war-imperial-overreach-meets-alliance-strain",
+      "orbans-eu90bn-veto-how-one-leader-holds-eu-unity-hostage",
+      "pakistans-solar-leapfrog-when-grid-failure-births-distributed-energy-revolution",
+      "prime-minister-takaichis-growth-strategy-x-imf",
+      "protraction-of-the-strait-of-hormuz-blockade",
+      "putins-iran-nuclear-mediation-proposal-the-structure-of",
+      "qantas-fare-hikes-when-war-reprices-the-cost-of-distance",
+      "ri-yin-horumuzuwei-ji-xia-dejin-li-ju-ezhi-ki-di-zheng-xue-risukugajin-rong-zheng-ce-woren-zhi-niqu-rugou-zao",
+      "ri-yin-horumuzuwei-ji-xia-dejin-li-ju-ezhi-ki-di-zheng-xue-risukugajin-rong-zheng-chang-hua-wodong-jie-surugou-zao",
+      "ri-yin-ju-ezhi-kitohorumuzuwei-ji-di-zheng-xue-risukugajin-rong-zheng-chang-hua-wodong-jie-surugou-zao",
+      "russias-oil-windfall-how-middle-east-war-fuels-moscows-war-machine",
+      "russias-petro-lifeline-how-middle-east-war-rescues-a-flagging-war-machine",
+      "russias-petrodollar-lifeline-how-middle-east-chaos-rescues-a-failing-war-economy",
+      "russias-wartime-windfall-how-middle-east-chaos-funds-moscows-war-machine",
+      "seven-central-banks-vs-inflation-bitcoins-macro-crucible-week",
+      "seven-central-banks-vs-inflation-bitcoins-monetary-policy-stress-test",
+      "strait-of-hormuz-crisis-and-trumps",
+      "strait-of-hormuz-crisis-and-trumps-3",
+      "strait-of-hormuz-crisis-europe-defects-from-us-imperial-overreach",
+      "strait-of-hormuz-defense-and-alliance-fiss",
+      "strait-of-hormuz-mining-the-escalation-spiral-that-threatens-global-oil",
+      "strait-of-hormuz-naval-deployment-issue-alliance-cr",
+      "strait-of-hormuz-the-escalation-spiral-that-threatens-global-energy",
+      "structure-seen-through-data-6",
+      "takaichis-growth-strategy-pivot-japans-sunday-power-play-signals-imf-alignment",
+      "takaichis-sunday-agenda-japans-growth-strategy-meets-imf-scrutiny",
+      "the-deeper-meaning-behind-the-feds-rate-cut-freeze",
+      "the-exitless-maze-of-the-us-iran",
+      "the-strait-of-hormuz-crisis-and-trumps-bur",
+      "toranpu-cai-pan-suo-nidui-chu-suru-fa-yan-zui-gao-cai-guan-shui-wei-xian-pan-jue-gayao-rasusan-quan-nojun-heng",
+      "toranpufang-zhong-hou-notai-wan-wu-qi-mai-que-mi-zhong-qu-yin-wai-jiao-gabao-kutong-meng-nocui-ruo-xing",
+      "toranpugatong-shang-fa-di-122tiao-de10-dai-ti-guan-shui-150ri-noshi-xi",
+      "toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no",
+      "toranpunoirandan-du-gong-ji-xuan-yan-tong-meng-ti-zhi-wogen-di-karayao-rugasu-quan-li-noguo-shen-zhan",
+      "trump-advisors-push-exit-plan-imperial-overreach-meets-escalation-spiral-in-iran-war",
+      "trump-advisors-push-for-iran-war-exit-imperial-overreach-meets-domestic-dissent",
+      "trump-signals-massive-iran-strike-the-escalation-spiral-that-reshapes-the-middle-east",
+      "trump-vs",
+      "trumps-declaration-of-unilateral-attack-on-iran",
+      "trumps-iran-endgame-imperial-overreach-meets-economic-blowback",
+      "trumps-iran-gambit-how-middle-east-overreach-hands-china-its-taiwan-window",
+      "uk-energy-bills-hit-by-iran-war-the-anatomy-of-a-political-price-trap",
+      "uk-energy-bills-iran-war-the-geopolitical-tax-households-cannot-escape",
+      "uk-fuel-price-crackdown-when-geopolitical-shocks-meet-domestic-political-theater",
+      "uk-fuel-price-crackdown-when-geopolitical-shocks-meet-domestic-political-theatre",
+      "uk-mortgage-shock-how-iran-war-risk-is-repricing-british-household-debt",
+      "ukraine-ceasefire-negotiations-the-structural-stalemate",
+      "us-china-paris-trade-talks-tariffs",
+      "us-china-paris-trade-talks-tariffs-and-rare-earth",
+      "us-india-oil-waiver-sanctions-pragmatism-meets-energy-realpolitik",
+      "us-iran-military-conflict-destruction-complete",
+      "us-iran-nuclear-talks-stall-in-oman-the-escalation-spiral-nobody-can-exit",
+      "us-iran-war-exit-strategy-demanded-regime-cracks",
+      "us-israel-strike-iran-the-escalation-spiral-that-reshapes-the-middle-east-order",
+      "us-israel-strike-on-iran-international-laws-legitimacy-crisis-deepens",
+      "us-sinks-iranian-warship-the-escalation-spiral-nobody-can-stop",
+      "war-powers-revolt-congress-challenges-executive-military-authority-on-iran",
+      "weaponisation-of-everything-how-trumps-return-rewrites-global-economic-rules",
+      "zhong-dong-wei-ji-toenerugijia-ge-gao-teng-shi-jie-jing-ji-woshi-mu-dui-li-noluo-xuan-to-chuan-ran-nolian-suo",
+      "zui-gao-cai-guan-shui-pan-jue-debtcyi-shi-6-8mo-dorufan-fa-shu-fen-dexiao-etashang-sheng-gabao-ku-dezitarugorudo-noxu-toben-dang"
+    ],
+    "tag_slug_frequency_top25": [
+      {
+        "tag": "deep-pattern",
+        "count": 196
+      },
+      {
+        "tag": "nowpattern",
+        "count": 196
+      },
+      {
+        "tag": "lang-en",
+        "count": 151
+      },
+      {
+        "tag": "genre-geopolitics",
+        "count": 144
+      },
+      {
+        "tag": "event-military",
+        "count": 115
+      },
+      {
+        "tag": "event-resource",
+        "count": 112
+      },
+      {
+        "tag": "p-escalation",
+        "count": 107
+      },
+      {
+        "tag": "genre-energy",
+        "count": 100
+      },
+      {
+        "tag": "p-path-dependency",
+        "count": 100
+      },
+      {
+        "tag": "p-overreach",
+        "count": 91
+      },
+      {
+        "tag": "p-alliance-strain",
+        "count": 74
+      },
+      {
+        "tag": "p-contagion",
+        "count": 66
+      },
+      {
+        "tag": "genre-economy",
+        "count": 52
+      },
+      {
+        "tag": "event-market",
+        "count": 47
+      },
+      {
+        "tag": "lang-ja",
+        "count": 45
+      },
+      {
+        "tag": "p-collective-failure",
+        "count": 42
+      },
+      {
+        "tag": "genre-finance",
+        "count": 41
+      },
+      {
+        "tag": "event-sanctions",
+        "count": 39
+      },
+      {
+        "tag": "event-alliance",
+        "count": 30
+      },
+      {
+        "tag": "genre-governance",
+        "count": 22
+      },
+      {
+        "tag": "p-shock-doctrine",
+        "count": 21
+      },
+      {
+        "tag": "p-narrative",
+        "count": 19
+      },
+      {
+        "tag": "p-moral-hazard",
+        "count": 18
+      },
+      {
+        "tag": "event-regulation",
+        "count": 16
+      },
+      {
+        "tag": "event-trade",
+        "count": 14
+      }
+    ],
+    "release_error_frequency": [
+      {
+        "error": "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT,FINANCIAL_CRISIS",
+        "count": 196
+      }
+    ],
+    "uniform_release_error": "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT,FINANCIAL_CRISIS",
+    "uniform_release_lane": "review_required",
+    "external_url_count_distribution": {
+      "not_available_in_manifest": true,
+      "explanation": "Computed in article_release_guard.py during manifest generation but not persisted to manifest JSON. Codex must re-derive from Ghost post HTML if needed."
+    },
+    "verified_external_source_count_distribution": {
+      "not_available_in_manifest": true,
+      "explanation": "Computed in article_release_guard.py during manifest generation but not persisted to manifest JSON."
+    },
+    "estimated_rescue_count": "100-150 (depends on verified_count distribution, not visible in manifest)",
+    "codex_action": {
+      "file": "scripts/article_release_guard.py",
+      "line": 87,
+      "change": "verified_count >= 2 -> verified_count >= 1 for dual AUTO_SAFE flag case; return editorial_review_advised",
+      "test": "Regenerate manifest; distribution_allowed_ratio_pct should reach ~65%"
+    }
+  },
+  "ic2": {
+    "id": "IC-2",
+    "title": "WAR_CONFLICT-only single-flag posts (regex over-broad)",
+    "description": "59 posts flagged WAR_CONFLICT only. All lang-ja. Blocked by L90-91: risk flag with verified_count < 1. The WAR_CONFLICT regex (L45-52) uses single keywords that fire on virtually all geopolitics articles.",
+    "blocking_rule": "article_release_guard.py L90-91: if risk_flags and verified_count < 1 -> review_required",
+    "proposed_change_option_a": "Narrow WAR_CONFLICT regex to compound phrases (e.g. military operation|military force instead of bare military)",
+    "proposed_change_option_b": "Add external_url_count >= 2 fallback for single-flag verified_count=0 posts",
+    "risk": "medium (option_a: false negative risk) / low (option_b)",
+    "count": 59,
+    "lang_distribution": {
+      "lang-ja": 59,
+      "lang-en": 0
+    },
+    "rows": [
+      {
+        "slug": "bei-zhao-xian-nozhan-zheng-jing-ji-2zhao-yuan-zhi-cai-ti-zhi-wokong-dong-hua-saseru-xie-nopei-dang-nogou-zao",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-sanctions",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-collective-failure",
+          "p-escalation",
+          "p-shock-doctrine"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "bei-zhao-xian-xin-xing-misairuri-ben-shang-kong-tong-guo-dui-li-noluo-xuan-gasheng-mudong-aziajun-kuo-nolin-jie-dian",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-sanctions",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "denmakuzong-xuan-ju-nochong-ji-gurinrandofang-wei-gazhao-itayu-dang-beng-huai-tobei-ou-zhi-xu-nozai-bian",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-election",
+          "genre-geopolitics",
+          "genre-governance",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-backlash",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "du-wa-nodu-tokuremurin-nawarinuian-sha-nohua-xue-de-zheng-ming",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-judicial",
+          "geopolitics",
+          "governance",
+          "lang-ja",
+          "nowpattern",
+          "p-institutional-rot",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "war"
+        ],
+        "trigger_source": "slug_keyword",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "eu-vs-mi-guo-tetukuzhan-zheng-dmagayin-kiqi-kosugui-zhi-nodi-que-bian-dong",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-regulation",
+          "governance",
+          "lang-ja",
+          "nowpattern",
+          "p-backlash",
+          "p-platform",
+          "technology"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "euhao-zhou-ftatuo-jie-toranpuguan-shui-gajia-su-saseta-tuo-mi-yi-cun-mao-yi-zai-bian-nogou-zao",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-trade",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-backlash",
+          "p-shock-doctrine"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "gao-shi-fang-mi-ri-mi-shou-noy-hui-tan-tong-meng-no-dui-jia-gawen-warerugou-zao-zhuan-huan-dian",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-trade",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "war"
+        ],
+        "trigger_source": "slug_keyword",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "gao-shi-fang-mi-tori-mi-shou-noy-hui-tan-tong-meng-zai-bian-tozhong-dong-risukugajiao-chai-surugou-zao-zhuan-huan-dian",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-trade",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "gao-shi-shou-xiang-cun-li-wei-ji-shi-tai-da-bian-mi-qing-bao-ji-guan-gadu-mijie-kuri-ben-an-bao-nogou-zao-zhuan-huan",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-regulation",
+          "genre-geopolitics",
+          "genre-governance",
+          "lang-ja",
+          "nowpattern",
+          "p-escalation",
+          "p-narrative",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "gao-shi-shou-xiang-cun-li-wei-ji-shi-tai-da-bian-ri-mi-tong-meng-nogou-zao-zhuan-huan-gashi-matuta",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-regulation",
+          "genre-geopolitics",
+          "genre-governance",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "gao-shi-shou-xiang-no-5shi-jian-wai-jiao-teiruuaemerutugaying-suri-ben-nozhan-lue-de-zai-pei-zhi",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-trade",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-path-dependency",
+          "p-tech-leapfrog"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "gao-shi-shou-xiang-no-ji-shu-zhu-quan-wai-jiao-paranteiauaedu-gajiao-chai-suruyi-ri-nogou-zao",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-tech",
+          "genre-geopolitics",
+          "genre-technology",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-path-dependency",
+          "p-platform"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "gao-shi-shou-xiang-no-ji-shu-zi-yuan-wai-jiao-ji-zhong-ri-ri-ben-gaaienerugidi-zheng-xue-nojie-jie-dian-womu-zhi-sugou-zao-zhuan-huan",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-tech",
+          "genre-geopolitics",
+          "genre-technology",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-path-dependency",
+          "p-shock-doctrine"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "gao-shi-toranpushou-noy-hui-tan-ri-mi-tong-meng-nozai-ding-yi-toiranbian-shu-gajiao-chai-surugou-zao-zhuan-huan-dian",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-trade",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-overreach",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "gao-shi-toranpushou-noy-hui-tan-tong-meng-nozai-jiao-she-toiranbian-shu-gashi-suri-ben-wai-jiao-nogou-zao-xian-jie",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-trade",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-overreach",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "gaza-ping-he-ping-yi-hui-guo-lian-chu-bao-gao-zheng-tong-xing-nakitong-zhi-gou-zao-gasheng-muzhong-dong-zhi-xu-nokong-bai",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-military",
+          "genre-geopolitics",
+          "genre-governance",
+          "lang-ja",
+          "nowpattern",
+          "p-collective-failure",
+          "p-legitimacy-void",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "event-military",
+          "genre-geopolitics",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "hormuz-kaikyo-kiki-beikoku-iran-tairitsu",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-resource",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-contagion",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "horumuzuhai-xia-fang-wei-totong-meng-nogui-lie-mi-guo-no-fu-dan-gong-you-ya-li-gabao-kuhai-yang-an-quan-bao-zhang-nogou-zao-de-mao-dun",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-resource",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-collective-failure",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "horumuzuhai-xia-jian-chuan-pai-qian-wen-ti-tong-meng-nogui-lie-galu-cheng-suruenerugian-quan-bao-zhang-nogou-zao-zhuan-huan",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-resource",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-collective-failure",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "horumuzuhai-xia-wei-ji-mi-iran-dui-li-noluo-xuan-gaenerugizhi-xu-woyao-rugasu",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-resource",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-contagion",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "horumuzuhai-xia-wei-ji-mi-iran-dui-li-noluo-xuan-gazhong-dong-enerugizhi-xu-woyao-rugasu",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-resource",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-collective-failure",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "horumuzuhai-xia-wei-ji-totoranpuno-fu-dan-gong-you-ya-li-tong-meng-nogui-lie-gazi-yuan-wei-ji-wozeng-fu-surugou-zao",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-resource",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-collective-failure",
+          "p-escalation"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "horumuzuno3shi-jian-shi-jie-noshi-you-20-gazhi-matutari",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "energy",
+          "event-military",
+          "event-resource",
+          "geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-escalation",
+          "p-platform"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "iranbao-fu-neng-li-da-fu-di-xia-fa-yan-mi-yuan-gao-guan-gamiao-kuzhong-dong-pawabaransunobu-ke-ni-de-zhuan-huan",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-sanctions",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "iranenerugishi-she-gong-ji-zhong-dong-dui-li-noluo-xuan-gashi-jie-gong-gei-wang-woduan-lie-saserugou-zao",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-resource",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-contagion",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "kerotugute-shi-tui-ren-toukurainating-zhan-putinno-guo-shen-zhan-gashi-sarerugou-zao-de-zhuan-huan-dian",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-sanctions",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-collective-failure",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "mi-24zhou-noguan-shui-su-song-da-tong-ling-quan-xian-noguo-shen-zhan-gazhao-kuxian-fa-de-yao-rili-si",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-judicial",
+          "event-trade",
+          "genre-economy",
+          "genre-governance",
+          "lang-ja",
+          "nowpattern",
+          "p-backlash",
+          "p-institutional-rot",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "mi-iranjun-shi-chong-tu-po-huai-wan-liao-xuan-yan-tobao-fu-noluo-xuan-gashi-suzhong-dong-zhi-xu-nobeng-huai-dian",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-sanctions",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-escalation",
+          "p-narrative",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "mi-iranjun-shi-zuo-zhan-nochang-qi-hua-xuan-nian-quan-li-noguo-shen-zhan-gazhao-kuche-tui-ya-li-tozhong-dong-zhi-xu-nozai-bian",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-resource",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "mi-jun-nozhong-dong-bei-hai-risuku-toranpuno-che-tui-kakuo-da-ka-wojue-merusun-hai-yu-zhi-nogou-zao",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-sanctions",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-backlash",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "mi-rodian-hua-hui-tan-toiranbao-wei-wang-da-guo-jian-qu-yin-gazhong-dong-zhi-xu-woshu-kihuan-erugou-zao-zhuan-huan",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-sanctions",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-narrative"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "mi-ying-tong-meng-nogui-lie-toranpunoiranzuo-zhan-ganatojie-shu-woshi-sugou-zao-de-zhuan-huan-dian",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-military",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "event-military",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "mi-zhong-parimao-yi-xie-yi-guan-shui-toreaasugaying-suba-quan-jiao-she-nogou-zao-zhuan-huan",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-sanctions",
+          "event-trade",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-escalation",
+          "p-overreach",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "genre-geopolitics",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "mi-zhong-parimao-yi-xie-yi-guan-shui-toreaasugaying-suba-quan-yi-xing-nogou-zao-de-duan-ceng",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-sanctions",
+          "event-trade",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-escalation",
+          "p-overreach",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "genre-geopolitics",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "nan-sinahai-hui-se-nochong-tu-mi-zhong-gahu-initui-kenaidui-li-noluo-xuan-gou-zao",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-military",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "event-military",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "odashi-shi-ti-zhi-gai-ge-jing-ji-an-bao-shi-dai-noyuan-zhu-wai-jiao-gawen-uri-ben-no-zhan-lue-de-zi-lu",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-regulation",
+          "event-structural",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-institutional-rot",
+          "p-path-dependency",
+          "p-shock-doctrine"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "genre-geopolitics"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "odashi-shi-ti-zhi-gai-ge-jing-ji-an-quan-bao-zhang-shi-dai-noyuan-zhu-zhan-lue-gawen-uri-ben-wai-jiao-nogou-zao-zhuan-huan",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-regulation",
+          "event-structural",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-institutional-rot",
+          "p-path-dependency",
+          "p-shock-doctrine"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "genre-geopolitics"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "ou-mi-tong-meng-nogui-lie-rosiagashi-gua-keru-fen-duan-noqing-bao-zhan-toxi-ce-jie-shu-nogou-zao-de-cui-ruo-xing",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-military",
+          "genre-geopolitics",
+          "genre-media",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-narrative"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "event-military",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "putinnoiranhe-zhong-jie-ti-an-xie-diao-noshi-bai-gasheng-muhe-kuo-san-risukunogou-zao",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-sanctions",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-collective-failure",
+          "p-escalation",
+          "p-shock-doctrine"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "ri-ben-no-zi-zhu-fang-wei-fa-an-zhan-hou-80nian-noan-quan-bao-zhang-tabugabeng-rerugou-zao-li-xue",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-regulation",
+          "genre-geopolitics",
+          "genre-governance",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "ri-ben-nohorumuzuhai-xia-jian-chuan-pai-qian-tong-meng-nogui-lie-ka-xin-tanaan-quan-bao-zhang-akitekutiyanotai-dong-ka",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-resource",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-overreach",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "ri-ben-nohorumuzuhai-xia-pai-qian-wen-ti-tong-meng-nodai-jia-tozi-zhu-wai-jiao-noqi-lu",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-resource",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-overreach",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "ri-ben-noyu-suan-shen-yi-jiao-zhao-shao-shu-yu-dang-galu-cheng-saseru-xie-diao-noshi-bai-tozhi-du-pi-lao",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-regulation",
+          "event-structural",
+          "genre-economy",
+          "genre-governance",
+          "lang-ja",
+          "nowpattern",
+          "p-collective-failure",
+          "p-escalation",
+          "p-institutional-rot"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "ri-ben-noyu-suan-shen-yi-jiao-zhao-shao-shu-yu-dang-shi-dai-no-xie-diao-noshi-bai-gazhi-du-woshi-mu",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-regulation",
+          "event-structural",
+          "genre-economy",
+          "genre-governance",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-collective-failure",
+          "p-institutional-rot"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "p-alliance-strain"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "ri-mi-fang-wei-dian-hua-hui-tan-horumuzuhai-xia-wei-ji-gazhi-richu-sutong-meng-nogou-zao-de-shi-lian",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-military",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "event-military",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "ri-mi-fang-wei-shou-noy-noiranwei-ji-xie-yi-horumuzuhai-xia-womegurutong-meng-diao-zheng-nogou-zao-li-xue",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-military",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "event-military",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "ri-mi-fang-wei-xie-yi-toiranwei-ji-horumuzuhai-xia-womegurutong-meng-noshi-jin-shi",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-military",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "event-military",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "ri-mi-shou-noy-hui-tan-2026nian-3yue-guan-shui-ya-li-xia-notong-meng-zai-jiao-she-tojing-lu-yi-cun-nomin",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-trade",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-overreach",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "ri-mi-shou-noy-hui-tan-toiranwen-ti-tong-meng-no-dui-jia-gawen-warerugou-zao-zhuan-huan-dian",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-sanctions",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "war"
+        ],
+        "trigger_source": "slug_keyword",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "ri-mi-shou-noy-hui-tan-toiranwen-ti-tong-meng-no-zhong-cheng-shi-yan-gari-ben-wai-jiao-nozi-lu-xing-woshi-su",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-sanctions",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "rosia-iranjun-shi-lian-xi-noshen-hua-zerensukigabao-ku-er-zheng-mian-ya-li-gou-zao",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-sanctions",
+          "genre-economy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "rosianohe-wei-xia-tori-ben-noan-bao-zhuan-huan-dui-li-noluo-xuan-gaji-dong-nohe-zhi-xu-woshu-kihuan-eru",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-structural",
+          "genre-geopolitics",
+          "genre-governance",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-escalation",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-alliance-strain",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "toranpu-orubanlian-dai-fei-riberarutong-meng-gayao-rugasueunozheng-tong-xing",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-election",
+          "genre-geopolitics",
+          "genre-governance",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-institutional-rot",
+          "p-narrative"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "toranpu-orubanlian-dai-quan-wei-zhu-yi-netutowakugaeumin-zhu-zhu-yi-woshi-sufen-shui-ling",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-election",
+          "genre-geopolitics",
+          "genre-governance",
+          "lang-ja",
+          "nowpattern",
+          "p-alliance-strain",
+          "p-institutional-rot",
+          "p-narrative"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "genre-geopolitics",
+          "p-alliance-strain"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "toranpuno-he-kayuan-you-ka-er-ze-xuan-yan-enerugiba-quan-tozhong-dong-zhi-xu-nogou-zao-de-chong-tu",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-sanctions",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-escalation",
+          "p-narrative",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "ukurainating-zhan-jiao-she-putinno-quan-li-noguo-shen-zhan-gasheng-mugou-zao-de-jiao-zhao",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-sanctions",
+          "genre-geopolitics",
+          "genre-governance",
+          "lang-ja",
+          "nowpattern",
+          "p-collective-failure",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "wtiyuan-you-14-ji-luo-toranpunoirangong-ji-yan-qi-gabao-kuzhong-dong-risukupuremiamunocui-ruo-gou-zao",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-market",
+          "event-military",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-escalation",
+          "p-narrative",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-escalation",
+          "p-overreach"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "yuan-you-90dorutu-po-horumuzuhai-xia-feng-suo-risukugashi-jie-jing-ji-woyao-saburugou-zao",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-military",
+          "event-resource",
+          "genre-energy",
+          "genre-geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-contagion",
+          "p-escalation",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-military",
+          "genre-geopolitics",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      },
+      {
+        "slug": "ziyunebuno6shi-jian-4nian-mu-nozhan-zheng-ga-jiao-she-woshi-metagou-zao",
+        "risk_flags": [
+          "WAR_CONFLICT"
+        ],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-alliance",
+          "event-military",
+          "geopolitics",
+          "lang-ja",
+          "nowpattern",
+          "p-escalation",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:WAR_CONFLICT"
+        ],
+        "release_lane": "review_required",
+        "suspected_trigger_terms": [
+          "event-alliance",
+          "event-military",
+          "p-escalation"
+        ],
+        "trigger_source": "tag_match_inference",
+        "note": "trigger inference from slug text and tag_slugs; title not in manifest"
+      }
+    ],
+    "tag_slug_frequency_top20": [
+      {
+        "tag": "deep-pattern",
+        "count": 59
+      },
+      {
+        "tag": "lang-ja",
+        "count": 59
+      },
+      {
+        "tag": "nowpattern",
+        "count": 59
+      },
+      {
+        "tag": "genre-geopolitics",
+        "count": 52
+      },
+      {
+        "tag": "p-escalation",
+        "count": 38
+      },
+      {
+        "tag": "p-alliance-strain",
+        "count": 34
+      },
+      {
+        "tag": "event-military",
+        "count": 29
+      },
+      {
+        "tag": "event-alliance",
+        "count": 29
+      },
+      {
+        "tag": "p-overreach",
+        "count": 29
+      },
+      {
+        "tag": "p-path-dependency",
+        "count": 25
+      },
+      {
+        "tag": "genre-economy",
+        "count": 21
+      },
+      {
+        "tag": "genre-energy",
+        "count": 21
+      },
+      {
+        "tag": "event-sanctions",
+        "count": 15
+      },
+      {
+        "tag": "genre-governance",
+        "count": 12
+      },
+      {
+        "tag": "event-resource",
+        "count": 12
+      },
+      {
+        "tag": "p-collective-failure",
+        "count": 11
+      },
+      {
+        "tag": "event-trade",
+        "count": 10
+      },
+      {
+        "tag": "p-institutional-rot",
+        "count": 8
+      },
+      {
+        "tag": "event-regulation",
+        "count": 8
+      },
+      {
+        "tag": "p-narrative",
+        "count": 8
+      }
+    ],
+    "trigger_term_analysis": {
+      "method": "slug text keyword matching + tag_slugs inference (title not available in manifest)",
+      "limitation": "slug is romanized JA text; many JA slugs lack English WAR_CONFLICT keywords. Actual trigger is regex match against post HTML which is not in manifest.",
+      "slugs_with_keyword_hit": 3,
+      "slugs_without_keyword_hit": 56,
+      "inference": "Most IC-2 posts are flagged via tag_slugs matching (event-military, genre-geopolitics) or JA-text regex (Japanese war terms in HTML), not English slug keywords"
+    },
+    "estimated_rescue_count_option_a": "30-50",
+    "estimated_rescue_count_option_b": "20-40",
+    "codex_action": {
+      "file": "scripts/article_release_guard.py",
+      "lines": "45-52 (regex) and/or 90-91 (fallback)",
+      "test": "Re-run detect_release_risk_flags against all 474 posts and compare flag counts before/after"
+    }
+  },
+  "ic3": {
+    "id": "IC-3",
+    "title": "FINANCIAL_CRISIS-only single-flag posts",
+    "description": "4 posts flagged FINANCIAL_CRISIS only. All lang-ja, all crypto-tagged. Blocked by L90-91: risk flag with verified_count < 1.",
+    "blocking_rule": "article_release_guard.py L90-91: if risk_flags and verified_count < 1 -> review_required",
+    "proposed_change": "Add fallback: if verified_count < 1 but external_url_count >= 2, return editorial_review_advised",
+    "risk": "low",
+    "count": 4,
+    "lang_distribution": {
+      "lang-ja": 4,
+      "lang-en": 0
+    },
+    "rows": [
+      {
+        "slug": "gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu",
+        "risk_flags": [
+          "FINANCIAL_CRISIS"
+        ],
+        "tag_slugs": [
+          "crypto",
+          "deep-pattern",
+          "event-structural",
+          "finance",
+          "lang-ja",
+          "nowpattern",
+          "p-path-dependency",
+          "p-winner-takes-all"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:FINANCIAL_CRISIS"
+        ],
+        "release_lane": "review_required"
+      },
+      {
+        "slug": "guan-ce-rogu-fen-san-xing-qu-yin-suo-haiparikitudo-defiwoxun-ruzheng-ce-ti-yan-tuan-ti-womi-guo-deshe-li",
+        "risk_flags": [
+          "FINANCIAL_CRISIS"
+        ],
+        "tag_slugs": [
+          "crypto",
+          "deep-pattern",
+          "event-regulation",
+          "governance",
+          "lang-ja",
+          "nowpattern",
+          "p-capture",
+          "p-narrative"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:FINANCIAL_CRISIS"
+        ],
+        "release_lane": "review_required"
+      },
+      {
+        "slug": "suteburukoinshi-jia-zong-e-3000yi-dorutu-po-an-hao-zi-chan-nodai-ji-zi-jin-gashi-sujing-kanadi-que-bian-dong",
+        "risk_flags": [
+          "FINANCIAL_CRISIS"
+        ],
+        "tag_slugs": [
+          "crypto",
+          "deep-pattern",
+          "event-structural",
+          "lang-ja",
+          "nowpattern",
+          "p-contagion",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:FINANCIAL_CRISIS"
+        ],
+        "release_lane": "review_required"
+      },
+      {
+        "slug": "toranpujia-zu-noan-hao-zi-chan-samituto-gorudomanceokaranitukiminaziyu",
+        "risk_flags": [
+          "FINANCIAL_CRISIS"
+        ],
+        "tag_slugs": [
+          "crypto",
+          "deep-pattern",
+          "event-regulation",
+          "finance",
+          "lang-ja",
+          "nowpattern",
+          "p-capture",
+          "p-moral-hazard"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:FINANCIAL_CRISIS"
+        ],
+        "release_lane": "review_required"
+      }
+    ],
+    "estimated_rescue_count": "up to 4 (depends on external_url_count, not in manifest)",
+    "codex_action": {
+      "file": "scripts/article_release_guard.py",
+      "line": "90-91",
+      "change": "Add: elif risk_flags and verified_count < 1 and external_url_count >= 2: return editorial_review_advised",
+      "test": "Regenerate manifest; verify these 4 slugs move to editorial_review_advised"
+    }
+  },
+  "other": {
+    "title": "Empty risk_flags with EDITOR_REVIEW_REQUIRED error",
+    "description": "3 posts have empty risk_flags but EDITOR_REVIEW_REQUIRED: (empty flag string) in release_errors. Edge case in classify_release_lane.",
+    "count": 3,
+    "rows": [
+      {
+        "slug": "fed-fomc-march-2026-rate-decision",
+        "risk_flags": [],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-market",
+          "genre-finance",
+          "lang-ja",
+          "nowpattern",
+          "p-institutional-rot",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:"
+        ],
+        "release_lane": "review_required",
+        "note": "empty risk_flags but EDITOR_REVIEW_REQUIRED error present"
+      },
+      {
+        "slug": "gao-shi-shou-xiang-no-cheng-chang-zhan-lue-ri-yao-hui-he-jing-ji-an-bao-tocai-zheng-noer-lu-bei-fan-galu-cheng-surugou-zao",
+        "risk_flags": [],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-regulation",
+          "event-structural",
+          "genre-economy",
+          "genre-governance",
+          "lang-ja",
+          "nowpattern",
+          "p-collective-failure",
+          "p-overreach",
+          "p-path-dependency"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:"
+        ],
+        "release_lane": "review_required",
+        "note": "empty risk_flags but EDITOR_REVIEW_REQUIRED error present"
+      },
+      {
+        "slug": "ri-ben-noyu-suan-zheng-zhi-zan-ding-yu-suan-fu-shang-gaying-suyu-ye-dang-xie-diao-noshi-bai-tozhi-du-pi-lao",
+        "risk_flags": [],
+        "tag_slugs": [
+          "deep-pattern",
+          "event-election",
+          "event-regulation",
+          "genre-economy",
+          "genre-governance",
+          "lang-ja",
+          "nowpattern",
+          "p-collective-failure",
+          "p-institutional-rot",
+          "p-overreach"
+        ],
+        "release_errors": [
+          "EDITOR_REVIEW_REQUIRED:"
+        ],
+        "release_lane": "review_required",
+        "note": "empty risk_flags but EDITOR_REVIEW_REQUIRED error present"
+      }
+    ],
+    "codex_note": "Investigate classify_release_lane for empty-flags path. Fix: if not risk_flags, skip EDITOR_REVIEW_REQUIRED injection."
+  },
+  "mojibake_audit": {
+    "scope": "All .py and .md files under scripts/, .claude/rules/, docs/, reports/claude_sidecar/",
+    "method": "grep for known Shift_JIS-to-UTF-8 double-encoding artifacts (hex: e7b8ba, e7b9a7, e89bbb, e8ae80e68786, e88ea0e59f9fe383b8e383ac)",
+    "marker_description": "Common double-encoding artifacts from Shift_JIS mishandled as UTF-8",
+    "source_files_audited": [
+      "scripts/canonical_public_lexicon.py",
+      "scripts/public_lexicon.py",
+      "scripts/product_lexicon.py",
+      "scripts/mission_contract.py",
+      "scripts/agent_bootstrap_context.py",
+      "scripts/lexicon_contract_audit.py"
+    ],
+    "source_files_result": "ZERO mojibake findings in all 6 source files",
+    "v1_output_findings": [
+      {
+        "file": "reports/claude_sidecar/task_result.json",
+        "line": 88,
+        "field": "mojibake_check_method",
+        "issue": "Raw mojibake marker chars embedded in JSON output value",
+        "fix": "v2 uses hex descriptions instead of raw characters"
+      },
+      {
+        "file": "reports/claude_sidecar/task_result.md",
+        "line": 96,
+        "field": "mojibake audit method description",
+        "issue": "Same raw marker chars in markdown text",
+        "fix": "v2 uses hex descriptions instead of raw characters"
+      }
+    ],
+    "v2_mitigation": "All marker references use ASCII hex codes or English descriptions. No raw CJK mojibake characters in this file."
+  },
+  "vocabulary_drift_findings": [
+    {
+      "id": "VD-1",
+      "severity": "info",
+      "area": "identity hierarchy",
+      "finding": "Some docs use Nowpattern as OS name. Canonical: NAOTO OS = OS, Nowpattern = platform",
+      "guard": "PROJECT_DRIFT_GUARD in mistake_patterns.json"
+    },
+    {
+      "id": "VD-2",
+      "severity": "info",
+      "area": "Brier Score notation",
+      "finding": "Three Brier averages coexist: 0.1780/0.1828/0.4759. Canonical: binary n=53 avg=0.4759",
+      "guard": "M006 in mistake_registry.json"
+    },
+    {
+      "id": "VD-3",
+      "severity": "info",
+      "area": "PVQE V definition",
+      "finding": "mission_contract.py V=value_density vs NORTH_STAR.md V=improvement_speed. Canonical: mission_contract.py v3 is authoritative",
+      "affected_files": [
+        ".claude/rules/NORTH_STAR.md",
+        ".claude/rules/OPERATING_PRINCIPLES.md"
+      ]
+    }
+  ],
+  "codex_handoff_priority": [
+    {
+      "id": "IC-1",
+      "priority": "high",
+      "risk": "low",
+      "estimated_impact_pct": "+20pp (44.73% -> ~65%)",
+      "file": "scripts/article_release_guard.py",
+      "line": 87
+    },
+    {
+      "id": "IC-3",
+      "priority": "medium",
+      "risk": "low",
+      "estimated_impact_pct": "+1-2pp",
+      "file": "scripts/article_release_guard.py",
+      "line": "90-91"
+    },
+    {
+      "id": "IC-2",
+      "priority": "medium",
+      "risk": "medium",
+      "estimated_impact_pct": "+5-10pp (regex-dependent)",
+      "file": "scripts/article_release_guard.py",
+      "line": "45-52"
+    },
+    {
+      "id": "OTHER-FIX",
+      "priority": "low",
+      "risk": "low",
+      "estimated_impact_pct": "+0.6pp (3 posts)",
+      "file": "scripts/article_release_guard.py",
+      "line": "L224-226"
+    },
+    {
+      "id": "VD-3",
+      "priority": "low",
+      "risk": "low",
+      "estimated_impact_pct": "docs only",
+      "file": ".claude/rules/NORTH_STAR.md"
+    }
+  ],
+  "do_not_touch": [
+    "data/prediction_db.json",
+    "scripts/one_pass_completion_gate.py",
+    "scripts/build_article_release_manifest.py (production runs only)"
+  ],
+  "completion_conditions": {
+    "blocked_rows_at_slug_granularity": true,
+    "mojibake_findings_with_file_line": true,
+    "utf8_clean_output": true,
+    "ic1_ic2_ic3_per_post_mapping": true,
+    "manifest_field_limitations_documented": true
+  }
+}

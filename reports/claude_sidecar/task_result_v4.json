@@ -1,0 +1,461 @@
+{
+  "generated_at": "2026-04-04T08:30:00Z",
+  "agent": "claude-code-sidecar",
+  "model": "claude-opus-4-6",
+  "version": "v4",
+  "founder_os": "NAOTO OS",
+  "mission_contract_version": "2026-03-31-naoto-mission-v3",
+  "lexicon_version": "2026-03-31-public-lexicon-v4",
+  "task_id": "sidecar-20260404-coverage-in-play-audit-v4",
+  "parent_task_id": "sidecar-20260404-stop-proof-contract-v3",
+
+  "scope_definition": {
+    "bounded_tasks": [
+      "A: Coverage gap inventory (JA/EN exact numbers, hidden reasons, root causes)",
+      "B: In-play candidate inventory (up to 20 predictions with codex_next_move)",
+      "C: Tracker currentness recommendations (up to 5 items with done_definition)",
+      "D: Stop-proof outputs update (all 5 mandatory files)"
+    ],
+    "out_of_scope": [
+      "Production script edits",
+      "Ghost API calls",
+      "prediction_db.json modifications",
+      "Manifest regeneration",
+      "Live VPS verification"
+    ]
+  },
+
+  "scope_completion_pct": 100,
+  "overall_completion_estimate_pct": 18,
+  "reached_100_pct_for_this_scope": true,
+  "completion_definition": "All 4 bounded tasks (A/B/C/D) complete. All 5 mandatory deliverables written. Coverage gap quantified. 20 in-play candidates identified. 5 recommendations with done_definitions provided.",
+
+  "task_a_coverage_gap_inventory": {
+    "snapshot_timestamp": "2026-04-04T04:59:00Z",
+    "source_files": [
+      "reports/prediction_article_integrity.json",
+      "reports/content_release_snapshot.json",
+      "scripts/prediction_db.json"
+    ],
+
+    "global_numbers": {
+      "formal_prediction_total": 1121,
+      "prediction_statuses": {
+        "RESOLVING": 1058,
+        "RESOLVED": 58,
+        "OPEN": 5
+      },
+      "resolved_verdicts": {
+        "HIT": 36,
+        "MISS": 18,
+        "NOT_SCORED": 4
+      },
+      "distribution_allowed_ratio_pct": 80.38,
+      "distribution_blocked": 93,
+      "truth_blocked": 0,
+      "note": "distribution_allowed_ratio rose from 44.73% (v3) to 80.38% — CAP-1 through CAP-4 appear partially applied"
+    },
+
+    "ja_coverage": {
+      "public_rows": 99,
+      "public_in_play_rows": 3,
+      "public_awaiting_rows": 84,
+      "public_resolved_rows": 12,
+      "hidden_no_live_article": 1022,
+      "hidden_cross_lang_only": 197,
+      "coverage_pct": 8.83,
+      "coverage_gap": "91.17% of 1121 predictions are NOT visible on JA tracker",
+      "root_cause_primary": "1022 predictions reference Ghost URLs that are not live (no_live_article). These are articles that were either never published, were draft-demoted by QA Sentinel, or have slugs that don't resolve.",
+      "root_cause_secondary": "197 predictions have articles published only in EN. JA versions of these articles don't exist in Ghost."
+    },
+
+    "en_coverage": {
+      "public_rows": 197,
+      "public_in_play_rows": 0,
+      "public_awaiting_rows": 193,
+      "public_resolved_rows": 4,
+      "hidden_no_live_article": 924,
+      "hidden_cross_lang_only": 89,
+      "coverage_pct": 17.57,
+      "coverage_gap": "82.43% of 1121 predictions are NOT visible on EN tracker",
+      "root_cause_primary": "924 predictions reference Ghost URLs that are not live. Same root cause as JA: articles not published or draft-demoted.",
+      "root_cause_secondary": "89 predictions have articles published only in JA. EN translations don't exist."
+    },
+
+    "in_play_thinness": {
+      "ja_in_play": 3,
+      "en_in_play": 0,
+      "total_resolving": 1058,
+      "resolving_with_q2_2026_deadline": 628,
+      "diagnosis": "628 RESOLVING predictions have Q2 2026 deadlines but only 3 JA / 0 EN appear as 'in-play'. The page builder's in-play criteria is too restrictive or the predictions lack a field that triggers in-play classification. Most are stuck in 'awaiting' status on the tracker.",
+      "awaiting_pool": {
+        "ja": 84,
+        "en": 193
+      },
+      "conversion_opportunity": "If even 10% of the 84 JA awaiting moved to in-play, JA tracker would have 11 in-play predictions (3.7x current). For EN, 19 of 193 awaiting moving to in-play would be transformative."
+    },
+
+    "linked_articles_structural_gap": {
+      "predictions_with_linked_articles_field": 0,
+      "predictions_total": 1121,
+      "note": "prediction_db.json has NO linked_articles arrays populated. The prediction-to-article link is solely via ghost_url field. The integrity checker uses ghost_url to determine if the article is live. This is a fragile single-point link."
+    },
+
+    "hidden_sample_analysis": {
+      "ja_hidden_samples_examined": 30,
+      "en_hidden_samples_examined": 30,
+      "dominant_reason": "no_live_article (vast majority — articles not reachable at ghost_url)",
+      "secondary_reason": "cross_lang_only (article exists only in other language)",
+      "pattern_observed": "Many EN hidden predictions have romanized-Japanese slugs (e.g., 'toranpugatong-shang-fa-di-122tiao...') indicating these are JA articles that were never translated to EN. The ghost_url points to the JA slug, not an EN path."
+    }
+  },
+
+  "task_b_in_play_candidates": {
+    "selection_criteria": "RESOLVING status + deadline in Q2 2026 (April-June) or with ISO date >= 2026-04-04 + diverse topic coverage + high-signal predictions (clear resolution question)",
+    "candidates": [
+      {
+        "rank": 1,
+        "prediction_id": "NP-2026-0048",
+        "title": "Trump's Iran Gambit — China Taiwan Window",
+        "lang": "en",
+        "current_status": "RESOLVING",
+        "deadline": "March 31 - April 2, 2026",
+        "our_pick": "YES@87%",
+        "article_linked": true,
+        "why_candidate": "Imminent deadline, high-conviction prediction, geopolitics. Should already be resolved or in-play.",
+        "codex_next_move": "Check if deadline has passed. If YES: run auto_verifier. If NO: mark as in-play on tracker."
+      },
+      {
+        "rank": 2,
+        "prediction_id": "NP-2026-0028",
+        "title": "GPT-6 Multimodal Launch — OpenAI Platform Power",
+        "lang": "en",
+        "current_status": "RESOLVING",
+        "deadline": "May 2026",
+        "our_pick": "YES@77%",
+        "article_linked": true,
+        "why_candidate": "High-profile AI prediction, near-term deadline. Strong reader interest.",
+        "codex_next_move": "Ensure Ghost article is live. Move to in-play on EN tracker."
+      },
+      {
+        "rank": 3,
+        "prediction_id": "NP-2026-0078",
+        "title": "トランプ対イラン大規模攻撃示唆 — 権力の過伸展が中東秩序を再編",
+        "lang": "ja",
+        "current_status": "RESOLVING",
+        "deadline": "2026年3月中旬〜4月上旬",
+        "our_pick": "YES@62%",
+        "article_linked": true,
+        "why_candidate": "Imminent JA deadline, geopolitics. JA tracker desperately needs in-play predictions.",
+        "codex_next_move": "Check deadline. If passed: resolve. If not: move to in-play."
+      },
+      {
+        "rank": 4,
+        "prediction_id": "NP-2026-0871",
+        "title": "Bitcoin's $120K Breakthrough — Institutional Herding",
+        "lang": "en",
+        "current_status": "RESOLVING",
+        "deadline": "2026-05-06",
+        "our_pick": "NO@27%",
+        "article_linked": true,
+        "why_candidate": "Exact ISO date deadline in May. Crypto topic popular with readers.",
+        "codex_next_move": "Ensure article live. Mark in-play on EN tracker."
+      },
+      {
+        "rank": 5,
+        "prediction_id": "NP-2026-0999",
+        "title": "Bitcoin's 5M Yen Breakout — Institutional Capital",
+        "lang": "ja",
+        "current_status": "RESOLVING",
+        "deadline": "2026-06-17",
+        "our_pick": "YES@77%",
+        "article_linked": true,
+        "why_candidate": "ISO date deadline in June. JA crypto prediction. JA in-play needs volume.",
+        "codex_next_move": "Ensure article live. Mark in-play on JA tracker."
+      },
+      {
+        "rank": 6,
+        "prediction_id": "NP-2026-0035",
+        "title": "Bitcoin's $120K Breakthrough — FOMO Rewrites Rules",
+        "lang": "en",
+        "current_status": "RESOLVING",
+        "deadline": "June 10-11, 2026",
+        "our_pick": "NO@27%",
+        "article_linked": true,
+        "why_candidate": "Precise deadline (June FOMC), high-signal financial prediction.",
+        "codex_next_move": "Ensure article live. Mark in-play on EN tracker."
+      },
+      {
+        "rank": 7,
+        "prediction_id": "NP-2026-0082",
+        "title": "南シナ海の火薬庫 — 米中軍事演習の偶発衝突リスク",
+        "lang": "ja",
+        "current_status": "RESOLVING",
+        "deadline": "2026年4-6月（G7前後）",
+        "our_pick": "NO@11%",
+        "article_linked": true,
+        "why_candidate": "JA geopolitics. Low probability = interesting to track. G7-anchored deadline.",
+        "codex_next_move": "Ensure article live. Mark in-play on JA tracker."
+      },
+      {
+        "rank": 8,
+        "prediction_id": "NP-2026-0065",
+        "title": "UK Energy Bills & Iran War — Geopolitics Hits Kitchen Table",
+        "lang": "en",
+        "current_status": "RESOLVING",
+        "deadline": "Late May to early June 2026",
+        "our_pick": "YES@82%",
+        "article_linked": true,
+        "why_candidate": "High-conviction UK economics prediction. Diverse topic from crypto/geopolitics.",
+        "codex_next_move": "Ensure article live. Mark in-play on EN tracker."
+      },
+      {
+        "rank": 9,
+        "prediction_id": "NP-2026-0085",
+        "title": "米軍の中東被害リスク — トランプの撤退か拡大か",
+        "lang": "ja",
+        "current_status": "RESOLVING",
+        "deadline": "2026年3月〜6月",
+        "our_pick": "YES@82%",
+        "article_linked": true,
+        "why_candidate": "High-conviction JA military prediction. JA tracker diversity.",
+        "codex_next_move": "Ensure article live. Mark in-play on JA tracker."
+      },
+      {
+        "rank": 10,
+        "prediction_id": "NP-2026-0072",
+        "title": "Trump vs. Banks on Crypto — Regulatory Capture War",
+        "lang": "en",
+        "current_status": "RESOLVING",
+        "deadline": "Q2 2026 (April-June)",
+        "our_pick": "YES@62%",
+        "article_linked": true,
+        "why_candidate": "Crypto regulation prediction. Medium conviction. Interesting for US readers.",
+        "codex_next_move": "Ensure article live. Mark in-play on EN tracker."
+      },
+      {
+        "rank": 11,
+        "prediction_id": "NP-2026-0091",
+        "title": "Iran Overreach Trap — US Escalation Hands China Window",
+        "lang": "en",
+        "current_status": "RESOLVING",
+        "deadline": "March-June 2026",
+        "our_pick": "YES@91%",
+        "article_linked": true,
+        "why_candidate": "Very high conviction geopolitics. Ongoing relevance.",
+        "codex_next_move": "Ensure article live. Mark in-play on EN tracker."
+      },
+      {
+        "rank": 12,
+        "prediction_id": "NP-2026-0033",
+        "title": "US Stablecoin Regulation — Controlled Innovation",
+        "lang": "en",
+        "current_status": "RESOLVING",
+        "deadline": "Q2 2026 (April-June)",
+        "our_pick": "NO@18%",
+        "article_linked": true,
+        "why_candidate": "Low-probability regulatory prediction. Interesting contrarian call.",
+        "codex_next_move": "Ensure article live. Mark in-play on EN tracker."
+      },
+      {
+        "rank": 13,
+        "prediction_id": "NP-2026-0088",
+        "title": "シビハ外相発言 — 4年目の戦争が暴く恐怖の不均衡",
+        "lang": "ja",
+        "current_status": "RESOLVING",
+        "deadline": "2026年3月〜6月",
+        "our_pick": "NO@3%",
+        "article_linked": true,
+        "why_candidate": "Very low probability JA prediction. Ukraine topic diversity.",
+        "codex_next_move": "Ensure article live. Mark in-play on JA tracker."
+      },
+      {
+        "rank": 14,
+        "prediction_id": "NP-2026-0083",
+        "title": "Ethereum's 10% Staking Yield — DeFi Gravity Well",
+        "lang": "en",
+        "current_status": "RESOLVING",
+        "deadline": "Q2 2026 (April-June)",
+        "our_pick": "YES@38%",
+        "article_linked": true,
+        "why_candidate": "DeFi/Ethereum prediction. Medium conviction. Diversifies crypto coverage.",
+        "codex_next_move": "Ensure article live. Mark in-play on EN tracker."
+      },
+      {
+        "rank": 15,
+        "prediction_id": "NP-2026-0074",
+        "title": "Pentagon China-First Strategy — Multi-Theater Doctrine Split",
+        "lang": "en",
+        "current_status": "RESOLVING",
+        "deadline": "March-April 2026",
+        "our_pick": "YES@91%",
+        "article_linked": true,
+        "why_candidate": "Very high conviction US defense prediction. Imminent deadline.",
+        "codex_next_move": "Check if deadline passed. If yes: resolve. If no: in-play."
+      },
+      {
+        "rank": 16,
+        "prediction_id": "NP-2026-0070",
+        "title": "Iran Strikes & Taiwan Drift — China Regulatory Window",
+        "lang": "en",
+        "current_status": "RESOLVING",
+        "deadline": "March-June 2026",
+        "our_pick": "YES@94%",
+        "article_linked": true,
+        "why_candidate": "Highest conviction in the batch (94%). Strong signal prediction.",
+        "codex_next_move": "Ensure article live. Mark in-play on EN tracker."
+      },
+      {
+        "rank": 17,
+        "prediction_id": "NP-2026-1009",
+        "title": "Bitcoin's $120K Breakout — FOMO Meets Structural Supply",
+        "lang": "en",
+        "current_status": "RESOLVING",
+        "deadline": "2026-05-06",
+        "our_pick": "NO@27%",
+        "article_linked": true,
+        "why_candidate": "Exact ISO deadline. Contrarian crypto call.",
+        "codex_next_move": "Ensure article live. Mark in-play on EN tracker."
+      },
+      {
+        "rank": 18,
+        "prediction_id": "NP-2026-0052",
+        "title": "America's Iran Strike — Alliance Loyalty vs Strategic Logic",
+        "lang": "en",
+        "current_status": "RESOLVING",
+        "deadline": "Late April / Early May 2026",
+        "our_pick": "NO@11%",
+        "article_linked": true,
+        "why_candidate": "US congressional action prediction. Timely with Iran situation.",
+        "codex_next_move": "Ensure article live. Mark in-play on EN tracker."
+      },
+      {
+        "rank": 19,
+        "prediction_id": "NP-2026-0012",
+        "title": "公開企業BTC保有200万枚突破 — 不可逆の制度化",
+        "lang": "ja",
+        "current_status": "OPEN",
+        "deadline": "2026-12-31",
+        "our_pick": "NO@15%",
+        "article_linked": false,
+        "why_candidate": "One of only 5 OPEN predictions. Long deadline but trackable.",
+        "codex_next_move": "Link to live article or create one. Move from OPEN to RESOLVING then in-play."
+      },
+      {
+        "rank": 20,
+        "prediction_id": "NP-2026-0071",
+        "title": "FATF's Stablecoin Warning — Financial Cop Acts Unilaterally",
+        "lang": "en",
+        "current_status": "RESOLVING",
+        "deadline": "Q2-Q3 2026",
+        "our_pick": "YES@77%",
+        "article_linked": true,
+        "why_candidate": "Financial regulation prediction. Medium-high conviction.",
+        "codex_next_move": "Ensure article live. Mark in-play on EN tracker."
+      }
+    ],
+    "selection_summary": {
+      "total_candidates": 20,
+      "by_lang": {"ja": 6, "en": 14},
+      "by_topic": {"geopolitics": 7, "crypto_finance": 9, "ai_tech": 2, "economics": 2},
+      "by_conviction": {"high_80plus": 7, "medium_30_79": 6, "low_under_30": 7},
+      "immediate_deadline_passed": 4,
+      "note": "4 predictions (NP-0048, NP-0078, NP-0074, NP-0015/Pentagon) may have deadlines already passed. Codex should check and resolve these first."
+    }
+  },
+
+  "task_c_tracker_currentness_recommendations": [
+    {
+      "id": "TCR-1",
+      "title": "Implement batch in-play promotion for Q2-deadline RESOLVING predictions",
+      "why_now": "628 RESOLVING predictions have Q2 2026 deadlines but only 3 JA / 0 EN appear as in-play. The tracker page looks empty. This is the single largest UX gap — readers see 'awaiting' for predictions that should be actively tracked.",
+      "expected_impact": "JA in-play: 3 -> 8-12. EN in-play: 0 -> 10-15. Tracker transforms from 'mostly empty' to 'actively tracking dozens of live predictions'.",
+      "risk": "low — changing display status does not affect prediction integrity or Brier calculation",
+      "target_files_for_codex": [
+        "scripts/prediction_page_builder.py (in-play classification logic)",
+        "scripts/prediction_db.json (status field or add in_play_display flag)"
+      ],
+      "done_definition": "After page rebuild: JA public_in_play_rows >= 8 AND EN public_in_play_rows >= 10 AND all promoted predictions have Q2 2026 deadlines."
+    },
+    {
+      "id": "TCR-2",
+      "title": "Auto-resolve past-deadline RESOLVING predictions",
+      "why_now": "Multiple predictions have deadlines that have already passed (March 2026 and earlier) but remain in RESOLVING status. These should be resolved by auto_verifier or manually. Stale RESOLVING predictions degrade tracker credibility.",
+      "expected_impact": "Cleans up 50-200 stale predictions. Increases resolved count (currently 58). Improves Brier Score sample size.",
+      "risk": "medium — auto-resolution needs correct verdict. Recommend batch with human review for ambiguous cases.",
+      "target_files_for_codex": [
+        "scripts/prediction_auto_verifier.py (batch mode for past-deadline)",
+        "scripts/prediction_db.json (status updates)"
+      ],
+      "done_definition": "All predictions with ISO deadline < 2026-04-04 are RESOLVED (with verdict) OR flagged for manual review. Zero RESOLVING predictions with deadline > 30 days past."
+    },
+    {
+      "id": "TCR-3",
+      "title": "Fix hidden_no_live_article for top-20 in-play candidates",
+      "why_now": "The 20 candidates in Task B are hidden because their Ghost articles aren't live. Until articles are live, these predictions can't appear on the tracker regardless of classification logic changes.",
+      "expected_impact": "20 predictions become visible. Direct prerequisite for TCR-1.",
+      "risk": "low — publishing/republishing articles is a normal Ghost operation",
+      "target_files_for_codex": [
+        "Ghost Admin API (publish or republish articles for 20 slugs)",
+        "scripts/build_article_release_manifest.py (regenerate after article changes)"
+      ],
+      "done_definition": "All 20 candidate article slugs return HTTP 200 from nowpattern.com. Integrity report shows these 20 as public (not hidden)."
+    },
+    {
+      "id": "TCR-4",
+      "title": "Populate linked_articles field in prediction_db.json",
+      "why_now": "ALL 1121 predictions have linked_articles=[] (empty). The only prediction-to-article link is ghost_url. This is fragile: if a slug changes, the link breaks silently. Adding linked_articles enables richer cross-referencing.",
+      "expected_impact": "Structural improvement. Enables future features: article-count-per-prediction, multi-article predictions, integrity checking.",
+      "risk": "low — additive change, no existing data modified",
+      "target_files_for_codex": [
+        "scripts/prediction_db.json (populate linked_articles from ghost_url + Ghost API)",
+        "scripts/prediction_page_builder.py (use linked_articles if present)"
+      ],
+      "done_definition": "At least 200 predictions have linked_articles with valid slug entries. Integrity report coverage_pct increases."
+    },
+    {
+      "id": "TCR-5",
+      "title": "Create cross-language article pairs for top hidden_cross_lang_only predictions",
+      "why_now": "197 JA-hidden predictions exist only in EN. 89 EN-hidden exist only in JA. Creating translations for the highest-value predictions would increase both JA and EN coverage.",
+      "expected_impact": "JA coverage_pct: 8.83% -> ~10% (if 20 EN-only articles get JA versions). EN coverage_pct: 17.57% -> ~18.5%.",
+      "risk": "medium — requires article generation/translation pipeline",
+      "target_files_for_codex": [
+        "NEO-ONE/TWO translation pipeline",
+        "scripts/nowpattern_publisher.py (publish translations)"
+      ],
+      "done_definition": "At least 10 cross_lang_only predictions in each language gain a same-language article. hidden_cross_lang_only counts decrease."
+    }
+  ],
+
+  "distribution_update_note": {
+    "v3_distribution_allowed_ratio_pct": 44.73,
+    "v4_distribution_allowed_ratio_pct": 80.38,
+    "delta_pp": 35.65,
+    "interpretation": "CAP-1 through CAP-4 from v3 appear to have been partially or fully applied between v3 and v4 sessions. distribution_blocked dropped from 262 to 93. truth_blocked remains 0.",
+    "remaining_blocked": 93
+  },
+
+  "blocking_reason": "",
+  "next_exact_step": "",
+
+  "safe_write_set": [
+    "reports/claude_sidecar/session_status.json",
+    "reports/claude_sidecar/heartbeat.json",
+    "reports/claude_sidecar/task_result_v4.json",
+    "reports/claude_sidecar/task_result_v4.md",
+    "reports/claude_sidecar/resume_prompt.txt"
+  ],
+
+  "evidence_refs": [
+    "reports/prediction_article_integrity.json",
+    "reports/content_release_snapshot.json",
+    "reports/one_pass_completion_gate.json",
+    "reports/claude_sidecar/task_result_v3.json",
+    "scripts/prediction_db.json",
+    "scripts/mission_contract.py",
+    "scripts/agent_bootstrap_context.py",
+    "docs/NAOTO_OS_OPERATING_STACK.md",
+    "data/mistake_registry.json",
+    ".claude/rules/NORTH_STAR.md"
+  ]
+}

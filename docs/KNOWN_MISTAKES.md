@@ -2532,3 +2532,75 @@ Traceback (most recent call last):
 - **検知時刻**: 2026-03-28 01:00 JST
 - **自動記録**: vps-error-capture.py
 
+
+
+### 2026-03-30: self-healer エラー検知 (sig: 29bf9489)
+- **スクリプト**: self-healer
+- **ログ**: /opt/shared/logs/self_healer.log
+- **エラー**:
+```
+[2026-03-30 17:10:33] [HEALER] Service restart FAILED: neo-telegram
+```
+- **検知時刻**: 2026-03-30 17:45 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-30: self-healer エラー検知 (sig: 27e3151c)
+- **スクリプト**: self-healer
+- **ログ**: /opt/shared/logs/self_healer.log
+- **エラー**:
+```
+[2026-03-30 17:15:33] [HEALER] Service restart FAILED: ghost-nowpattern
+```
+- **検知時刻**: 2026-03-30 17:45 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-30: self-healer エラー検知 (sig: 67668d5f)
+- **スクリプト**: self-healer
+- **ログ**: /opt/shared/logs/self_healer.log
+- **エラー**:
+```
+[2026-03-30 17:43:28] [HEALER] Service restart FAILED: ghost-page-guardian
+```
+- **検知時刻**: 2026-03-30 17:45 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-30: self-healer エラー検知 (sig: 29bf9489)
+- **スクリプト**: self-healer
+- **ログ**: /opt/shared/logs/self_healer.log
+- **エラー**:
+```
+[2026-03-30 17:10:33] [HEALER] Service restart FAILED: neo-telegram
+```
+- **検知時刻**: 2026-03-30 17:45 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-30: self-healer エラー検知 (sig: 27e3151c)
+- **スクリプト**: self-healer
+- **ログ**: /opt/shared/logs/self_healer.log
+- **エラー**:
+```
+[2026-03-30 17:15:33] [HEALER] Service restart FAILED: ghost-nowpattern
+```
+- **検知時刻**: 2026-03-30 17:45 JST
+- **自動記録**: vps-error-capture.py
+
+
+
+### 2026-03-30: self-healer エラー検知 (sig: 67668d5f)
+- **スクリプト**: self-healer
+- **ログ**: /opt/shared/logs/self_healer.log
+- **エラー**:
+```
+[2026-03-30 17:43:28] [HEALER] Service restart FAILED: ghost-page-guardian
+```
+- **検知時刻**: 2026-03-30 17:45 JST
+- **自動記録**: vps-error-capture.py
+

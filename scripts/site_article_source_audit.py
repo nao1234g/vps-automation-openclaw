@@ -4,10 +4,8 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import re
-import ssl
 import sys
 import time
 import urllib.request
@@ -15,28 +13,22 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 
-
-SEEDS = [
-    {"slug": "home-ja", "path": "/", "lang": "ja"},
-    {"slug": "home-en", "path": "/en/", "lang": "en"},
-]
-
-SKIP_PREFIXES = (
-    "/tag/",
-    "/author/",
-    "/rss/",
-    "/page/",
-    "/predictions/",
-    "/taxonomy/",
-    "/about/",
-    "/members/",
-    "/webmentions/",
-    "/ghost/",
-    "/assets/",
-    "/public/",
-    "/p/",
+from public_article_rotation import (
+    LINK_RE,
+    discover_article_paths,
+    fetch,
+    load_state,
+    pick_batch,
+    save_state,
+    ssl_context,
 )
-ARTICLE_LINK_RE = re.compile(r'href=["\']([^"\']+)["\']', re.IGNORECASE)
+
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent
+LOCAL_REPORT_DIR = REPO_ROOT / "reports" / "site_guard"
+DEFAULT_STATE_PATH = LOCAL_REPORT_DIR / "site_article_source_state.json"
+ARTICLE_SCOPE_RE = re.compile(r"<article\b.*?</article>", re.IGNORECASE | re.DOTALL)
 
 
 @dataclass
@@ -59,56 +51,11 @@ def ensure_stdout_utf8() -> None:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 
-def ssl_context() -> ssl.SSLContext:
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    return ctx
-
-
-def fetch(url: str, timeout: int = 20) -> tuple[int, str]:
-    req = urllib.request.Request(url, headers={"User-Agent": "nowpattern-article-source-audit/1.0"})
-    with urllib.request.urlopen(req, context=ssl_context(), timeout=timeout) as resp:
-        return resp.status, resp.read().decode("utf-8", errors="replace")
-
-
-def rotating_sample(items: list[str], limit: int, salt: str) -> list[str]:
-    keyed = sorted(items, key=lambda item: hashlib.sha256(f"{salt}:{item}".encode("utf-8")).hexdigest())
-    return keyed[:limit]
-
-
-def discover_article_paths(base_url: str, path: str, lang: str, limit: int) -> list[str]:
-    _, html = fetch(urljoin(base_url, path))
-    hrefs = ARTICLE_LINK_RE.findall(html)
-    base_host = urlparse(base_url).netloc
-    paths: list[str] = []
-    seen: set[str] = set()
-    for href in hrefs:
-        parsed = urlparse(urljoin(base_url, href))
-        if parsed.netloc != base_host:
-            continue
-        candidate = parsed.path or "/"
-        if candidate == "/" or candidate.startswith(SKIP_PREFIXES):
-            continue
-        if lang == "en":
-            if not candidate.startswith("/en/"):
-                continue
-        else:
-            if candidate.startswith("/en/"):
-                continue
-        if candidate in seen:
-            continue
-        seen.add(candidate)
-        paths.append(candidate)
-    salt = time.strftime("%Y%m%d")
-    return rotating_sample(paths, limit, salt)
-
-
 def extract_external_links(base_url: str, html: str) -> list[str]:
     base_host = urlparse(base_url).netloc
     links: list[str] = []
     seen: set[str] = set()
-    for href in ARTICLE_LINK_RE.findall(html):
+    for href in LINK_RE.findall(html):
         parsed = urlparse(urljoin(base_url, href))
         if not parsed.scheme.startswith("http"):
             continue
@@ -120,6 +67,13 @@ def extract_external_links(base_url: str, html: str) -> list[str]:
         seen.add(normalized)
         links.append(normalized)
     return links
+
+
+def extract_article_scope(html: str) -> str:
+    match = ARTICLE_SCOPE_RE.search(html)
+    if match:
+        return match.group(0)
+    return html
 
 
 def probe_source(url: str) -> tuple[str, str] | None:
@@ -144,11 +98,26 @@ def probe_source(url: str) -> tuple[str, str] | None:
     return ("error", last_error)
 
 
+def is_stale_article_result(result: ArticleAuditResult) -> bool:
+    if result.ok:
+        return False
+    errors = " | ".join(result.errors)
+    return any(
+        marker in errors
+        for marker in (
+            "article_fetch_failed:HTTP Error 404",
+            "article_fetch_failed:HTTP Error 410",
+            "article_http_404",
+            "article_http_410",
+        )
+    )
+
+
 def audit_article(base_url: str, path: str) -> ArticleAuditResult:
     url = urljoin(base_url, path)
     result = ArticleAuditResult(slug=path.strip("/"), url=url)
     try:
-        status, html = fetch(url)
+        status, html = fetch(base_url, path)
     except Exception as exc:
         result.fail(f"article_fetch_failed:{exc}")
         return result
@@ -156,7 +125,7 @@ def audit_article(base_url: str, path: str) -> ArticleAuditResult:
         result.fail(f"article_http_{status}")
         return result
 
-    source_links = extract_external_links(base_url, html)
+    source_links = extract_external_links(base_url, extract_article_scope(html))
     result.source_count = len(source_links)
     if not source_links:
         result.fail("no_external_source_links")
@@ -179,29 +148,69 @@ def main() -> int:
     ensure_stdout_utf8()
     parser = argparse.ArgumentParser(description="Audit public article source links from the live site.")
     parser.add_argument("--base-url", default="https://nowpattern.com", help="Base public URL")
-    parser.add_argument("--per-seed", type=int, default=4, help="How many articles to sample per language seed")
+    parser.add_argument("--discover-limit", type=int, default=120, help="How many known article pages to expand")
+    parser.add_argument("--check-limit", type=int, default=12, help="How many article pages to verify this run")
+    parser.add_argument("--full-scan", action="store_true", help="Ignore rotation state and verify every discovered article this run")
+    parser.add_argument("--state-path", default=str(DEFAULT_STATE_PATH), help="State file path")
     parser.add_argument("--json-out", help="Optional JSON report path")
     args = parser.parse_args()
 
     base_url = args.base_url.rstrip("/") + "/"
+    state_path = Path(args.state_path)
+    state = load_state(state_path)
+    known_paths = [path for path in state.get("known_paths", []) if isinstance(path, str)]
+    cursor = int(state.get("cursor", 0) or 0)
+    known_paths = discover_article_paths(base_url, known_paths, args.discover_limit)
+    if args.full_scan:
+        batch = known_paths
+        next_cursor = 0
+    else:
+        batch, next_cursor = pick_batch(known_paths, cursor, args.check_limit)
+
     results: list[dict[str, object]] = []
     failed = False
-    for seed in SEEDS:
-        article_paths = discover_article_paths(base_url, seed["path"], seed["lang"], args.per_seed)
-        for path in article_paths:
-            result = audit_article(base_url, path)
-            results.append(asdict(result))
-            if not result.ok:
-                failed = True
+    pruned_stale_paths: list[str] = []
+    for path in batch:
+        result = audit_article(base_url, path)
+        if is_stale_article_result(result):
+            pruned_stale_paths.append(path)
+            continue
+        results.append(asdict(result))
+        if not result.ok:
+            failed = True
+
+    if pruned_stale_paths:
+        stale = set(pruned_stale_paths)
+        known_paths = [path for path in known_paths if path not in stale]
+        next_cursor = 0 if not known_paths else next_cursor % len(known_paths)
+
+    state.update(
+        {
+            "known_paths": known_paths,
+            "cursor": next_cursor,
+            "last_generated_at_epoch": int(time.time()),
+            "last_checked_batch": batch,
+            "last_pruned_stale_paths": pruned_stale_paths,
+        }
+    )
+    save_state(state_path, state)
 
     report = {
         "base_url": base_url.rstrip("/"),
         "generated_at_epoch": int(time.time()),
+        "discover_limit": args.discover_limit,
+        "check_limit": args.check_limit,
+        "full_scan": args.full_scan,
+        "known_paths_total": len(known_paths),
+        "cursor_start": cursor,
+        "cursor_end": next_cursor,
         "summary": {
             "total": len(results),
             "failed": sum(1 for item in results if not item["ok"]),
             "passed": sum(1 for item in results if item["ok"]),
+            "pruned_stale_paths": len(pruned_stale_paths),
         },
+        "pruned_stale_paths": pruned_stale_paths,
         "results": results,
     }
 

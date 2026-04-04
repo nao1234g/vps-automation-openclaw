@@ -1,0 +1,163 @@
+{
+  "generated_at": "2026-04-04T03:24:16Z",
+  "generated_at_epoch": 1775273056,
+  "mission_contract_version": "2026-03-31-naoto-mission-v3",
+  "mission_contract_hash": "1e8a9d10265289a622e4149ac2d6b9eef7f721c7dd27c3de6f72140852819b18",
+  "lexicon_version": "2026-03-31-public-lexicon-v4",
+  "policy": {
+    "base_url": "https://nowpattern.com",
+    "min_distribution_allowed_ratio_pct": 30.0,
+    "max_high_risk_unapproved_ratio_pct": 25.0,
+    "require_truth_blocked_zero": true,
+    "require_orphan_zero": true,
+    "max_report_age_seconds": 21600,
+    "reuse_fresh_artifacts_seconds": 2700
+  },
+  "mission_handshake": {
+    "agent_name": "one_pass_completion_gate",
+    "purpose": "prove a release is truly green across truth, UI, crawl, governance, drift, and backlog thresholds",
+    "mission_contract_version": "2026-03-31-naoto-mission-v3",
+    "mission_contract_hash": "1e8a9d10265289a622e4149ac2d6b9eef7f721c7dd27c3de6f72140852819b18",
+    "lexicon_version": "2026-03-31-public-lexicon-v4",
+    "north_star": "Nowpattern is a verifiable forecast platform.",
+    "founder_os": "NAOTO OS",
+    "pvqe": {
+      "P": "判断精度",
+      "V": "価値密度",
+      "Q": "行動量",
+      "E": "波及力"
+    },
+    "bootstrap_context_hash": "e96c5b83fa76c7465fa31732aa655ae7dec577bd8da618d62673ea1b130a2f2e",
+    "bootstrap_release_generated_at": "2026-04-04T03:13:57Z",
+    "non_negotiable_count": 10,
+    "timestamp_utc": "2026-04-04T03:14:15.687727+00:00"
+  },
+  "checks": {
+    "prediction_deploy_gate": {
+      "ok": true,
+      "json": {
+        "generated_at": "2026-04-04T03:13:57Z",
+        "generated_at_epoch": 1775272437,
+        "mission_contract_version": "2026-03-31-naoto-mission-v3",
+        "mission_contract_hash": "1e8a9d10265289a622e4149ac2d6b9eef7f721c7dd27c3de6f72140852819b18",
+        "lexicon_version": "2026-03-31-public-lexicon-v4",
+        "manifest_generated_at": "2026-04-04T03:06:19Z",
+        "tracker_generated_at": "2026-04-04 12:06 JST",
+        "manifest_counts": {
+          "published_total": 474,
+          "public_truth_allowed": 474,
+          "distribution_allowed": 212,
+          "truth_blocked": 0,
+          "distribution_blocked": 262,
+          "high_risk_unapproved": 0,
+          "drafted_truth_failures": 0,
+          "draft_failures": 0,
+          "drafted_human_review_required": 0,
+          "human_review_draft_failures": 0
+        },
+        "tracker_summary": {
+          "ghost_published_posts_total": 474,
+          "ghost_published_posts_release_scope": 474,
+          "formal_prediction_total": 1121,
+          "orphan_oracle_articles": 0,
+          "coverage": {
+            "ja": {
+              "public_rows": 99,
+              "public_in_play_rows": 3,
+              "public_awaiting_rows": 84,
+              "public_resolved_rows": 12,
+              "hidden_no_live_article": 1022,
+              "coverage_pct": 8.83
+            },
+            "en": {
+              "public_rows": 197,
+              "public_in_play_rows": 0,
+              "public_awaiting_rows": 193,
+              "public_resolved_rows": 4,
+              "hidden_no_live_article": 924,
+              "coverage_pct": 17.57
+            }
+          }
+        },
+        "operational_metrics": {
+          "distribution_allowed_ratio_pct": 44.73,
+          "approval_backlog_ratio_pct": 0.0
+        },
+        "failures": [],
+        "warnings": [],
+        "ok": true
+      }
+    },
+    "ecosystem_governance_audit": {
+      "ok": true,
+      "failed": 0,
+      "total": 20
+    },
+    "synthetic_user_crawler": {
+      "ok": true,
+      "failed": 0,
+      "total": 4
+    },
+    "site_ui_smoke_audit": {
+      "ok": true,
+      "summary": {
+        "total": 28,
+        "passed": 28,
+        "failed": 0
+      }
+    },
+    "playwright_e2e_predictions": {
+      "ok": true,
+      "summary": {
+        "total_runs": 4,
+        "failed_runs": 0,
+        "passed_runs": 4
+      },
+      "results": [
+        {
+          "lang": "ja",
+          "device": "desktop",
+          "ok": true,
+          "pass_count": 9,
+          "fail_count": 0,
+          "fail_details": [],
+          "total": 9
+        },
+        {
+          "lang": "ja",
+          "device": "mobile",
+          "ok": true,
+          "pass_count": 9,
+          "fail_count": 0,
+          "fail_details": [],
+          "total": 9
+        },
+        {
+          "lang": "en",
+          "device": "desktop",
+          "ok": true,
+          "pass_count": 9,
+          "fail_count": 0,
+          "fail_details": [],
+          "total": 9
+        },
+        {
+          "lang": "en",
+          "device": "mobile",
+          "ok": true,
+          "pass_count": 9,
+          "fail_count": 0,
+          "fail_details": [],
+          "total": 9
+        }
+      ]
+    },
+    "check_live_repo_drift": {
+      "ok": true,
+      "output_tail": "al and remote match\n- site_article_source_audit\n  OK: local and remote match\n- public_article_rotation\n  OK: local and remote match\n- site_link_crawler\n  OK: local and remote match\n- auto_tweet\n  OK: local and remote match\n- x_swarm_dispatcher\n  OK: local and remote match\n- substack_notes_poster\n  OK: local and remote match\n- neo_queue_dispatcher\n  OK: local and remote match\n- test_mission_contract\n  OK: local and remote match\n- test_agent_bootstrap_context\n  OK: local and remote match\n- test_public_lexicon\n  OK: local and remote match\n- test_public_article_rotation\n  OK: local and remote match\n- test_site_article_source_audit\n  OK: local and remote match\n- test_repair_article_source_urls\n  OK: local and remote match\n- test_repair_cross_language_article_links\n  OK: local and remote match\n- test_refresh_prediction_db_meta\n  OK: local and remote match\n- test_site_link_crawler\n  OK: local and remote match\n- test_install_site_ui_guard\n  OK: local and remote match\n- test_prediction_ops_scheduler\n  OK: local and remote match\n- install_prediction_ops_scheduler\n  OK: local and remote match\n- ghost_ui_settings\n  OK: local and remote match\n- ghost_content_hygiene\n  OK: local and remote match"
+    }
+  },
+  "failures": [],
+  "warnings": [],
+  "ok": true
+}

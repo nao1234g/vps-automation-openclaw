@@ -11,11 +11,16 @@ from pathlib import Path
 from typing import Any
 
 from canonical_public_lexicon import LEXICON_VERSION, get_brand_copy
+from runtime_boundary import shared_or_local_path
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent
-REPORT_DIR = Path("/opt/shared/reports") if Path("/opt/shared").exists() else REPO_ROOT / "reports"
+REPORT_DIR = shared_or_local_path(
+    script_file=__file__,
+    shared_path="/opt/shared/reports",
+    local_path=REPO_ROOT / "reports",
+)
 HANDSHAKE_DIR = REPORT_DIR / "mission_handshakes"
 
 MISSION_CONTRACT_VERSION = "2026-03-31-naoto-mission-v3"

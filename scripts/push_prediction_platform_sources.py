@@ -30,6 +30,11 @@ TARGETS = [
         "remote": "/opt/shared/scripts/agent_bootstrap_context.py",
     },
     {
+        "name": "runtime_boundary",
+        "local": REPO_ROOT / "scripts" / "runtime_boundary.py",
+        "remote": "/opt/shared/scripts/runtime_boundary.py",
+    },
+    {
         "name": "product_lexicon",
         "local": REPO_ROOT / "scripts" / "product_lexicon.py",
         "remote": "/opt/shared/scripts/product_lexicon.py",
@@ -63,6 +68,26 @@ TARGETS = [
         "name": "release_governor",
         "local": REPO_ROOT / "scripts" / "release_governor.py",
         "remote": "/opt/shared/scripts/release_governor.py",
+    },
+    {
+        "name": "change_freeze_guard",
+        "local": REPO_ROOT / "scripts" / "change_freeze_guard.py",
+        "remote": "/opt/shared/scripts/change_freeze_guard.py",
+    },
+    {
+        "name": "credibility_budget_guard",
+        "local": REPO_ROOT / "scripts" / "credibility_budget_guard.py",
+        "remote": "/opt/shared/scripts/credibility_budget_guard.py",
+    },
+    {
+        "name": "one_pass_completion_gate",
+        "local": REPO_ROOT / "scripts" / "one_pass_completion_gate.py",
+        "remote": "/opt/shared/scripts/one_pass_completion_gate.py",
+    },
+    {
+        "name": "one_pass_completion_policy",
+        "local": REPO_ROOT / "scripts" / "one_pass_completion_policy.json",
+        "remote": "/opt/shared/scripts/one_pass_completion_policy.json",
     },
     {
         "name": "mistake_registry_data",
@@ -215,6 +240,31 @@ TARGETS = [
         "remote": "/opt/shared/scripts/fix_ghost_content_links.py",
     },
     {
+        "name": "patch_ghost_theme_en_urls",
+        "local": REPO_ROOT / "scripts" / "patch_ghost_theme_en_urls.py",
+        "remote": "/opt/shared/scripts/patch_ghost_theme_en_urls.py",
+    },
+    {
+        "name": "repair_ghost_post_authors",
+        "local": REPO_ROOT / "scripts" / "repair_ghost_post_authors.py",
+        "remote": "/opt/shared/scripts/repair_ghost_post_authors.py",
+    },
+    {
+        "name": "repair_internal_draft_links",
+        "local": REPO_ROOT / "scripts" / "repair_internal_draft_links.py",
+        "remote": "/opt/shared/scripts/repair_internal_draft_links.py",
+    },
+    {
+        "name": "repair_article_source_urls",
+        "local": REPO_ROOT / "scripts" / "repair_article_source_urls.py",
+        "remote": "/opt/shared/scripts/repair_article_source_urls.py",
+    },
+    {
+        "name": "repair_cross_language_article_links",
+        "local": REPO_ROOT / "scripts" / "repair_cross_language_article_links.py",
+        "remote": "/opt/shared/scripts/repair_cross_language_article_links.py",
+    },
+    {
         "name": "live_site_availability_check",
         "local": REPO_ROOT / "scripts" / "live_site_availability_check.py",
         "remote": "/opt/shared/scripts/live_site_availability_check.py",
@@ -228,6 +278,11 @@ TARGETS = [
         "name": "site_guard_runner",
         "local": REPO_ROOT / "scripts" / "site_guard_runner.py",
         "remote": "/opt/shared/scripts/site_guard_runner.py",
+    },
+    {
+        "name": "site_guard_scheduler",
+        "local": REPO_ROOT / "scripts" / "site_guard_scheduler.py",
+        "remote": "/opt/shared/scripts/site_guard_scheduler.py",
     },
     {
         "name": "site_ui_smoke_audit",
@@ -285,9 +340,34 @@ TARGETS = [
         "remote": "/opt/shared/scripts/site_article_source_audit.py",
     },
     {
+        "name": "public_article_rotation",
+        "local": REPO_ROOT / "scripts" / "public_article_rotation.py",
+        "remote": "/opt/shared/scripts/public_article_rotation.py",
+    },
+    {
+        "name": "site_link_crawler",
+        "local": REPO_ROOT / "scripts" / "site_link_crawler.py",
+        "remote": "/opt/shared/scripts/site_link_crawler.py",
+    },
+    {
         "name": "article_anchor_integrity_audit",
         "local": REPO_ROOT / "scripts" / "article_anchor_integrity_audit.py",
         "remote": "/opt/shared/scripts/article_anchor_integrity_audit.py",
+    },
+    {
+        "name": "synthetic_user_crawler",
+        "local": REPO_ROOT / "scripts" / "synthetic_user_crawler.py",
+        "remote": "/opt/shared/scripts/synthetic_user_crawler.py",
+    },
+    {
+        "name": "stateful_user_journey_audit",
+        "local": REPO_ROOT / "scripts" / "stateful_user_journey_audit.py",
+        "remote": "/opt/shared/scripts/stateful_user_journey_audit.py",
+    },
+    {
+        "name": "synthetic_user_freshness_audit",
+        "local": REPO_ROOT / "scripts" / "synthetic_user_freshness_audit.py",
+        "remote": "/opt/shared/scripts/synthetic_user_freshness_audit.py",
     },
     {
         "name": "site_dev_page_audit",
@@ -300,14 +380,44 @@ TARGETS = [
         "remote": "/opt/shared/scripts/ecosystem_mission_control.py",
     },
     {
+        "name": "ecosystem_schedule_router",
+        "local": REPO_ROOT / "scripts" / "ecosystem_schedule_router.py",
+        "remote": "/opt/shared/scripts/ecosystem_schedule_router.py",
+    },
+    {
+        "name": "prediction_ops_scheduler",
+        "local": REPO_ROOT / "scripts" / "prediction_ops_scheduler.py",
+        "remote": "/opt/shared/scripts/prediction_ops_scheduler.py",
+    },
+    {
         "name": "install_ecosystem_mission_control",
         "local": REPO_ROOT / "scripts" / "install_ecosystem_mission_control.py",
         "remote": "/opt/shared/scripts/install_ecosystem_mission_control.py",
     },
     {
+        "name": "install_prediction_ops_scheduler",
+        "local": REPO_ROOT / "scripts" / "install_prediction_ops_scheduler.py",
+        "remote": "/opt/shared/scripts/install_prediction_ops_scheduler.py",
+    },
+    {
         "name": "test_release_governor",
         "local": REPO_ROOT / "scripts" / "test_release_governor.py",
         "remote": "/opt/shared/scripts/test_release_governor.py",
+    },
+    {
+        "name": "test_change_freeze_guard",
+        "local": REPO_ROOT / "scripts" / "test_change_freeze_guard.py",
+        "remote": "/opt/shared/scripts/test_change_freeze_guard.py",
+    },
+    {
+        "name": "test_credibility_budget_guard",
+        "local": REPO_ROOT / "scripts" / "test_credibility_budget_guard.py",
+        "remote": "/opt/shared/scripts/test_credibility_budget_guard.py",
+    },
+    {
+        "name": "test_one_pass_completion_gate",
+        "local": REPO_ROOT / "scripts" / "test_one_pass_completion_gate.py",
+        "remote": "/opt/shared/scripts/test_one_pass_completion_gate.py",
     },
     {
         "name": "test_mission_contract",
@@ -338,6 +448,81 @@ TARGETS = [
         "name": "test_cron_governance_audit",
         "local": REPO_ROOT / "scripts" / "test_cron_governance_audit.py",
         "remote": "/opt/shared/scripts/test_cron_governance_audit.py",
+    },
+    {
+        "name": "test_repair_internal_draft_links",
+        "local": REPO_ROOT / "scripts" / "test_repair_internal_draft_links.py",
+        "remote": "/opt/shared/scripts/test_repair_internal_draft_links.py",
+    },
+    {
+        "name": "test_repair_article_source_urls",
+        "local": REPO_ROOT / "scripts" / "test_repair_article_source_urls.py",
+        "remote": "/opt/shared/scripts/test_repair_article_source_urls.py",
+    },
+    {
+        "name": "test_repair_cross_language_article_links",
+        "local": REPO_ROOT / "scripts" / "test_repair_cross_language_article_links.py",
+        "remote": "/opt/shared/scripts/test_repair_cross_language_article_links.py",
+    },
+    {
+        "name": "test_refresh_prediction_db_meta",
+        "local": REPO_ROOT / "scripts" / "test_refresh_prediction_db_meta.py",
+        "remote": "/opt/shared/scripts/test_refresh_prediction_db_meta.py",
+    },
+    {
+        "name": "test_public_article_rotation",
+        "local": REPO_ROOT / "scripts" / "test_public_article_rotation.py",
+        "remote": "/opt/shared/scripts/test_public_article_rotation.py",
+    },
+    {
+        "name": "test_site_article_source_audit",
+        "local": REPO_ROOT / "scripts" / "test_site_article_source_audit.py",
+        "remote": "/opt/shared/scripts/test_site_article_source_audit.py",
+    },
+    {
+        "name": "test_site_link_crawler",
+        "local": REPO_ROOT / "scripts" / "test_site_link_crawler.py",
+        "remote": "/opt/shared/scripts/test_site_link_crawler.py",
+    },
+    {
+        "name": "test_site_guard_scheduler",
+        "local": REPO_ROOT / "scripts" / "test_site_guard_scheduler.py",
+        "remote": "/opt/shared/scripts/test_site_guard_scheduler.py",
+    },
+    {
+        "name": "test_ecosystem_schedule_router",
+        "local": REPO_ROOT / "scripts" / "test_ecosystem_schedule_router.py",
+        "remote": "/opt/shared/scripts/test_ecosystem_schedule_router.py",
+    },
+    {
+        "name": "test_prediction_ops_scheduler",
+        "local": REPO_ROOT / "scripts" / "test_prediction_ops_scheduler.py",
+        "remote": "/opt/shared/scripts/test_prediction_ops_scheduler.py",
+    },
+    {
+        "name": "test_synthetic_user_freshness_audit",
+        "local": REPO_ROOT / "scripts" / "test_synthetic_user_freshness_audit.py",
+        "remote": "/opt/shared/scripts/test_synthetic_user_freshness_audit.py",
+    },
+    {
+        "name": "reconcile_orphan_oracle_articles",
+        "local": REPO_ROOT / "scripts" / "reconcile_orphan_oracle_articles.py",
+        "remote": "/opt/shared/scripts/reconcile_orphan_oracle_articles.py",
+    },
+    {
+        "name": "test_reconcile_orphan_oracle_articles",
+        "local": REPO_ROOT / "scripts" / "test_reconcile_orphan_oracle_articles.py",
+        "remote": "/opt/shared/scripts/test_reconcile_orphan_oracle_articles.py",
+    },
+    {
+        "name": "test_article_release_guard",
+        "local": REPO_ROOT / "scripts" / "test_article_release_guard.py",
+        "remote": "/opt/shared/scripts/test_article_release_guard.py",
+    },
+    {
+        "name": "test_install_site_ui_guard",
+        "local": REPO_ROOT / "scripts" / "test_install_site_ui_guard.py",
+        "remote": "/opt/shared/scripts/test_install_site_ui_guard.py",
     },
     {
         "name": "test_mistake_guard_contracts",

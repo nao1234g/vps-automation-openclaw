@@ -1,0 +1,19 @@
+{
+  "agent_name": "release_governor",
+  "purpose": "gate every public release and distribution decision under the founder mission contract",
+  "mission_contract_version": "2026-03-31-naoto-mission-v3",
+  "mission_contract_hash": "1e8a9d10265289a622e4149ac2d6b9eef7f721c7dd27c3de6f72140852819b18",
+  "lexicon_version": "2026-03-31-public-lexicon-v4",
+  "north_star": "Nowpattern is a verifiable forecast platform.",
+  "founder_os": "NAOTO OS",
+  "pvqe": {
+    "P": "判断精度",
+    "V": "価値密度",
+    "Q": "行動量",
+    "E": "波及力"
+  },
+  "bootstrap_context_hash": "e96c5b83fa76c7465fa31732aa655ae7dec577bd8da618d62673ea1b130a2f2e",
+  "bootstrap_release_generated_at": "2026-04-04T03:13:57Z",
+  "non_negotiable_count": 10,
+  "timestamp_utc": "2026-04-04T04:08:18.631668+00:00"
+}

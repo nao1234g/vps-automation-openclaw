@@ -39,11 +39,7 @@ SUSPEND_PATTERNS = (
 )
 
 MISSION_LINES = (
-    "7 * * * * /usr/bin/env python3 /opt/shared/scripts/ecosystem_mission_control.py --profile hourly-core >> /opt/shared/logs/ecosystem_mission_control_hourly.log 2>&1 # np-mission-control-hourly",
-    "19 */6 * * * /usr/bin/env python3 /opt/shared/scripts/ecosystem_mission_control.py --profile six-hour-site >> /opt/shared/logs/ecosystem_mission_control_site.log 2>&1 # np-mission-control-six-hour-site",
-    "31 4 * * * /usr/bin/env python3 /opt/shared/scripts/ecosystem_mission_control.py --profile daily-quality >> /opt/shared/logs/ecosystem_mission_control_quality.log 2>&1 # np-mission-control-daily-quality",
-    "43 5 * * * /usr/bin/env python3 /opt/shared/scripts/ecosystem_mission_control.py --profile daily-integrity >> /opt/shared/logs/ecosystem_mission_control_integrity.log 2>&1 # np-mission-control-daily-integrity",
-    "17 6 * * 1 /usr/bin/env python3 /opt/shared/scripts/ecosystem_mission_control.py --profile weekly-governance >> /opt/shared/logs/ecosystem_mission_control_weekly.log 2>&1 # np-mission-control-weekly-governance",
+    "* * * * * /usr/bin/env python3 /opt/shared/scripts/ecosystem_schedule_router.py >> /opt/shared/logs/ecosystem_schedule_router.log 2>&1 # np-ecosystem-schedule-router",
 )
 
 
@@ -57,7 +53,14 @@ def main() -> int:
         if not stripped:
             updated.append(line)
             continue
-        if any(marker in stripped for marker in ("np-mission-control-hourly", "np-mission-control-six-hour-site", "np-mission-control-daily-quality", "np-mission-control-daily-integrity", "np-mission-control-weekly-governance")):
+        if any(marker in stripped for marker in (
+            "np-mission-control-hourly",
+            "np-mission-control-six-hour-site",
+            "np-mission-control-daily-quality",
+            "np-mission-control-daily-integrity",
+            "np-mission-control-weekly-governance",
+            "np-ecosystem-schedule-router",
+        )):
             continue
         if not stripped.startswith("#") and any(pattern in stripped for pattern in SUSPEND_PATTERNS):
             updated.append("# SUSPENDED-MISSION-CONTROL: " + line)

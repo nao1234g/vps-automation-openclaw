@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-04-04T10:25:00Z",
+  "agent": "claude-code-sidecar",
+  "task_id": "sidecar-20260404-runtime-layer-v1",
+  "status": "completed",
+  "current_phase": "phase-4-handoff",
+  "scope_completion_pct": 100,
+  "overall_completion_estimate_pct": 100,
+  "reached_100_pct_for_this_scope": true,
+  "blocking_reason": "",
+  "next_exact_step": "Scope complete. Read resume_prompt.txt for next candidates.",
+  "files_written": [
+    "reports/claude_sidecar/session_status.json",
+    "reports/claude_sidecar/heartbeat.json",
+    "reports/claude_sidecar/task_result_runtime_v1.json",
+    "reports/claude_sidecar/task_result_runtime_v1.md",
+    "reports/claude_sidecar/resume_prompt.txt",
+    ".claude/hooks/sidecar_session_start.py",
+    ".claude/hooks/sidecar_session_end.py",
+    ".claude/settings.json"
+  ],
+  "safe_write_set": [
+    "reports/claude_sidecar/session_status.json",
+    "reports/claude_sidecar/heartbeat.json",
+    "reports/claude_sidecar/task_result_runtime_v1.json",
+    "reports/claude_sidecar/task_result_runtime_v1.md",
+    "reports/claude_sidecar/resume_prompt.txt"
+  ],
+  "completed_tasks": ["A-runtime-audit", "B-runtime-patch", "C-sidecar-update", "D-codex-handoff"]
+}

@@ -8,6 +8,7 @@ import json
 import os
 import sqlite3
 import ssl
+import sys
 import time
 import urllib.request
 from collections import Counter
@@ -17,16 +18,19 @@ from content_release_scope import SKIP_SLUGS
 from mission_contract import MISSION_CONTRACT_VERSION, mission_contract_hash
 from canonical_public_lexicon import LEXICON_VERSION
 from release_governor import evaluate_governed_release
+from runtime_boundary import shared_or_local_path
 
 GHOST_DB = "/var/www/nowpattern/content/data/ghost.db"
 CRON_ENV = "/opt/cron-env.sh"
 GHOST_URL = "https://nowpattern.com"
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 _LOCAL_REPORT_DIR = os.path.join(os.path.dirname(_SCRIPT_DIR), "reports")
-MANIFEST_PATH = (
-    "/opt/shared/reports/article_release_manifest.json"
-    if os.path.exists("/opt/shared")
-    else os.path.join(_LOCAL_REPORT_DIR, "article_release_manifest.json")
+MANIFEST_PATH = str(
+    shared_or_local_path(
+        script_file=__file__,
+        shared_path="/opt/shared/reports/article_release_manifest.json",
+        local_path=os.path.join(_LOCAL_REPORT_DIR, "article_release_manifest.json"),
+    )
 )
 def load_env() -> dict[str, str]:
     env: dict[str, str] = {}
@@ -110,13 +114,21 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check-source-fetchability", action="store_true")
     parser.add_argument("--apply-draft-truth-failures", action="store_true")
+    parser.add_argument("--apply-draft-human-review-required", action="store_true")
     parser.add_argument("--limit", type=int, default=0)
     args = parser.parse_args()
 
     env = load_env()
     admin_api_key = env.get("NOWPATTERN_GHOST_ADMIN_API_KEY", "")
 
-    con = sqlite3.connect(GHOST_DB)
+    try:
+        con = sqlite3.connect(GHOST_DB)
+    except sqlite3.OperationalError as exc:
+        sys.exit(
+            f"ERROR: Cannot open Ghost DB at {GHOST_DB} — {exc}\n"
+            "This script requires the Ghost CMS SQLite database on VPS.\n"
+            "If running locally, set GHOST_DB env var or copy the DB file."
+        )
     con.row_factory = sqlite3.Row
     rows = con.execute(
         """
@@ -142,9 +154,13 @@ def main() -> int:
         "high_risk_unapproved": 0,
         "drafted_truth_failures": 0,
         "draft_failures": 0,
+        "drafted_human_review_required": 0,
+        "human_review_draft_failures": 0,
     }
     lane_counts: Counter[str] = Counter()
     risk_flag_counts: Counter[str] = Counter()
+    release_error_counts: Counter[str] = Counter()
+    release_warning_counts: Counter[str] = Counter()
     review_queue_samples: list[dict[str, object]] = []
 
     for row in rows:
@@ -163,7 +179,12 @@ def main() -> int:
             check_source_fetchability=args.check_source_fetchability,
         )
         truth_only_errors = [
-            err for err in release["errors"] if not err.startswith("HUMAN_APPROVAL_REQUIRED:")
+            err
+            for err in release["errors"]
+            if not (
+                err.startswith("HUMAN_APPROVAL_REQUIRED:")
+                or err.startswith("EDITOR_REVIEW_REQUIRED:")
+            )
         ]
         public_truth_allowed = not truth_only_errors
         distribution_allowed = not release["errors"]
@@ -176,21 +197,29 @@ def main() -> int:
             "distribution_allowed": distribution_allowed,
             "truth_only_errors": truth_only_errors,
             "release_errors": release["errors"],
+            "release_warnings": release.get("warnings", []),
             "risk_flags": release["risk_flags"],
             "human_approval_required": release["human_approval_required"],
             "human_approval_present": release["human_approval_present"],
             "release_lane": release["release_lane"],
+            "external_url_count": len(release.get("external_urls", [])),
+            "verified_external_source_count": int(release.get("verified_external_source_count") or 0),
         }
         posts.append(entry)
         lane_counts[release["release_lane"]] += 1
         risk_flag_counts.update(release["risk_flags"])
-        if release["release_lane"] == "human_review_required" and len(review_queue_samples) < 50:
+        release_error_counts.update(release["errors"])
+        release_warning_counts.update(release.get("warnings", []))
+        if release["release_lane"] in {"human_review_required", "review_required"} and len(review_queue_samples) < 50:
             review_queue_samples.append(
                 {
                     "slug": slug,
                     "url": entry["url"],
                     "risk_flags": release["risk_flags"],
                     "release_errors": release["errors"],
+                    "release_lane": release["release_lane"],
+                    "external_url_count": entry["external_url_count"],
+                    "verified_external_source_count": entry["verified_external_source_count"],
                 }
             )
 
@@ -210,6 +239,13 @@ def main() -> int:
                 counts["drafted_truth_failures"] += 1
             else:
                 counts["draft_failures"] += 1
+        elif args.apply_draft_human_review_required and release["human_approval_required"] and not release["human_approval_present"]:
+            if not admin_api_key:
+                counts["human_review_draft_failures"] += 1
+            elif draft_post(str(row["id"]), str(row["updated_at"]), admin_api_key):
+                counts["drafted_human_review_required"] += 1
+            else:
+                counts["human_review_draft_failures"] += 1
 
         if args.limit and len(posts) >= args.limit:
             break
@@ -224,8 +260,10 @@ def main() -> int:
         "counts": counts,
         "lane_counts": dict(sorted(lane_counts.items())),
         "risk_flag_counts": dict(sorted(risk_flag_counts.items())),
+        "release_error_counts": dict(sorted(release_error_counts.items())),
+        "release_warning_counts": dict(sorted(release_warning_counts.items())),
         "review_queue": {
-            "count": lane_counts.get("human_review_required", 0),
+            "count": lane_counts.get("human_review_required", 0) + lane_counts.get("review_required", 0),
             "samples": review_queue_samples,
         },
         "posts": posts,

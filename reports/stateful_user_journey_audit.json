@@ -1,0 +1,49 @@
+{
+  "generated_at": "2026-04-04T02:30:46Z",
+  "generated_at_epoch": 1775269846,
+  "base_url": "https://nowpattern.com",
+  "total": 8,
+  "failed": 0,
+  "results": [
+    {
+      "name": "ja_tracker_load",
+      "ok": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "ja_search_state",
+      "ok": true,
+      "detail": "hidden_after_filter=90"
+    },
+    {
+      "name": "ja_article_open",
+      "ok": true,
+      "detail": "href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/"
+    },
+    {
+      "name": "ja_return_to_tracker",
+      "ok": true,
+      "detail": "path=/predictions/"
+    },
+    {
+      "name": "en_tracker_load",
+      "ok": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "en_search_state",
+      "ok": true,
+      "detail": "hidden_after_filter=193"
+    },
+    {
+      "name": "en_article_open",
+      "ok": true,
+      "detail": "href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/"
+    },
+    {
+      "name": "en_return_to_tracker",
+      "ok": true,
+      "detail": "path=/en/predictions/"
+    }
+  ]
+}

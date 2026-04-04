@@ -1,7 +1,50 @@
 {
-  "total": 6,
-  "failed": 1,
+  "generated_at": "2026-04-04T05:31:14Z",
+  "generated_at_epoch": 1775280674,
+  "total": 20,
+  "failed": 2,
   "results": [
+    {
+      "name": "mission_contract",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\n  \"checked\": 16,\n  \"failures\": []\n}",
+      "json": {
+        "checked": 16,
+        "failures": []
+      }
+    },
+    {
+      "name": "lexicon_contract",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\n  \"checked\": 12,\n  \"failures\": []\n}",
+      "json": {
+        "checked": 12,
+        "failures": []
+      }
+    },
+    {
+      "name": "change_freeze_contract",
+      "ok": true,
+      "returncode": 0,
+      "output": "PASS: change freeze guard regression checks",
+      "json": null
+    },
+    {
+      "name": "credibility_budget_contract",
+      "ok": true,
+      "returncode": 0,
+      "output": "PASS: credibility budget guard regression checks",
+      "json": null
+    },
+    {
+      "name": "one_pass_completion_contract",
+      "ok": true,
+      "returncode": 0,
+      "output": "PASS: one-pass completion gate regression checks",
+      "json": null
+    },
     {
       "name": "publish_path_guard",
       "ok": true,
@@ -16,224 +59,160 @@
       "name": "ghost_write_surface",
       "ok": true,
       "returncode": 0,
-      "output": "{\n  \"discovered_total\": 41,\n  \"classified_total\": 82,\n  \"class_counts\": {\n    \"audited_active_guard\": 3,\n    \"audited_active_release\": 2,\n    \"dormant_batch\": 3,\n    \"emergency_repair\": 11,\n    \"instructional_only\": 1,\n    \"manual_maintenance\": 21\n  },\n  \"failures\": [],\n  \"warnings\": [\n    {\n      \"path\": \"scripts/a1-bulk-en-translator.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/a3-schema-injector.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/a3_feature_image.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/a4-hreflang-injector.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/a4-hreflang-reset.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/ai_redteam.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/article_schema_self_test.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/batch_format_upgrade.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/c1-newsletter-setup.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/dedup2.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/dedup_articles.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/fix_article_tags.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/ghost_contract_test.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/ghost_integrity_check.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/ghost_tag_updater.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/image_audit_autofix.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/internal-link-builder.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/internal_link_enhancer.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/jp_en_pairing_checker.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/link_integrity_checker.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/manifold_widget_injector.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/meta_desc_batch.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/migrate_prediction_links.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/news-analyst-pipeline.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/nowpattern-ghost-post.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/nowpattern_post_audit.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/nowpattern_publish_gateway.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/phase7_public_rules_pages.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/prediction_auto_update.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/prediction_ogp_generator.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/publish_predictions_articles.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/regen_pattern_history.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/register_ghost_webhook.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/repair_article_tags.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/repair_speed_log_tags.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/rollback_meta_desc.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/semantic_qa.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/slug_repair.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/slug_repair2.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/translation_qa.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/unsplash_image_assigner.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    }\n  ],\n  \"discovered\": [\n    \"scripts/_dedup_articles.py\",\n    \"scripts/_fix_404_articles.py\",\n    \"scripts/_fix_404_republish.py\",\n    \"scripts/_fix_404_tags.py\",\n    \"scripts/_fix_existing_articles.py\",\n    \"scripts/_fix_existing_articles_tags.py\",\n    \"scripts/_fix_existing_articles_v2.py\",\n    \"scripts/_fix_ghost_tags.py\",\n    \"scripts/_ghost_setup_disclaimer_predictions.py\",\n    \"scripts/_recreate_404_articles.py\",\n    \"scripts/assign_tags_to_posts.py\",\n    \"scripts/build_article_release_manifest.py\",\n    \"scripts/builder_patch_faqpage.py\",\n    \"scripts/create_tag_pages.py\",\n    \"scripts/create_taxonomy_guide.py\",\n    \"scripts/deep_pattern_batch1.py\",\n    \"scripts/deep_pattern_batch2.py\",\n    \"scripts/deep_pattern_batch3.py\",\n    \"scripts/draft_rescue.py\",\n    \"scripts/fix_article_tags_footer.py\",\n    \"scripts/fix_broken_article.py\",\n    \"scripts/fix_hormuz_lexical.py\",\n    \"scripts/fix_ja_headings.py\",\n    \"scripts/fix_missing_ghost_tags.py\",\n    \"scripts/fix_tag_urls.py\",\n    \"scripts/ghost_tag_setup_v3.py\",\n    \"scripts/ghost_webhook_server.py\",\n    \"scripts/ghost_write_surface_audit.py\",\n    \"scripts/mark_article_human_approved.py\",\n    \"scripts/neo_queue_dispatcher.py\",\n    \"scripts/nowpattern_article_patcher.py\",\n    \"scripts/nowpattern_publisher.py\",\n    \"scripts/patch_stakeholder_table.py\",\n    \"scripts/prediction_page_builder.py\",\n    \"scripts/qa_sentinel.py\",\n    \"scripts/quarantine_unverifiable_articles.py\",\n    \"scripts/reformat_articles.py\",\n    \"scripts/update_article_titles.py\",\n    \"scripts/update_integrity_audit_pages.py\",\n    \"scripts/update_predictions_page.py\",\n    \"scripts/update_taxonomy_pages.py\"\n  ]\n}",
+      "output": "{\n  \"discovered_total\": 64,\n  \"classified_total\": 83,\n  \"class_counts\": {\n    \"audited_active_guard\": 10,\n    \"audited_active_maintenance\": 8,\n    \"audited_active_release\": 2,\n    \"dormant_batch\": 5,\n    \"emergency_repair\": 7,\n    \"instructional_only\": 1,\n    \"manual_maintenance\": 31\n  },\n  \"failures\": [],\n  \"warnings\": [\n    {\n      \"path\": \"scripts/_dedup_articles.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/_fix_404_articles.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/_fix_404_republish.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/_fix_404_tags.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/_fix_existing_articles.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/_fix_existing_articles_v2.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/_fix_ghost_tags.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/_ghost_setup_disclaimer_predictions.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/_recreate_404_articles.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/builder_patch_faqpage.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/deep_pattern_batch1.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/deep_pattern_batch2.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/deep_pattern_batch3.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/fix_article_tags_footer.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/fix_broken_article.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/fix_ja_headings.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/ghost_tag_setup_v3.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/reformat_articles.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    },\n    {\n      \"path\": \"scripts/update_article_titles.py\",\n      \"warning\": \"classified_surface_not_currently_detected\"\n    }\n  ],\n  \"discovered\": [\n    \"scripts/_fix_existing_articles_tags.py\",\n    \"scripts/a1-bulk-en-translator.py\",\n    \"scripts/a3-schema-injector.py\",\n    \"scripts/a3_feature_image.py\",\n    \"scripts/a4-hreflang-injector.py\",\n    \"scripts/a4-hreflang-reset.py\",\n    \"scripts/ai_redteam.py\",\n    \"scripts/article_schema_self_test.py\",\n    \"scripts/assign_tags_to_posts.py\",\n    \"scripts/batch_format_upgrade.py\",\n    \"scripts/build_article_release_manifest.py\",\n    \"scripts/c1-newsletter-setup.py\",\n    \"scripts/create_tag_pages.py\",\n    \"scripts/create_taxonomy_guide.py\",\n    \"scripts/dedup2.py\",\n    \"scripts/dedup_articles.py\",\n    \"scripts/draft_rescue.py\",\n    \"scripts/fix_article_tags.py\",\n    \"scripts/fix_hormuz_lexical.py\",\n    \"scripts/fix_missing_ghost_tags.py\",\n    \"scripts/fix_tag_urls.py\",\n    \"scripts/ghost_contract_test.py\",\n    \"scripts/ghost_integrity_check.py\",\n    \"scripts/ghost_tag_updater.py\",\n    \"scripts/ghost_webhook_server.py\",\n    \"scripts/ghost_write_surface_audit.py\",\n    \"scripts/image_audit_autofix.py\",\n    \"scripts/internal-link-builder.py\",\n    \"scripts/internal_link_enhancer.py\",\n    \"scripts/jp_en_pairing_checker.py\",\n    \"scripts/link_integrity_checker.py\",\n    \"scripts/manifold_widget_injector.py\",\n    \"scripts/mark_article_human_approved.py\",\n    \"scripts/meta_desc_batch.py\",\n    \"scripts/migrate_prediction_links.py\",\n    \"scripts/neo_queue_dispatcher.py\",\n    \"scripts/news-analyst-pipeline.py\",\n    \"scripts/nowpattern-ghost-post.py\",\n    \"scripts/nowpattern_article_patcher.py\",\n    \"scripts/nowpattern_post_audit.py\",\n    \"scripts/nowpattern_publish_gateway.py\",\n    \"scripts/nowpattern_publisher.py\",\n    \"scripts/patch_stakeholder_table.py\",\n    \"scripts/phase7_public_rules_pages.py\",\n    \"scripts/prediction_auto_update.py\",\n    \"scripts/prediction_ogp_generator.py\",\n    \"scripts/prediction_page_builder.py\",\n    \"scripts/publish_predictions_articles.py\",\n    \"scripts/qa_sentinel.py\",\n    \"scripts/quarantine_unverifiable_articles.py\",\n    \"scripts/regen_pattern_history.py\",\n    \"scripts/register_ghost_webhook.py\",\n    \"scripts/repair_article_tags.py\",\n    \"scripts/repair_speed_log_tags.py\",\n    \"scripts/rollback_meta_desc.py\",\n    \"scripts/semantic_qa.py\",\n    \"scripts/slug_repair.py\",\n    \"scripts/slug_repair2.py\",\n    \"scripts/translation_qa.py\",\n    \"scripts/unsplash_image_assigner.py\",\n    \"scripts/update_about_pages.py\",\n    \"scripts/update_integrity_audit_pages.py\",\n    \"scripts/update_predictions_page.py\",\n    \"scripts/update_taxonomy_pages.py\"\n  ]\n}",
       "json": {
-        "discovered_total": 41,
-        "classified_total": 82,
+        "discovered_total": 64,
+        "classified_total": 83,
         "class_counts": {
-          "audited_active_guard": 3,
+          "audited_active_guard": 10,
+          "audited_active_maintenance": 8,
           "audited_active_release": 2,
-          "dormant_batch": 3,
-          "emergency_repair": 11,
+          "dormant_batch": 5,
+          "emergency_repair": 7,
           "instructional_only": 1,
-          "manual_maintenance": 21
+          "manual_maintenance": 31
         },
         "failures": [],
         "warnings": [
           {
-            "path": "scripts/a1-bulk-en-translator.py",
+            "path": "scripts/_dedup_articles.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/a3-schema-injector.py",
+            "path": "scripts/_fix_404_articles.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/a3_feature_image.py",
+            "path": "scripts/_fix_404_republish.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/a4-hreflang-injector.py",
+            "path": "scripts/_fix_404_tags.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/a4-hreflang-reset.py",
+            "path": "scripts/_fix_existing_articles.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/ai_redteam.py",
+            "path": "scripts/_fix_existing_articles_v2.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/article_schema_self_test.py",
+            "path": "scripts/_fix_ghost_tags.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/batch_format_upgrade.py",
+            "path": "scripts/_ghost_setup_disclaimer_predictions.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/c1-newsletter-setup.py",
+            "path": "scripts/_recreate_404_articles.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/dedup2.py",
+            "path": "scripts/builder_patch_faqpage.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/dedup_articles.py",
+            "path": "scripts/deep_pattern_batch1.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/fix_article_tags.py",
+            "path": "scripts/deep_pattern_batch2.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/ghost_contract_test.py",
+            "path": "scripts/deep_pattern_batch3.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/ghost_integrity_check.py",
+            "path": "scripts/fix_article_tags_footer.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/ghost_tag_updater.py",
+            "path": "scripts/fix_broken_article.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/image_audit_autofix.py",
+            "path": "scripts/fix_ja_headings.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/internal-link-builder.py",
+            "path": "scripts/ghost_tag_setup_v3.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/internal_link_enhancer.py",
+            "path": "scripts/reformat_articles.py",
             "warning": "classified_surface_not_currently_detected"
           },
           {
-            "path": "scripts/jp_en_pairing_checker.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/link_integrity_checker.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/manifold_widget_injector.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/meta_desc_batch.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/migrate_prediction_links.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/news-analyst-pipeline.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/nowpattern-ghost-post.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/nowpattern_post_audit.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/nowpattern_publish_gateway.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/phase7_public_rules_pages.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/prediction_auto_update.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/prediction_ogp_generator.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/publish_predictions_articles.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/regen_pattern_history.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/register_ghost_webhook.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/repair_article_tags.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/repair_speed_log_tags.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/rollback_meta_desc.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/semantic_qa.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/slug_repair.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/slug_repair2.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/translation_qa.py",
-            "warning": "classified_surface_not_currently_detected"
-          },
-          {
-            "path": "scripts/unsplash_image_assigner.py",
+            "path": "scripts/update_article_titles.py",
             "warning": "classified_surface_not_currently_detected"
           }
         ],
         "discovered": [
-          "scripts/_dedup_articles.py",
-          "scripts/_fix_404_articles.py",
-          "scripts/_fix_404_republish.py",
-          "scripts/_fix_404_tags.py",
-          "scripts/_fix_existing_articles.py",
           "scripts/_fix_existing_articles_tags.py",
-          "scripts/_fix_existing_articles_v2.py",
-          "scripts/_fix_ghost_tags.py",
-          "scripts/_ghost_setup_disclaimer_predictions.py",
-          "scripts/_recreate_404_articles.py",
+          "scripts/a1-bulk-en-translator.py",
+          "scripts/a3-schema-injector.py",
+          "scripts/a3_feature_image.py",
+          "scripts/a4-hreflang-injector.py",
+          "scripts/a4-hreflang-reset.py",
+          "scripts/ai_redteam.py",
+          "scripts/article_schema_self_test.py",
           "scripts/assign_tags_to_posts.py",
+          "scripts/batch_format_upgrade.py",
           "scripts/build_article_release_manifest.py",
-          "scripts/builder_patch_faqpage.py",
+          "scripts/c1-newsletter-setup.py",
           "scripts/create_tag_pages.py",
           "scripts/create_taxonomy_guide.py",
-          "scripts/deep_pattern_batch1.py",
-          "scripts/deep_pattern_batch2.py",
-          "scripts/deep_pattern_batch3.py",
+          "scripts/dedup2.py",
+          "scripts/dedup_articles.py",
           "scripts/draft_rescue.py",
-          "scripts/fix_article_tags_footer.py",
-          "scripts/fix_broken_article.py",
+          "scripts/fix_article_tags.py",
           "scripts/fix_hormuz_lexical.py",
-          "scripts/fix_ja_headings.py",
           "scripts/fix_missing_ghost_tags.py",
           "scripts/fix_tag_urls.py",
-          "scripts/ghost_tag_setup_v3.py",
+          "scripts/ghost_contract_test.py",
+          "scripts/ghost_integrity_check.py",
+          "scripts/ghost_tag_updater.py",
           "scripts/ghost_webhook_server.py",
           "scripts/ghost_write_surface_audit.py",
+          "scripts/image_audit_autofix.py",
+          "scripts/internal-link-builder.py",
+          "scripts/internal_link_enhancer.py",
+          "scripts/jp_en_pairing_checker.py",
+          "scripts/link_integrity_checker.py",
+          "scripts/manifold_widget_injector.py",
           "scripts/mark_article_human_approved.py",
+          "scripts/meta_desc_batch.py",
+          "scripts/migrate_prediction_links.py",
           "scripts/neo_queue_dispatcher.py",
+          "scripts/news-analyst-pipeline.py",
+          "scripts/nowpattern-ghost-post.py",
           "scripts/nowpattern_article_patcher.py",
+          "scripts/nowpattern_post_audit.py",
+          "scripts/nowpattern_publish_gateway.py",
           "scripts/nowpattern_publisher.py",
           "scripts/patch_stakeholder_table.py",
+          "scripts/phase7_public_rules_pages.py",
+          "scripts/prediction_auto_update.py",
+          "scripts/prediction_ogp_generator.py",
           "scripts/prediction_page_builder.py",
+          "scripts/publish_predictions_articles.py",
           "scripts/qa_sentinel.py",
           "scripts/quarantine_unverifiable_articles.py",
-          "scripts/reformat_articles.py",
-          "scripts/update_article_titles.py",
+          "scripts/regen_pattern_history.py",
+          "scripts/register_ghost_webhook.py",
+          "scripts/repair_article_tags.py",
+          "scripts/repair_speed_log_tags.py",
+          "scripts/rollback_meta_desc.py",
+          "scripts/semantic_qa.py",
+          "scripts/slug_repair.py",
+          "scripts/slug_repair2.py",
+          "scripts/translation_qa.py",
+          "scripts/unsplash_image_assigner.py",
+          "scripts/update_about_pages.py",
           "scripts/update_integrity_audit_pages.py",
           "scripts/update_predictions_page.py",
           "scripts/update_taxonomy_pages.py"
@@ -244,10 +223,10 @@
       "name": "release_guard_canary",
       "ok": true,
       "returncode": 0,
-      "output": "{\n  \"total\": 6,\n  \"passed\": 6,\n  \"failed\": 0,\n  \"checks\": [\n    {\n      \"name\": \"frontier_claim_without_sources_blocked\",\n      \"ok\": true,\n      \"errors\": [\n        \"NO_EXTERNAL_SOURCES\",\n        \"BROKEN_SOURCE_SECTION\",\n        \"UNSUPPORTED_FRONTIER_RELEASE_CLAIM\",\n        \"OpenAI frontier model release claims require an official OpenAI source\",\n        \"HUMAN_APPROVAL_REQUIRED:FRONTIER_AI\"\n      ]\n    },\n    {\n      \"name\": \"frontier_claim_without_vendor_source_blocked\",\n      \"ok\": true,\n      \"errors\": [\n        \"NO_EXTERNAL_SOURCES\",\n        \"UNSUPPORTED_FRONTIER_RELEASE_CLAIM\",\n        \"OpenAI frontier model release claims require an official OpenAI source\",\n        \"HUMAN_APPROVAL_REQUIRED:FRONTIER_AI\"\n      ]\n    },\n    {\n      \"name\": \"broken_source_section_blocked\",\n      \"ok\": true,\n      \"errors\": [\n        \"NO_EXTERNAL_SOURCES\",\n        \"BROKEN_SOURCE_SECTION\"\n      ]\n    },\n    {\n      \"name\": \"high_risk_article_requires_human_approval\",\n      \"ok\": true,\n      \"errors\": [\n        \"HUMAN_APPROVAL_REQUIRED:WAR_CONFLICT\"\n      ]\n    },\n    {\n      \"name\": \"high_risk_article_with_human_approval_can_pass\",\n      \"ok\": true,\n      \"errors\": []\n    },\n    {\n      \"name\": \"assert_release_ready_raises_on_invalid_frontier_claim\",\n      \"ok\": true,\n      \"errors\": [\n        \"release blocker: NO_EXTERNAL_SOURCES, UNSUPPORTED_FRONTIER_RELEASE_CLAIM, Anthropic frontier model release claims require an official Anthropic source, HUMAN_APPROVAL_REQUIRED:FRONTIER_AI\"\n      ]\n    }\n  ]\n}",
+      "output": "{\n  \"total\": 7,\n  \"passed\": 7,\n  \"failed\": 0,\n  \"checks\": [\n    {\n      \"name\": \"frontier_claim_without_sources_blocked\",\n      \"ok\": true,\n      \"errors\": [\n        \"NO_EXTERNAL_SOURCES\",\n        \"BROKEN_SOURCE_SECTION\",\n        \"UNSUPPORTED_FRONTIER_RELEASE_CLAIM\",\n        \"OpenAI frontier model release claims require an official OpenAI source\"\n      ]\n    },\n    {\n      \"name\": \"frontier_claim_without_vendor_source_blocked\",\n      \"ok\": true,\n      \"errors\": [\n        \"NO_EXTERNAL_SOURCES\",\n        \"UNSUPPORTED_FRONTIER_RELEASE_CLAIM\",\n        \"OpenAI frontier model release claims require an official OpenAI source\"\n      ]\n    },\n    {\n      \"name\": \"broken_source_section_blocked\",\n      \"ok\": true,\n      \"errors\": [\n        \"NO_EXTERNAL_SOURCES\",\n        \"BROKEN_SOURCE_SECTION\"\n      ]\n    },\n    {\n      \"name\": \"single_risk_source_backed_article_can_be_auto_safe\",\n      \"ok\": true,\n      \"errors\": []\n    },\n    {\n      \"name\": \"multi_risk_article_with_two_sources_is_editorially_advised\",\n      \"ok\": true,\n      \"errors\": [\n        \"EDITORIAL_REVIEW_ADVISED:WAR_CONFLICT,FINANCIAL_CRISIS\"\n      ]\n    },\n    {\n      \"name\": \"high_risk_article_with_human_approval_can_pass\",\n      \"ok\": true,\n      \"errors\": []\n    },\n    {\n      \"name\": \"assert_release_ready_raises_on_invalid_frontier_claim\",\n      \"ok\": true,\n      \"errors\": [\n        \"release blocker: NO_EXTERNAL_SOURCES, UNSUPPORTED_FRONTIER_RELEASE_CLAIM, Anthropic frontier model release claims require an official Anthropic source\"\n      ]\n    }\n  ]\n}",
       "json": {
-        "total": 6,
-        "passed": 6,
+        "total": 7,
+        "passed": 7,
         "failed": 0,
         "checks": [
           {
@@ -257,8 +236,7 @@
               "NO_EXTERNAL_SOURCES",
               "BROKEN_SOURCE_SECTION",
               "UNSUPPORTED_FRONTIER_RELEASE_CLAIM",
-              "OpenAI frontier model release claims require an official OpenAI source",
-              "HUMAN_APPROVAL_REQUIRED:FRONTIER_AI"
+              "OpenAI frontier model release claims require an official OpenAI source"
             ]
           },
           {
@@ -267,8 +245,7 @@
             "errors": [
               "NO_EXTERNAL_SOURCES",
               "UNSUPPORTED_FRONTIER_RELEASE_CLAIM",
-              "OpenAI frontier model release claims require an official OpenAI source",
-              "HUMAN_APPROVAL_REQUIRED:FRONTIER_AI"
+              "OpenAI frontier model release claims require an official OpenAI source"
             ]
           },
           {
@@ -280,10 +257,15 @@
             ]
           },
           {
-            "name": "high_risk_article_requires_human_approval",
+            "name": "single_risk_source_backed_article_can_be_auto_safe",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "name": "multi_risk_article_with_two_sources_is_editorially_advised",
             "ok": true,
             "errors": [
-              "HUMAN_APPROVAL_REQUIRED:WAR_CONFLICT"
+              "EDITORIAL_REVIEW_ADVISED:WAR_CONFLICT,FINANCIAL_CRISIS"
             ]
           },
           {
@@ -295,7 +277,7 @@
             "name": "assert_release_ready_raises_on_invalid_frontier_claim",
             "ok": true,
             "errors": [
-              "release blocker: NO_EXTERNAL_SOURCES, UNSUPPORTED_FRONTIER_RELEASE_CLAIM, Anthropic frontier model release claims require an official Anthropic source, HUMAN_APPROVAL_REQUIRED:FRONTIER_AI"
+              "release blocker: NO_EXTERNAL_SOURCES, UNSUPPORTED_FRONTIER_RELEASE_CLAIM, Anthropic frontier model release claims require an official Anthropic source"
             ]
           }
         ]
@@ -303,9 +285,9 @@
     },
     {
       "name": "article_anchor_integrity",
-      "ok": false,
-      "returncode": 1,
-      "output": "{\"total\": 10, \"failed\": 3, \"passed\": 7}\nFAIL predictions: broken_anchor_pattern:/predictions/#np-2026- | broken_anchor_pattern:#np-2026-\nFAIL en/predictions: broken_anchor_pattern:/predictions/#np-2026- | broken_anchor_pattern:#np-2026-\nFAIL webmentions/receive: fetch_failed:HTTP Error 404: Not Found",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\"total\": 28, \"failed\": 0, \"passed\": 28, \"pruned_stale_paths\": 0}\nPASS: article anchor integrity audit",
       "json": null
     },
     {
@@ -316,11 +298,413 @@
       "json": null
     },
     {
+      "name": "stateful_user_journey",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\n  \"generated_at\": \"2026-04-04T05:22:27Z\",\n  \"generated_at_epoch\": 1775280147,\n  \"base_url\": \"https://nowpattern.com\",\n  \"total\": 8,\n  \"failed\": 0,\n  \"results\": [\n    {\n      \"name\": \"ja_tracker_load\",\n      \"ok\": true,\n      \"detail\": \"status=200\"\n    },\n    {\n      \"name\": \"ja_search_state\",\n      \"ok\": true,\n      \"detail\": \"hidden_after_filter=90\"\n    },\n    {\n      \"name\": \"ja_article_open\",\n      \"ok\": true,\n      \"detail\": \"href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/\"\n    },\n    {\n      \"name\": \"ja_return_to_tracker\",\n      \"ok\": true,\n      \"detail\": \"path=/predictions/\"\n    },\n    {\n      \"name\": \"en_tracker_load\",\n      \"ok\": true,\n      \"detail\": \"status=200\"\n    },\n    {\n      \"name\": \"en_search_state\",\n      \"ok\": true,\n      \"detail\": \"hidden_after_filter=193\"\n    },\n    {\n      \"name\": \"en_article_open\",\n      \"ok\": true,\n      \"detail\": \"href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/\"\n    },\n    {\n      \"name\": \"en_return_to_tracker\",\n      \"ok\": true,\n      \"detail\": \"path=/en/predictions/\"\n    }\n  ]\n}",
+      "json": {
+        "generated_at": "2026-04-04T05:22:27Z",
+        "generated_at_epoch": 1775280147,
+        "base_url": "https://nowpattern.com",
+        "total": 8,
+        "failed": 0,
+        "results": [
+          {
+            "name": "ja_tracker_load",
+            "ok": true,
+            "detail": "status=200"
+          },
+          {
+            "name": "ja_search_state",
+            "ok": true,
+            "detail": "hidden_after_filter=90"
+          },
+          {
+            "name": "ja_article_open",
+            "ok": true,
+            "detail": "href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/"
+          },
+          {
+            "name": "ja_return_to_tracker",
+            "ok": true,
+            "detail": "path=/predictions/"
+          },
+          {
+            "name": "en_tracker_load",
+            "ok": true,
+            "detail": "status=200"
+          },
+          {
+            "name": "en_search_state",
+            "ok": true,
+            "detail": "hidden_after_filter=193"
+          },
+          {
+            "name": "en_article_open",
+            "ok": true,
+            "detail": "href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/"
+          },
+          {
+            "name": "en_return_to_tracker",
+            "ok": true,
+            "detail": "path=/en/predictions/"
+          }
+        ]
+      }
+    },
+    {
+      "name": "article_source_repairs",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\n  \"db\": \"/var/www/nowpattern/content/data/ghost.db\",\n  \"issues_before\": 0,\n  \"repaired\": 0,\n  \"issues_after\": 0,\n  \"samples_before\": [],\n  \"samples_after\": []\n}",
+      "json": {
+        "db": "/var/www/nowpattern/content/data/ghost.db",
+        "issues_before": 0,
+        "repaired": 0,
+        "issues_after": 0,
+        "samples_before": [],
+        "samples_after": []
+      }
+    },
+    {
+      "name": "cross_language_article_links",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\n  \"db\": \"/var/www/nowpattern/content/data/ghost.db\",\n  \"issues_before\": 0,\n  \"repaired_posts\": 0,\n  \"issues_after\": 0,\n  \"cross_language_after\": 0,\n  \"same_language_replacements_after\": 0,\n  \"samples_before\": [],\n  \"samples_after\": []\n}",
+      "json": {
+        "db": "/var/www/nowpattern/content/data/ghost.db",
+        "issues_before": 0,
+        "repaired_posts": 0,
+        "issues_after": 0,
+        "cross_language_after": 0,
+        "same_language_replacements_after": 0,
+        "samples_before": [],
+        "samples_after": []
+      }
+    },
+    {
       "name": "site_article_source",
       "ok": true,
       "returncode": 0,
-      "output": "{\"total\": 2, \"failed\": 0, \"passed\": 2}\nPASS: article source audit",
+      "output": "{\"total\": 18, \"failed\": 0, \"passed\": 18, \"pruned_stale_paths\": 0}\nPASS: article source audit",
       "json": null
+    },
+    {
+      "name": "ghost_author_integrity",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\n  \"db\": \"/var/www/nowpattern/content/data/ghost.db\",\n  \"author_slug\": \"naoto\",\n  \"fallback_author_id\": \"1\",\n  \"missing_before\": 0,\n  \"repaired\": 0,\n  \"missing_after\": 0,\n  \"samples_before\": [],\n  \"samples_after\": []\n}",
+      "json": {
+        "db": "/var/www/nowpattern/content/data/ghost.db",
+        "author_slug": "naoto",
+        "fallback_author_id": "1",
+        "missing_before": 0,
+        "repaired": 0,
+        "missing_after": 0,
+        "samples_before": [],
+        "samples_after": []
+      }
+    },
+    {
+      "name": "draft_link_integrity",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\n  \"db\": \"/var/www/nowpattern/content/data/ghost.db\",\n  \"issues_before\": 0,\n  \"repaired_fields\": 0,\n  \"issues_after\": 0,\n  \"unresolved_after\": 0,\n  \"samples_before\": [],\n  \"samples_after\": []\n}",
+      "json": {
+        "db": "/var/www/nowpattern/content/data/ghost.db",
+        "issues_before": 0,
+        "repaired_fields": 0,
+        "issues_after": 0,
+        "unresolved_after": 0,
+        "samples_before": [],
+        "samples_after": []
+      }
+    },
+    {
+      "name": "site_link_crawler",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\"total\": 60, \"failed\": 0, \"passed\": 60}\nPASS: site link crawler",
+      "json": null
+    },
+    {
+      "name": "synthetic_user_crawler",
+      "ok": false,
+      "returncode": 1,
+      "output": "{\n  \"generated_at\": \"2026-04-04T05:31:13Z\",\n  \"generated_at_epoch\": 1775280673,\n  \"base_url\": \"https://nowpattern.com\",\n  \"total\": 4,\n  \"failed\": 1,\n  \"results\": [\n    {\n      \"name\": \"site_link_crawler\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"command\": [\n        \"/usr/bin/python3\",\n        \"/opt/shared/scripts/site_link_crawler.py\",\n        \"--base-url\",\n        \"https://nowpattern.com\",\n        \"--discover-limit\",\n        \"2000\",\n        \"--full-scan\"\n      ],\n      \"output\": \"{\\\"total\\\": 531, \\\"failed\\\": 0, \\\"passed\\\": 531}\\nPASS: site link crawler\",\n      \"json\": null\n    },\n    {\n      \"name\": \"stateful_user_journey\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"command\": [\n        \"/usr/bin/python3\",\n        \"/opt/shared/scripts/stateful_user_journey_audit.py\",\n        \"--base-url\",\n        \"https://nowpattern.com\"\n      ],\n      \"output\": \"{\\n  \\\"generated_at\\\": \\\"2026-04-04T05:27:43Z\\\",\\n  \\\"generated_at_epoch\\\": 1775280463,\\n  \\\"base_url\\\": \\\"https://nowpattern.com\\\",\\n  \\\"total\\\": 8,\\n  \\\"failed\\\": 0,\\n  \\\"results\\\": [\\n    {\\n      \\\"name\\\": \\\"ja_tracker_load\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"status=200\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"ja_search_state\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"hidden_after_filter=90\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"ja_article_open\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"ja_return_to_tracker\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"path=/predictions/\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"en_tracker_load\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"status=200\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"en_search_state\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"hidden_after_filter=193\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"en_article_open\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"en_return_to_tracker\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"path=/en/predictions/\\\"\\n    }\\n  ]\\n}\",\n      \"json\": {\n        \"generated_at\": \"2026-04-04T05:27:43Z\",\n        \"generated_at_epoch\": 1775280463,\n        \"base_url\": \"https://nowpattern.com\",\n        \"total\": 8,\n        \"failed\": 0,\n        \"results\": [\n          {\n            \"name\": \"ja_tracker_load\",\n            \"ok\": true,\n            \"detail\": \"status=200\"\n          },\n          {\n            \"name\": \"ja_search_state\",\n            \"ok\": true,\n            \"detail\": \"hidden_after_filter=90\"\n          },\n          {\n            \"name\": \"ja_article_open\",\n            \"ok\": true,\n            \"detail\": \"href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/\"\n          },\n          {\n            \"name\": \"ja_return_to_tracker\",\n            \"ok\": true,\n            \"detail\": \"path=/predictions/\"\n          },\n          {\n            \"name\": \"en_tracker_load\",\n            \"ok\": true,\n            \"detail\": \"status=200\"\n          },\n          {\n            \"name\": \"en_search_state\",\n            \"ok\": true,\n            \"detail\": \"hidden_after_filter=193\"\n          },\n          {\n            \"name\": \"en_article_open\",\n            \"ok\": true,\n            \"detail\": \"href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/\"\n          },\n          {\n            \"name\": \"en_return_to_tracker\",\n            \"ok\": true,\n            \"detail\": \"path=/en/predictions/\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"article_anchor_integrity\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"command\": [\n        \"/usr/bin/python3\",\n        \"/opt/shared/scripts/article_anchor_integrity_audit.py\",\n        \"--base-url\",\n        \"https://nowpattern.com\",\n        \"--discover-limit\",\n        \"2000\",\n        \"--full-scan\"\n      ],\n      \"output\": \"{\\\"total\\\": 214, \\\"failed\\\": 0, \\\"passed\\\": 214, \\\"pruned_stale_paths\\\": 0}\\nPASS: article anchor integrity audit\",\n      \"json\": null\n    },\n    {\n      \"name\": \"site_article_source\",\n      \"ok\": false,\n      \"returncode\": 1,\n      \"command\": [\n        \"/usr/bin/python3\",\n        \"/opt/shared/scripts/site_article_source_audit.py\",\n        \"--base-url\",\n        \"https://nowpattern.com\",\n        \"--discover-limit\",\n        \"2000\",\n        \"--full-scan\"\n      ],\n      \"output\": \"{\\\"total\\\": 107, \\\"failed\\\": 2, \\\"passed\\\": 105, \\\"pruned_stale_paths\\\": 0}\\nFAIL us-rolls-back-russia-oil-sanctions-alliance-strain-meets-energy-realpolitik: article_fetch_failed:The read operation timed out\\nFAIL en/bitcoin-65k-crash-digital-gold-myth-shatters-under-iran-war: article_fetch_failed:<urlopen error _ssl.c:983: The handshake operation timed out>\",\n      \"json\": null\n    }\n  ]\n}",
+      "json": {
+        "generated_at": "2026-04-04T05:31:13Z",
+        "generated_at_epoch": 1775280673,
+        "base_url": "https://nowpattern.com",
+        "total": 4,
+        "failed": 1,
+        "results": [
+          {
+            "name": "site_link_crawler",
+            "ok": true,
+            "returncode": 0,
+            "command": [
+              "/usr/bin/python3",
+              "/opt/shared/scripts/site_link_crawler.py",
+              "--base-url",
+              "https://nowpattern.com",
+              "--discover-limit",
+              "2000",
+              "--full-scan"
+            ],
+            "output": "{\"total\": 531, \"failed\": 0, \"passed\": 531}\nPASS: site link crawler",
+            "json": null
+          },
+          {
+            "name": "stateful_user_journey",
+            "ok": true,
+            "returncode": 0,
+            "command": [
+              "/usr/bin/python3",
+              "/opt/shared/scripts/stateful_user_journey_audit.py",
+              "--base-url",
+              "https://nowpattern.com"
+            ],
+            "output": "{\n  \"generated_at\": \"2026-04-04T05:27:43Z\",\n  \"generated_at_epoch\": 1775280463,\n  \"base_url\": \"https://nowpattern.com\",\n  \"total\": 8,\n  \"failed\": 0,\n  \"results\": [\n    {\n      \"name\": \"ja_tracker_load\",\n      \"ok\": true,\n      \"detail\": \"status=200\"\n    },\n    {\n      \"name\": \"ja_search_state\",\n      \"ok\": true,\n      \"detail\": \"hidden_after_filter=90\"\n    },\n    {\n      \"name\": \"ja_article_open\",\n      \"ok\": true,\n      \"detail\": \"href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/\"\n    },\n    {\n      \"name\": \"ja_return_to_tracker\",\n      \"ok\": true,\n      \"detail\": \"path=/predictions/\"\n    },\n    {\n      \"name\": \"en_tracker_load\",\n      \"ok\": true,\n      \"detail\": \"status=200\"\n    },\n    {\n      \"name\": \"en_search_state\",\n      \"ok\": true,\n      \"detail\": \"hidden_after_filter=193\"\n    },\n    {\n      \"name\": \"en_article_open\",\n      \"ok\": true,\n      \"detail\": \"href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/\"\n    },\n    {\n      \"name\": \"en_return_to_tracker\",\n      \"ok\": true,\n      \"detail\": \"path=/en/predictions/\"\n    }\n  ]\n}",
+            "json": {
+              "generated_at": "2026-04-04T05:27:43Z",
+              "generated_at_epoch": 1775280463,
+              "base_url": "https://nowpattern.com",
+              "total": 8,
+              "failed": 0,
+              "results": [
+                {
+                  "name": "ja_tracker_load",
+                  "ok": true,
+                  "detail": "status=200"
+                },
+                {
+                  "name": "ja_search_state",
+                  "ok": true,
+                  "detail": "hidden_after_filter=90"
+                },
+                {
+                  "name": "ja_article_open",
+                  "ok": true,
+                  "detail": "href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/"
+                },
+                {
+                  "name": "ja_return_to_tracker",
+                  "ok": true,
+                  "detail": "path=/predictions/"
+                },
+                {
+                  "name": "en_tracker_load",
+                  "ok": true,
+                  "detail": "status=200"
+                },
+                {
+                  "name": "en_search_state",
+                  "ok": true,
+                  "detail": "hidden_after_filter=193"
+                },
+                {
+                  "name": "en_article_open",
+                  "ok": true,
+                  "detail": "href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/"
+                },
+                {
+                  "name": "en_return_to_tracker",
+                  "ok": true,
+                  "detail": "path=/en/predictions/"
+                }
+              ]
+            }
+          },
+          {
+            "name": "article_anchor_integrity",
+            "ok": true,
+            "returncode": 0,
+            "command": [
+              "/usr/bin/python3",
+              "/opt/shared/scripts/article_anchor_integrity_audit.py",
+              "--base-url",
+              "https://nowpattern.com",
+              "--discover-limit",
+              "2000",
+              "--full-scan"
+            ],
+            "output": "{\"total\": 214, \"failed\": 0, \"passed\": 214, \"pruned_stale_paths\": 0}\nPASS: article anchor integrity audit",
+            "json": null
+          },
+          {
+            "name": "site_article_source",
+            "ok": false,
+            "returncode": 1,
+            "command": [
+              "/usr/bin/python3",
+              "/opt/shared/scripts/site_article_source_audit.py",
+              "--base-url",
+              "https://nowpattern.com",
+              "--discover-limit",
+              "2000",
+              "--full-scan"
+            ],
+            "output": "{\"total\": 107, \"failed\": 2, \"passed\": 105, \"pruned_stale_paths\": 0}\nFAIL us-rolls-back-russia-oil-sanctions-alliance-strain-meets-energy-realpolitik: article_fetch_failed:The read operation timed out\nFAIL en/bitcoin-65k-crash-digital-gold-myth-shatters-under-iran-war: article_fetch_failed:<urlopen error _ssl.c:983: The handshake operation timed out>",
+            "json": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "synthetic_user_freshness",
+      "ok": false,
+      "returncode": 1,
+      "output": "{\n  \"report_path\": \"/opt/shared/reports/synthetic_user_crawler/latest.json\",\n  \"max_age_seconds\": 129600,\n  \"generated_at_epoch\": 1775277346,\n  \"failures\": [\n    \"full_crawl_failed:1\"\n  ],\n  \"warnings\": []\n}",
+      "json": {
+        "report_path": "/opt/shared/reports/synthetic_user_crawler/latest.json",
+        "max_age_seconds": 129600,
+        "generated_at_epoch": 1775277346,
+        "failures": [
+          "full_crawl_failed:1"
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "name": "cron_governance",
+      "ok": true,
+      "returncode": 0,
+      "output": "{\n  \"active_total\": 88,\n  \"forbidden_patterns_checked\": 12,\n  \"active_governed_write_surfaces\": [\n    {\n      \"path\": \"scripts/nowpattern_post_audit.py\",\n      \"class\": \"audited_active_guard\"\n    },\n    {\n      \"path\": \"scripts/article_schema_self_test.py\",\n      \"class\": \"audited_active_guard\"\n    },\n    {\n      \"path\": \"scripts/internal-link-builder.py\",\n      \"class\": \"audited_active_maintenance\"\n    },\n    {\n      \"path\": \"scripts/a4-hreflang-injector.py\",\n      \"class\": \"audited_active_maintenance\"\n    },\n    {\n      \"path\": \"scripts/c1-newsletter-setup.py\",\n      \"class\": \"audited_active_maintenance\"\n    },\n    {\n      \"path\": \"scripts/translation_qa.py\",\n      \"class\": \"audited_active_guard\"\n    },\n    {\n      \"path\": \"scripts/prediction_ogp_generator.py\",\n      \"class\": \"audited_active_maintenance\"\n    },\n    {\n      \"path\": \"scripts/internal_link_enhancer.py\",\n      \"class\": \"audited_active_maintenance\"\n    },\n    {\n      \"path\": \"scripts/prediction_auto_update.py\",\n      \"class\": \"audited_active_maintenance\"\n    },\n    {\n      \"path\": \"scripts/image_audit_autofix.py\",\n      \"class\": \"audited_active_maintenance\"\n    },\n    {\n      \"path\": \"scripts/ghost_contract_test.py\",\n      \"class\": \"audited_active_guard\"\n    }\n  ],\n  \"failures\": [],\n  \"warnings\": [],\n  \"active_subset\": [\n    \"COORD_BOT_TOKEN=7949581564:AAGMEAARjntvQZ4GG6ZB74sz5YkC_MDtj8g\",\n    \"SHELL=/bin/bash\",\n    \"*/5 * * * * /opt/claude-code-telegram/healthcheck.sh\",\n    \"*/5 * * * * /opt/sync-neo-history.sh >> /var/log/neo-sync.log 2>&1\",\n    \"55 14 * * * . /opt/cron-env.sh && /usr/bin/python3 /opt/shared/x-intelligence/scripts/memory_gen.py >> /opt/shared/x-intelligence/logs/memory.log 2>&1\",\n    \"0 14 * * 0 . /opt/cron-env.sh && /bin/bash /opt/shared/scripts/weekly-analysis.sh >> /opt/shared/reports/weekly-analysis.log 2>&1\",\n    \"0 * * * * /opt/scripts/check-neo-token.sh\",\n    \"0 3 1 * * source /opt/cron-env.sh && python3 /opt/shared/scripts/format_evolver.py >> /opt/shared/reports/format_evolver.log 2>&1\",\n    \"*/30 * * * * python3 /opt/shared/scripts/nowpattern_post_audit.py >> /opt/shared/scripts/audit.log 2>&1\",\n    \"*/30 * * * * python3 /opt/shared/scripts/generate_shared_state.py >> /var/log/shared-state.log 2>&1\",\n    \"*/15 * * * * /usr/bin/python3 /opt/shared/scripts/gen_mission_control.py >> /opt/shared/logs/mission_control.log 2>&1\",\n    \"0 8 * * * python3 /opt/shared/scripts/mission_control_notify.py morning\",\n    \"*/5 * * * * python3 /opt/shared/scripts/mission_control_notify.py alert\",\n    \"0 0 * * * source /opt/cron-env.sh && python3 /opt/shared/scripts/x-algorithm-monitor.py >> /opt/shared/x-analytics/cron.log 2>&1\",\n    \"0 9 * * * /usr/bin/python3 /opt/shared/scripts/prediction_tracker.py overdue --notify >> /tmp/prediction_overdue.log 2>&1\",\n    \"0 0 * * * python3 /opt/shared/scripts/polymarket_updater.py >> /opt/shared/logs/polymarket_updater.log 2>&1\",\n    \"0 0 * * 1 python3 /opt/shared/scripts/weekly_prediction_task.py >> /opt/shared/reports/weekly_prediction.log 2>&1\",\n    \"0 23 * * * source /opt/cron-env.sh && python3 /opt/shared/scripts/master_health_check.py >> /var/log/master-health-check.log 2>&1\",\n    \"0 23 * * * . /opt/cron-env.sh && python3 /opt/shared/scripts/prediction_deadline_alert.py >> /var/log/prediction-deadline-alert.log 2>&1\",\n    \"30 8 * * * python3 /opt/shared/scripts/seo_monitor.py >> /opt/shared/reports/seo_monitor.log 2>&1\",\n    \"0 0,6,12,18 * * * . /opt/cron-env.sh && /usr/bin/python3 /opt/shared/scripts/rss-news-pipeline.py >> /opt/shared/scripts/rss-pipeline.log 2>&1\",\n    \"0 1,7,13,19 * * * . /opt/cron-env.sh && /usr/bin/python3 /opt/shared/scripts/grok-news-collector.py >> /opt/shared/scripts/grok-collector.log 2>&1\",\n    \"0 6 * * * python3 /opt/shared/scripts/article_schema_self_test.py >> /opt/shared/logs/schema_self_test.log 2>&1\",\n    \"0 3 * * * /usr/bin/python3 /opt/shared/scripts/neo-mistake-capture.py >> /opt/shared/logs/neo_mistake.log 2>&1\",\n    \"0 9 1 * * python3 /opt/shared/scripts/brier-score-validator.py >> /opt/shared/logs/brier-score-validator.log 2>&1\",\n    \"0 10 * * 1 python3 /opt/shared/scripts/polymarket-staleness-checker.py >> /opt/shared/logs/polymarket-staleness-checker.log 2>&1\",\n    \"0 3 * * 0 python3 /opt/shared/scripts/regression-runner.py >> /opt/shared/logs/regression-runner.log 2>&1\",\n    \"*/30 * * * * python3 /opt/shared/scripts/hung-process-killer.py >> /opt/shared/logs/hung-process-killer.log 2>&1\",\n    \"0 7 * * * python3 /opt/shared/scripts/neo-morning-diagnosis.py >> /opt/shared/logs/neo-morning-diagnosis.log 2>&1\",\n    \"0 6 * * * /usr/bin/python3 /opt/shared/scripts/internal-link-builder.py >> /opt/shared/logs/internal_links.log 2>&1\",\n    \"0 7 * * * /usr/bin/python3 /opt/shared/scripts/a4-hreflang-injector.py >> /opt/shared/logs/hreflang.log 2>&1\",\n    \"0 * * * * /usr/bin/python3 /opt/shared/scripts/b2-news-sitemap.py >> /opt/shared/logs/news_sitemap.log 2>&1\",\n    \"0 9 * * 1 python3 /opt/shared/scripts/c1-newsletter-setup.py >> /var/log/cron-c1-newsletter.log 2>&1\",\n    \"0 * * * * python3 /opt/shared/scripts/neo-token-watchdog.py >> /opt/shared/logs/neo-token-watchdog.log 2>&1\",\n    \"0 23 * * * python3 /opt/shared/scripts/d5-cwv-monitor.py >> /opt/shared/logs/cwv.log 2>&1\",\n    \"0 0 * * 1 . /opt/cron-env.sh && python3 /opt/shared/scripts/weekly_prediction_summary.py >> /opt/shared/scripts/logs/weekly-summary.log 2>&1\",\n    \"0 4 * * * . /opt/cron-env.sh && python3 /opt/shared/scripts/polymarket_divergence.py --neo >> /opt/shared/scripts/logs/polymarket-divergence.log 2>&1\",\n    \"0 20 * * * . /opt/cron-env.sh && python3 /opt/shared/scripts/translation_qa.py >> /opt/shared/scripts/logs/translation_qa.log 2>&1\",\n    \"0 6 * * * python3 /opt/shared/scripts/homepage_accuracy_injector.py >> /opt/shared/scripts/logs/homepage_accuracy.log 2>&1\",\n    \"0 19 * * * . /opt/cron-env.sh && python3 /opt/shared/scripts/prediction_ogp_generator.py --limit 20 >> /opt/shared/scripts/logs/ogp-gen.log 2>&1\",\n    \"0 19 * * 0 . /opt/cron-env.sh && python3 /opt/shared/scripts/internal_link_enhancer.py --limit 30 >> /opt/shared/scripts/logs/internal-link.log 2>&1\",\n    \"0 5 * * * . /opt/cron-env.sh && python3 /opt/shared/scripts/prediction_auto_update.py >> /opt/shared/scripts/logs/prediction-auto-update.log 2>&1\",\n    \"0 1 * * 1 . /opt/cron-env.sh && python3 /opt/shared/scripts/d2_substack_weekly.py >> /opt/shared/logs/substack_weekly.log 2>&1\",\n    \"0 3 * * * python3 /opt/shared/scripts/e2_prediction_badge.py >> /opt/shared/logs/e2_badge.log 2>&1\",\n    \"0 19 * * * python3 /opt/shared/scripts/prediction_future_gate.py --fix >> /opt/shared/logs/future_gate.log 2>&1\",\n    \"0 23 * * 0 . /opt/cron-env.sh && python3 /opt/shared/scripts/ai_vs_ai_predictor.py >> /opt/shared/logs/ai_vs_ai.log 2>&1\",\n    \"0 * * * * python3 /opt/shared/scripts/prediction_timestamper.py >> /opt/shared/logs/prediction_timestamper.log 2>&1\",\n    \"0 6 * * * python3 /opt/shared/scripts/prediction_timestamper.py --verify >> /opt/shared/logs/prediction_timestamper.log 2>&1\",\n    \"30 */4 * * * . /opt/cron-env.sh && python3 /opt/shared/scripts/en_post_auditor.py --recent 10 >> /opt/shared/logs/en_post_auditor.log 2>&1\",\n    \"0 22 * * * . /opt/cron-env.sh && python3 /opt/shared/scripts/neo-ecc-check.py --report >> /opt/shared/logs/neo-ecc-report.log 2>&1\",\n    \"0 9 * * * python3 /opt/shared/scripts/prediction_deadline_alerter.py >> /var/log/deadline_alerter.log 2>&1\",\n    \"*/5 * * * * python3 /opt/shared/scripts/picsum_fallback.py >> /opt/shared/logs/picsum_fallback.log 2>&1\",\n    \"*/5 * * * * python3 /opt/shared/scripts/lang_tag_fixer.py >> /opt/shared/logs/lang_tag_fixer.log 2>&1\",\n    \"30 18 * * * /usr/bin/python3 /opt/shared/scripts/image_audit_autofix.py >> /opt/shared/logs/image_audit.log 2>&1\",\n    \"0 * * * * /usr/bin/python3 /opt/shared/scripts/vps_knowledge_aggregator.py >> /opt/shared/logs/hive_mind.log 2>&1\",\n    \"*/5 * * * * cd /opt/shared/scripts && python3 task_queue_worker.py >> /opt/shared/logs/task_queue_worker.log 2>&1\",\n    \"0 0 * * * python3 /opt/shared/scripts/budget_sentinel.py --daily-check >> /opt/shared/logs/budget_sentinel.log 2>&1\",\n    \"0 21 * * * python3 /opt/shared/scripts/ghost_contract_test.py >> /opt/shared/logs/ghost_contract_test.log 2>&1\",\n    \"0 17 * * * python3 /opt/shared/scripts/offsite_backup.py >> /opt/shared/logs/offsite_backup.log 2>&1\",\n    \"0 1 * * * python3 /opt/shared/scripts/dlq_reviver.py >> /opt/shared/logs/dlq_reviver.log 2>&1\",\n    \"0 0 * * 1 python3 /opt/shared/scripts/model_intel_bot.py >> /opt/shared/logs/model_intel.log 2>&1\",\n    \"0 0 * * 0 /usr/bin/python3 /opt/shared/scripts/evolution_loop.py >> /opt/shared/logs/evolution_loop.log 2>&1\",\n    \"0 * * * * /usr/bin/python3 /opt/shared/scripts/neo_ai_player.py >> /opt/shared/logs/neo_ai_player.log 2>&1\",\n    \"55 6 * * * /usr/bin/python3 /opt/shared/scripts/fix_prediction_links_auto.py >> /opt/shared/logs/fix_wrong_lang_auto.log 2>&1\",\n    \"0 0 1 1,4,7,10 * source /opt/cron-env.sh && python3 /opt/shared/scripts/prediction_tournament.py --lang all >> /opt/shared/logs/tournament.log 2>&1\",\n    \"0 23 * * * . /opt/cron-env.sh && /usr/bin/python3 /opt/shared/scripts/gsc_intelligence.py >> /opt/shared/reports/gsc_intelligence.log 2>&1\",\n    \"0 14 * * * /bin/bash /opt/shared/scripts/run_ensemble_batch.sh >> /opt/shared/logs/ensemble_batch.log 2>&1\",\n    \"0 1 * * * python3 /opt/shared/scripts/brier_unit_test.py >> /opt/shared/logs/brier_unit_test.log 2>&1\",\n    \"30 22 * * * /usr/bin/python3 /opt/shared/scripts/prediction_db_audit.py >> /opt/shared/logs/prediction_db_audit.log 2>&1\",\n    \"59 22 * * * . /opt/cron-env.sh && /usr/bin/python3 /opt/shared/scripts/brier_audit.py >> /opt/shared/logs/brier_audit.log 2>&1\",\n    \"0 0 * * * . /opt/cron-env.sh && /opt/shared/memory/venv/bin/python /opt/shared/scripts/daily_memory_harvest.py >> /opt/shared/logs/memory_harvest.log 2>&1\",\n    \"30 1 * * * python3 /opt/shared/scripts/test_brier_score.py >> /opt/shared/logs/test_brier_score.log 2>&1\",\n    \"*/30 * * * * python3 /opt/shared/scripts/ghost_url_updater.py >> /var/log/ghost_url_updater.log 2>&1\",\n    \"30 21 * * * /usr/bin/python3 /opt/shared/scripts/polymarket_sync.py >> /opt/shared/logs/polymarket_sync.log 2>&1\",\n    \"0 1 * * 0 /usr/bin/python3 /opt/shared/scripts/observer_archiver.py >> /opt/shared/logs/observer_archiver.log 2>&1\",\n    \"0 8 * * 1 /usr/bin/python3 /opt/shared/scripts/lint_oracle_cta_cron.py >> /opt/shared/logs/lint_oracle_cta.log 2>&1\",\n    \"* * * * * /usr/bin/python3 /opt/shared/scripts/coordination_reaper.py >> /opt/shared/logs/coordination_reaper.log 2>&1\",\n    \"* * * * * /usr/bin/python3 /opt/shared/scripts/coordination_snapshot.py >> /opt/shared/logs/coordination_snapshot.log 2>&1\",\n    \"*/5 * * * * /usr/bin/python3 /opt/shared/scripts/coordination_events_export.py --incremental --append --output /opt/shared/coordination/events.ndjson >> /opt/shared/logs/coordination_events_export.log 2>&1\",\n    \"0 1 1 * * source /opt/cron-env.sh && python3 /opt/shared/scripts/prediction_review_writer.py >> /opt/shared/logs/prediction_review.log 2>&1\"\n  ]\n}",
+      "json": {
+        "active_total": 88,
+        "forbidden_patterns_checked": 12,
+        "active_governed_write_surfaces": [
+          {
+            "path": "scripts/nowpattern_post_audit.py",
+            "class": "audited_active_guard"
+          },
+          {
+            "path": "scripts/article_schema_self_test.py",
+            "class": "audited_active_guard"
+          },
+          {
+            "path": "scripts/internal-link-builder.py",
+            "class": "audited_active_maintenance"
+          },
+          {
+            "path": "scripts/a4-hreflang-injector.py",
+            "class": "audited_active_maintenance"
+          },
+          {
+            "path": "scripts/c1-newsletter-setup.py",
+            "class": "audited_active_maintenance"
+          },
+          {
+            "path": "scripts/translation_qa.py",
+            "class": "audited_active_guard"
+          },
+          {
+            "path": "scripts/prediction_ogp_generator.py",
+            "class": "audited_active_maintenance"
+          },
+          {
+            "path": "scripts/internal_link_enhancer.py",
+            "class": "audited_active_maintenance"
+          },
+          {
+            "path": "scripts/prediction_auto_update.py",
+            "class": "audited_active_maintenance"
+          },
+          {
+            "path": "scripts/image_audit_autofix.py",
+            "class": "audited_active_maintenance"
+          },
+          {
+            "path": "scripts/ghost_contract_test.py",
+            "class": "audited_active_guard"
+          }
+        ],
+        "failures": [],
+        "warnings": [],
+        "active_subset": [
+          "COORD_BOT_TOKEN=7949581564:AAGMEAARjntvQZ4GG6ZB74sz5YkC_MDtj8g",
+          "SHELL=/bin/bash",
+          "*/5 * * * * /opt/claude-code-telegram/healthcheck.sh",
+          "*/5 * * * * /opt/sync-neo-history.sh >> /var/log/neo-sync.log 2>&1",
+          "55 14 * * * . /opt/cron-env.sh && /usr/bin/python3 /opt/shared/x-intelligence/scripts/memory_gen.py >> /opt/shared/x-intelligence/logs/memory.log 2>&1",
+          "0 14 * * 0 . /opt/cron-env.sh && /bin/bash /opt/shared/scripts/weekly-analysis.sh >> /opt/shared/reports/weekly-analysis.log 2>&1",
+          "0 * * * * /opt/scripts/check-neo-token.sh",
+          "0 3 1 * * source /opt/cron-env.sh && python3 /opt/shared/scripts/format_evolver.py >> /opt/shared/reports/format_evolver.log 2>&1",
+          "*/30 * * * * python3 /opt/shared/scripts/nowpattern_post_audit.py >> /opt/shared/scripts/audit.log 2>&1",
+          "*/30 * * * * python3 /opt/shared/scripts/generate_shared_state.py >> /var/log/shared-state.log 2>&1",
+          "*/15 * * * * /usr/bin/python3 /opt/shared/scripts/gen_mission_control.py >> /opt/shared/logs/mission_control.log 2>&1",
+          "0 8 * * * python3 /opt/shared/scripts/mission_control_notify.py morning",
+          "*/5 * * * * python3 /opt/shared/scripts/mission_control_notify.py alert",
+          "0 0 * * * source /opt/cron-env.sh && python3 /opt/shared/scripts/x-algorithm-monitor.py >> /opt/shared/x-analytics/cron.log 2>&1",
+          "0 9 * * * /usr/bin/python3 /opt/shared/scripts/prediction_tracker.py overdue --notify >> /tmp/prediction_overdue.log 2>&1",
+          "0 0 * * * python3 /opt/shared/scripts/polymarket_updater.py >> /opt/shared/logs/polymarket_updater.log 2>&1",
+          "0 0 * * 1 python3 /opt/shared/scripts/weekly_prediction_task.py >> /opt/shared/reports/weekly_prediction.log 2>&1",
+          "0 23 * * * source /opt/cron-env.sh && python3 /opt/shared/scripts/master_health_check.py >> /var/log/master-health-check.log 2>&1",
+          "0 23 * * * . /opt/cron-env.sh && python3 /opt/shared/scripts/prediction_deadline_alert.py >> /var/log/prediction-deadline-alert.log 2>&1",
+          "30 8 * * * python3 /opt/shared/scripts/seo_monitor.py >> /opt/shared/reports/seo_monitor.log 2>&1",
+          "0 0,6,12,18 * * * . /opt/cron-env.sh && /usr/bin/python3 /opt/shared/scripts/rss-news-pipeline.py >> /opt/shared/scripts/rss-pipeline.log 2>&1",
+          "0 1,7,13,19 * * * . /opt/cron-env.sh && /usr/bin/python3 /opt/shared/scripts/grok-news-collector.py >> /opt/shared/scripts/grok-collector.log 2>&1",
+          "0 6 * * * python3 /opt/shared/scripts/article_schema_self_test.py >> /opt/shared/logs/schema_self_test.log 2>&1",
+          "0 3 * * * /usr/bin/python3 /opt/shared/scripts/neo-mistake-capture.py >> /opt/shared/logs/neo_mistake.log 2>&1",
+          "0 9 1 * * python3 /opt/shared/scripts/brier-score-validator.py >> /opt/shared/logs/brier-score-validator.log 2>&1",
+          "0 10 * * 1 python3 /opt/shared/scripts/polymarket-staleness-checker.py >> /opt/shared/logs/polymarket-staleness-checker.log 2>&1",
+          "0 3 * * 0 python3 /opt/shared/scripts/regression-runner.py >> /opt/shared/logs/regression-runner.log 2>&1",
+          "*/30 * * * * python3 /opt/shared/scripts/hung-process-killer.py >> /opt/shared/logs/hung-process-killer.log 2>&1",
+          "0 7 * * * python3 /opt/shared/scripts/neo-morning-diagnosis.py >> /opt/shared/logs/neo-morning-diagnosis.log 2>&1",
+          "0 6 * * * /usr/bin/python3 /opt/shared/scripts/internal-link-builder.py >> /opt/shared/logs/internal_links.log 2>&1",
+          "0 7 * * * /usr/bin/python3 /opt/shared/scripts/a4-hreflang-injector.py >> /opt/shared/logs/hreflang.log 2>&1",
+          "0 * * * * /usr/bin/python3 /opt/shared/scripts/b2-news-sitemap.py >> /opt/shared/logs/news_sitemap.log 2>&1",
+          "0 9 * * 1 python3 /opt/shared/scripts/c1-newsletter-setup.py >> /var/log/cron-c1-newsletter.log 2>&1",
+          "0 * * * * python3 /opt/shared/scripts/neo-token-watchdog.py >> /opt/shared/logs/neo-token-watchdog.log 2>&1",
+          "0 23 * * * python3 /opt/shared/scripts/d5-cwv-monitor.py >> /opt/shared/logs/cwv.log 2>&1",
+          "0 0 * * 1 . /opt/cron-env.sh && python3 /opt/shared/scripts/weekly_prediction_summary.py >> /opt/shared/scripts/logs/weekly-summary.log 2>&1",
+          "0 4 * * * . /opt/cron-env.sh && python3 /opt/shared/scripts/polymarket_divergence.py --neo >> /opt/shared/scripts/logs/polymarket-divergence.log 2>&1",
+          "0 20 * * * . /opt/cron-env.sh && python3 /opt/shared/scripts/translation_qa.py >> /opt/shared/scripts/logs/translation_qa.log 2>&1",
+          "0 6 * * * python3 /opt/shared/scripts/homepage_accuracy_injector.py >> /opt/shared/scripts/logs/homepage_accuracy.log 2>&1",
+          "0 19 * * * . /opt/cron-env.sh && python3 /opt/shared/scripts/prediction_ogp_generator.py --limit 20 >> /opt/shared/scripts/logs/ogp-gen.log 2>&1",
+          "0 19 * * 0 . /opt/cron-env.sh && python3 /opt/shared/scripts/internal_link_enhancer.py --limit 30 >> /opt/shared/scripts/logs/internal-link.log 2>&1",
+          "0 5 * * * . /opt/cron-env.sh && python3 /opt/shared/scripts/prediction_auto_update.py >> /opt/shared/scripts/logs/prediction-auto-update.log 2>&1",
+          "0 1 * * 1 . /opt/cron-env.sh && python3 /opt/shared/scripts/d2_substack_weekly.py >> /opt/shared/logs/substack_weekly.log 2>&1",
+          "0 3 * * * python3 /opt/shared/scripts/e2_prediction_badge.py >> /opt/shared/logs/e2_badge.log 2>&1",
+          "0 19 * * * python3 /opt/shared/scripts/prediction_future_gate.py --fix >> /opt/shared/logs/future_gate.log 2>&1",
+          "0 23 * * 0 . /opt/cron-env.sh && python3 /opt/shared/scripts/ai_vs_ai_predictor.py >> /opt/shared/logs/ai_vs_ai.log 2>&1",
+          "0 * * * * python3 /opt/shared/scripts/prediction_timestamper.py >> /opt/shared/logs/prediction_timestamper.log 2>&1",
+          "0 6 * * * python3 /opt/shared/scripts/prediction_timestamper.py --verify >> /opt/shared/logs/prediction_timestamper.log 2>&1",
+          "30 */4 * * * . /opt/cron-env.sh && python3 /opt/shared/scripts/en_post_auditor.py --recent 10 >> /opt/shared/logs/en_post_auditor.log 2>&1",
+          "0 22 * * * . /opt/cron-env.sh && python3 /opt/shared/scripts/neo-ecc-check.py --report >> /opt/shared/logs/neo-ecc-report.log 2>&1",
+          "0 9 * * * python3 /opt/shared/scripts/prediction_deadline_alerter.py >> /var/log/deadline_alerter.log 2>&1",
+          "*/5 * * * * python3 /opt/shared/scripts/picsum_fallback.py >> /opt/shared/logs/picsum_fallback.log 2>&1",
+          "*/5 * * * * python3 /opt/shared/scripts/lang_tag_fixer.py >> /opt/shared/logs/lang_tag_fixer.log 2>&1",
+          "30 18 * * * /usr/bin/python3 /opt/shared/scripts/image_audit_autofix.py >> /opt/shared/logs/image_audit.log 2>&1",
+          "0 * * * * /usr/bin/python3 /opt/shared/scripts/vps_knowledge_aggregator.py >> /opt/shared/logs/hive_mind.log 2>&1",
+          "*/5 * * * * cd /opt/shared/scripts && python3 task_queue_worker.py >> /opt/shared/logs/task_queue_worker.log 2>&1",
+          "0 0 * * * python3 /opt/shared/scripts/budget_sentinel.py --daily-check >> /opt/shared/logs/budget_sentinel.log 2>&1",
+          "0 21 * * * python3 /opt/shared/scripts/ghost_contract_test.py >> /opt/shared/logs/ghost_contract_test.log 2>&1",
+          "0 17 * * * python3 /opt/shared/scripts/offsite_backup.py >> /opt/shared/logs/offsite_backup.log 2>&1",
+          "0 1 * * * python3 /opt/shared/scripts/dlq_reviver.py >> /opt/shared/logs/dlq_reviver.log 2>&1",
+          "0 0 * * 1 python3 /opt/shared/scripts/model_intel_bot.py >> /opt/shared/logs/model_intel.log 2>&1",
+          "0 0 * * 0 /usr/bin/python3 /opt/shared/scripts/evolution_loop.py >> /opt/shared/logs/evolution_loop.log 2>&1",
+          "0 * * * * /usr/bin/python3 /opt/shared/scripts/neo_ai_player.py >> /opt/shared/logs/neo_ai_player.log 2>&1",
+          "55 6 * * * /usr/bin/python3 /opt/shared/scripts/fix_prediction_links_auto.py >> /opt/shared/logs/fix_wrong_lang_auto.log 2>&1",
+          "0 0 1 1,4,7,10 * source /opt/cron-env.sh && python3 /opt/shared/scripts/prediction_tournament.py --lang all >> /opt/shared/logs/tournament.log 2>&1",
+          "0 23 * * * . /opt/cron-env.sh && /usr/bin/python3 /opt/shared/scripts/gsc_intelligence.py >> /opt/shared/reports/gsc_intelligence.log 2>&1",
+          "0 14 * * * /bin/bash /opt/shared/scripts/run_ensemble_batch.sh >> /opt/shared/logs/ensemble_batch.log 2>&1",
+          "0 1 * * * python3 /opt/shared/scripts/brier_unit_test.py >> /opt/shared/logs/brier_unit_test.log 2>&1",
+          "30 22 * * * /usr/bin/python3 /opt/shared/scripts/prediction_db_audit.py >> /opt/shared/logs/prediction_db_audit.log 2>&1",
+          "59 22 * * * . /opt/cron-env.sh && /usr/bin/python3 /opt/shared/scripts/brier_audit.py >> /opt/shared/logs/brier_audit.log 2>&1",
+          "0 0 * * * . /opt/cron-env.sh && /opt/shared/memory/venv/bin/python /opt/shared/scripts/daily_memory_harvest.py >> /opt/shared/logs/memory_harvest.log 2>&1",
+          "30 1 * * * python3 /opt/shared/scripts/test_brier_score.py >> /opt/shared/logs/test_brier_score.log 2>&1",
+          "*/30 * * * * python3 /opt/shared/scripts/ghost_url_updater.py >> /var/log/ghost_url_updater.log 2>&1",
+          "30 21 * * * /usr/bin/python3 /opt/shared/scripts/polymarket_sync.py >> /opt/shared/logs/polymarket_sync.log 2>&1",
+          "0 1 * * 0 /usr/bin/python3 /opt/shared/scripts/observer_archiver.py >> /opt/shared/logs/observer_archiver.log 2>&1",
+          "0 8 * * 1 /usr/bin/python3 /opt/shared/scripts/lint_oracle_cta_cron.py >> /opt/shared/logs/lint_oracle_cta.log 2>&1",
+          "* * * * * /usr/bin/python3 /opt/shared/scripts/coordination_reaper.py >> /opt/shared/logs/coordination_reaper.log 2>&1",
+          "* * * * * /usr/bin/python3 /opt/shared/scripts/coordination_snapshot.py >> /opt/shared/logs/coordination_snapshot.log 2>&1",
+          "*/5 * * * * /usr/bin/python3 /opt/shared/scripts/coordination_events_export.py --incremental --append --output /opt/shared/coordination/events.ndjson >> /opt/shared/logs/coordination_events_export.log 2>&1",
+          "0 1 1 * * source /opt/cron-env.sh && python3 /opt/shared/scripts/prediction_review_writer.py >> /opt/shared/logs/prediction_review.log 2>&1"
+        ]
+      }
     }
   ]
 }

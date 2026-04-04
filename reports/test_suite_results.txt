@@ -1,0 +1,105 @@
+============================================================
+ TEST SUITE RESULTS — 20 New Scripts
+ Date: 2026-04-02
+ Runner: C:/Program Files/Python312/python.exe (local)
+============================================================
+
+## TEST EXECUTION RESULTS (20/20)
+
+ #  | Test File                                    | Result
+----|----------------------------------------------|-------
+  1 | test_article_anchor_integrity_audit.py        | PASS
+  2 | test_change_freeze_guard.py                   | PASS
+  3 | test_credibility_budget_guard.py               | PASS
+  4 | test_ecosystem_schedule_router.py              | PASS
+  5 | test_install_site_ui_guard.py                  | PASS
+  6 | test_one_pass_completion_gate.py               | PASS
+  7 | test_patch_ghost_theme_en_urls.py              | PASS
+  8 | test_prediction_ops_scheduler.py               | PASS
+  9 | test_public_article_rotation.py                | PASS
+ 10 | test_reconcile_orphan_oracle_articles.py       | PASS
+ 11 | test_refresh_prediction_db_meta.py             | PASS
+ 12 | test_repair_article_source_urls.py             | PASS
+ 13 | test_repair_cross_language_article_links.py    | PASS
+ 14 | test_repair_ghost_post_authors.py              | PASS
+ 15 | test_repair_internal_draft_links.py            | PASS
+ 16 | test_report_authority.py                       | PASS
+ 17 | test_site_article_source_audit.py              | PASS
+ 18 | test_site_guard_scheduler.py                   | PASS
+ 19 | test_site_link_crawler.py                      | PASS
+ 20 | test_synthetic_user_freshness_audit.py         | PASS
+
+Summary: 20 PASS / 0 FAIL / 0 SKIP
+
+============================================================
+
+## SCRIPT BODY QUALITY CHECK (20 scripts + 1 JSON config)
+
+### Runtime Classification
+
+ VPS-only (13):
+   - credibility_budget_guard.py
+   - ecosystem_schedule_router.py
+   - one_pass_completion_gate.py
+   - patch_ghost_theme_en_urls.py
+   - prediction_ops_scheduler.py
+   - reconcile_orphan_oracle_articles.py
+   - repair_article_source_urls.py
+   - repair_cross_language_article_links.py
+   - repair_ghost_post_authors.py
+   - repair_internal_draft_links.py
+   - site_guard_scheduler.py
+   - synthetic_user_freshness_audit.py
+   - install_prediction_ops_scheduler.py
+
+ Local-runnable (5):
+   - change_freeze_guard.py
+   - public_article_rotation.py
+   - site_link_crawler.py
+   - stateful_user_journey_audit.py (requires playwright optional)
+   - synthetic_user_crawler.py
+
+ Hybrid (1):
+   - report_authority.py (detects VPS/local at runtime)
+
+ Config (1):
+   - one_pass_completion_policy.json
+
+### Inter-Script Dependencies (custom module imports)
+
+ Module               | Imported By
+ ---------------------|-------------------------------------------
+ mission_contract     | ecosystem_schedule_router, one_pass_completion_gate,
+                      | prediction_ops_scheduler, site_guard_scheduler
+ report_authority     | credibility_budget_guard, one_pass_completion_gate
+ change_freeze_guard  | credibility_budget_guard
+ canonical_public_    | one_pass_completion_gate
+   lexicon            |
+
+### Issues Found (non-blocking, no bugs that break tests)
+
+ 1. patch_ghost_theme_en_urls.py
+    - Not idempotent: re-running after patch raises ValueError
+      (patch_text_once raises if old snippet not found)
+
+ 2. one_pass_completion_gate.py
+    - Hardcoded VPS IP fallback (163.44.124.123) in os.environ.get
+
+ 3. reconcile_orphan_oracle_articles.py
+    - Dict modification during iteration without transaction safety;
+      exception mid-loop loses partial updates
+
+ 4. repair_article_source_urls.py
+    - Uses dict(zip(..., strict=True)) — Python 3.10+ only
+
+ 5. site_guard_scheduler.py
+    - Imports mission_contract which must exist at runtime on VPS
+
+### Overall Assessment
+
+All 20 tests pass locally. No blocking bugs. The scripts are
+well-structured with defensive error handling. Most are VPS-targeted
+repair/audit tools that correctly use Ghost SQLite or Ghost Admin API.
+
+The 5 issues above are non-critical (idempotency, hardcoded fallbacks,
+Python version constraints) and would only surface during VPS deployment.

@@ -36,9 +36,19 @@ GHOST_CONTENT_FIELD_HINTS = {
     "value",
 }
 GHOST_ACTIVE_HYGIENE_TABLES = {"posts", "settings"}
-STALE_EN_ARTICLE_RE = re.compile(r"(?<![A-Za-z0-9_-])/en/en-", flags=re.IGNORECASE)
-STALE_EN_PREDICTIONS_RE = re.compile(r"(?<![A-Za-z0-9_-])/en/en-predictions/", flags=re.IGNORECASE)
-STALE_FULL_EN_ARTICLE_RE = re.compile(r"https?://(?:www\.)?nowpattern\.com/en/en-", flags=re.IGNORECASE)
+URL_SLOT_PREFIX = r"(?:href|src|content|action|data-href|data-url|canonical(?:_url)?|url)"
+STALE_EN_ARTICLE_RE = re.compile(
+    rf"{URL_SLOT_PREFIX}\s*[:=]\s*[\"'](?:https?://(?:www\.)?nowpattern\.com)?/en/en-(?!predictions/)[^\"']*",
+    flags=re.IGNORECASE,
+)
+STALE_EN_PREDICTIONS_RE = re.compile(
+    rf"{URL_SLOT_PREFIX}\s*[:=]\s*[\"'](?:https?://(?:www\.)?nowpattern\.com)?/en/en-predictions/[^\"']*",
+    flags=re.IGNORECASE,
+)
+STALE_FULL_EN_ARTICLE_RE = re.compile(
+    rf"{URL_SLOT_PREFIX}\s*[:=]\s*[\"']https?://(?:www\.)?nowpattern\.com/en/en-(?!predictions/)[^\"']*",
+    flags=re.IGNORECASE,
+)
 
 TARGETS = [
     {
@@ -58,6 +68,12 @@ TARGETS = [
         "kind": "text",
         "local": REPO_ROOT / "scripts" / "agent_bootstrap_context.py",
         "remote": "/opt/shared/scripts/agent_bootstrap_context.py",
+    },
+    {
+        "name": "runtime_boundary",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "runtime_boundary.py",
+        "remote": "/opt/shared/scripts/runtime_boundary.py",
     },
     {
         "name": "product_lexicon",
@@ -82,6 +98,48 @@ TARGETS = [
         "kind": "text",
         "local": REPO_ROOT / "scripts" / "release_governor.py",
         "remote": "/opt/shared/scripts/release_governor.py",
+    },
+    {
+        "name": "change_freeze_guard",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "change_freeze_guard.py",
+        "remote": "/opt/shared/scripts/change_freeze_guard.py",
+    },
+    {
+        "name": "credibility_budget_guard",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "credibility_budget_guard.py",
+        "remote": "/opt/shared/scripts/credibility_budget_guard.py",
+    },
+    {
+        "name": "one_pass_completion_gate",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "one_pass_completion_gate.py",
+        "remote": "/opt/shared/scripts/one_pass_completion_gate.py",
+    },
+    {
+        "name": "one_pass_completion_policy",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "one_pass_completion_policy.json",
+        "remote": "/opt/shared/scripts/one_pass_completion_policy.json",
+    },
+    {
+        "name": "test_change_freeze_guard",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_change_freeze_guard.py",
+        "remote": "/opt/shared/scripts/test_change_freeze_guard.py",
+    },
+    {
+        "name": "test_credibility_budget_guard",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_credibility_budget_guard.py",
+        "remote": "/opt/shared/scripts/test_credibility_budget_guard.py",
+    },
+    {
+        "name": "test_one_pass_completion_gate",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_one_pass_completion_gate.py",
+        "remote": "/opt/shared/scripts/test_one_pass_completion_gate.py",
     },
     {
         "name": "prediction_db",
@@ -180,6 +238,36 @@ TARGETS = [
         "remote": "/opt/shared/scripts/fix_ghost_content_links.py",
     },
     {
+        "name": "patch_ghost_theme_en_urls",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "patch_ghost_theme_en_urls.py",
+        "remote": "/opt/shared/scripts/patch_ghost_theme_en_urls.py",
+    },
+    {
+        "name": "repair_ghost_post_authors",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "repair_ghost_post_authors.py",
+        "remote": "/opt/shared/scripts/repair_ghost_post_authors.py",
+    },
+    {
+        "name": "repair_internal_draft_links",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "repair_internal_draft_links.py",
+        "remote": "/opt/shared/scripts/repair_internal_draft_links.py",
+    },
+    {
+        "name": "repair_article_source_urls",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "repair_article_source_urls.py",
+        "remote": "/opt/shared/scripts/repair_article_source_urls.py",
+    },
+    {
+        "name": "repair_cross_language_article_links",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "repair_cross_language_article_links.py",
+        "remote": "/opt/shared/scripts/repair_cross_language_article_links.py",
+    },
+    {
         "name": "live_site_availability_check",
         "kind": "text",
         "local": REPO_ROOT / "scripts" / "live_site_availability_check.py",
@@ -234,6 +322,12 @@ TARGETS = [
         "remote": "/opt/shared/scripts/release_guard_canary.py",
     },
     {
+        "name": "prediction_ops_scheduler",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "prediction_ops_scheduler.py",
+        "remote": "/opt/shared/scripts/prediction_ops_scheduler.py",
+    },
+    {
         "name": "ecosystem_governance_audit",
         "kind": "text",
         "local": REPO_ROOT / "scripts" / "ecosystem_governance_audit.py",
@@ -256,6 +350,18 @@ TARGETS = [
         "kind": "text",
         "local": REPO_ROOT / "scripts" / "site_article_source_audit.py",
         "remote": "/opt/shared/scripts/site_article_source_audit.py",
+    },
+    {
+        "name": "public_article_rotation",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "public_article_rotation.py",
+        "remote": "/opt/shared/scripts/public_article_rotation.py",
+    },
+    {
+        "name": "site_link_crawler",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "site_link_crawler.py",
+        "remote": "/opt/shared/scripts/site_link_crawler.py",
     },
     {
         "name": "auto_tweet",
@@ -298,6 +404,60 @@ TARGETS = [
         "kind": "text",
         "local": REPO_ROOT / "scripts" / "test_public_lexicon.py",
         "remote": "/opt/shared/scripts/test_public_lexicon.py",
+    },
+    {
+        "name": "test_public_article_rotation",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_public_article_rotation.py",
+        "remote": "/opt/shared/scripts/test_public_article_rotation.py",
+    },
+    {
+        "name": "test_site_article_source_audit",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_site_article_source_audit.py",
+        "remote": "/opt/shared/scripts/test_site_article_source_audit.py",
+    },
+    {
+        "name": "test_repair_article_source_urls",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_repair_article_source_urls.py",
+        "remote": "/opt/shared/scripts/test_repair_article_source_urls.py",
+    },
+    {
+        "name": "test_repair_cross_language_article_links",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_repair_cross_language_article_links.py",
+        "remote": "/opt/shared/scripts/test_repair_cross_language_article_links.py",
+    },
+    {
+        "name": "test_refresh_prediction_db_meta",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_refresh_prediction_db_meta.py",
+        "remote": "/opt/shared/scripts/test_refresh_prediction_db_meta.py",
+    },
+    {
+        "name": "test_site_link_crawler",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_site_link_crawler.py",
+        "remote": "/opt/shared/scripts/test_site_link_crawler.py",
+    },
+    {
+        "name": "test_install_site_ui_guard",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_install_site_ui_guard.py",
+        "remote": "/opt/shared/scripts/test_install_site_ui_guard.py",
+    },
+    {
+        "name": "test_prediction_ops_scheduler",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_prediction_ops_scheduler.py",
+        "remote": "/opt/shared/scripts/test_prediction_ops_scheduler.py",
+    },
+    {
+        "name": "install_prediction_ops_scheduler",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "install_prediction_ops_scheduler.py",
+        "remote": "/opt/shared/scripts/install_prediction_ops_scheduler.py",
     },
     {
         "name": "ghost_ui_settings",
@@ -529,6 +689,7 @@ def summarize_remote(ssh_bin: str, host: str, target: dict) -> dict:
 import hashlib
 import json
 import pathlib
+import re
 import sqlite3
 import sys
 
@@ -577,14 +738,28 @@ def summarize_text(raw):
         "lines": text.count("\n") + (0 if not text else 1),
     }
 
+URL_SLOT_PREFIX = r"(?:href|src|content|action|data-href|data-url|canonical(?:_url)?|url)"
+STALE_EN_ARTICLE_RE = re.compile(
+    rf"{URL_SLOT_PREFIX}\s*[:=]\s*[\"'](?:https?://(?:www\.)?nowpattern\.com)?/en/en-(?!predictions/)[^\"']*",
+    re.IGNORECASE,
+)
+STALE_EN_PREDICTIONS_RE = re.compile(
+    rf"{URL_SLOT_PREFIX}\s*[:=]\s*[\"'](?:https?://(?:www\.)?nowpattern\.com)?/en/en-predictions/[^\"']*",
+    re.IGNORECASE,
+)
+STALE_FULL_EN_ARTICLE_RE = re.compile(
+    rf"{URL_SLOT_PREFIX}\s*[:=]\s*[\"']https?://(?:www\.)?nowpattern\.com/en/en-(?!predictions/)[^\"']*",
+    re.IGNORECASE,
+)
+
 def count_stale_en_article_links(value):
-    return value.count("/en/en-")
+    return len(STALE_EN_ARTICLE_RE.findall(value))
 
 def count_stale_en_predictions_links(value):
-    return value.count("/en-predictions/")
+    return len(STALE_EN_PREDICTIONS_RE.findall(value))
 
 def count_stale_full_en_article_links(value):
-    return value.count("https://nowpattern.com/en/en-")
+    return len(STALE_FULL_EN_ARTICLE_RE.findall(value))
 
 def summarize_ghost_ui_settings(db_path):
     con = sqlite3.connect(str(db_path))

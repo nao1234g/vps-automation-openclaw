@@ -1,0 +1,293 @@
+============================================================
+  CRON PATCH PLAN v2 — VPS crontab 整理案（確定版）
+  作成: 2026-04-04
+  担当: Claude Code (Window 2) — cron/インフラ衛生専任
+  Codex非干渉確認済み
+============================================================
+
+■ 前提
+  - 現在のcrontab: 337行（env2行 + active88行 + suspended131行 + comment~116行）
+  - 毎分実行: 7件（うち4件が間隔変更対象）
+  - Codex所有スクリプトへの参照: なし（grep確認済み）
+
+============================================================
+1. 変更してよい crontab 行（4件）
+============================================================
+
+--- 変更① 行321: coordination_snapshot ---
+BEFORE:
+  * * * * * /usr/bin/python3 /opt/shared/scripts/coordination_snapshot.py >> /opt/shared/logs/coordination_snapshot.log 2>&1
+AFTER:
+  */5 * * * * /usr/bin/python3 /opt/shared/scripts/coordination_snapshot.py >> /opt/shared/logs/coordination_snapshot.log 2>&1
+理由:  毎分スナップショットは過剰。coordination/ が95MB肥大。5分間隔で十分。
+リスク: 低。スナップショットが5分粒度になるだけ。リアルタイム監視に使っていない。
+Codex干渉: なし
+
+--- 変更② 行334: site_guard_scheduler ---
+BEFORE:
+  * * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_scheduler.py >> /opt/shared/logs/site_guard_scheduler.log 2>&1 # np-site-guard-scheduler
+AFTER:
+  */15 * * * * /usr/bin/env python3 /opt/shared/scripts/site_guard_scheduler.py >> /opt/shared/logs/site_guard_scheduler.log 2>&1 # np-site-guard-scheduler
+理由:  サイトガードのスケジューラが毎分起動は過剰。ログ20,190行蓄積。15分で十分。
+リスク: 低。内部でサブタスクをスケジュールするだけ。15分遅延は許容範囲。
+Codex干渉: なし（Codex所有ファイルにsite_guard_schedulerへの参照なし）
+
+--- 変更③ 行335: ecosystem_schedule_router ---
+BEFORE:
+  * * * * * /usr/bin/env python3 /opt/shared/scripts/ecosystem_schedule_router.py >> /opt/shared/logs/ecosystem_schedule_router.log 2>&1 # np-ecosystem-schedule-router
+AFTER:
+  */15 * * * * /usr/bin/env python3 /opt/shared/scripts/ecosystem_schedule_router.py >> /opt/shared/logs/ecosystem_schedule_router.log 2>&1 # np-ecosystem-schedule-router
+理由:  エコシステムルーティングが毎分は過剰。ログ16,702行蓄積。
+リスク: 低。ルーティング判定の遅延が最大15分になるだけ。
+Codex干渉: なし（ecosystem_governance_audit.pyに参照なし）
+
+--- 変更④ 行336: prediction_ops_scheduler ---
+BEFORE:
+  * * * * * /usr/bin/env python3 /opt/shared/scripts/prediction_ops_scheduler.py >> /opt/shared/logs/prediction_ops_scheduler.log 2>&1 # np-prediction-ops-scheduler
+AFTER:
+  */15 * * * * /usr/bin/env python3 /opt/shared/scripts/prediction_ops_scheduler.py >> /opt/shared/logs/prediction_ops_scheduler.log 2>&1 # np-prediction-ops-scheduler
+理由:  予測opsスケジューラが毎分は過剰。ログ16,651行蓄積。
+リスク: 低。予測関連バッチの起動が最大15分遅延するだけ。
+Codex干渉: なし
+
+--- 変更なし（明示） ---
+  行320: coordination_reaper.py    毎分 → 現状維持（リース期限管理、軽量、設計意図）
+  行277: task_queue_worker.py      */5  → 現状維持（タスクキュー処理、レイテンシ重要）
+  行322: coordination_events_export */5  → 現状維持（設計通り）
+  行217: hung-process-killer.py    */30 → 現状維持（必要な監視）
+  行329: coordination_violation_alerter */15 → 現状維持（適切な間隔）
+
+============================================================
+2. まだ触るなという行（HOLD）
+============================================================
+
+--- HOLD-1: prediction_deadline 重複 ---
+  行173: prediction_deadline_alert.py   毎日 23:00 UTC（236行、21日/7日/3日前）
+  行269: prediction_deadline_alerter.py 毎日 09:00 UTC（165行、7日前のみ）
+理由:  行173が上位互換の可能性が高いが、alerter.py(行269)が
+       異なるロジック（例: Telegram通知先が違う等）を持つ可能性を排除できない。
+       スクリプト内容の差分確認後に判断。
+推奨:  次回セッションで diff を取ってから片方削除。
+
+--- HOLD-2: Brier系テスト 4重実行 ---
+  行214: brier-score-validator.py  月1回（月初 09:00 JST）162行
+  行308: brier_unit_test.py        毎日 01:00 UTC          85行
+  行311: brier_audit.py            毎日 22:59 UTC          95行
+  行313: test_brier_score.py       毎日 01:30 UTC         165行
+理由:  3つの日次テストが重複している可能性が高い。
+       ただし各々のテスト内容（何を検証しているか）が異なる場合がある。
+推奨:  内容確認後、brier_audit.py（行311）を日次代表として残し、
+       brier_unit_test(行308) + test_brier_score(行313) を削除候補に。
+       brier-score-validator(行214) は月次なのでそのまま。
+
+============================================================
+3. 即削除候補コメント群（131行 + 付随コメント約70行 = 約200行）
+============================================================
+
+全てコメントアウト済み。実行に影響ゼロ。git履歴から復元可能。
+
+--- SUSPENDED-CLEANUP（16行）---
+  行5:   neo-jarvis-bridge.sh
+  行6:   hawk-x-api-research.sh
+  行48:  rss-news-pipeline.py (旧3本)
+  行49:  rss-news-pipeline.py
+  行50:  rss-news-pipeline.py
+  行61:  thread-log-monitor.py
+  行71:  analyze_rss.py (3本)
+  行72:  analyze_rss.py
+  行73:  analyze_rss.py
+  行76:  find_tweet_ids.py (3本)
+  行77:  find_tweet_ids.py
+  行78:  find_tweet_ids.py
+  行91:  gen_system_briefing.py
+  行95:  x-intelligence discover.py
+  行99:  x-intelligence watchdog.sh
+  行105: news-analyst-pipeline.py
+
+--- SUSPENDED-EMERGENCY（20行）---
+  行32,34:      x-engage-wrapper.sh
+  行55,57,59:   post-thread-cron.sh
+  行66:         note-publish-cron.sh
+  行81,82,83:   rss-post-quote-rt.py
+  行109,111,113: x-engage.py v2
+  行116,117:    x-engage.py --self-replies
+  行119,120,121: auto_tweet.py v2
+  行124:        x_tweet_collector.py
+  行126:        neo_article_writer.py
+  行128:        x_quote_repost.py
+
+--- SUSPENDED-EMERGENCY-GPT6（2行）---
+  行290: x_swarm_dispatcher.py
+  行291: x_swarm_dispatcher.py --retry-dlq
+
+--- SUSPENDED-CONTENT-INTEGRITY（22行）---
+  行88,89,90:       deep-pattern-generate neo1 (3本)
+  行181,182,183:    deep-pattern-generate neo1 追加 (3本)
+  行185,186,187,188: rss-post-quote-rt.py (4本)
+  行192-197:        deep-pattern-generate neo2 (6本)
+  行199:            breaking-news-watcher.py
+  行287:            neo_queue_dispatcher.py
+  行296:            ghost_to_tweet_queue.py
+  行298,299,300:    auto_tweet.py X投稿 (3本)
+
+--- SUSPENDED-PREDICTION-OPS（20行）---
+  行20,21,22,23: daily-learning.py (4本)
+  行137:         prediction_auto_verifier.py
+  行146-149:     polymarket_monitor.py (4本)
+  行151-154:     polymarket_delta.py (4本)
+  行155,156:     prediction_page_builder.py (2本)
+  行157:         inject_live_panel.py
+  行159:         prediction_resolver.py
+  行167:         sync_stats.py
+  行172:         apply_polymarket_matches.py
+  行289:         prediction_cron_update.py
+  行292:         prediction_verifier.py
+  行293:         market_history_crawler.py
+
+--- SUSPENDED-MISSION-CONTROL（24行）---
+  行161:  prediction_builder_monitor.py
+  行168:  ghost_page_guardian.py
+  行169:  ui_guard.py
+  行175:  proactive_scanner.py
+  行177:  ghost_integrity_check.py
+  行200:  tag_audit_weekly.py
+  行203:  zero-article-alert.py
+  行204:  self-healer.py
+  行205:  article-count-monitor.py
+  行206:  en-translation-monitor.py
+  行207:  content-quality-monitor.py
+  行208:  oracle-monitor.py
+  行209:  pipeline-monitor.py
+  行210:  vps-error-capture.py
+  行212:  infra-monitor.py
+  行213:  prediction-update-checker.py
+  行219:  repair-verifier.py
+  行261:  site_link_crawler.py
+  行263:  site_playwright_check.py
+  行264:  post_publish_auditor.py
+  行265:  prediction_db_guardian.py
+  行266:  prediction_taxonomy_validator.py
+  行267:  link_integrity_checker.py
+  行268:  jp_en_pairing_checker.py
+  行270:  agent_consistency_validator.py
+  行274:  qa_sentinel.py
+  行276:  service_watchdog.py
+  行319:  ja_en_pairing_audit.py
+
+--- SUSPENDED-GOVERNANCE（4行）---
+  行27,28,29: post-notes.py (3本)
+  行255:      a1-bulk-en-translator.py
+
+--- SUSPENDED ラベルなし（13行）---
+  行7,9,11,13:  X Intelligence系コメント
+  行35,39,42:   旧X engagement/auto-tweet コメント
+  行52:         neo-orchestrator.py
+  行67:         note noindex停止コメント
+  行85:         x-news-monitor.py
+  行93:         repair_article_tags.py
+  行96,97:      X Intelligence重複コメント
+
+--- PAUSED-SNS（3行）---
+  行222: b1-x-thread-generator.py
+  行231: x_poll_post.py
+  行233: x_article_post.py
+
+--- DISABLED（1行）---
+  行134: update_predictions_page.py
+
+--- 付随コメント行（約70行）---
+  各SUSPENDED行に付随する説明コメント。
+  SUSPENDED本体が消えれば説明も不要。
+
+============================================================
+4. 保留候補（次回セッションで判断）
+============================================================
+
+  HOLD-1: prediction_deadline重複 → diff確認後に片方削除
+  HOLD-2: Brier系テスト4重 → 内容確認後に2件削除
+  （詳細はセクション2参照）
+
+============================================================
+5. 適用順序
+============================================================
+
+  Step 0: バックアップ
+    ssh root@163.44.124.123 "crontab -l > /root/crontab_backup_20260404.txt"
+    ssh root@163.44.124.123 "wc -l /root/crontab_backup_20260404.txt"
+    → 337行を確認
+
+  Step 1: 間隔変更（4行）— 最小変更、即効果
+    行321: * * * * *  →  */5 * * * *   (coordination_snapshot)
+    行334: * * * * *  →  */15 * * * *  (site_guard_scheduler)
+    行335: * * * * *  →  */15 * * * *  (ecosystem_schedule_router)
+    行336: * * * * *  →  */15 * * * *  (prediction_ops_scheduler)
+    検証: crontab -l | grep -c '^\* \* \* \* \*' → 3（reaper + token-watchdog + neo_ai_player）
+
+  Step 2: SUSPENDED一括削除（約200行）— ゼロリスク
+    sed コマンドで # SUSPENDED / # PAUSED / # DISABLED 行と
+    それに付随する孤立コメント行を一括除去。
+    検証: crontab -l | wc -l → 約137行
+
+  Step 3: 保留候補の確認と実行（別セッション）
+    HOLD-1, HOLD-2 を diff 確認後に適用。
+
+============================================================
+6. ロールバック方法
+============================================================
+
+  # 即時復元（所要3秒）
+  ssh root@163.44.124.123 "crontab /root/crontab_backup_20260404.txt"
+
+  # 復元確認
+  ssh root@163.44.124.123 "crontab -l | wc -l"
+  → 337 が返れば復元成功
+
+  # Step 1だけ戻したい場合（4行のみ手動で * に戻す）
+  ssh root@163.44.124.123 "crontab -e"  # 該当4行の */5 or */15 を * に手動変更
+
+============================================================
+Codex非干渉チェック結果
+============================================================
+
+  grep確認: Codex所有ファイル（ecosystem_governance_audit.py,
+    deploy_site_ui_guard_stack.py, release_guard_canary.py,
+    one_pass_completion_gate.py）に site_guard_scheduler /
+    ecosystem_schedule_router / prediction_ops_scheduler への
+    参照なし → 干渉なし
+
+  crontab間隔変更はスクリプト内部ロジックに影響しない
+  （起動頻度が変わるだけ、引数・出力は同一）
+
+  判定: 全4件 SAFE（HOLDなし）
+
+============================================================
+効果見積もり
+============================================================
+
+  プロセス起動数:
+    毎分: 7件 → 3件（-57%）
+    毎日合計: 7×1440 + ... → 3×1440 + 4×96 + ... （-5,376回/日）
+
+  ログ削減:
+    334-336の3件: 53,543行蓄積 → 今後1/15ペースに
+    321: 8,746行蓄積 → 今後1/5ペースに
+
+  ディスク:
+    coordination/ 95MB → snapshot頻度1/5で肥大抑制
+
+  Swap圧迫:
+    毎分4プロセス削減 → メモリ圧迫緩和に寄与（計測はStep1適用後）
+
+============================================================
+付随運用改善案（参考）
+============================================================
+
+  [今すぐ] /var/log auth.log 21MB + kern.log 14MB → logrotate設定確認
+  [今すぐ] coordination/ 95MB → coord_cleanup.py の保持期間確認
+  [後で]  Swap 70% → Step1適用後に free -h で再計測
+  [後で]  prediction_timestamper.log 66K行 → logrotate追加 or --quiet検討
+  [後で]  HOLD-1, HOLD-2 の diff確認と実行
+
+============================================================
+END OF PLAN
+============================================================

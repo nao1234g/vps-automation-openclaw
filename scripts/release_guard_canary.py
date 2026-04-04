@@ -71,7 +71,7 @@ def run_canary() -> dict[str, object]:
         }
     )
 
-    blocked_high_risk = evaluate_release_blockers(
+    auto_safe_single_risk = evaluate_release_blockers(
         title="Iran conflict escalates after missile strikes",
         html="<article><p>War risk rises.</p></article>",
         source_urls=["https://www.reuters.com/world/middle-east/sample"],
@@ -82,11 +82,29 @@ def run_canary() -> dict[str, object]:
     )
     checks.append(
         {
-            "name": "high_risk_article_requires_human_approval",
-            "ok": (not blocked_high_risk["ok"]) and any(
-                err.startswith("HUMAN_APPROVAL_REQUIRED:") for err in blocked_high_risk["errors"]
-            ),
-            "errors": blocked_high_risk["errors"],
+            "name": "single_risk_source_backed_article_can_be_auto_safe",
+            "ok": auto_safe_single_risk["ok"] and auto_safe_single_risk["release_lane"] == "auto_safe",
+            "errors": auto_safe_single_risk["errors"],
+        }
+    )
+
+    advised_multi_risk = evaluate_release_blockers(
+        title="Iran conflict shock pushes energy markets toward systemic banking stress",
+        html="<article><p>War escalation and liquidity fears are colliding.</p></article>",
+        source_urls=[
+            "https://www.reuters.com/world/middle-east/sample",
+            "https://www.ft.com/content/example",
+        ],
+        tags={"war", "finance", "lang-en"},
+        status="published",
+        channel="distribution",
+        require_external_sources=True,
+    )
+    checks.append(
+        {
+            "name": "multi_risk_article_with_two_sources_is_editorially_advised",
+            "ok": advised_multi_risk["ok"] and advised_multi_risk["release_lane"] == "editorial_review_advised",
+            "errors": advised_multi_risk["errors"] + advised_multi_risk.get("warnings", []),
         }
     )
 

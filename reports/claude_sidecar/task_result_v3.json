@@ -1,0 +1,269 @@
+{
+  "generated_at": "2026-04-04T07:10:00Z",
+  "agent": "claude-code-sidecar",
+  "model": "claude-opus-4-6",
+  "version": "v3",
+  "founder_os": "NAOTO OS",
+  "mission_contract_version": "2026-03-31-naoto-mission-v3",
+  "lexicon_version": "2026-03-31-public-lexicon-v4",
+  "task_id": "sidecar-20260404-stop-proof-contract-v3",
+  "parent_task_id": "sidecar-20260404-distribution-audit-v2",
+
+  "scope_definition": {
+    "bounded_tasks": [
+      "A: Stop-proof sidecar contract (session_status, heartbeat, resume_prompt, v3 deliverables)",
+      "B: 100% completion semantics definition",
+      "C: NAOTO OS <-> Nowpattern drift canonicalization",
+      "D: Codex action packet (top 5, priority-ordered)"
+    ],
+    "out_of_scope": [
+      "Production script edits",
+      "Live VPS verification",
+      "Ghost API calls",
+      "Manifest regeneration"
+    ]
+  },
+
+  "scope_completion_pct": 100,
+  "overall_completion_estimate_pct": 14,
+  "reached_100_pct_for_this_scope": true,
+  "completion_definition": "All 5 mandatory deliverables (session_status.json, heartbeat.json, task_result_v3.json, task_result_v3.md, resume_prompt.txt) exist, are UTF-8 clean, contain all required fields, and scope_completion_pct reflects bounded task completion. Production scripts are untouched.",
+
+  "completion_semantics": {
+    "scope_completion_pct": {
+      "definition": "Percentage of the bounded tasks assigned to this sidecar session that are complete.",
+      "current_value": 100,
+      "denominator": "4 bounded tasks (A: contract, B: semantics, C: drift, D: codex packet)",
+      "when_100_means_100": "All 5 deliverables exist with all required fields. No blocking_reason remains. No next_exact_step is pending within scope."
+    },
+    "overall_completion_estimate_pct": {
+      "definition": "Estimated progress toward the full NAOTO OS / Nowpattern operational target: distribution_allowed_ratio >= 65%, all drift resolved, all IC items implemented in production.",
+      "current_value": 14,
+      "estimate_basis": "distribution_allowed_ratio is 44.73% (target 65%). Sidecar has provided audit + action packet but Codex has not yet applied IC-1/IC-2/IC-3 changes. Drift items are documented but not yet fixed in source files. 14% = audit complete + contract established, implementation pending.",
+      "is_estimate": true
+    },
+    "reached_100_pct_for_this_scope": {
+      "definition": "Boolean. True if and only if scope_completion_pct == 100 AND all deliverables pass validation.",
+      "current_value": true
+    }
+  },
+
+  "findings": [
+    {
+      "id": "F-01",
+      "area": "distribution_blocked inventory",
+      "summary": "262 of 474 published posts are distribution_blocked (55.27%). All are release_lane=review_required. Zero truth_blocked.",
+      "detail": "IC-1: 196 dual-flag (WAR_CONFLICT+FINANCIAL_CRISIS). IC-2: 59 WAR_CONFLICT-only. IC-3: 4 FINANCIAL_CRISIS-only. Other: 3 empty risk_flags edge case.",
+      "evidence_ref": "reports/claude_sidecar/task_result_v2.json",
+      "status": "complete"
+    },
+    {
+      "id": "F-02",
+      "area": "manifest field limitation",
+      "summary": "article_release_manifest.json does NOT contain external_url_count, verified_external_source_count, title, html, or plaintext fields.",
+      "detail": "IC-1 estimated_rescue_count and IC-3 external_url_count fallback cannot be precisely quantified from manifest alone. Codex must re-derive from Ghost post data during implementation.",
+      "evidence_ref": "reports/article_release_manifest.json (schema inspection)",
+      "status": "complete"
+    },
+    {
+      "id": "F-03",
+      "area": "mojibake audit",
+      "summary": "v1 deliverables had mojibake in 2 files (task_result.json L88, task_result.md L96). All 6 source .py files are clean. v2/v3 use ASCII hex descriptions only.",
+      "evidence_ref": "reports/claude_sidecar/task_result_v2.json mojibake_audit section",
+      "status": "complete"
+    },
+    {
+      "id": "F-04",
+      "area": "one_pass_completion_gate",
+      "summary": "All checks passing (ok=true). prediction_deploy_gate ok, ecosystem_governance_audit 20/20, synthetic_user_crawler 4/4, site_ui_smoke_audit 28/28, playwright_e2e 36/36, check_live_repo_drift all match.",
+      "evidence_ref": "reports/one_pass_completion_gate.json",
+      "status": "complete"
+    },
+    {
+      "id": "F-05",
+      "area": "stop-proof contract gap",
+      "summary": "Prior sessions had no machine-readable progress tracking. If Claude Code stopped mid-task, Codex had no way to know what was done vs pending.",
+      "detail": "v3 introduces session_status.json (running/blocked/completed + pct), heartbeat.json (per-phase), resume_prompt.txt (restart instructions).",
+      "evidence_ref": "this file (task_result_v3.json)",
+      "status": "resolved_by_v3"
+    }
+  ],
+
+  "naoto_os_nowpattern_drift": [
+    {
+      "drift_id": "DRIFT-01",
+      "area": "identity_hierarchy",
+      "severity": "info",
+      "canonical_definition": {
+        "NAOTO_OS": "The operating system. Founder OS. The intelligence and execution layer that governs all projects.",
+        "Nowpattern": "The primary project under NAOTO OS. A verifiable forecast platform (nowpattern.com).",
+        "relationship": "NAOTO OS contains Nowpattern. Nowpattern is not the OS itself."
+      },
+      "drift_observed": "Some docs use 'Nowpattern' as if it were the OS name. NORTH_STAR.md mixes mission-level OS language with Nowpattern-specific platform language.",
+      "authoritative_source": "scripts/mission_contract.py: founder_os.canonical_name = 'NAOTO OS', north_star = 'Nowpattern is a verifiable forecast platform.'",
+      "guard": "PROJECT_DRIFT_GUARD in mistake_patterns.json",
+      "codex_action": "No code change needed. Docs clarification only."
+    },
+    {
+      "drift_id": "DRIFT-02",
+      "area": "brier_score_notation",
+      "severity": "info",
+      "canonical_definition": {
+        "official_methodology": "binary, n=53 (HIT+MISS, NOT_SCORED excluded)",
+        "official_avg_brier": 0.4759,
+        "official_accuracy_pct": 66.0,
+        "stale_values_seen": [0.1780, 0.1828],
+        "stale_reason": "0.1780 is VPS live subset (n=7). 0.1828 is stale stats snapshot. Neither is the canonical value."
+      },
+      "drift_observed": "Three different Brier averages appear in different docs/reports. Only 0.4759 (binary, n=53) is canonical.",
+      "authoritative_source": "prediction_db.json scored predictions + prediction_deploy_gate.py calculation",
+      "guard": "M006 in mistake_registry.json",
+      "codex_action": "No code change. Remove stale values from any docs that cite 0.1780 or 0.1828."
+    },
+    {
+      "drift_id": "DRIFT-03",
+      "area": "pvqe_v_definition",
+      "severity": "warning",
+      "canonical_definition": {
+        "V": "value_density (from mission_contract.py v3)",
+        "V_ja": "価値密度"
+      },
+      "drift_observed": "NORTH_STAR.md PVQE table says V = '改善速度' (improvement speed). OPERATING_PRINCIPLES.md PVQE table says V = '改善速度'. mission_contract.py says V = '価値密度' (value density).",
+      "authoritative_source": "scripts/mission_contract.py line 49: 'V': '価値密度'",
+      "affected_files": [
+        ".claude/rules/NORTH_STAR.md",
+        ".claude/rules/OPERATING_PRINCIPLES.md"
+      ],
+      "codex_action": "Update NORTH_STAR.md and OPERATING_PRINCIPLES.md PVQE tables: V = '価値密度' (not '改善速度'). This is a docs-only fix."
+    },
+    {
+      "drift_id": "DRIFT-04",
+      "area": "public_internal_wording",
+      "severity": "info",
+      "canonical_definition": {
+        "public_lexicon_source": "scripts/canonical_public_lexicon.py (v4)",
+        "rule": "Public UI and public explanation text must use only vocabulary from canonical_public_lexicon.py. Internal docs may use extended vocabulary."
+      },
+      "drift_observed": "No active public-facing wording violations detected in this audit scope. Lexicon shims (public_lexicon.py, product_lexicon.py) correctly forward to canonical source.",
+      "authoritative_source": "scripts/canonical_public_lexicon.py",
+      "codex_action": "None required."
+    }
+  ],
+
+  "codex_action_packet": [
+    {
+      "id": "CAP-1",
+      "title": "IC-1: Relax dual-flag verified_count threshold from >= 2 to >= 1",
+      "why_now": "196 posts (41% of all published) are blocked solely because dual AUTO_SAFE flags require verified_count >= 2. Most have 0-1 verified sources. This is the single largest blocker preventing distribution_allowed_ratio from reaching 65%.",
+      "expected_impact": "+20pp on distribution_allowed_ratio (44.73% -> ~65%)",
+      "target_files": [
+        "scripts/article_release_guard.py L86-89"
+      ],
+      "risk": "low — editorial_review_advised still flags posts for human review while allowing distribution",
+      "done_definition": "After regenerating manifest: distribution_allowed_ratio_pct >= 60% AND truth_blocked == 0 AND all 196 IC-1 slugs have release_lane in (auto_safe, editorial_review_advised)."
+    },
+    {
+      "id": "CAP-2",
+      "title": "IC-3: Add external_url_count >= 2 fallback for single-flag posts",
+      "why_now": "4 FINANCIAL_CRISIS-only posts (all crypto, all lang-ja) are blocked by verified_count < 1 with no fallback. Adding external_url_count check provides a low-risk escape hatch.",
+      "expected_impact": "+1-2pp on distribution_allowed_ratio",
+      "target_files": [
+        "scripts/article_release_guard.py L90-91"
+      ],
+      "risk": "low — external_url_count is already computed during manifest generation",
+      "done_definition": "After regenerating manifest: these 4 slugs have release_lane = editorial_review_advised AND distribution_allowed = true."
+    },
+    {
+      "id": "CAP-3",
+      "title": "IC-2: Narrow WAR_CONFLICT regex to compound phrases",
+      "why_now": "59 WAR_CONFLICT-only posts are blocked. The regex at L45-52 fires on bare keywords (military, conflict, sanction) hitting 96% of geopolitics articles. Compound phrases would reduce false positives.",
+      "expected_impact": "+5-10pp on distribution_allowed_ratio (regex-dependent)",
+      "target_files": [
+        "scripts/article_release_guard.py L45-52"
+      ],
+      "risk": "medium — false negatives possible if regex is too narrow. Requires before/after comparison of all 474 posts.",
+      "done_definition": "After regenerating manifest: WAR_CONFLICT flag count drops by >= 30% AND no new truth_blocked posts AND distribution_allowed_ratio >= 70%."
+    },
+    {
+      "id": "CAP-4",
+      "title": "Fix empty risk_flags edge case in classify_release_lane",
+      "why_now": "3 posts have risk_flags=[] but get EDITOR_REVIEW_REQUIRED: (empty) error. This is a logic gap in classify_release_lane.",
+      "expected_impact": "+0.6pp (3 posts)",
+      "target_files": [
+        "scripts/article_release_guard.py L224-226"
+      ],
+      "risk": "low — guard against empty risk_flags before injecting EDITOR_REVIEW_REQUIRED",
+      "done_definition": "After regenerating manifest: these 3 slugs have distribution_allowed = true AND release_errors is empty."
+    },
+    {
+      "id": "CAP-5",
+      "title": "DRIFT-03: Fix PVQE V definition in NORTH_STAR.md and OPERATING_PRINCIPLES.md",
+      "why_now": "V is defined as '改善速度' in two principle docs but mission_contract.py (authoritative) says '価値密度'. This inconsistency can mislead agents reading principle docs without also reading mission_contract.py.",
+      "expected_impact": "docs-only — no runtime impact, but prevents vocabulary drift propagation",
+      "target_files": [
+        ".claude/rules/NORTH_STAR.md",
+        ".claude/rules/OPERATING_PRINCIPLES.md"
+      ],
+      "risk": "low — text-only change in clearly defined fields",
+      "done_definition": "Both files have V = '価値密度' in PVQE table. lexicon_contract_audit.py passes."
+    }
+  ],
+
+  "stop_proof_contract": {
+    "description": "This contract defines 4 mandatory files that any sidecar session must maintain to be resume-safe.",
+    "mandatory_files": {
+      "session_status": {
+        "path": "reports/claude_sidecar/session_status.json",
+        "update_frequency": "At session start, at each phase boundary, at session end or interruption",
+        "required_fields": ["generated_at", "agent", "task_id", "status", "current_phase", "scope_completion_pct", "overall_completion_estimate_pct", "reached_100_pct_for_this_scope", "blocking_reason", "next_exact_step", "files_written", "safe_write_set"]
+      },
+      "heartbeat": {
+        "path": "reports/claude_sidecar/heartbeat.json",
+        "update_frequency": "At each phase completion",
+        "required_fields": ["generated_at", "phase", "phase_status", "progress_note", "next_step"]
+      },
+      "task_result": {
+        "path": "reports/claude_sidecar/task_result_v{N}.json",
+        "update_frequency": "Once per session, at completion",
+        "required_fields": ["generated_at", "agent", "version", "founder_os", "scope_completion_pct", "overall_completion_estimate_pct", "reached_100_pct_for_this_scope", "completion_definition", "findings", "naoto_os_nowpattern_drift", "codex_action_packet", "blocking_reason", "next_exact_step", "safe_write_set", "evidence_refs"]
+      },
+      "resume_prompt": {
+        "path": "reports/claude_sidecar/resume_prompt.txt",
+        "update_frequency": "At session end or interruption",
+        "purpose": "Shortest possible prompt for next Claude Code or Codex to pick up exactly where this session left off"
+      }
+    },
+    "invariants": [
+      "session_status.json is ALWAYS written BEFORE any other work in a phase",
+      "heartbeat.json is ALWAYS written at phase completion BEFORE moving to next phase",
+      "If session is about to stop (context limit, error, user interrupt), update session_status.json with status=blocked, blocking_reason, and next_exact_step BEFORE stopping",
+      "Silent stops are prohibited. blocking_reason and next_exact_step must always be populated on non-completed stops",
+      "resume_prompt.txt is written at session end regardless of completion status",
+      "Production scripts listed in edit-prohibited set are never modified"
+    ]
+  },
+
+  "blocking_reason": "",
+  "next_exact_step": "",
+
+  "safe_write_set": [
+    "reports/claude_sidecar/session_status.json",
+    "reports/claude_sidecar/heartbeat.json",
+    "reports/claude_sidecar/task_result_v3.json",
+    "reports/claude_sidecar/task_result_v3.md",
+    "reports/claude_sidecar/resume_prompt.txt"
+  ],
+
+  "evidence_refs": [
+    "reports/article_release_manifest.json",
+    "reports/content_release_snapshot.json",
+    "reports/one_pass_completion_gate.json",
+    "reports/claude_sidecar/task_result_v2.json",
+    "scripts/mission_contract.py",
+    "scripts/agent_bootstrap_context.py",
+    "docs/NAOTO_OS_OPERATING_STACK.md",
+    "data/mistake_registry.json",
+    ".claude/rules/NORTH_STAR.md",
+    ".claude/rules/OPERATING_PRINCIPLES.md"
+  ]
+}

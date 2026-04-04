@@ -1,0 +1,12 @@
+# Review: `.claude/hooks/fact-checker.py`
+
+## Findings
+
+1. **Warning** [`fact-checker.py:680-690`](\/mnt\/c\/Users\/user\/OneDrive\/デスクトップ\/vps-automation-openclaw\/.claude\/hooks\/fact-checker.py#L680) and [`fact-checker.py:707-708`](\/mnt\/c\/Users\/user\/OneDrive\/デスクトップ\/vps-automation-openclaw\/.claude\/hooks\/fact-checker.py#L707): the new transcript-based “unverified edit” gate can be bypassed by generic prose. `ANY_PROOF_PATTERN` treats phrases like `確認してください`, `実行してください`, and `確認をお願いします` as sufficient proof, so a response can avoid the block even when the transcript explicitly shows no verification command was run. That contradicts the stated “語彙完全非依存” design and will produce false negatives.
+   - **Concrete fix:** split the regex into two buckets: real evidence (`HTTP`, code block, PASS/OK, etc.) and explicit user handoff. For the handoff path, require a concrete command or URL in the same message, rather than accepting generic confirmation phrases by themselves.
+
+2. **Warning** [`fact-checker.py:226-234`](\/mnt\/c\/Users\/user\/OneDrive\/デスクトップ\/vps-automation-openclaw\/.claude\/hooks\/fact-checker.py#L226) and [`fact-checker.py:987-993`](\/mnt\/c\/Users\/user\/OneDrive\/デスクトップ\/vps-automation-openclaw\/.claude\/hooks\/fact-checker.py#L987): the HG-23 parity gate is skipped whenever `_dynamic` is falsy, not only when it is unavailable. If `mistake_patterns.json` exists and legitimately loads as an empty list, `_rt_skip_hg23` becomes `True`, so `KNOWN_MISTAKES.md` entries with `GUARD_PATTERN` are never reported as missing from `mistake_patterns.json`.
+   - **Concrete fix:** initialize `_dynamic = None` before the file load, set it only on successful parse, and in the parity block distinguish `None` (load failure, skip) from `[]` (successful empty parse, run HG-23 with an empty set).
+
+3. **Info** [`fact-checker.py:901-914`](\/mnt\/c\/Users\/user\/OneDrive\/デスクトップ\/vps-automation-openclaw\/.claude\/hooks\/fact-checker.py#L901) and [`fact-checker.py:927-929`](\/mnt\/c\/Users\/user\/OneDrive\/デスクトップ\/vps-automation-openclaw\/.claude\/hooks\/fact-checker.py#L927): the new `nowpattern.com` delivery check uses `HEAD` and requires an exact `200`. That will falsely block valid URLs that redirect or reject `HEAD` while still serving correctly with `GET`.
+   - **Concrete fix:** on non-200 or `HEAD` failure, retry with `GET` before blocking, and treat a successful final 2xx after redirect as valid delivery.

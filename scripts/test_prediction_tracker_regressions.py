@@ -61,10 +61,68 @@ def test_build_rows_keeps_prediction_without_scenarios_if_same_lang_article_exis
     assert rows[0]["url"] == "https://nowpattern.com/test-article/", rows[0]
 
 
+def test_build_rows_canonicalizes_lang_en_root_urls_for_en_tracker() -> None:
+    pred_db = {
+        "predictions": [
+            {
+                "prediction_id": "NP-2026-0043",
+                "title": "English prediction",
+                "article_slug": "english-root-article",
+                "ghost_url": "https://nowpattern.com/english-root-article/",
+                "status": "OPEN",
+                "scenarios": [],
+                "our_pick_prob": 60,
+                "question_type": "binary",
+            }
+        ]
+    }
+    ghost_posts = [
+        {
+            "slug": "english-root-article",
+            "title": "English root article",
+            "url": "https://nowpattern.com/english-root-article/",
+            "html": "<article><div class='np-oracle'></div></article>",
+            "tags": [{"slug": "lang-en"}],
+        }
+    ]
+    rows = ppb.build_rows(pred_db, ghost_posts, embed_data=[], lang="en")
+    assert len(rows) == 1, rows
+    assert rows[0]["url"] == "https://nowpattern.com/en/english-root-article/", rows[0]
+    assert rows[0]["same_lang_url"] == "https://nowpattern.com/en/english-root-article/", rows[0]
+
+
+def test_resolving_near_deadline_promotes_to_in_play() -> None:
+    row = {
+        "status": "RESOLVING",
+        "trigger_date": "2026-05-06",
+    }
+    assert ppb._is_tracker_in_play(row, ppb.date(2026, 4, 4)) is True
+
+
+def test_resolving_far_past_deadline_stays_awaiting() -> None:
+    row = {
+        "status": "RESOLVING",
+        "trigger_date": "2026-02-15",
+    }
+    assert ppb._is_tracker_in_play(row, ppb.date(2026, 4, 4)) is False
+
+
+def test_resolving_q2_deadline_promotes_to_in_play() -> None:
+    row = {
+        "status": "RESOLVING",
+        "trigger_date": "Q2 2026",
+    }
+    assert ppb._is_tracker_in_play(row, ppb.date(2026, 4, 4)) is True
+
+
 def run() -> None:
     test_anchor_href_lowercases_prediction_id()
     test_tracker_ui_gate_blocks_tracker_back_links()
     test_build_rows_keeps_prediction_without_scenarios_if_same_lang_article_exists()
+    test_build_rows_canonicalizes_lang_en_root_urls_for_en_tracker()
+    test_resolving_near_deadline_promotes_to_in_play()
+    test_resolving_far_past_deadline_stays_awaiting()
+    test_resolving_q2_deadline_promotes_to_in_play()
     print("PASS: prediction tracker regression checks")
 
 

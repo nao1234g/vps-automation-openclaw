@@ -45,6 +45,16 @@ PROFILES: dict[str, list[list[str]]] = {
         ["python3", str(SCRIPT_DIR / "agent_consistency_validator.py"), "--notify"],
         ["python3", str(SCRIPT_DIR / "ja_en_pairing_audit.py")],
     ],
+    "daily-full-crawl": [
+        [
+            "python3",
+            str(SCRIPT_DIR / "synthetic_user_crawler.py"),
+            "--base-url",
+            "https://nowpattern.com",
+            "--json-out",
+            "/opt/shared/reports/synthetic_user_crawler/latest.json",
+        ],
+    ],
     "weekly-governance": [
         ["python3", str(SCRIPT_DIR / "proactive_scanner.py")],
         ["python3", str(SCRIPT_DIR / "tag_audit_weekly.py")],

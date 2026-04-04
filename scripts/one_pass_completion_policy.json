@@ -1,0 +1,8 @@
+{
+  "base_url": "https://nowpattern.com",
+  "min_distribution_allowed_ratio_pct": 30.0,
+  "max_high_risk_unapproved_ratio_pct": 25.0,
+  "require_truth_blocked_zero": true,
+  "require_orphan_zero": true,
+  "reuse_fresh_artifacts_seconds": 2700
+}

@@ -1,0 +1,194 @@
+{
+  "generated_at": "2026-04-04T04:15:00Z",
+  "agent": "claude-code-sidecar",
+  "model": "claude-opus-4-6",
+  "mission_contract_version": "2026-03-31-naoto-mission-v3",
+  "lexicon_version": "2026-03-31-public-lexicon-v4",
+  "task_id": "sidecar-20260404-distribution-audit",
+
+  "workstream_a": {
+    "title": "distribution_blocked 262 棚卸し",
+    "summary": "262件全てが release_lane=review_required。主因は HIGH_RISK_RULES の regex が広すぎ + dual-flag 時の verified_count >= 2 要件。",
+    "blocked_total": 262,
+    "breakdown_by_risk_flags": {
+      "WAR_CONFLICT_AND_FINANCIAL_CRISIS": 196,
+      "WAR_CONFLICT_only": 59,
+      "FINANCIAL_CRISIS_only": 4,
+      "empty_flags": 3
+    },
+    "blocking_mechanism": {
+      "field": "release_errors",
+      "pattern": "EDITOR_REVIEW_REQUIRED:{risk_flags}",
+      "source_file": "scripts/article_release_guard.py",
+      "source_lines": {
+        "regex_definition": "43-65",
+        "classify_release_lane": "68-94",
+        "review_required_dual_flag": "86-89",
+        "review_required_single_no_source": "90-91",
+        "auto_safe_bypass": "92-93",
+        "error_injection": "224-226"
+      }
+    },
+    "root_cause_analysis": {
+      "primary": "WAR_CONFLICT regex matches overly broad keywords (war, attack, strike, missile, nuclear, invasion, military, troops, conflict, ceasefire, sanction, drone, blockade, naval, airstrike) — any single hit flags the entire post",
+      "secondary": "196 posts (75%) have BOTH WAR_CONFLICT + FINANCIAL_CRISIS flags. classify_release_lane line 86-89 requires verified_count >= 2 for dual-flag AUTO_SAFE bypass, but most posts have 0-1 verified external sources",
+      "tertiary": "Tag-based detection (tag_slugs matching {war, conflict, geopolitics, security, military}) also triggers flags, doubling the hit rate"
+    },
+    "improvement_candidates": [
+      {
+        "id": "IC-1",
+        "title": "dual-flag AUTO_SAFE threshold を verified_count >= 1 に緩和",
+        "target_posts": 196,
+        "estimated_unblock": "100-150",
+        "blocking_rule": "classify_release_lane line 87: verified_count >= 2",
+        "proposed_change": "if set(risk_flags).issubset(AUTO_SAFE_SINGLE_RISK_FLAGS) and verified_count >= 1: return 'editorial_review_advised'",
+        "risk": "low — editorial_review_advised は distribution_allowed=true だが warning を残す。safety net 維持。",
+        "codex_file": "scripts/article_release_guard.py",
+        "codex_line": 87,
+        "reversible": true
+      },
+      {
+        "id": "IC-2",
+        "title": "WAR_CONFLICT regex にコンテキスト要件を追加",
+        "target_posts": 456,
+        "estimated_unblock": "50-80",
+        "blocking_rule": "HIGH_RISK_RULES WAR_CONFLICT pattern (line 45-52)",
+        "proposed_change": "単語マッチから phrase-boundary マッチへ。例: 'military' 単独ではなく 'military operation|military action|military force' を要求。geopolitics 記事の大半は 'military' を含むが実際の戦争記事ではない",
+        "risk": "medium — regex 変更は false negative リスクあり。段階的に緩和し、各ステップで manifest を再生成して検証すべき",
+        "codex_file": "scripts/article_release_guard.py",
+        "codex_line": "45-52",
+        "reversible": true
+      },
+      {
+        "id": "IC-3",
+        "title": "verified_count=0 の single-flag 記事に external_url_count fallback を適用",
+        "target_posts": 59,
+        "estimated_unblock": "20-40",
+        "blocking_rule": "classify_release_lane line 90-91: risk_flags and verified_count < 1",
+        "proposed_change": "verified_external_source_count が 0 でも external_url_count >= 2 なら editorial_review_advised に格下げ。現状は fetchability check が未実装のため verified=0 が多い",
+        "risk": "low — external_url_count は既に計算済み（line 195-196）。fetch 未検証でも URL 存在自体が一定の信頼性指標",
+        "codex_file": "scripts/article_release_guard.py",
+        "codex_line": "90-91",
+        "reversible": true
+      }
+    ],
+    "current_metrics": {
+      "distribution_allowed_ratio_pct": 44.73,
+      "policy_minimum_pct": 30.0,
+      "estimated_after_IC1": 65.0,
+      "estimated_after_IC1_IC3": 72.0,
+      "estimated_after_all_three": 80.0
+    }
+  },
+
+  "workstream_b": {
+    "title": "NAOTO OS ↔ Nowpattern 語彙ドリフト監査",
+    "summary": "mojibake ゼロ。lexicon v4 は健全。軽微なドリフト 3件検出。",
+    "mojibake_found": false,
+    "mojibake_check_method": "lexicon_contract_audit.py markers (縺, 繧, 蛻､, 讀懆, 莠域ｸｬ) + grep across .md/.py",
+    "drift_findings": [
+      {
+        "id": "VD-1",
+        "severity": "info",
+        "area": "identity hierarchy",
+        "finding": "CLAUDE.md 冒頭で 'Naoto Intelligence OS のルート' と定義しているが、一部の docs 内で 'Nowpattern' を OS 名として使用している箇所あり",
+        "canonical": "NAOTO OS = OS名, Nowpattern = プロジェクト名/プラットフォーム名",
+        "guard": "PROJECT_DRIFT_GUARD in mistake_patterns.json"
+      },
+      {
+        "id": "VD-2",
+        "severity": "info",
+        "area": "Brier Score 表記揺れ",
+        "finding": "3つの異なる Brier 平均値が並存: 0.1780 (VPS live/7件), 0.1828 (stale stats), 0.4759 (official binary n=53)",
+        "canonical": "公式値は binary methodology (n=53, avg=0.4759)。0.1780 は VPS resolved=7 の部分集合",
+        "guard": "M006 in mistake_registry.json"
+      },
+      {
+        "id": "VD-3",
+        "severity": "info",
+        "area": "PVQE 定義の V",
+        "finding": "mission_contract.py の PVQE.V = '価値密度' だが、CLAUDE.md rules/NORTH_STAR.md の PVQE 表では V = '改善速度'",
+        "canonical": "mission_contract.py (v3) が権威。V = '価値密度' が正",
+        "affected_files": [".claude/rules/NORTH_STAR.md", ".claude/rules/OPERATING_PRINCIPLES.md"]
+      }
+    ],
+    "lexicon_shim_status": {
+      "public_lexicon.py": "compatibility shim → canonical_public_lexicon.py",
+      "product_lexicon.py": "compatibility shim → canonical_public_lexicon.py",
+      "status": "healthy — all shims forward to canonical source"
+    },
+    "files_audited": [
+      "scripts/canonical_public_lexicon.py",
+      "scripts/public_lexicon.py",
+      "scripts/product_lexicon.py",
+      "scripts/mission_contract.py",
+      "scripts/agent_bootstrap_context.py",
+      "scripts/lexicon_contract_audit.py",
+      "scripts/test_public_lexicon.py",
+      "data/mistake_registry.json",
+      ".claude/hooks/state/mistake_patterns.json",
+      "docs/NAOTO_OS_OPERATING_STACK.md",
+      "docs/MULTI_AGENT_COORDINATION_ARCHITECTURE.md",
+      "docs/local_vs_shared_boundary_report.md",
+      "scripts/AI_TO_AI_SYSTEM.md",
+      ".claude/rules/NORTH_STAR.md",
+      ".claude/rules/OPERATING_PRINCIPLES.md"
+    ]
+  },
+
+  "workstream_c": {
+    "title": "Codex handoff",
+    "codex_actionable_items": [
+      {
+        "id": "IC-1",
+        "file": "scripts/article_release_guard.py",
+        "line": 87,
+        "action": "Change verified_count >= 2 to verified_count >= 1 for dual AUTO_SAFE flag case, and return editorial_review_advised instead of review_required",
+        "test": "Regenerate article_release_manifest.json and verify distribution_allowed_ratio_pct increases to ~65%",
+        "priority": "high",
+        "risk": "low"
+      },
+      {
+        "id": "IC-3",
+        "file": "scripts/article_release_guard.py",
+        "line": "90-91",
+        "action": "Add fallback: if verified_count < 1 but external_url_count >= 2, return editorial_review_advised instead of review_required",
+        "test": "Regenerate manifest and check single-flag posts with external URLs are now editorial_review_advised",
+        "priority": "medium",
+        "risk": "low"
+      },
+      {
+        "id": "IC-2",
+        "file": "scripts/article_release_guard.py",
+        "line": "45-52",
+        "action": "Narrow WAR_CONFLICT regex to require compound phrases instead of single keywords. Suggested: replace 'military' with 'military\\s+(?:operation|action|force|offensive|campaign)', replace 'conflict' with '(?:armed|military)\\s+conflict'",
+        "test": "Run regex against all 474 post titles/bodies and compare flag counts before/after",
+        "priority": "medium",
+        "risk": "medium — requires manifest regen + regression test"
+      },
+      {
+        "id": "VD-3",
+        "file": ".claude/rules/NORTH_STAR.md",
+        "line": "PVQE table",
+        "action": "Update V definition from '改善速度' to '価値密度' to match mission_contract.py v3",
+        "test": "Run lexicon_contract_audit.py",
+        "priority": "low",
+        "risk": "low — docs only"
+      }
+    ],
+    "do_not_touch": [
+      "data/prediction_db.json",
+      "scripts/one_pass_completion_gate.py",
+      "scripts/build_article_release_manifest.py (production runs only — code review OK)"
+    ]
+  },
+
+  "completion_conditions_met": {
+    "distribution_blocked_inventory": true,
+    "top_3_candidates_with_fields": true,
+    "vocabulary_drift_audit": true,
+    "mojibake_audit": true,
+    "codex_handoff_created": true,
+    "no_forbidden_edits": true
+  }
+}

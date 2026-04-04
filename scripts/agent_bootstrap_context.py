@@ -14,12 +14,22 @@ from mission_contract import (
     get_mission_contract,
     mission_contract_hash,
 )
+from report_authority import load_authoritative_json
+from runtime_boundary import shared_or_local_path
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent
-REPORT_DIR = Path("/opt/shared/reports") if Path("/opt/shared").exists() else REPO_ROOT / "reports"
-DATA_DIR = Path("/opt/shared/data") if Path("/opt/shared").exists() else REPO_ROOT / "data"
+REPORT_DIR = shared_or_local_path(
+    script_file=__file__,
+    shared_path="/opt/shared/reports",
+    local_path=REPO_ROOT / "reports",
+)
+DATA_DIR = shared_or_local_path(
+    script_file=__file__,
+    shared_path="/opt/shared/data",
+    local_path=REPO_ROOT / "data",
+)
 
 SNAPSHOT_PATH = REPORT_DIR / "content_release_snapshot.json"
 GOVERNANCE_PATH = REPORT_DIR / "ecosystem_governance_audit.json"
@@ -27,12 +37,7 @@ MISTAKE_REGISTRY_PATH = DATA_DIR / "mistake_registry.json"
 
 
 def _read_json(path: Path) -> dict[str, Any]:
-    if not path.exists():
-        return {}
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
+    return load_authoritative_json(path)
 
 
 def _summarize_mistake_registry(registry: dict[str, Any]) -> dict[str, Any]:

@@ -1,66 +1,57 @@
 {
-  "generated_at": "2026-03-31T12:17:49Z",
-  "manifest_generated_at": "2026-03-30T15:34:56Z",
-  "tracker_generated_at": "2026-03-30 23:30 JST",
+  "generated_at": "2026-04-04T05:31:16Z",
+  "generated_at_epoch": 1775280676,
+  "mission_contract_version": "2026-03-31-naoto-mission-v3",
+  "mission_contract_hash": "1e8a9d10265289a622e4149ac2d6b9eef7f721c7dd27c3de6f72140852819b18",
+  "lexicon_version": "2026-03-31-public-lexicon-v4",
+  "manifest_generated_at": "2026-04-04T05:22:06Z",
+  "tracker_generated_at": "2026-04-04 14:00 JST",
   "manifest_counts": {
-    "published_total": 498,
-    "public_truth_allowed": 497,
-    "distribution_allowed": 5,
-    "truth_blocked": 1,
-    "distribution_blocked": 493,
-    "high_risk_unapproved": 493,
+    "published_total": 474,
+    "public_truth_allowed": 474,
+    "distribution_allowed": 381,
+    "truth_blocked": 0,
+    "distribution_blocked": 93,
+    "high_risk_unapproved": 0,
     "drafted_truth_failures": 0,
-    "draft_failures": 0
+    "draft_failures": 0,
+    "drafted_human_review_required": 0,
+    "human_review_draft_failures": 0
   },
   "tracker_summary": {
-    "ghost_published_posts_total": null,
-    "ghost_published_posts_release_scope": null,
+    "ghost_published_posts_total": 474,
+    "ghost_published_posts_release_scope": 474,
     "formal_prediction_total": 1121,
-    "orphan_oracle_articles": 193,
+    "orphan_oracle_articles": 0,
     "coverage": {
       "ja": {
-        "public_rows": 392,
-        "public_in_play_rows": 0,
-        "public_awaiting_rows": 0,
-        "public_resolved_rows": 0,
-        "hidden_no_live_article": 729,
-        "coverage_pct": 34.97
+        "public_rows": 99,
+        "public_in_play_rows": 3,
+        "public_awaiting_rows": 84,
+        "public_resolved_rows": 12,
+        "hidden_no_live_article": 1022,
+        "coverage_pct": 8.83
       },
       "en": {
-        "public_rows": 392,
+        "public_rows": 197,
         "public_in_play_rows": 0,
-        "public_awaiting_rows": 0,
-        "public_resolved_rows": 0,
-        "hidden_no_live_article": 729,
-        "coverage_pct": 34.97
+        "public_awaiting_rows": 193,
+        "public_resolved_rows": 4,
+        "hidden_no_live_article": 924,
+        "coverage_pct": 17.57
       }
     }
   },
   "operational_metrics": {
-    "distribution_allowed_ratio_pct": 1.0,
-    "approval_backlog_ratio_pct": 99.0
+    "distribution_allowed_ratio_pct": 80.38,
+    "approval_backlog_ratio_pct": 0.0
   },
   "failures": [
-    "manifest_refresh_failed:1",
-    "tracker_refresh_failed:1",
     "governance_refresh_failed:1",
-    "governance_audit_failed:1",
-    "manifest_tracker_published_mismatch:498!=0",
-    "truth_blocked_remaining:1",
-    "missing_tracker_field:ja.public_in_play_rows",
-    "missing_tracker_field:ja.public_awaiting_rows",
-    "missing_tracker_field:ja.public_resolved_rows",
-    "missing_tracker_field:en.public_in_play_rows",
-    "missing_tracker_field:en.public_awaiting_rows",
-    "missing_tracker_field:en.public_resolved_rows",
-    "report_timestamp_delta_exceeded:3896>1800"
+    "governance_audit_failed:2"
   ],
   "warnings": [
-    "manifest_refresh_output:Traceback (most recent call last):\n  File \"C:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\scripts\\build_article_release_manifest.py\", line 239, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"C:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\scripts\\build_article_release_manifest.py\", line 117, in main\n    con = sqlite3.connect(GHOST_DB)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^\nsqlite3.OperationalError: unable to open database file",
-    "tracker_refresh_output:Traceback (most recent call last):\n  File \"C:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\scripts\\prediction_page_builder.py\", line 4692, in <module>\n    main()\n  File \"C:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\scripts\\prediction_page_builder.py\", line 4404, in main\n    import fcntl as _fcntl\nModuleNotFoundError: No module named 'fcntl'",
-    "governance_refresh_output:Traceback (most recent call last):\n  File \"C:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\scripts\\ecosystem_governance_audit.py\", line 85, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"C:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\scripts\\ecosystem_governance_audit.py\", line 76, in main\n    print(payload)\nUnicodeEncodeError: 'cp932' codec can't encode character '\\ufffd' in position 22119: illegal multibyte sequence",
-    "distribution_allowed_very_low:5/498",
-    "high_risk_unapproved_backlog:493/498"
+    "governance_refresh_output:{\n  \"generated_at\": \"2026-04-04T05:31:14Z\",\n  \"generated_at_epoch\": 1775280674,\n  \"total\": 20,\n  \"failed\": 2,\n  \"results\": [\n    {\n      \"name\": \"mission_contract\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"output\": \"{\\n  \\\"checked\\\": 16,\\n  \\\"failures\\\": []\\n}\",\n      \"json\": {\n        \"checked\": 16,\n        \"failures\": []\n      }\n    },\n    {\n      \"name\": \"lexicon_contract\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"output\": \"{\\n  \\\"checked\\\": 12,\\n  \\\"failures\\\": []\\n}\",\n      \"j"
   ],
   "ok": false
 }

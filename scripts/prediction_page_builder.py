@@ -31,7 +31,7 @@ import base64
 import urllib.request
 import ssl
 import math
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 from content_release_scope import count_release_scope_posts
 from mission_contract import MISSION_CONTRACT_VERSION, mission_contract_hash
@@ -86,6 +86,126 @@ def _is_resolved_status(status_or_prediction):
     if isinstance(status_or_prediction, dict):
         return is_prediction_resolved(status_or_prediction)
     return _normalize_status_value(status_or_prediction) == "resolved"
+
+
+_ISO_DATE_RE = re.compile(r"(?P<year>20\d{2})-(?P<month>\d{2})-(?P<day>\d{2})")
+_ISO_MONTH_RE = re.compile(r"(?P<year>20\d{2})-(?P<month>\d{2})(?!-\d{2})")
+_YEAR_MONTH_JA_RE = re.compile(r"(?P<year>20\d{2})年\s*(?P<month>\d{1,2})月(?:\s*(?P<day>\d{1,2})日)?")
+_QUARTER_RE = re.compile(r"(?:(?P<year_a>20\d{2})\s*Q(?P<q_a>[1-4])|Q(?P<q_b>[1-4])\s*(?P<year_b>20\d{2}))", re.IGNORECASE)
+_MONTH_NAME_RE = re.compile(
+    r"(?P<month>January|February|March|April|May|June|July|August|September|October|November|December)"
+    r"(?:\s+\d{1,2})?(?:\s*-\s*[A-Za-z]+\s*\d{1,2})?(?:,\s*|\s+)(?P<year>20\d{2})",
+    re.IGNORECASE,
+)
+_MONTH_NAMES = {
+    "january": 1,
+    "february": 2,
+    "march": 3,
+    "april": 4,
+    "may": 5,
+    "june": 6,
+    "july": 7,
+    "august": 8,
+    "september": 9,
+    "october": 10,
+    "november": 11,
+    "december": 12,
+}
+_QUARTER_START_MONTH = {1: 1, 2: 4, 3: 7, 4: 10}
+_IN_PLAY_LOOKAHEAD_DAYS = 120
+_IN_PLAY_OVERDUE_GRACE_DAYS = 30
+
+
+def _safe_date(year: int, month: int, day: int = 1) -> date | None:
+    try:
+        return date(year, month, day)
+    except ValueError:
+        return None
+
+
+def _parse_deadline_candidate(raw_value) -> date | None:
+    text = str(raw_value or "").strip()
+    if not text:
+        return None
+
+    match = _ISO_DATE_RE.search(text)
+    if match:
+        return _safe_date(
+            int(match.group("year")),
+            int(match.group("month")),
+            int(match.group("day")),
+        )
+
+    match = _YEAR_MONTH_JA_RE.search(text)
+    if match:
+        return _safe_date(
+            int(match.group("year")),
+            int(match.group("month")),
+            int(match.group("day") or 1),
+        )
+
+    match = _QUARTER_RE.search(text)
+    if match:
+        quarter = int(match.group("q_a") or match.group("q_b"))
+        year = int(match.group("year_a") or match.group("year_b"))
+        return _safe_date(year, _QUARTER_START_MONTH[quarter], 1)
+
+    match = _MONTH_NAME_RE.search(text)
+    if match:
+        month = _MONTH_NAMES.get(match.group("month").lower())
+        year = int(match.group("year"))
+        if month:
+            return _safe_date(year, month, 1)
+
+    match = _ISO_MONTH_RE.search(text)
+    if match:
+        return _safe_date(int(match.group("year")), int(match.group("month")), 1)
+
+    return None
+
+
+def _prediction_deadline_date(row) -> date | None:
+    if not isinstance(row, dict):
+        return None
+
+    candidates = []
+    for field_name in ("trigger_date_display", "trigger_date", "oracle_deadline"):
+        parsed = _parse_deadline_candidate(row.get(field_name))
+        if parsed:
+            candidates.append(parsed)
+
+    for trigger in row.get("triggers", []) or []:
+        if not isinstance(trigger, dict):
+            continue
+        for key in ("date_en", "date", "deadline"):
+            parsed = _parse_deadline_candidate(trigger.get(key))
+            if parsed:
+                candidates.append(parsed)
+
+    if not candidates:
+        return None
+    return min(candidates)
+
+
+def _is_tracker_in_play(row, now_dt: date | datetime | None = None) -> bool:
+    status = _normalize_status_value(row)
+    if status in ("active", "open"):
+        return True
+    if status != "resolving" or _is_resolved_status(row):
+        return False
+
+    deadline = _prediction_deadline_date(row)
+    if deadline is None:
+        return False
+
+    if isinstance(now_dt, datetime):
+        now_date = now_dt.date()
+    else:
+        now_date = now_dt or datetime.now().date()
+
+    if deadline < (now_date - timedelta(days=_IN_PLAY_OVERDUE_GRACE_DAYS)):
+        return False
+    return deadline <= (now_date + timedelta(days=_IN_PLAY_LOOKAHEAD_DAYS))
 
 
 def _normalize_score_tier(score_tier, brier=None):
@@ -1026,13 +1146,38 @@ import sqlite3 as _sqlite3
 
 _GHOST_DB_PATH = "/var/www/nowpattern/content/data/ghost.db"
 
-def _resolve_ghost_url(api_url: str, slug: str) -> str:
+
+def _post_tag_slugs(post: dict | None) -> set[str]:
+    tag_slugs: set[str] = set()
+    for tag in (post or {}).get("tags") or []:
+        if isinstance(tag, dict):
+            slug = str(tag.get("slug") or "").strip().lower()
+            if slug:
+                tag_slugs.add(slug)
+    return tag_slugs
+
+
+def _canonical_public_post_url(slug: str, tag_slugs: set[str], api_url: str = "") -> str:
+    slug = (slug or "").strip()
+    api_url = (api_url or "").strip()
+    is_en = bool(slug) and ("lang-en" in tag_slugs or slug.startswith("en-"))
+    if is_en:
+        clean_slug = slug[3:] if slug.startswith("en-") else slug
+        return f"{GHOST_URL}/en/{clean_slug}/"
+    if api_url:
+        return api_url if api_url.endswith("/") else api_url + "/"
+    return ""
+
+
+def _resolve_ghost_url(api_url: str, slug: str, tag_slugs: set[str] | None = None) -> str:
     """
     Ghost Admin APIのurlフィールドを検証し正しい /{primary_tag}/{slug}/ 形式を返す。
     API URLが正しくない場合(primary_tagなし)はSQLite DBからprimary_tagを取得。
     """
-    if api_url:
-        return api_url if api_url.endswith("/") else api_url + "/"
+    tag_slugs = {str(item).strip().lower() for item in (tag_slugs or set()) if str(item).strip()}
+    canonical = _canonical_public_post_url(slug, tag_slugs, api_url)
+    if canonical:
+        return canonical
     if not slug:
         return ""
     # Fallback: query SQLite DB for primary_tag
@@ -1053,6 +1198,14 @@ def _resolve_ghost_url(api_url: str, slug: str) -> str:
     except Exception:
         pass
     return ""
+
+
+def _resolve_ghost_post_url(post: dict) -> str:
+    return _resolve_ghost_url(
+        post.get("url", ""),
+        post.get("slug", ""),
+        _post_tag_slugs(post),
+    )
 
 
 def _normalize_public_url(url: str) -> str:
@@ -1235,7 +1388,7 @@ def _read_json_if_exists(path: str) -> dict:
 def _load_prediction_integrity_policy() -> dict:
     default_policy = {
         "required_langs": ["ja", "en"],
-        "max_orphan_oracle_articles": 197,
+        "max_orphan_oracle_articles": 0,
     }
     payload = _read_json_if_exists(PREDICTION_INTEGRITY_POLICY)
     if isinstance(payload, dict):
@@ -1303,7 +1456,7 @@ def _find_orphan_oracle_articles(pred_db: dict, ghost_posts: list[dict]) -> list
     ghost_url_set = set()
     for post in ghost_posts:
         slug = post.get("slug", "")
-        resolved_url = _resolve_ghost_url(post.get("url", ""), slug)
+        resolved_url = _resolve_ghost_post_url(post)
         if slug and resolved_url:
             ghost_slug_url_map[slug] = resolved_url
             ghost_url_set.add(_normalize_public_url(resolved_url))
@@ -1325,7 +1478,7 @@ def _find_orphan_oracle_articles(pred_db: dict, ghost_posts: list[dict]) -> list
             continue
         orphans.append({
             "slug": slug,
-            "url": _resolve_ghost_url(post.get("url", ""), slug),
+            "url": _resolve_ghost_post_url(post),
             "published_at": post.get("published_at", ""),
         })
     return orphans
@@ -1386,7 +1539,7 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
     _ghost_url_set = set()
     for _post in ghost_posts:
         _slug = _post.get("slug", "")
-        _resolved_url = _resolve_ghost_url(_post.get("url", ""), _slug)
+        _resolved_url = _resolve_ghost_post_url(_post)
         if _slug and _resolved_url:
             _ghost_slug_url_map[_slug] = _resolved_url
             _ghost_url_set.add(_normalize_public_url(_resolved_url))
@@ -1661,8 +1814,8 @@ def build_rows(pred_db, ghost_posts, embed_data, lang="ja"):
 
     public_rows = [r for r in rows if r.get("source") == "prediction_db"]
     audit["public_rows"] = len(public_rows)
-    audit["public_in_play_rows"] = len([r for r in public_rows if _normalize_status_value(r) in ("active", "open")])
-    audit["public_awaiting_rows"] = len([r for r in public_rows if _normalize_status_value(r) == "resolving"])
+    audit["public_in_play_rows"] = len([r for r in public_rows if _is_tracker_in_play(r)])
+    audit["public_awaiting_rows"] = len([r for r in public_rows if _normalize_status_value(r) == "resolving" and not _is_tracker_in_play(r)])
     audit["public_resolved_rows"] = len([r for r in public_rows if _is_resolved_status(r)])
     TRACKER_INTEGRITY_REPORT[lang] = audit
     return rows
@@ -2374,10 +2527,10 @@ def _build_card(r, lang):
         _sb_bg, _sb_clr = "#e0f2fe", "#0284c7"
         _sb_txt = "\u23f3 " + ("\u8ffd\u8de1\u4e2d" if lang == "ja" else "Tracking")
         _public_state = _normalize_status_value(r)
-        if _public_state == "resolving":
+        if _public_state == "resolving" and not _is_tracker_in_play(r):
             _sb_bg, _sb_clr = "#e8f0fe", "#1a73e8"
             _sb_txt = "\u23f3 " + ui["compact_status"]
-        elif _public_state in ("active", "open"):
+        elif _is_tracker_in_play(r):
             _sb_bg, _sb_clr = "#e0f2fe", "#0284c7"
             _sb_txt = "\u23f3 " + ui["view_in_play"]
     _status_badge = (
@@ -3376,8 +3529,8 @@ def build_page_html(rows, stats, lang="ja"):
 
     formal_rows = [r for r in rows if r.get("source") == "prediction_db"]
     tracking = [r for r in formal_rows if not _is_resolved_status(r)]
-    in_play = [r for r in tracking if _normalize_status_value(r) in ("active", "open")]
-    awaiting = [r for r in tracking if _normalize_status_value(r) == "resolving"]
+    in_play = [r for r in tracking if _is_tracker_in_play(r)]
+    awaiting = [r for r in tracking if _normalize_status_value(r) == "resolving" and not _is_tracker_in_play(r)]
     resolved = [r for r in formal_rows if _is_resolved_status(r)]
 
     # ── BLOCK 1: Scoreboard (formal predictions only) ──
@@ -3457,8 +3610,8 @@ def build_page_html(rows, stats, lang="ja"):
 
     # Split tracking: active/open -> full _build_card(); resolving -> compact row
     # Reduces EN page: 5.27MB -> ~450KB (91% size reduction)
-    _featured   = [r for r in tracking if _normalize_status_value(r) in ('active', 'open')]
-    _monitoring = [r for r in tracking if _normalize_status_value(r) == 'resolving']
+    _featured   = [r for r in tracking if _is_tracker_in_play(r)]
+    _monitoring = [r for r in tracking if _normalize_status_value(r) == 'resolving' and not _is_tracker_in_play(r)]
     _featured_cards   = "\n".join(_build_card(r, lang) for r in _featured)
     _monitoring_cards = "\n".join(_build_compact_row(r, lang) for r in _monitoring)
     if _monitoring:

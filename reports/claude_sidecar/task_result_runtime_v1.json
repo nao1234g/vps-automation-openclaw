@@ -1,0 +1,65 @@
+{
+  "task_result_version": "runtime_v1",
+  "generated_at": "2026-04-04T10:20:00Z",
+  "task_id": "sidecar-20260404-runtime-layer-v1",
+  "scope": "Claude Code runtime layer stability audit and patch",
+  "status": "completed",
+
+  "audit_findings": {
+    "total_hooks": 31,
+    "hook_event_types": 7,
+    "config_files": {
+      "settings.json": "repo-level, 4 hook entries (SessionStart, Stop, SubagentStop, SessionEnd)",
+      "settings.local.json": "user-level, 27 hook entries (UserPromptSubmit x3, PreToolUse x10, PostToolUse x8, PostToolUseFailure x2, SessionEnd x1, Stop x2)"
+    },
+    "hooks_per_edit_write": "13-14 invocations (10 PreToolUse + 8 PostToolUse, minus non-matching)",
+    "root_causes_for_10min_stop": [
+      "RC-1: No mid-session sidecar state save — if Claude crashes or compacts context, session_status.json is stale at 0%",
+      "RC-2: Stop gate only checks for 'in_progress' or 'completed' — no concept of 'interrupted' for unplanned exits",
+      "RC-3: SessionStart hook does not detect prior interrupted sessions — new session starts blind",
+      "RC-4: session-start.sh makes 5-6 SSH calls (5-8s connect timeout each) — contributes to slow startup but not the 10-minute stop itself",
+      "RC-5: 13-14 hooks per Edit/Write with up to 75s theoretical timeout budget — contributes to latency but not the silent stop"
+    ]
+  },
+
+  "patches_applied": [
+    {
+      "patch_id": "P1",
+      "file": ".claude/hooks/sidecar_session_start.py",
+      "change": "Added ~30 lines to detect prior session state (in_progress/blocked/completed/interrupted) from session_status.json and inject resume context into SessionStart additionalContext",
+      "root_causes_fixed": ["RC-3"]
+    },
+    {
+      "patch_id": "P2",
+      "file": ".claude/hooks/sidecar_session_end.py",
+      "change": "Created new 75-line script. Auto-detects if session_status.json says 'in_progress' at session end, marks it as 'interrupted' with blocking_reason, updates heartbeat.json",
+      "root_causes_fixed": ["RC-1", "RC-2"]
+    },
+    {
+      "patch_id": "P3",
+      "file": ".claude/settings.json",
+      "change": "Registered P2 as SessionEnd hook. Updated Stop gate prompt to recognize 'interrupted' as valid stop state. Updated SubagentStop prompt to match.",
+      "root_causes_fixed": ["RC-2"]
+    }
+  ],
+
+  "sidecar_lifecycle_after_patch": {
+    "normal_flow": "in_progress → completed (agent finishes work, writes final sidecar files)",
+    "planned_block": "in_progress → blocked (agent hits blocker, writes blocking_reason + next_exact_step)",
+    "unplanned_exit": "in_progress → interrupted (SessionEnd hook auto-fires, writes blocking_reason + interrupted_at)",
+    "resume": "Next SessionStart detects interrupted/blocked status, injects resume context, agent continues"
+  },
+
+  "not_addressed": [
+    "Hook overhead reduction (13-14 hooks per Edit/Write) — not causing the 10-minute stop, optimization deferred",
+    "session-start.sh SSH heaviness (5-6 calls) — contributes to slow startup, not causing silent stop, optimization deferred",
+    "Mid-session heartbeat updates — would require UserPromptSubmit hook, adds overhead, deferred"
+  ],
+
+  "verification": {
+    "sidecar_session_start_py": "Reads session_status.json, injects resume context for in_progress/blocked/interrupted states",
+    "sidecar_session_end_py": "Auto-marks in_progress as interrupted, writes heartbeat with interrupted status",
+    "settings_json_stop_gate": "Recognizes interrupted as valid stop state alongside completed and blocked",
+    "settings_json_session_end": "Registered sidecar_session_end.py as SessionEnd command hook with 10s timeout"
+  }
+}

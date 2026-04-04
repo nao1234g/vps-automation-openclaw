@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "reason": "integration test",
+  "scopes": [
+    "public_release",
+    "distribution"
+  ],
+  "enabled_by": "test",
+  "enabled_at": "2026-04-02T16:07:18Z",
+  "expires_at": "",
+  "ticket": "",
+  "notes": ""
+}

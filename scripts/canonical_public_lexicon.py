@@ -7,9 +7,16 @@ import json
 from pathlib import Path
 from typing import Any
 
+from report_authority import load_authoritative_json
+from runtime_boundary import shared_or_local_path
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-REPORT_DIR = Path("/opt/shared/reports") if Path("/opt/shared").exists() else SCRIPT_DIR.parent / "reports"
+REPORT_DIR = shared_or_local_path(
+    script_file=__file__,
+    shared_path="/opt/shared/reports",
+    local_path=SCRIPT_DIR.parent / "reports",
+)
 SNAPSHOT_PATH = REPORT_DIR / "content_release_snapshot.json"
 DEFAULT_OPERATING_SINCE = "2026"
 LEXICON_VERSION = "2026-03-31-public-lexicon-v4"
@@ -140,11 +147,7 @@ ABOUT_COPY = {
 
 
 def _read_json(path: Path) -> dict[str, Any]:
-    if not path.exists():
-        return {}
-    with path.open(encoding="utf-8") as fh:
-        data = json.load(fh)
-    return data if isinstance(data, dict) else {}
+    return load_authoritative_json(path)
 
 
 def load_release_snapshot() -> dict[str, Any]:

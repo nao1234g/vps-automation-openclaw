@@ -1,0 +1,238 @@
+============================================================
+  CRON PATCH PLAN v3 — 承認待ち資料（確定版）
+  作成: 2026-04-04
+  担当: Claude Code (Window 2) — cron/インフラ衛生専任
+  状態: READY-FOR-APPROVAL
+  前提: Codex主実装体制下での非干渉パッチ案
+============================================================
+
+■ 本資料の位置づけ
+  v2（リスト作成・分析）→ v3（承認待ち形式に再整理）
+  本資料は「適用案」ではなく「承認資料」である。
+  適用は本資料末尾の「適用前提条件」が全て満たされた後にのみ行う。
+
+============================================================
+1. cron 変更候補（4行）
+============================================================
+
+  No.  行番号  スクリプト                    変更内容           理由
+  ───  ──────  ──────────────────────────────  ─────────────────  ──────────────────────────────
+  C-1  321     coordination_snapshot.py       * → */5           毎分スナップショットは過剰。
+                                                                coordination/ 95MB肥大。
+                                                                5分粒度で監視要件を満たす。
+
+  C-2  334     site_guard_scheduler.py        * → */15          スケジューラ毎分起動は過剰。
+                                                                ログ20,190行蓄積。
+                                                                内部サブタスクの遅延15分は許容。
+
+  C-3  335     ecosystem_schedule_router.py   * → */15          ルーティング毎分は過剰。
+                                                                ログ16,702行蓄積。
+                                                                最大15分遅延は許容範囲。
+
+  C-4  336     prediction_ops_scheduler.py    * → */15          予測opsスケジューラ毎分は過剰。
+                                                                ログ16,651行蓄積。
+                                                                予測バッチ起動の15分遅延は許容。
+
+  変更しない行（明示的KEEP）:
+  - 行320: coordination_reaper.py     毎分維持（リース期限管理、軽量、設計意図）
+  - 行277: task_queue_worker.py       */5維持（タスクキュー処理、レイテンシ重要）
+  - 行322: coordination_events_export */5維持（設計通り）
+  - 行217: hung-process-killer.py     */30維持（必要な監視）
+  - 行329: coordination_violation_alerter */15維持（適切な間隔）
+
+============================================================
+2. 即削除候補コメント群（約200行）
+============================================================
+
+  全てコメントアウト済み（#付き）。実行に影響ゼロ。
+  git履歴から復元可能。削除はゼロリスク。
+
+  カテゴリ         行数   内容
+  ───────────────  ─────  ──────────────────────────────
+  SUSPENDED-CLEANUP      16行   旧パイプライン（neo-jarvis, rss, x-intelligence等）
+  SUSPENDED-EMERGENCY    20行   X投稿系緊急停止（x-engage, auto_tweet, post-thread等）
+  SUSPENDED-EMERGENCY-GPT6  2行   x_swarm_dispatcher（GPT-6虚偽記事対応）
+  SUSPENDED-CONTENT-INTEGRITY  22行   deep-pattern-generate, rss-post, breaking-news等
+  SUSPENDED-PREDICTION-OPS  20行   旧予測系（daily-learning, polymarket, prediction_resolver等）
+  SUSPENDED-MISSION-CONTROL  24行   旧監視系（ghost_integrity, self-healer, infra-monitor等）
+  SUSPENDED-GOVERNANCE    4行   post-notes, a1-bulk-en-translator
+  SUSPENDED ラベルなし    13行   旧X Intelligence系、neo-orchestrator等
+  PAUSED-SNS              3行   x_thread_generator, x_poll_post, x_article_post
+  DISABLED                1行   update_predictions_page
+  付随コメント行        約70行   各SUSPENDED行に付随する説明コメント
+  ───────────────  ─────  ──────────────────────────────
+  合計              約200行
+
+============================================================
+3. HOLD対象（次回セッションで判断）
+============================================================
+
+  HOLD-1: prediction_deadline 重複
+  ─────────────────────────────────
+  行173: prediction_deadline_alert.py   毎日 23:00 UTC（236行、21日/7日/3日前アラート）
+  行269: prediction_deadline_alerter.py 毎日 09:00 UTC（165行、7日前のみ）
+
+  判断保留理由:
+    行173が上位互換の可能性が高いが、alerter.py（行269）が
+    異なるロジック（通知先の違い等）を持つ可能性を排除できない。
+  次のアクション:
+    スクリプト内容の diff 確認後に片方を削除候補に。
+
+  HOLD-2: Brier系テスト 4重実行
+  ─────────────────────────────────
+  行214: brier-score-validator.py  月1回（月初 09:00 JST）162行
+  行308: brier_unit_test.py        毎日 01:00 UTC          85行
+  行311: brier_audit.py            毎日 22:59 UTC          95行
+  行313: test_brier_score.py       毎日 01:30 UTC         165行
+
+  判断保留理由:
+    3つの日次テストが重複している可能性が高いが、
+    各テストが検証する内容が異なる場合がある。
+  次のアクション:
+    内容確認後、brier_audit.py（行311）を日次代表として残し、
+    brier_unit_test(行308) + test_brier_score(行313) を削除候補に。
+    brier-score-validator(行214) は月次なので現状維持。
+
+============================================================
+4. 非干渉判定
+============================================================
+
+  【直接衝突判定】
+  Codex所有ファイル（ecosystem_governance_audit.py,
+  deploy_site_ui_guard_stack.py, release_guard_canary.py,
+  one_pass_completion_gate.py, article_release_guard.py,
+  build_article_release_manifest.py, synthetic_user_crawler.py,
+  push_prediction_platform_sources.py, stateful_user_journey_audit.py）
+  に対し、site_guard_scheduler / ecosystem_schedule_router /
+  prediction_ops_scheduler / coordination_snapshot への参照を
+  grep確認した結果: ゼロ件。
+
+  結論: Codex所有ファイルとの直接編集衝突はない。
+
+  【間接影響の注記】
+  ただし、scheduler cadence 変更は以下の間接影響がありうる:
+  - site_guard_scheduler（*/15化）: サイトガードのサブタスク起動頻度が
+    1/15に減少するため、live artifact の鮮度が最大15分遅延する。
+    Codexの検証が「直近N分以内の更新」を前提にしている場合、
+    タイミングによって観測結果が変わりうる。
+  - ecosystem_schedule_router（*/15化）: エコシステム系ルーティングの
+    判定間隔が15分になるため、Codexのecosystem_governance_audit.pyが
+    参照するデータの更新頻度に間接的な影響がありうる。
+  - prediction_ops_scheduler（*/15化）: 予測ops系バッチの起動遅延が
+    最大15分になるため、prediction関連のデータフローに遅延が生じうる。
+
+  総合判定:
+    直接衝突なし。間接影響は低リスクだが、ゼロではない。
+    よって左上承認 + Codexの主要検証基準確定後にのみ適用候補とする。
+
+============================================================
+5. 適用前提条件（全て満たされるまで APPLY 不可）
+============================================================
+
+  □ 条件1: 左上司令塔（Naoto）の明示承認
+           — 本資料の内容を確認し「実行してよい」と明言すること
+
+  □ 条件2: Codexの主要検証が green
+           — Codexが進行中のrelease guard / governance audit /
+             site UI guard 等の検証が完了し、greenであること
+
+  □ 条件3: 右上の VERIFY 結果に重大HOLDなし
+           — HOLD-1, HOLD-2 は「変更4行」とは独立しているため
+             変更4行の適用をブロックしない。ただし新たな重大HOLD
+             （例: scheduler停止でCodex検証がREDになる等）が
+             発見された場合は適用を保留する
+
+  □ 条件4: 右下の commit/integration 計画が固定済み
+           — Codexのcommit計画と本パッチの適用タイミングが
+             衝突しないことを確認済みであること
+
+  適用順序（条件充足後）:
+    Step 0: バックアップ
+      ssh root@163.44.124.123 "crontab -l > /root/crontab_backup_20260404.txt"
+    Step 1: 間隔変更（4行）
+    Step 2: SUSPENDED一括削除（約200行）
+    Step 3: HOLD調査・実行（別セッション）
+
+  ロールバック（即時復元、所要3秒）:
+    ssh root@163.44.124.123 "crontab /root/crontab_backup_20260404.txt"
+
+============================================================
+6. 想定効果
+============================================================
+
+  プロセス起動数:
+    毎分: 7件 → 3件（-57%）
+    毎日合計: -5,376回/日
+
+  ログ削減:
+    C-2〜C-4の3件: 53,543行蓄積 → 今後1/15ペースに
+    C-1: 8,746行蓄積 → 今後1/5ペースに
+
+  ディスク:
+    coordination/ 95MB → snapshot頻度1/5で肥大抑制
+
+  Swap圧迫:
+    毎分4プロセス削減 → メモリ圧迫緩和に寄与（計測はStep1適用後）
+
+============================================================
+7. 想定リスク
+============================================================
+
+  C-1（coordination_snapshot */5）:
+    リスク: 低。スナップショットが5分粒度になるだけ。
+    リアルタイム監視には使っていない。復元不要データ。
+
+  C-2（site_guard_scheduler */15）:
+    リスク: 低。サブタスクスケジュール遅延が最大15分。
+    サイトガード自体のチェック間隔には影響しない。
+
+  C-3（ecosystem_schedule_router */15）:
+    リスク: 低。ルーティング判定の遅延が最大15分。
+    間接影響: Codex governance audit のデータ鮮度に微小な影響の可能性。
+
+  C-4（prediction_ops_scheduler */15）:
+    リスク: 低。予測バッチ起動の15分遅延。
+    予測ページビルダーは独自cron（毎日07:00 JST）で動くため無影響。
+
+  SUSPENDED削除:
+    リスク: ゼロ。全行コメントアウト済み。実行に影響なし。
+    git履歴から完全復元可能。
+
+============================================================
+8. 状態ラベル
+============================================================
+
+  ┌─────────────────────────────────────┐
+  │  STATUS: READY-FOR-APPROVAL         │
+  │  日時: 2026-04-04                   │
+  │  担当: Claude Code (Window 2)       │
+  │  次のアクション: 左上承認待ち        │
+  └─────────────────────────────────────┘
+
+  根拠:
+  - 直接衝突なし（grep確認済み）
+  - 間接影響は低リスク（注記済み）
+  - 新規HOLDなし
+  - v2からの変更: 非干渉判定の精緻化 + 適用前提条件の明文化のみ
+
+============================================================
+9. 締め
+============================================================
+
+  今すぐ実行してよいこと:
+    - 本資料の内容確認・レビュー
+    - HOLD-1, HOLD-2 のスクリプト diff 調査（読み取りのみ）
+    - VPS状態の監視・ログ確認（読み取りのみ）
+
+  まだ実行してはいけないこと:
+    - crontab への書き込み（4行変更・SUSPENDED削除いずれも）
+    - systemd / docker への変更
+    - Codex所有ファイルへの編集
+
+  左上の承認が必要なこと:
+    - Step 0〜2 の適用開始（バックアップ→間隔変更→SUSPENDED削除）
+    - 適用前提条件4項目の充足確認
+
+============================================================
+END OF PLAN v3
+============================================================

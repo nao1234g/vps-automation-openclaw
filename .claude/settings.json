@@ -21,7 +21,8 @@
       "Bash(\"c:/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/docs/KNOWN_MISTAKES.md\":*)",
       "Bash(\"/c/Program Files/Python312/python.exe\" -c:*)",
       "Bash(\"/c/Program Files/Python312/python.exe\" -c \":*)",
-      "Bash(wsl -d Ubuntu -e bash -c '$HOME/.smux/tmux-bridge read codex 5 && $HOME/.smux/tmux-bridge type codex \"\"esc\"\"')"
+      "Bash(wsl -d Ubuntu -e bash -c '$HOME/.smux/tmux-bridge read codex 5 && $HOME/.smux/tmux-bridge type codex \"\"esc\"\"')",
+      "Bash(\"/c/Program Files/Python312/python.exe\":*)"
     ],
     "deny": [
       "Bash(* rm -rf /*)",
@@ -43,5 +44,54 @@
       "c:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\docs\\seo_audit"
     ]
   },
-  "defaultMode": "acceptEdits"
+  "defaultMode": "acceptEdits",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "& python \"$env:CLAUDE_PROJECT_DIR/.claude/hooks/sidecar_session_start.py\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "agent",
+            "timeout": 60,
+            "prompt": "You are a stop gate for this repository. Inspect CLAUDE.md and reports/claude_sidecar/session_status.json, heartbeat.json, task_result_v*.json, and resume_prompt.txt if they exist. Allow stopping if: (a) no active sidecar session exists, (b) session_status says completed, (c) session_status says blocked or interrupted and includes both blocking_reason and next_exact_step. If session_status is in_progress, or required sidecar files are missing for an active sidecar scope, return {\"ok\": false, \"reason\": \"Explain exactly what file or status is still missing and require Claude to finish updating the sidecar artifacts before stopping.\"}. Context: $ARGUMENTS"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "agent",
+            "timeout": 60,
+            "prompt": "You are a subagent stop gate for this repository. Inspect reports/claude_sidecar/session_status.json, heartbeat.json, task_result_v*.json, and resume_prompt.txt if they exist. If a sidecar scope is still in_progress or has no resume-safe output, return {\"ok\": false, \"reason\": \"Require the subagent to update sidecar artifacts before stopping.\"}. Otherwise return {\"ok\": true}. Context: $ARGUMENTS"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "& python \"$env:CLAUDE_PROJECT_DIR/.claude/hooks/sidecar_session_end.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
 }

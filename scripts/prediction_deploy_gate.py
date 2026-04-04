@@ -8,23 +8,29 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
+import time
 from datetime import datetime, timedelta, timezone
 import re
 
 from mission_contract import MISSION_CONTRACT_VERSION, mission_contract_hash
 from canonical_public_lexicon import LEXICON_VERSION
+from runtime_boundary import shared_or_local_path
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-REPORT_DIR = (
-    "/opt/shared/reports"
-    if os.path.exists("/opt/shared")
-    else os.path.join(os.path.dirname(SCRIPT_DIR), "reports")
+REPORT_DIR = str(
+    shared_or_local_path(
+        script_file=__file__,
+        shared_path="/opt/shared/reports",
+        local_path=os.path.join(os.path.dirname(SCRIPT_DIR), "reports"),
+    )
 )
 MANIFEST_PATH = os.path.join(REPORT_DIR, "article_release_manifest.json")
 TRACKER_PATH = os.path.join(REPORT_DIR, "prediction_article_integrity.json")
 SNAPSHOT_PATH = os.path.join(REPORT_DIR, "content_release_snapshot.json")
 POLICY_PATH = os.path.join(SCRIPT_DIR, "prediction_integrity_policy.json")
 GOVERNANCE_PATH = os.path.join(REPORT_DIR, "ecosystem_governance_audit.json")
+DEFAULT_SUBPROCESS_TIMEOUT_SECONDS = int(os.environ.get("NOWPATTERN_DEPLOY_GATE_SUBPROCESS_TIMEOUT_SECONDS") or 900)
 
 
 def _load_json(path: str) -> dict:
@@ -34,16 +40,40 @@ def _load_json(path: str) -> dict:
         return json.load(fh)
 
 
-def _run(cmd: list[str]) -> tuple[int, str]:
-    proc = subprocess.run(cmd, capture_output=True, text=True)
-    output = "\n".join(part for part in [proc.stdout.strip(), proc.stderr.strip()] if part).strip()
+def _run(cmd: list[str], timeout_seconds: int = DEFAULT_SUBPROCESS_TIMEOUT_SECONDS) -> tuple[int, str]:
+    try:
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=timeout_seconds,
+        )
+    except subprocess.TimeoutExpired as exc:
+        stdout = (exc.stdout or "").strip()
+        stderr = (exc.stderr or "").strip()
+        output = "\n".join(part for part in [stdout, stderr, f"TIMEOUT:{timeout_seconds}s"] if part).strip()
+        return 124, output
+    stdout = (proc.stdout or "").strip()
+    stderr = (proc.stderr or "").strip()
+    output = "\n".join(part for part in [stdout, stderr] if part).strip()
     return proc.returncode, output
+
+
+def _write_json_atomic(path: str, payload: dict) -> None:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", delete=False, encoding="utf-8", dir=os.path.dirname(path)) as tmp:
+        json.dump(payload, tmp, ensure_ascii=False, indent=2)
+        tmp.write("\n")
+        tmp_path = tmp.name
+    os.replace(tmp_path, path)
 
 
 def _load_policy(tracker: dict) -> dict:
     policy = {
         "required_langs": ["ja", "en"],
-        "max_orphan_oracle_articles": 197,
+        "max_orphan_oracle_articles": 0,
         "max_manifest_tracker_count_delta": 0,
         "max_report_timestamp_delta_seconds": 1800,
         "max_mojibake_strings": 0,
@@ -112,6 +142,7 @@ def _build_snapshot(manifest: dict, tracker: dict, failures: list[str], warnings
         }
     return {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generated_at_epoch": int(time.time()),
         "mission_contract_version": MISSION_CONTRACT_VERSION,
         "mission_contract_hash": mission_contract_hash(),
         "lexicon_version": LEXICON_VERSION,
@@ -139,6 +170,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--refresh", action="store_true", help="Refresh manifest and tracker integrity before validating")
     parser.add_argument("--check-source-fetchability", action="store_true")
+    parser.add_argument("--json-out", default=SNAPSHOT_PATH)
     args = parser.parse_args()
 
     failures: list[str] = []
@@ -173,6 +205,7 @@ def main() -> int:
             os.path.join(SCRIPT_DIR, "ecosystem_governance_audit.py"),
             "--json-out",
             GOVERNANCE_PATH,
+            "--include-full-crawl",
         ]
         rc, out = _run(governance_cmd)
         if rc != 0:
@@ -196,6 +229,8 @@ def main() -> int:
     max_orphans = int(policy.get("max_orphan_oracle_articles", 0))
     max_report_timestamp_delta_seconds = int(policy.get("max_report_timestamp_delta_seconds", 1800))
     max_mojibake_strings = int(policy.get("max_mojibake_strings", 0))
+    min_distribution_allowed_ratio_pct = float(policy.get("min_distribution_allowed_ratio_pct", 0.0) or 0.0)
+    max_high_risk_unapproved_ratio_pct = float(policy.get("max_high_risk_unapproved_ratio_pct", 100.0) or 100.0)
 
     manifest_counts = manifest.get("counts", {}) if isinstance(manifest, dict) else {}
     tracker_langs = tracker.get("langs", {}) if isinstance(tracker, dict) else {}
@@ -250,15 +285,25 @@ def main() -> int:
 
     distribution_allowed = int(manifest_counts.get("distribution_allowed") or 0)
     high_risk_unapproved = int(manifest_counts.get("high_risk_unapproved") or 0)
+    distribution_allowed_ratio = round((distribution_allowed / published_total) * 100, 2) if published_total else 0.0
+    approval_backlog_ratio = round((high_risk_unapproved / published_total) * 100, 2) if published_total else 0.0
+    if distribution_allowed_ratio < min_distribution_allowed_ratio_pct:
+        failures.append(
+            "distribution_allowed_ratio_below_threshold:"
+            f"{distribution_allowed_ratio}<{min_distribution_allowed_ratio_pct}"
+        )
+    if approval_backlog_ratio > max_high_risk_unapproved_ratio_pct:
+        failures.append(
+            "high_risk_unapproved_ratio_exceeded:"
+            f"{approval_backlog_ratio}>{max_high_risk_unapproved_ratio_pct}"
+        )
     if published_total and distribution_allowed <= 5:
         warnings.append(f"distribution_allowed_very_low:{distribution_allowed}/{published_total}")
     if published_total and high_risk_unapproved:
         warnings.append(f"high_risk_unapproved_backlog:{high_risk_unapproved}/{published_total}")
 
     snapshot = _build_snapshot(manifest, tracker, failures, warnings)
-    os.makedirs(REPORT_DIR, exist_ok=True)
-    with open(SNAPSHOT_PATH, "w", encoding="utf-8") as fh:
-        json.dump(snapshot, fh, ensure_ascii=False, indent=2)
+    _write_json_atomic(args.json_out, snapshot)
 
     print(json.dumps(snapshot, ensure_ascii=False, indent=2))
     return 0 if not failures else 2

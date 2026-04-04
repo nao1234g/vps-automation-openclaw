@@ -48,6 +48,31 @@ def canonicalize_prediction_statuses(payload: dict) -> int:
     return changed
 
 
+def infer_article_link_lang(article: dict) -> str:
+    url = str(article.get("url") or "").strip().lower()
+    slug = str(article.get("slug") or "").strip().lower()
+    if "/en/" in url or slug.startswith("en-"):
+        return "en"
+    if url or slug:
+        return "ja"
+    return ""
+
+
+def canonicalize_prediction_article_links(payload: dict) -> int:
+    preds = payload.get("predictions", [])
+    changed = 0
+    for pred in preds:
+        for article in pred.get("article_links") or []:
+            if not isinstance(article, dict):
+                continue
+            inferred_lang = infer_article_link_lang(article)
+            current_lang = str(article.get("lang") or "").strip().lower()
+            if inferred_lang and current_lang != inferred_lang:
+                article["lang"] = inferred_lang
+                changed += 1
+    return changed
+
+
 def compute_meta(payload: dict) -> tuple[dict, dict]:
     preds = payload.get("predictions", [])
     total = len(preds)
@@ -120,10 +145,12 @@ def main() -> int:
     payload = json.loads(db_path.read_text(encoding="utf-8"))
     payload.setdefault("meta", {})
     changed = canonicalize_prediction_statuses(payload)
+    article_link_lang_updates = canonicalize_prediction_article_links(payload)
 
     meta_updates, summary = compute_meta(payload)
     payload["meta"].update(meta_updates)
     summary["canonical_status_updates"] = changed
+    summary["article_link_lang_updates"] = article_link_lang_updates
 
     if args.dry_run:
         print(json.dumps({"db": str(db_path), "summary": summary, "meta_updates": meta_updates}, ensure_ascii=False, indent=2))

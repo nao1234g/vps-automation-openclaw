@@ -1,932 +1,773 @@
 {
-  "generated_at": "2026-03-30 23:30 JST",
-  "ghost_published_posts": 608,
+  "generated_at": "2026-04-04 04:59 JST",
+  "mission_contract_version": "2026-03-31-naoto-mission-v3",
+  "mission_contract_hash": "1e8a9d10265289a622e4149ac2d6b9eef7f721c7dd27c3de6f72140852819b18",
+  "lexicon_version": "2026-03-31-public-lexicon-v4",
+  "requested_lang": "both",
+  "integrity_langs": [
+    "ja",
+    "en"
+  ],
+  "ghost_published_posts_total": 474,
+  "ghost_published_posts_release_scope": 474,
   "formal_prediction_total": 1121,
   "orphan_oracle_articles": {
-    "count": 193,
-    "samples": [
-      {
-        "slug": "iran-wars-asian-shockwaves-how-a-gulf-conflict-rewires-indo-pacific-power",
-        "title": "イラン戦争の衝撃 — 湾岸紛争がインド太平洋の勢力図を塗り替える",
-        "url": "https://nowpattern.com/iran-wars-asian-shockwaves-how-a-gulf-conflict-rewires-indo-pacific-power/",
-        "published_at": "2026-03-30T11:06:07.000Z"
-      },
-      {
-        "slug": "iran-war-gas-prices-the-shock-doctrine-of-energy-realignment",
-        "title": "イラン戦争とガス価格 — エネルギー再編のショックドクトリン",
-        "url": "https://nowpattern.com/iran-war-gas-prices-the-shock-doctrine-of-energy-realignment/",
-        "published_at": "2026-03-30T10:49:02.000Z"
-      },
-      {
-        "slug": "japans-iran-diplomacy-gambit-alliance-loyalty-vs-strategic-autonomy",
-        "title": "日本のイラン外交：同盟か自律か",
-        "url": "https://nowpattern.com/japans-iran-diplomacy-gambit-alliance-loyalty-vs-strategic-autonomy/",
-        "published_at": "2026-03-30T10:18:55.000Z"
-      },
-      {
-        "slug": "hormuz-kaikyo-kiki-beikoku-iran-tairitsu",
-        "title": "ホルムズ海峡危機、米イラン対立で世界のエネルギー要衝に脅威",
-        "url": "https://nowpattern.com/hormuz-kaikyo-kiki-beikoku-iran-tairitsu/",
-        "published_at": "2026-03-30T22:16:48.000Z"
-      },
-      {
-        "slug": "nichibei-shunoukaidan-iran-kiki",
-        "title": "日米首脳会談とイラン危機：試される同盟の忠誠",
-        "url": "https://nowpattern.com/nichibei-shunoukaidan-iran-kiki/",
-        "published_at": "2026-03-30T21:46:44.000Z"
-      },
-      {
-        "slug": "bitcoin-65k-crash-digital-gold-myth-shatters-under-iran-war",
-        "title": "Bitcoin65,000ドル急落 — 「デジタルゴールド」神話がイラン戦争で砕ける",
-        "url": "https://nowpattern.com/bitcoin-65k-crash-digital-gold-myth-shatters-under-iran-war/",
-        "published_at": "2026-03-30T21:11:03.000Z"
-      },
-      {
-        "slug": "en-bitcoin-65k-crash-digital-gold-myth-shatters-under-iran-war",
-        "title": "Bitcoin's Crash to $65K — The Digital Gold Myth Shatters Under Iran War Fire",
-        "url": "https://nowpattern.com/en/en-bitcoin-65k-crash-digital-gold-myth-shatters-under-iran-war/",
-        "published_at": "2026-03-30T21:11:03.000Z"
-      },
-      {
-        "slug": "bitcoin-breaks-72k-against-strong-dollar-the-decoupling-signal",
-        "title": "Bitcoinが7万2000ドルを突破、強いドルに対するデカップリングの兆候",
-        "url": "https://nowpattern.com/bitcoin-breaks-72k-against-strong-dollar-the-decoupling-signal/",
-        "published_at": "2026-03-30T20:47:22.000Z"
-      },
-      {
-        "slug": "dhsyu-suan-nojiao-zhao-bi-suo-nozheng-zhi-gazhi-du-nolie-hua-nibian-warutoki",
-        "title": "DHS予算の膠着 — 閉鎖の政治が制度の劣化に変わるとき",
-        "url": "https://nowpattern.com/dhsyu-suan-nojiao-zhao-bi-suo-nozheng-zhi-gazhi-du-nolie-hua-nibian-warutoki/",
-        "published_at": "2026-03-30T11:36:47.000Z"
-      },
-      {
-        "slug": "an-hao-zi-chan-nogui-zhi-noshen-pan-ji-guan-tou-zi-jia-nocai-yong-gali-fa-noxian-shi-tojiao-chai-suru-2",
-        "title": "暗号資産の規制の審判 — 機関投資家の採用が立法の現実と交差する",
-        "url": "https://nowpattern.com/an-hao-zi-chan-nogui-zhi-noshen-pan-ji-guan-tou-zi-jia-nocai-yong-gali-fa-noxian-shi-tojiao-chai-suru-2/",
-        "published_at": "2026-03-30T11:06:56.000Z"
-      },
-      {
-        "slug": "an-hao-zi-chan-nogui-zhi-noshen-pan-ji-guan-tou-zi-jia-nocai-yong-gali-fa-noxian-shi-tojiao-chai-suru",
-        "title": "暗号資産の規制の審判 — 機関投資家の採用が立法の現実と交差する",
-        "url": "https://nowpattern.com/an-hao-zi-chan-nogui-zhi-noshen-pan-ji-guan-tou-zi-jia-nocai-yong-gali-fa-noxian-shi-tojiao-chai-suru/",
-        "published_at": "2026-03-30T11:06:54.000Z"
-      },
-      {
-        "slug": "us-india-oil-waiver-sanctions-flexibility-reveals-empires-energy-dilemma",
-        "title": "米印石油免除 — 制裁の柔軟化が帝国のエネルギー・ジレンマを露呈",
-        "url": "https://nowpattern.com/us-india-oil-waiver-sanctions-flexibility-reveals-empires-energy-dilemma/",
-        "published_at": "2026-03-29T14:13:19.000Z"
-      },
-      {
-        "slug": "us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity",
-        "title": "米国がロシア石油制裁を緩和 — 同盟の緊張が西側の結束を分裂させる",
-        "url": "https://nowpattern.com/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
-        "published_at": "2026-03-29T10:59:09.000Z"
-      },
-      {
-        "slug": "takaichi-trump-summit-alliance-strain-meets-middle-east-escalation",
-        "title": "高市・Trump首脳会談 — 同盟の緊張と中東エスカレーション",
-        "url": "https://nowpattern.com/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation/",
-        "published_at": "2026-03-29T10:59:04.000Z"
-      },
-      {
-        "slug": "world-war-iii-comparisons-why-threat-inflation-distorts-strategic-clarity",
-        "title": "第三次世界大戦の比較論 — 脅威の誇張が戦略的明晰さを歪める理由",
-        "url": "https://nowpattern.com/world-war-iii-comparisons-why-threat-inflation-distorts-strategic-clarity/",
-        "published_at": "2026-03-29T10:58:59.000Z"
-      },
-      {
-        "slug": "us-china-paris-trade-talks-rare-earths-as-the-new-leverage-battleground",
-        "title": "米中パリ貿易交渉 — レアアースが新たな交渉力の戦場に",
-        "url": "https://nowpattern.com/us-china-paris-trade-talks-rare-earths-as-the-new-leverage-battleground/",
-        "published_at": "2026-03-29T10:58:54.000Z"
-      },
-      {
-        "slug": "us-rolls-back-russia-oil-sanctions-alliance-strain-meets-energy-realpolitik",
-        "title": "米国がロシア石油制裁を緩和 — 同盟の緊張とエネルギー現実主義の交差",
-        "url": "https://nowpattern.com/us-rolls-back-russia-oil-sanctions-alliance-strain-meets-energy-realpolitik/",
-        "published_at": "2026-03-29T10:51:20.000Z"
-      },
-      {
-        "slug": "us-china-paris-trade-talks-rare-earths-as-the-new-leverage-frontier",
-        "title": "米中パリ貿易交渉 — レアアースが新たな交渉カードに",
-        "url": "https://nowpattern.com/us-china-paris-trade-talks-rare-earths-as-the-new-leverage-frontier/",
-        "published_at": "2026-03-29T09:58:35.000Z"
-      },
-      {
-        "slug": "takaichi-trump-summit-alliance-strain-meets-iran-crisis-calculus",
-        "title": "高市・Trump首脳会談 — 同盟の緊張とイラン危機の計算",
-        "url": "https://nowpattern.com/takaichi-trump-summit-alliance-strain-meets-iran-crisis-calculus/",
-        "published_at": "2026-03-29T09:58:27.000Z"
-      },
-      {
-        "slug": "hormuz-strait-crisis-trumps-burden-sharing-gambit-strains-alliances",
-        "title": "ホルムズ海峡危機 — Trumpの負担分担戦略が同盟を圧迫",
-        "url": "https://nowpattern.com/hormuz-strait-crisis-trumps-burden-sharing-gambit-strains-alliances/",
-        "published_at": "2026-03-29T09:58:11.000Z"
-      },
-      {
-        "slug": "pakistans-solar-leapfrog-when-grid-failure-births-distributed-energy-revolution",
-        "title": "Pakistanのソーラー飛躍 — 送電網の崩壊が分散型エネルギー革命を生む",
-        "url": "https://nowpattern.com/pakistans-solar-leapfrog-when-grid-failure-births-distributed-energy-revolution/",
-        "published_at": "2026-03-29T09:48:49.000Z"
-      },
-      {
-        "slug": "hormuz-chokepoint-crushes-south-asia-the-contagion-cascade-of-energy-dependence",
-        "title": "ホルムズ海峡のチョークポイントが南アジアを圧迫 — エネルギー依存の伝染カスケード",
-        "url": "https://nowpattern.com/hormuz-chokepoint-crushes-south-asia-the-contagion-cascade-of-energy-dependence/",
-        "published_at": "2026-03-29T09:48:45.000Z"
-      },
-      {
-        "slug": "strait-of-hormuz-crisis-europe-defects-from-us-imperial-overreach",
-        "title": "ホルムズ海峡危機 — 欧州が米国の帝国的過剰介入から離反",
-        "url": "https://nowpattern.com/strait-of-hormuz-crisis-europe-defects-from-us-imperial-overreach/",
-        "published_at": "2026-03-29T09:48:39.000Z"
-      },
-      {
-        "slug": "hormuz-refusal-natos-alliance-strain-exposes-post-atlantic-order",
-        "title": "ホルムズ海峡拒否 — NATOの同盟の緊張がポスト大西洋秩序を露呈する",
-        "url": "https://nowpattern.com/hormuz-refusal-natos-alliance-strain-exposes-post-atlantic-order/",
-        "published_at": "2026-03-29T09:48:33.000Z"
-      },
-      {
-        "slug": "us-iran-war-exit-pressure-imperial-overreach-meets-internal-dissent",
-        "title": "米イラン戦争からの撤退圧力 — 帝国的過剰介入が国内の異論に直面",
-        "url": "https://nowpattern.com/us-iran-war-exit-pressure-imperial-overreach-meets-internal-dissent/",
-        "published_at": "2026-03-29T09:38:42.000Z"
-      },
-      {
-        "slug": "trumps-hormuz-ultimatum-alliance-strain-meets-energy-chokepoint-crisis",
-        "title": "Trumpのホルムズ最後通牒 — 同盟の緊張がエネルギーのチョークポイント危機に直面",
-        "url": "https://nowpattern.com/trumps-hormuz-ultimatum-alliance-strain-meets-energy-chokepoint-crisis/",
-        "published_at": "2026-03-29T09:38:36.000Z"
-      },
-      {
-        "slug": "kelloggs-exit-interview-ceasefire-hinges-on-putins-land-calculus",
-        "title": "Kelloggの退任インタビュー — 停戦はPutinの領土計算にかかっている",
-        "url": "https://nowpattern.com/kelloggs-exit-interview-ceasefire-hinges-on-putins-land-calculus/",
-        "published_at": "2026-03-29T09:38:32.000Z"
-      },
-      {
-        "slug": "iran-strikes-energy-shock-geopolitical-war-premium-returns-to-global-markets",
-        "title": "イラン攻撃とエネルギーショック — 地政学的戦争プレミアムが世界市場に回帰",
-        "url": "https://nowpattern.com/iran-strikes-energy-shock-geopolitical-war-premium-returns-to-global-markets/",
-        "published_at": "2026-03-29T09:31:16.000Z"
-      },
-      {
-        "slug": "orbans-eu90bn-veto-how-one-leader-holds-eu-unity-hostage",
-        "title": "Orbánの€90bn拒否権 — 一人の指導者がEUの結束を人質にする方法",
-        "url": "https://nowpattern.com/orbans-eu90bn-veto-how-one-leader-holds-eu-unity-hostage/",
-        "published_at": "2026-03-29T09:31:11.000Z"
-      },
-      {
-        "slug": "iran-conflict-timeline-israels-six-month-bet-reveals-escalation-calculus",
-        "title": "イラン紛争タイムライン — イスラエルの6カ月の賭けがエスカレーションの計算を明らかにする",
-        "url": "https://nowpattern.com/iran-conflict-timeline-israels-six-month-bet-reveals-escalation-calculus/",
-        "published_at": "2026-03-29T09:30:55.000Z"
-      },
-      {
-        "slug": "en-takaichi-trump-summit-alliance-strain-meets-middle-east-escalation-2-2",
-        "title": "Takaichi-Trump Summit — Alliance St",
-        "url": "https://nowpattern.com/en/en-takaichi-trump-summit-alliance-strain-meets-middle-east-escalation-2-2/",
-        "published_at": "2026-03-29T07:07:18.000Z"
-      },
-      {
-        "slug": "en-boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit-2-2",
-        "title": "BOJ Keeps Rates Unchanged Amid Hormuz",
-        "url": "https://nowpattern.com/en/en-boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit-2-2/",
-        "published_at": "2026-03-29T07:05:47.000Z"
-      },
-      {
-        "slug": "japans-taiwan-pivot-takaichis-existential-threat-doctrine-rewrites-alliance-rules",
-        "title": "日本の台湾シフト — 高市の存立危機事態ドクトリンが同盟のルールを書き換える",
-        "url": "https://nowpattern.com/japans-taiwan-pivot-takaichis-existential-threat-doctrine-rewrites-alliance-rules/",
-        "published_at": "2026-03-29T05:38:00.000Z"
-      },
-      {
-        "slug": "oil-vs-ai-how-middle-east-war-threatens-the-data-center-boom",
-        "title": "石油 vs. AI — 中東戦争がデータセンターブームを脅かす構図",
-        "url": "https://nowpattern.com/oil-vs-ai-how-middle-east-war-threatens-the-data-center-boom/",
-        "published_at": "2026-03-29T05:29:19.000Z"
-      },
-      {
-        "slug": "iran-war-powers-vote-congress-cedes-authority-as-escalation-spiral-deepens",
-        "title": "イラン戦争権限投票 — エスカレーション・スパイラルが深まる中、議会が権限を委譲",
-        "url": "https://nowpattern.com/iran-war-powers-vote-congress-cedes-authority-as-escalation-spiral-deepens/",
-        "published_at": "2026-03-29T05:27:17.000Z"
-      },
-      {
-        "slug": "oman-breaks-silence-on-iran-war-imperial-overreach-meets-alliance-strain",
-        "title": "オマーン、イラン戦争で沈黙を破る — 権力の過伸展と同盟の軋みが交差",
-        "url": "https://nowpattern.com/oman-breaks-silence-on-iran-war-imperial-overreach-meets-alliance-strain/",
-        "published_at": "2026-03-29T05:20:12.000Z"
-      },
-      {
-        "slug": "uk-us-alliance-fractures-over-iran-badenochs-break-signals-structural-shift",
-        "title": "英米同盟のイラン問題での亀裂 — バデノックの離反が構造的転換を示す",
-        "url": "https://nowpattern.com/uk-us-alliance-fractures-over-iran-badenochs-break-signals-structural-shift/",
-        "published_at": "2026-03-29T05:19:59.000Z"
-      },
-      {
-        "slug": "takaichi-trump-summit-alliance-strain-meets-middle-east-escalation-2",
-        "title": "高市・トランプ首脳会談 — 同盟の軋みが中東エスカレーションと交差する",
-        "url": "https://nowpattern.com/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation-2/",
-        "published_at": "2026-03-29T05:12:39.000Z"
-      },
-      {
-        "slug": "boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit-2",
-        "title": "日銀、ホルムズ危機の中で金利据え置き — 経路依存が日本の出口を阻む",
-        "url": "https://nowpattern.com/boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit-2/",
-        "published_at": "2026-03-29T05:12:33.000Z"
-      },
-      {
-        "slug": "ecb-holds-at-2-for-sixth-straight-meeting-path-dependency-traps-europes-central-bank",
-        "title": "ECB、6会合連続で2%据え置き — 経路依存がヨーロッパ中央銀行を縛る",
-        "url": "https://nowpattern.com/ecb-holds-at-2-for-sixth-straight-meeting-path-dependency-traps-europes-central-bank/",
-        "published_at": "2026-03-29T05:12:29.000Z"
-      },
-      {
-        "slug": "bitcoins-70k-breach-energy-shock-meets-monetary-paralysis",
-        "title": "ビットコインの7万ドル割れ — エネルギーショックが金融政策の麻痺と衝突",
-        "url": "https://nowpattern.com/bitcoins-70k-breach-energy-shock-meets-monetary-paralysis/",
-        "published_at": "2026-03-29T04:44:49.000Z"
-      },
-      {
-        "slug": "iran-energy-infrastructure-under-fire-the-escalation-spiral-threatening-global-oil-markets",
-        "title": "イランのエネルギーインフラへの攻撃 — 世界石油市場を脅かす対立の螺旋",
-        "url": "https://nowpattern.com/iran-energy-infrastructure-under-fire-the-escalation-spiral-threatening-global-oil-markets/",
-        "published_at": "2026-03-28T22:38:03.000Z"
-      },
-      {
-        "slug": "trumps-electoral-boomerang-how-gop-overreach-seeds-democratic-revival",
-        "title": "トランプの選挙ブーメラン — 共和党の過剰がいかに民主党の復活の種をまくか",
-        "url": "https://nowpattern.com/trumps-electoral-boomerang-how-gop-overreach-seeds-democratic-revival/",
-        "published_at": "2026-03-28T22:13:11.000Z"
-      },
-      {
-        "slug": "hormuz-strait-ultimatum-trumps-48-hour-threat-triggers-escalation-spiral-with-iran",
-        "title": "ホルムズ海峡の最後通牒 — トランプの48時間の脅威がイランとの対立の螺旋を引き起こす",
-        "url": "https://nowpattern.com/hormuz-strait-ultimatum-trumps-48-hour-threat-triggers-escalation-spiral-with-iran/",
-        "published_at": "2026-03-28T22:06:07.000Z"
-      },
-      {
-        "slug": "trumps-dhs-deal-reversal-when-shutdown-leverage-backfires-on-the-dealmaker",
-        "title": "トランプのDHS取引逆転 — シャットダウンのレバレッジが取引の達人に裏目に出るとき",
-        "url": "https://nowpattern.com/trumps-dhs-deal-reversal-when-shutdown-leverage-backfires-on-the-dealmaker/",
-        "published_at": "2026-03-28T21:49:14.000Z"
-      },
-      {
-        "slug": "new-zealands-fuel-subsidy-when-energy-crises-birth-new-welfare-states",
-        "title": "ニュージーランドの燃料補助金 — エネルギー危機が新しい福祉国家を生み出すとき",
-        "url": "https://nowpattern.com/new-zealands-fuel-subsidy-when-energy-crises-birth-new-welfare-states/",
-        "published_at": "2026-03-28T21:34:27.000Z"
-      },
-      {
-        "slug": "horumuzufeng-suo-28ri-mu-toyuan-you-100nogong-fang-ting-zhan-jiao-she-gafu-iyin-su-dui-li-noluo-xuan",
-        "title": "ホルムズ封鎖28日目と原油$100の攻防 — 停戦交渉が覆い隠す「対立の螺旋」",
-        "url": "https://nowpattern.com/horumuzufeng-suo-28ri-mu-toyuan-you-100nogong-fang-ting-zhan-jiao-she-gafu-iyin-su-dui-li-noluo-xuan/",
-        "published_at": "2026-03-28T12:12:27.000Z"
-      },
-      {
-        "slug": "en-frbli-xia-gejian-song-rilian-sok-zhong-dong-risukutoinhurezai-ran-gafu-rujin-rong-zheng-ce-nojing-lu-yi-cun",
-        "title": "Fed Continues to Hold Off on Rate Cuts — Middle East",
-        "url": "https://nowpattern.com/en/en-frbli-xia-gejian-song-rilian-sok-zhong-dong-risukutoinhurezai-ran-gafu-rujin-rong-zheng-ce-nojing-lu-yi-cun/",
-        "published_at": "2026-03-28T11:03:26.000Z"
-      },
-      {
-        "slug": "en-ri-ben-noyu-suan-zheng-zhi-zan-ding-yu-suan-fu-shang-gaying-suyu-ye-dang-xie-diao-noshi-bai-tozhi-du-pi-lao",
-        "title": "Japan's Budget Politics — Provisional Budget's Emergence",
-        "url": "https://nowpattern.com/en/en-ri-ben-noyu-suan-zheng-zhi-zan-ding-yu-suan-fu-shang-gaying-suyu-ye-dang-xie-diao-noshi-bai-tozhi-du-pi-lao/",
-        "published_at": "2026-03-28T11:01:51.000Z"
-      },
-      {
-        "slug": "ri-ben-noyu-suan-zheng-zhi-zan-ding-yu-suan-fu-shang-gaying-suyu-ye-dang-xie-diao-noshi-bai-tozhi-du-pi-lao",
-        "title": "日本の予算政治 — 暫定予算浮上が映す与野党「協調の失敗」と制度疲労",
-        "url": "https://nowpattern.com/ri-ben-noyu-suan-zheng-zhi-zan-ding-yu-suan-fu-shang-gaying-suyu-ye-dang-xie-diao-noshi-bai-tozhi-du-pi-lao/",
-        "published_at": "2026-03-28T09:41:02.000Z"
-      }
-    ]
+    "count": 0,
+    "samples": []
+  },
+  "release_manifest_counts": {
+    "published_total": 474,
+    "public_truth_allowed": 474,
+    "distribution_allowed": 184,
+    "truth_blocked": 0,
+    "distribution_blocked": 290,
+    "high_risk_unapproved": 0,
+    "drafted_truth_failures": 0,
+    "draft_failures": 0,
+    "drafted_human_review_required": 0,
+    "human_review_draft_failures": 0
+  },
+  "release_manifest_generated_at": "2026-04-03T19:59:07Z",
+  "policy": {
+    "required_langs": [
+      "ja",
+      "en"
+    ],
+    "max_orphan_oracle_articles": 0,
+    "max_manifest_tracker_count_delta": 0,
+    "max_report_timestamp_delta_seconds": 1800,
+    "max_mojibake_strings": 0,
+    "min_distribution_allowed_ratio_pct": 30.0,
+    "max_high_risk_unapproved_ratio_pct": 25.0
   },
   "langs": {
     "ja": {
       "lang": "ja",
       "formal_predictions_seen": 1121,
-      "same_lang_analysis": 96,
-      "cross_lang_fallback": 296,
-      "hidden_no_live_article": 729,
+      "same_lang_analysis": 99,
+      "cross_lang_fallback": 0,
+      "hidden_cross_lang_only": 197,
+      "hidden_no_live_article": 1022,
+      "public_in_play_rows": 3,
+      "public_awaiting_rows": 84,
+      "public_resolved_rows": 12,
       "hidden_samples": [
         {
           "prediction_id": "NP-2026-0007",
           "title": "EUがAppleに2兆円の制裁金を課した構造",
           "article_slug": "eugaappleni2zhao-yuan-nozhi-cai-jin-woke-sitagou-zao-dmashang-su-to-puratutohuomuzhi-pei-nomo-lu",
-          "ghost_url": "https://nowpattern.com/eugaappleni2zhao-yuan-nozhi-cai-jin-woke-sitagou-zao-dmashang-su-to-puratutohuomuzhi-pei-nomo-lu/"
+          "ghost_url": "https://nowpattern.com/eugaappleni2zhao-yuan-nozhi-cai-jin-woke-sitagou-zao-dmashang-su-to-puratutohuomuzhi-pei-nomo-lu/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0008",
+          "title": "NASAが火星でAI自律走行に成功 — 28年間の人間操縦時代の終わりの始まり",
+          "article_slug": "nasa-mars-ai-autonomous-driving",
+          "ghost_url": "https://nowpattern.com/nasa-mars-ai-autonomous-driving/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0009",
+          "title": "ヴィタリック「AIの暴走は間違い」警告 — d/accが描く人間中心のAI×暗号資産",
+          "article_slug": "vuitarituku-ainobao-zou-hajian-wei-i-jing-gao-d-accgamiao-kuren-jian-zhong-xin-noaixan-hao-zi-chan",
+          "ghost_url": "https://nowpattern.com/vuitarituku-ainobao-zou-hajian-wei-i-jing-gao-d-accgamiao-kuren-jian-zhong-xin-noaixan-hao-zi-chan/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0014",
+          "title": "AIエージェントが「買い物」を始めた構造 — 50ドルの実験から15兆ドルの未来へ",
+          "article_slug": "aiezientoga-mai-iwu-woshi-metagou-zao-50dorunoshi-yan-kara15zhao-dorunowei-lai-he",
+          "ghost_url": "https://nowpattern.com/aiezientoga-mai-iwu-woshi-metagou-zao-50dorunoshi-yan-kara15zhao-dorunowei-lai-he/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0019",
           "title": "イランがホルムズ海峡を一時封鎖した構造 — 世界の石油の20%を人質にとる交渉術",
           "article_slug": "irangahorumuzuhai-xia-woyi-shi-feng-suo-sitagou-zao-shi-jie-noshi-you-no20-woren-zhi-nitorujiao-she-shu",
-          "ghost_url": "https://nowpattern.com/irangahorumuzuhai-xia-woyi-shi-feng-suo-sitagou-zao-shi-jie-noshi-you-no20-woren-zhi-nitorujiao-she-shu/"
+          "ghost_url": "https://nowpattern.com/irangahorumuzuhai-xia-woyi-shi-feng-suo-sitagou-zao-shi-jie-noshi-you-no20-woren-zhi-nitorujiao-she-shu/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0021",
           "title": "BTCは2026年3月末までに9万ドルを回復するか",
           "article_slug": "btc-90k-march-31-2026",
-          "ghost_url": "https://nowpattern.com/btc-90k-march-31-2026/"
+          "ghost_url": "https://nowpattern.com/btc-90k-march-31-2026/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0022",
           "title": "Trump Section 122 15%関税は2026年7月の期限後も継続するか",
           "article_slug": "trumpno-section-122-15-guan-shui-ha2026nian-7yue-yi-jiang-mosok-kunoka-zui-gao-cai-gatui-ketaieepanodai-ti-shou-duan-to150ri-noqi-xian",
-          "ghost_url": "https://nowpattern.com/trumpno-section-122-15-guan-shui-ha2026nian-7yue-yi-jiang-mosok-kunoka-zui-gao-cai-gatui-ketaieepanodai-ti-shou-duan-to150ri-noqi-xian/"
+          "ghost_url": "https://nowpattern.com/trumpno-section-122-15-guan-shui-ha2026nian-7yue-yi-jiang-mosok-kunoka-zui-gao-cai-gatui-ketaieepanodai-ti-shou-duan-to150ri-noqi-xian/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0023",
           "title": "日本の暗号資産ETF解禁2028年 — 2,200兆円の家計資産が動く経路依存の転換点",
           "article_slug": "ri-ben-noan-hao-zi-chan-etfjie-jin-2028nian-2-200zhao-yuan-nojia-ji-zi-chan-gadong-kujing-lu-yi-cun-nozhuan-huan-dian",
-          "ghost_url": "https://nowpattern.com/ri-ben-noan-hao-zi-chan-etfjie-jin-2028nian-2-200zhao-yuan-nojia-ji-zi-chan-gadong-kujing-lu-yi-cun-nozhuan-huan-dian/"
+          "ghost_url": "https://nowpattern.com/ri-ben-noan-hao-zi-chan-etfjie-jin-2028nian-2-200zhao-yuan-nojia-ji-zi-chan-gadong-kujing-lu-yi-cun-nozhuan-huan-dian/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0024",
           "title": "AI失業ドミノ — ヘイズが描く「法定通貨の自壊」とビットコイン最高値への道筋",
           "article_slug": "aishi-ye-domino-heizugamiao-ku-fa-ding-tong-huo-nozi-huai-tobitutokoinzui-gao-zhi-henodao-jin",
-          "ghost_url": "https://nowpattern.com/aishi-ye-domino-heizugamiao-ku-fa-ding-tong-huo-nozi-huai-tobitutokoinzui-gao-zhi-henodao-jin/"
+          "ghost_url": "https://nowpattern.com/aishi-ye-domino-heizugamiao-ku-fa-ding-tong-huo-nozi-huai-tobitutokoinzui-gao-zhi-henodao-jin/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0025",
           "title": "ハメネイ師暗殺後 — イランは2026年6月30日までに新最高指導者を正式決定するか",
           "article_slug": "khamenei-assassination-iran-supreme-leader-succession-2026",
-          "ghost_url": "https://nowpattern.com/khamenei-assassination-iran-supreme-leader-succession-2026/"
+          "ghost_url": "https://nowpattern.com/khamenei-assassination-iran-supreme-leader-succession-2026/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0026",
           "title": "Trump Section 122 15%関税は150日期限（2026年7月24日）前に大幅撤回されるか",
           "article_slug": "trumpnosection-122guan-shui-che-hui-sinariowojie-pou-suru-150ri-noshi-ji-tozhong-jian-xuan-ju-noxia-jian-de",
-          "ghost_url": "https://nowpattern.com/trumpnosection-122guan-shui-che-hui-sinariowojie-pou-suru-150ri-noshi-ji-tozhong-jian-xuan-ju-noxia-jian-de/"
+          "ghost_url": "https://nowpattern.com/trumpnosection-122guan-shui-che-hui-sinariowojie-pou-suru-150ri-noshi-ji-tozhong-jian-xuan-ju-noxia-jian-de/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0027",
           "title": "ビットコインは2026年3月末に$70,000を超えるか",
           "article_slug": "btc-70k-march-31-2026",
-          "ghost_url": "https://nowpattern.com/btc-70k-march-31-2026/"
+          "ghost_url": "https://nowpattern.com/btc-70k-march-31-2026/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0028",
           "title": "2026年12月31日までに、少なくとも100社のフォーチュン500企業がGPT-6を本番環境で使用するようになるでしょうか？",
           "article_slug": "gpt-6-multimodal-launch-openais-platform-power-play-reshapes-the-ai-stack",
-          "ghost_url": "https://nowpattern.com/en/gpt-6-multimodal-launch-openais-platform-power-play-reshapes-the-ai-stack/"
+          "ghost_url": "https://nowpattern.com/en/gpt-6-multimodal-launch-openais-platform-power-play-reshapes-the-ai-stack/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0029",
+          "title": "中国は、台湾が2026年3月に行う軍事演習の2週間以内に、台湾海峡で同規模またはそれ以上の規模の軍事演習を実施するだろうか？",
+          "article_slug": "taiwans-largest-military-drill-the-escalation-spiral-that-could-redraw-asias-security-map",
+          "ghost_url": "https://nowpattern.com/en/taiwans-largest-military-drill-the-escalation-spiral-that-could-redraw-asias-security-map/",
+          "reason": "cross_lang_only"
         },
         {
           "prediction_id": "NP-2026-0030",
           "title": "独立した第三者機関（英国AI安全研究所、METR、または同等の機関）は、DeepMindの2026年プロトタイプが、DeepMind独自のAGIフレームワークにおいて、2026年12月31日までにレベル2（「有能」）を満たすことを確認するか？",
           "article_slug": "deepminds-agi-prototype-the-race-to-define-intelligence-itself-2",
-          "ghost_url": "https://nowpattern.com/en/deepminds-agi-prototype-the-race-to-define-intelligence-itself-2/"
+          "ghost_url": "https://nowpattern.com/en/deepminds-agi-prototype-the-race-to-define-intelligence-itself-2/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0031",
           "title": "2026年4月4日までに、アメリカと中国の海軍艦艇が南シナ海で物理的な衝突や交戦をする可能性はありますか？",
           "article_slug": "scarborough-shoal-standoff-the-escalation-spiral-that-could-redraw-asias-map",
-          "ghost_url": "https://nowpattern.com/en/scarborough-shoal-standoff-the-escalation-spiral-that-could-redraw-asias-map/"
+          "ghost_url": "https://nowpattern.com/en/scarborough-shoal-standoff-the-escalation-spiral-that-could-redraw-asias-map/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0032",
           "title": "NATOは、2026年3月14日までに、ロシアの極超音速ミサイル実験に直接言及する新たなミサイル防衛構想または具体的な軍事的対抗措置を正式に発表するだろうか？",
           "article_slug": "russias-hypersonic-missile-test-escalation-spiral-meets-natos-strategic-dilemma",
-          "ghost_url": "https://nowpattern.com/en/russias-hypersonic-missile-test-escalation-spiral-meets-natos-strategic-dilemma/"
+          "ghost_url": "https://nowpattern.com/en/russias-hypersonic-missile-test-escalation-spiral-meets-natos-strategic-dilemma/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0033",
           "title": "テザー（USDT）は、2026年12月31日までにステーブルコイン規制を完全に遵守できるか？",
           "article_slug": "us-stablecoin-regulation-the-architecture-of-controlled-innovation",
-          "ghost_url": "https://nowpattern.com/en/us-stablecoin-regulation-the-architecture-of-controlled-innovation/"
+          "ghost_url": "https://nowpattern.com/en/us-stablecoin-regulation-the-architecture-of-controlled-innovation/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0034",
+          "title": "2027年12月31日までに、少なくとも5つの非EU加盟国が、EU AI法を明確なモデルとして包括的なAI法を制定するだろうか？",
+          "article_slug": "eu-ai-act-enforcement-begins-the-brussels-effect-reshapes-global-tech-governance",
+          "ghost_url": "https://nowpattern.com/en/eu-ai-act-enforcement-begins-the-brussels-effect-reshapes-global-tech-governance/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0035",
           "title": "2026年6月30日に、ビットコインの価格は12万ドル以上を維持しているだろうか？",
           "article_slug": "bitcoins-120k-breakthrough-institutional-fomo-rewrites-the-rules-of-sound-money",
-          "ghost_url": "https://nowpattern.com/en/bitcoins-120k-breakthrough-institutional-fomo-rewrites-the-rules-of-sound-money/"
+          "ghost_url": "https://nowpattern.com/en/bitcoins-120k-breakthrough-institutional-fomo-rewrites-the-rules-of-sound-money/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0036",
           "title": "イーサリアムの平均ステーキング利回りは、2026年6月30日までに年率8%超を維持するだろうか？",
           "article_slug": "ethereum-staking-yields-hit-10-the-gravity-well-reshaping-defi-capital-flows",
-          "ghost_url": "https://nowpattern.com/en/ethereum-staking-yields-hit-10-the-gravity-well-reshaping-defi-capital-flows/"
+          "ghost_url": "https://nowpattern.com/en/ethereum-staking-yields-hit-10-the-gravity-well-reshaping-defi-capital-flows/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0037",
+          "title": "アメリカ合衆国議会は、2026年9月30日までに、イランを対象とした正式な武力行使承認（AUMF）について、本会議で採決を行うか？",
+          "article_slug": "iran-mission-drift-when-congress-cannot-define-what-victory-means",
+          "ghost_url": "https://nowpattern.com/en/iran-mission-drift-when-congress-cannot-define-what-victory-means/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0038",
+          "title": "中国は、2026年4月30日までに台湾周辺で、海軍封鎖または（全面または部分的な）検疫（24時間以上商業輸送を停止させる演習を含む）を実施するか？",
+          "article_slug": "us-missile-shield-near-taiwan-the-escalation-spiral-that-could-redraw-the-pacific",
+          "ghost_url": "https://nowpattern.com/en/us-missile-shield-near-taiwan-the-escalation-spiral-that-could-redraw-the-pacific/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0039",
+          "title": "2026年12月31日までに、USDCの総市場規模はUSDTを上回るだろうか？",
+          "article_slug": "us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance",
+          "ghost_url": "https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0040",
+          "title": "イスラエルは2026年6月30日までにイランの核施設に対して先制軍事攻撃を行うだろうか？",
+          "article_slug": "irans-missile-test-the-escalation-spiral-that-could-redraw-the-middle-east",
+          "ghost_url": "https://nowpattern.com/en/irans-missile-test-the-escalation-spiral-that-could-redraw-the-middle-east/",
+          "reason": "cross_lang_only"
         },
         {
           "prediction_id": "NP-2026-0041",
           "title": "2026年6月30日までにビットコインは15万ドルに到達するだろうか？",
           "article_slug": "bitcoins-120k-breakout-institutional-capital-rewrites-the-rules-of-digital-gold",
-          "ghost_url": "https://nowpattern.com/en/bitcoins-120k-breakout-institutional-capital-rewrites-the-rules-of-digital-gold/"
+          "ghost_url": "https://nowpattern.com/en/bitcoins-120k-breakout-institutional-capital-rewrites-the-rules-of-digital-gold/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0042",
           "title": "2026年4月30日までに、ホルムズ海峡が継続的に閉鎖（商業輸送が48時間以上連続して停止）される事態は発生するか？",
           "article_slug": "us-sinks-iranian-warship-the-escalation-spiral-nobody-can-exit-2",
-          "ghost_url": "https://nowpattern.com/en/us-sinks-iranian-warship-the-escalation-spiral-nobody-can-exit-2/"
+          "ghost_url": "https://nowpattern.com/en/us-sinks-iranian-warship-the-escalation-spiral-nobody-can-exit-2/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0043",
+          "title": "2026年6月5日までに、スペインはイラン戦争への反対に関連して、米国から新たな関税や貿易制裁を受けることになるだろうか？",
+          "article_slug": "spain-defies-trump-on-iran-alliance-strain-meets-imperial-overreach",
+          "ghost_url": "https://nowpattern.com/en/spain-defies-trump-on-iran-alliance-strain-meets-imperial-overreach/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0044",
+          "title": "オーストラリアは、2026年4月5日までに中東からの民間人退避のために、ADF（オーストラリア国防軍）の軍事資産（航空機または艦艇）を派遣するだろうか？",
+          "article_slug": "australias-middle-east-evacuation-domestic-politics-weaponize-a-repatriation-crisis",
+          "ghost_url": "https://nowpattern.com/en/australias-middle-east-evacuation-domestic-politics-weaponize-a-repatriation-crisis/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0045",
+          "title": "スペインの国防費は2026年12月31日までにGDPの2%に達するだろうか？",
+          "article_slug": "sanchezs-no-to-war-natos-fracture-line-splits-open-in-madrid",
+          "ghost_url": "https://nowpattern.com/en/sanchezs-no-to-war-natos-fracture-line-splits-open-in-madrid/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0046",
+          "title": "中東紛争によるリスクプレミアムの上昇により、2026年第2四半期（4月～6月）のロシア産ウラル原油の平均輸出価格は1バレルあたり75ドルを超えるか？",
+          "article_slug": "russias-wartime-windfall-how-middle-east-chaos-funds-moscows-war-machine",
+          "ghost_url": "https://nowpattern.com/en/russias-wartime-windfall-how-middle-east-chaos-funds-moscows-war-machine/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0047",
+          "title": "2026年12月31日までに、USDCの総市場規模がUSDTを上回るだろうか？",
+          "article_slug": "us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance",
+          "ghost_url": "https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0048",
+          "title": "中国は2026年6月30日までに、米国の防衛関連物資を対象とした新たな重要鉱物の輸出規制を課すだろうか？",
+          "article_slug": "trumps-iran-gambit-how-middle-east-overreach-hands-china-its-taiwan-window",
+          "ghost_url": "https://nowpattern.com/en/trumps-iran-gambit-how-middle-east-overreach-hands-china-its-taiwan-window/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0049",
+          "title": "アメリカ合衆国上院は、2026年9月30日までに包括的な暗号資産市場構造法案（GENIUS法案の類似法案）を可決するだろうか？",
+          "article_slug": "trump-vs-banks-on-stablecoins-the-regulatory-capture-war-reshaping-crypto",
+          "ghost_url": "https://nowpattern.com/en/trump-vs-banks-on-stablecoins-the-regulatory-capture-war-reshaping-crypto/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0050",
+          "title": "イランは2026年4月4日までに、ホルムズ海峡を封鎖、または（少なくとも商船に対する1件以上の攻撃が確認される形で）航行を著しく妨害しようと試みるだろうか？",
+          "article_slug": "us-sinks-iranian-warship-the-escalation-spiral-nobody-can-stop",
+          "ghost_url": "https://nowpattern.com/en/us-sinks-iranian-warship-the-escalation-spiral-nobody-can-stop/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0051",
+          "title": "ペンタゴンの国家防衛戦略は、2026年12月31日までに、中国を最優先とするだけでなく、ヨーロッパと中東における具体的な多正面作戦の戦力要件を明記して公表されるか？",
+          "article_slug": "pentagon-strategy-under-fire-colbys-china-first-doctrine-splits-the-gop-on-global-posture",
+          "ghost_url": "https://nowpattern.com/en/pentagon-strategy-under-fire-colbys-china-first-doctrine-splits-the-gop-on-global-posture/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0052",
+          "title": "アメリカ合衆国議会は、2026年6月30日までに、イランに対する軍事作戦を制限または停止させるための戦争権限決議を可決するだろうか？",
+          "article_slug": "americas-iran-strike-when-alliance-loyalty-overrides-strategic-logic",
+          "ghost_url": "https://nowpattern.com/en/americas-iran-strike-when-alliance-loyalty-overrides-strategic-logic/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0053",
+          "title": "DFC（米国国際開発金融公社）は、2026年9月30日までにペルシャ湾の海上輸送に対して、少なくとも50億ドルの政治リスク保険を発行するだろうか？",
+          "article_slug": "trumps-oil-tanker-shield-the-hidden-architecture-of-wartime-energy-control",
+          "ghost_url": "https://nowpattern.com/en/trumps-oil-tanker-shield-the-hidden-architecture-of-wartime-energy-control/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0054",
+          "title": "アメリカ合衆国議会は、2026年6月30日までに、DHS（国土安全保障省）に対する年間予算の本予算（継続予算決議ではない）を可決するだろうか？",
+          "article_slug": "dhs-funding-standoff-how-war-abroad-fuels-the-immigration-stalemate-at-home",
+          "ghost_url": "https://nowpattern.com/en/dhs-funding-standoff-how-war-abroad-fuels-the-immigration-stalemate-at-home/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0055",
           "title": "2026年3月8日までに、南シナ海での海軍ニアミス衝突に関して、アメリカまたは中国が正式な外交抗議（公式な申し入れや大使の召喚など）を行うだろうか？",
           "article_slug": "south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit",
-          "ghost_url": "https://nowpattern.com/en/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit/"
+          "ghost_url": "https://nowpattern.com/en/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0056",
+          "title": "台湾は、2026年3月のドローン侵入に対応して、2026年3月20日までに、実弾射撃訓練を含む特定の名称の軍事演習を実施する予定ですか？",
+          "article_slug": "taiwans-drone-crisis-beijings-gray-zone-escalation-spiral-enters-a-new-phase",
+          "ghost_url": "https://nowpattern.com/en/taiwans-drone-crisis-beijings-gray-zone-escalation-spiral-enters-a-new-phase/",
+          "reason": "cross_lang_only"
         },
         {
           "prediction_id": "NP-2026-0057",
           "title": "NATOは、現在行われている約4万人の増強に加え、2026年3月15日までに東ヨーロッパへの追加部隊派遣を正式に発表するだろうか？",
           "article_slug": "geneva-talks-collapse-nuclear-brinkmanship-locks-the-escalation-spiral",
-          "ghost_url": "https://nowpattern.com/en/geneva-talks-collapse-nuclear-brinkmanship-locks-the-escalation-spiral/"
+          "ghost_url": "https://nowpattern.com/en/geneva-talks-collapse-nuclear-brinkmanship-locks-the-escalation-spiral/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0058",
+          "title": "2026年12月31日までに、ステーブルコインの総市場規模は2760億ドル（基準値2300億ドルから20%増）を超えるか？",
+          "article_slug": "us-stablecoin-bill-regulation-crowns-the-incumbents",
+          "ghost_url": "https://nowpattern.com/en/us-stablecoin-bill-regulation-crowns-the-incumbents/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0059",
           "title": "2027年6月30日までに、Am Law 200の法律事務所の少なくとも30%が、GPT-6（または同等の推論AI）を少なくとも1つの主要なワークフローに統合するだろうか？",
           "article_slug": "gpt-6-and-the-reasoning-revolution-ais-professional-grade-leap",
-          "ghost_url": "https://nowpattern.com/en/gpt-6-and-the-reasoning-revolution-ais-professional-grade-leap/"
+          "ghost_url": "https://nowpattern.com/en/gpt-6-and-the-reasoning-revolution-ais-professional-grade-leap/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0060",
           "title": "2026年6月30日に、ビットコインの価格は12万ドル以上を維持しているだろうか？",
           "article_slug": "bitcoins-120k-breakout-institutional-fomo-rewrites-the-digital-gold-playbook",
-          "ghost_url": "https://nowpattern.com/en/bitcoins-120k-breakout-institutional-fomo-rewrites-the-digital-gold-playbook/"
+          "ghost_url": "https://nowpattern.com/en/bitcoins-120k-breakout-institutional-fomo-rewrites-the-digital-gold-playbook/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0061",
+          "title": "2026年7月1日までに、イーサリアムのスポット価格は主要取引所（Binance、Coinbase、Kraken）のいずれかで7,000米ドルを超えるか？",
+          "article_slug": "ethereums-10-staking-yield-the-gravity-well-reshaping-defi-capital-flows",
+          "ghost_url": "https://nowpattern.com/en/ethereums-10-staking-yield-the-gravity-well-reshaping-defi-capital-flows/",
+          "reason": "cross_lang_only"
         },
         {
           "prediction_id": "NP-2026-0062",
           "title": "2028年6月30日までに、G7諸国のうち少なくとも3か国が、AGI（汎用人工知能）クラスのAIシステムに特化した法律を制定するだろうか？",
           "article_slug": "deepminds-agi-prototype-the-regulatory-reckoning-that-nobody-is-ready-for",
-          "ghost_url": "https://nowpattern.com/en/deepminds-agi-prototype-the-regulatory-reckoning-that-nobody-is-ready-for/"
+          "ghost_url": "https://nowpattern.com/en/deepminds-agi-prototype-the-regulatory-reckoning-that-nobody-is-ready-for/",
+          "reason": "no_live_article"
         },
         {
-          "prediction_id": "NP-2026-0076",
-          "title": "2026年3月に南シナ海で発生した米中間の海軍ニアミス事件について、アメリカまたは中国は2026年3月8日までに正式な外交抗議を行うだろうか？",
-          "article_slug": "south-china-sea-near-collision-the-escalation-spiral-that-could-sink-us-china-trade-talks",
-          "ghost_url": "https://nowpattern.com/en/south-china-sea-near-collision-the-escalation-spiral-that-could-sink-us-china-trade-talks/"
+          "prediction_id": "NP-2026-0063",
+          "title": "アメリカ合衆国下院は、2026年3月31日までにイラン戦争権限決議を可決するだろうか？",
+          "article_slug": "war-powers-showdown-congresss-shrinking-grip-on-military-authority",
+          "ghost_url": "https://nowpattern.com/en/war-powers-showdown-congresss-shrinking-grip-on-military-authority/",
+          "reason": "no_live_article"
         },
         {
-          "prediction_id": "NP-2026-0079",
-          "title": "NATOは2026年3月16日までに、東ヨーロッパへの追加部隊派遣を正式に発表するだろうか？",
-          "article_slug": "geneva-talks-collapse-the-escalation-spiral-nato-cannot-exit",
-          "ghost_url": "https://nowpattern.com/en/geneva-talks-collapse-the-escalation-spiral-nato-cannot-exit/"
+          "prediction_id": "NP-2026-0064",
+          "title": "2026年6月30日に、イングランド銀行の政策金利は4.50%以上を維持しているでしょうか？",
+          "article_slug": "uk-mortgage-shock-how-iran-war-risk-is-repricing-british-household-debt",
+          "ghost_url": "https://nowpattern.com/en/uk-mortgage-shock-how-iran-war-risk-is-repricing-british-household-debt/",
+          "reason": "cross_lang_only"
         },
         {
-          "prediction_id": "NP-2026-0081",
-          "title": "2027年6月30日までに、アメリカのトップ10法律事務所（AmLaw 10）のうち少なくとも3社が、AIの能力を理由に、新卒採用弁護士の人数を15%以上削減することを公に発表するだろうか？",
-          "article_slug": "gpt-6-and-the-reasoning-revolution-ais-professional-class-disruption-begins",
-          "ghost_url": "https://nowpattern.com/en/gpt-6-and-the-reasoning-revolution-ais-professional-class-disruption-begins/"
-        },
-        {
-          "prediction_id": "NP-2026-0082",
-          "title": "2026年12月31日までに、南シナ海において米中の軍艦または軍用機が物理的に接触・衝突する事案は発生するか？",
-          "article_slug": "nan-sinahai-nohuo-yao-ku-mi-zhong-jun-shi-yan-xi-notong-shi-zhan-kai-gasheng-mu-ou-fa-chong-tu-nogou-zao-de-risuku",
-          "ghost_url": "https://nowpattern.com/nan-sinahai-nohuo-yao-ku-mi-zhong-jun-shi-yan-xi-notong-shi-zhan-kai-gasheng-mu-ou-fa-chong-tu-nogou-zao-de-risuku/"
-        },
-        {
-          "prediction_id": "NP-2026-0083",
-          "title": "2026年7月1日までに、ETH（イーサリアム）の価格は一度でも7,000ドルを超えるだろうか？",
-          "article_slug": "ethereums-10-staking-yield-the-gravity-well-reshaping-defi-capital-flows-2",
-          "ghost_url": "https://nowpattern.com/en/ethereums-10-staking-yield-the-gravity-well-reshaping-defi-capital-flows-2/"
-        },
-        {
-          "prediction_id": "NP-2026-0092",
-          "title": "2026年12月31日までに北朝鮮が日本の排他的経済水域内に弾道ミサイルを着弾させるか？",
-          "article_slug": "bei-zhao-xian-icbmfa-she-zai-kai-dui-hua-nochuang-gabi-zitahou-nodui-li-noluo-xuan-gou-zao",
-          "ghost_url": "https://nowpattern.com/bei-zhao-xian-icbmfa-she-zai-kai-dui-hua-nochuang-gabi-zitahou-nodui-li-noluo-xuan-gou-zao/"
-        },
-        {
-          "prediction_id": "NP-2026-0103",
-          "title": "2026年3月8日までに、今回の海軍ニアミスに関して、アメリカ合衆国または中国のいずれかが、正式な外交抗議（外務省または国務省からの公式声明で、明確に「抗議」または「強い非難」という用語を使用し、具体的な是正措置を要求するものと定義される）を発するだろうか？",
-          "article_slug": "south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-2",
-          "ghost_url": "https://nowpattern.com/en/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-2/"
-        },
-        {
-          "prediction_id": "NP-2026-0105",
-          "title": "NATOは2026年3月9日までに、東ヨーロッパへの追加の部隊派遣（以前に予定されていたローテーション以外）を発表するだろうか？",
-          "article_slug": "geneva-talks-collapse-nuclear-brinkmanship-locks-the-escalation-spiral-2",
-          "ghost_url": "https://nowpattern.com/en/geneva-talks-collapse-nuclear-brinkmanship-locks-the-escalation-spiral-2/"
-        },
-        {
-          "prediction_id": "NP-2026-0108",
-          "title": "2027年3月31日までに、Am Law 50にランクインする法律事務所のうち、少なくとも3社が、顧客対応の法務業務へのGPT-6の導入を公に発表するだろうか？",
-          "article_slug": "gpt-6-and-the-reasoning-revolution-when-ai-outthinks-the-professional-class",
-          "ghost_url": "https://nowpattern.com/en/gpt-6-and-the-reasoning-revolution-when-ai-outthinks-the-professional-class/"
-        },
-        {
-          "prediction_id": "NP-2026-0109",
-          "title": "2026年7月1日までに、イーサリアムのスポット価格は一度でも7,000ドルを超えるだろうか？",
-          "article_slug": "ethereums-10-staking-yield-the-gravity-well-reshaping-defi-capital-flows-3",
-          "ghost_url": "https://nowpattern.com/en/ethereums-10-staking-yield-the-gravity-well-reshaping-defi-capital-flows-3/"
-        },
-        {
-          "prediction_id": "NP-2026-0113",
-          "title": "2027年12月31日より前に、ビットコインのスポット価格が20万ドルを超えるか?",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0114",
-          "title": "2028年12月31日より前に、DeepMind・OpenAI・AnthropicのいずれかがAGI達成を公式に宣言するか（すべての主要経済領域でエコノミスト設計テストを通過するAIとして定義）",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0115",
-          "title": "ドナルド・トランプは弾劾罷免または憲法修正25条発動なしに第2期の全任期（2029年1月20日まで）を全うするか",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0116",
-          "title": "2027年12月31日より前に、ウクライナが正式にNATOの加盟行動計画（MAP）または同等の安全保障保証枠組みを受けるか",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0117",
-          "title": "2027年12月31日より前に、EthereumのSpot価格が1万ドルを超えるか",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0118",
-          "title": "2028年12月31日より前に、日本金融庁（FSA）が個人投資家向けのビットコインスポットETFを正式承認するか",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0119",
-          "title": "2028年12月31日より前に、米国・EU・英国・中国を含む拘束力のあるAI国際ガバナンス条約が批准されるか",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0120",
-          "title": "2027年12月31日より前に、米国10年国債利回りが6.5%を超えるか",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0121",
-          "title": "2027年12月31日より前に、中国が台湾への持続的な軍事封鎖（国際海運を48時間以上継続的に遮断と定義）を実施するか",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0122",
-          "title": "2027年12月31日より前に、OpenAIが年収10億ドル以上（ARR）を達成し、かつ収益化への道筋（必ずしも黒字でなくてよい）を示すか",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0127",
-          "title": "2026年3月31日に予定されているトランプ・習近平会談は、延期や中止にならず、2026年4月5日までに予定通り開催されるだろうか？",
-          "article_slug": "spratly-standoff-the-escalation-spiral-that-neither-side-can-afford-to-lose",
-          "ghost_url": "https://nowpattern.com/en/spratly-standoff-the-escalation-spiral-that-neither-side-can-afford-to-lose/"
-        },
-        {
-          "prediction_id": "NP-2026-0129",
-          "title": "台湾海峡でのドローン事件にもかかわらず、2026年3月31日に北京で開催予定のトランプ・習近平首脳会談は、予定通り（中止や首脳レベル以下の格下げなしに）実施されるだろうか？",
-          "article_slug": "taiwan-strait-drone-intercept-the-escalation-spiral-neither-side-can-afford",
-          "ghost_url": "https://nowpattern.com/en/taiwan-strait-drone-intercept-the-escalation-spiral-neither-side-can-afford/"
-        },
-        {
-          "prediction_id": "NP-2026-0131",
-          "title": "イランはサイバー攻撃への報復として、2026年4月30日までにIAEA査察官の核施設への立ち入りを正式に制限するだろうか？",
-          "article_slug": "irans-nuclear-cyberattack-the-escalation-spiral-nobody-can-claim",
-          "ghost_url": "https://nowpattern.com/en/irans-nuclear-cyberattack-the-escalation-spiral-nobody-can-claim/"
-        },
-        {
-          "prediction_id": "NP-2026-0133",
-          "title": "NATOは、ロシアの2026年の極超音速ミサイル実験に直接対応して、2026年6月30日までに東ヨーロッパの加盟国に追加の軍事部隊（最低1万人規模の兵力またはそれに相当する資産）の配備を発表するか？",
-          "article_slug": "russias-hypersonic-missile-test-the-escalation-spiral-nato-cannot-ignore",
-          "ghost_url": "https://nowpattern.com/en/russias-hypersonic-missile-test-the-escalation-spiral-nato-cannot-ignore/"
-        },
-        {
-          "prediction_id": "NP-2026-0143",
-          "title": "アメリカと中国は、2026年6月7日までに、台湾海峡における航空機遭遇に特化した正式な軍事コミュニケーション協定を締結するだろうか？",
-          "article_slug": "taiwan-strait-drone-intercept-the-escalation-spiral-nobody-can-exit",
-          "ghost_url": "https://nowpattern.com/en/taiwan-strait-drone-intercept-the-escalation-spiral-nobody-can-exit/"
-        },
-        {
-          "prediction_id": "NP-2026-0144",
-          "title": "NATOは2026年3月21日までに、ロシアの防衛産業セクターを明確に標的とした新たな正式な制裁パッケージを発表するだろうか？",
-          "article_slug": "russias-hypersonic-missile-test-the-escalation-spiral-nato-cannot-ignore-2",
-          "ghost_url": "https://nowpattern.com/en/russias-hypersonic-missile-test-the-escalation-spiral-nato-cannot-ignore-2/"
-        },
-        {
-          "prediction_id": "NP-2026-0145",
-          "title": "イランは2026年3月21日までに、自国の核施設に対するサイバー攻撃について、米国またはイスラエルを公式に、かつ公然と非難するだろうか？",
-          "article_slug": "irans-nuclear-facility-cyberattack-the-shadow-wars-escalation-spiral",
-          "ghost_url": "https://nowpattern.com/en/irans-nuclear-facility-cyberattack-the-shadow-wars-escalation-spiral/"
+          "prediction_id": "NP-2026-0065",
+          "title": "イギリス政府は、イラン紛争によるエネルギー価格の高騰に対応するため、2026年7月1日までに、正式な家計向けエネルギー支援策（価格上限介入、還付金、または保証）を発表するだろうか？",
+          "article_slug": "uk-energy-bills-and-the-iran-war-when-geopolitics-hits-the-kitchen-table",
+          "ghost_url": "https://nowpattern.com/en/uk-energy-bills-and-the-iran-war-when-geopolitics-hits-the-kitchen-table/",
+          "reason": "cross_lang_only"
         }
       ],
-      "public_rows": 392
+      "public_rows": 99
     },
     "en": {
       "lang": "en",
       "formal_predictions_seen": 1121,
-      "same_lang_analysis": 296,
-      "cross_lang_fallback": 96,
-      "hidden_no_live_article": 729,
+      "same_lang_analysis": 197,
+      "cross_lang_fallback": 0,
+      "hidden_cross_lang_only": 89,
+      "hidden_no_live_article": 924,
+      "public_in_play_rows": 0,
+      "public_awaiting_rows": 193,
+      "public_resolved_rows": 4,
       "hidden_samples": [
+        {
+          "prediction_id": "NP-2026-0002",
+          "title": "Trump's Section 122 10% Tariff: Structural Impact of the \"150-Day Time Bomb\"",
+          "article_slug": "toranpugatong-shang-fa-di-122tiao-de10-dai-ti-guan-shui-150ri-noshi-xi",
+          "ghost_url": "https://nowpattern.com/toranpugatong-shang-fa-di-122tiao-de10-dai-ti-guan-shui-150ri-noshi-xi/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0003",
+          "title": "Trump Family Crypto Summit: \"Regulatory Capture\" from Goldman CEO to Nicki Minaj",
+          "article_slug": "toranpujia-zu-noan-hao-zi-chan-samituto-gorudomanceokaranitukiminaziyu",
+          "ghost_url": "https://nowpattern.com/toranpujia-zu-noan-hao-zi-chan-samituto-gorudomanceokaranitukiminaziyu/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0004",
+          "title": "Trump Tariff Declaration: \"Pushing Ahead Even with Supreme Court Loss\"",
+          "article_slug": "toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no",
+          "ghost_url": "https://nowpattern.com/toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0005",
+          "title": "BTC Briefly Rebounds to $68K on Supreme Court Tariff Ruling",
+          "article_slug": "zui-gao-cai-guan-shui-pan-jue-debtcyi-shi-6-8mo-dorufan-fa-shu-fen-dexiao-etashang-sheng-gabao-ku-dezitarugorudo-noxu-toben-dang",
+          "ghost_url": "https://nowpattern.com/zui-gao-cai-guan-shui-pan-jue-debtcyi-shi-6-8mo-dorufan-fa-shu-fen-dexiao-etashang-sheng-gabao-ku-dezitarugorudo-noxu-toben-dang/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0006",
+          "title": "Stablecoin Market Cap Exceeds $300 Billion: Silent Shift in Crypto Liquidity",
+          "article_slug": "suteburukoinshi-jia-zong-e-3000yi-dorutu-po-an-hao-zi-chan-nodai-ji-zi-jin-gashi-sujing-kanadi-que-bian-dong",
+          "ghost_url": "https://nowpattern.com/suteburukoinshi-jia-zong-e-3000yi-dorutu-po-an-hao-zi-chan-nodai-ji-zi-jin-gashi-sujing-kanadi-que-bian-dong/",
+          "reason": "cross_lang_only"
+        },
         {
           "prediction_id": "NP-2026-0007",
           "title": "The Structure Behind the EU's ¥2 Trillion Fine on Apple",
           "article_slug": "eugaappleni2zhao-yuan-nozhi-cai-jin-woke-sitagou-zao-dmashang-su-to-puratutohuomuzhi-pei-nomo-lu",
-          "ghost_url": "https://nowpattern.com/eugaappleni2zhao-yuan-nozhi-cai-jin-woke-sitagou-zao-dmashang-su-to-puratutohuomuzhi-pei-nomo-lu/"
+          "ghost_url": "https://nowpattern.com/eugaappleni2zhao-yuan-nozhi-cai-jin-woke-sitagou-zao-dmashang-su-to-puratutohuomuzhi-pei-nomo-lu/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0008",
+          "title": "NASA Succeeds with AI Autonomous Driving on Mars",
+          "article_slug": "nasa-mars-ai-autonomous-driving",
+          "ghost_url": "https://nowpattern.com/nasa-mars-ai-autonomous-driving/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0009",
+          "title": "Vitalik Warns of AI Runaway: d/acc's Human-Centered AI x Crypto Vision",
+          "article_slug": "vuitarituku-ainobao-zou-hajian-wei-i-jing-gao-d-accgamiao-kuren-jian-zhong-xin-noaixan-hao-zi-chan",
+          "ghost_url": "https://nowpattern.com/vuitarituku-ainobao-zou-hajian-wei-i-jing-gao-d-accgamiao-kuren-jian-zhong-xin-noaixan-hao-zi-chan/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0010",
+          "title": "Trump \"To Address the Court\" Remark: Tariff Ruling Shakes the Balance of Power",
+          "article_slug": "toranpu-cai-pan-suo-nidui-chu-suru-fa-yan-zui-gao-cai-guan-shui-wei-xian-pan-jue-gayao-rasusan-quan-nojun-heng",
+          "ghost_url": "https://nowpattern.com/toranpu-cai-pan-suo-nidui-chu-suru-fa-yan-zui-gao-cai-guan-shui-wei-xian-pan-jue-gayao-rasusan-quan-nojun-heng/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0011",
+          "title": "BTC Underperforms S&P 500 and Gold: Debunking the \"Digital Gold\" Myth",
+          "article_slug": "btcgas-p500tojin-nilie-hou-dezitarugorudo-shen-hua-beng-huai-gabao-kuben-dang-nozheng-ti",
+          "ghost_url": "https://nowpattern.com/btcgas-p500tojin-nilie-hou-dezitarugorudo-shen-hua-beng-huai-gabao-kuben-dang-nozheng-ti/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0012",
+          "title": "Public Companies' BTC Holdings Exceed 2 Million: The Next Game of \"Irreversible Institutionalization\"",
+          "article_slug": "gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu",
+          "ghost_url": "https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0013",
+          "title": "Hyperliquid Establishes Lobbying Group in DC: DeFi Moves From \"Regulated\" to \"Regulating\"",
+          "article_slug": "guan-ce-rogu-fen-san-xing-qu-yin-suo-haiparikitudo-defiwoxun-ruzheng-ce-ti-yan-tuan-ti-womi-guo-deshe-li",
+          "ghost_url": "https://nowpattern.com/guan-ce-rogu-fen-san-xing-qu-yin-suo-haiparikitudo-defiwoxun-ruzheng-ce-ti-yan-tuan-ti-womi-guo-deshe-li/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0014",
+          "title": "AI Agents Start \"Shopping\": From $50 Experiment to $15 Trillion Future",
+          "article_slug": "aiezientoga-mai-iwu-woshi-metagou-zao-50dorunoshi-yan-kara15zhao-dorunowei-lai-he",
+          "ghost_url": "https://nowpattern.com/aiezientoga-mai-iwu-woshi-metagou-zao-50dorunoshi-yan-kara15zhao-dorunowei-lai-he/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0015",
+          "title": "EU vs US Tech War: The Regulatory Shift Caused by the DMA",
+          "article_slug": "eu-vs-mi-guo-tetukuzhan-zheng-dmagayin-kiqi-kosugui-zhi-nodi-que-bian-dong",
+          "ghost_url": "https://nowpattern.com/eu-vs-mi-guo-tetukuzhan-zheng-dmagayin-kiqi-kosugui-zhi-nodi-que-bian-dong/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0016",
+          "title": "The Poison of the Poison Frog and the Kremlin: Chemical Proof of Navalny's Assassination",
+          "article_slug": "du-wa-nodu-tokuremurin-nawarinuian-sha-nohua-xue-de-zheng-ming",
+          "ghost_url": "https://nowpattern.com/du-wa-nodu-tokuremurin-nawarinuian-sha-nohua-xue-de-zheng-ming/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0017",
+          "title": "Geneva: Ukraine-Russia War Negotiations",
+          "article_slug": "ziyunebuno6shi-jian-4nian-mu-nozhan-zheng-ga-jiao-she-woshi-metagou-zao",
+          "ghost_url": "https://nowpattern.com/ziyunebuno6shi-jian-4nian-mu-nozhan-zheng-ga-jiao-she-woshi-metagou-zao/",
+          "reason": "cross_lang_only"
+        },
+        {
+          "prediction_id": "NP-2026-0018",
+          "title": "Strait of Hormuz Closure by Iran?",
+          "article_slug": "horumuzuno3shi-jian-shi-jie-noshi-you-20-gazhi-matutari",
+          "ghost_url": "https://nowpattern.com/horumuzuno3shi-jian-shi-jie-noshi-you-20-gazhi-matutari/",
+          "reason": "cross_lang_only"
         },
         {
           "prediction_id": "NP-2026-0019",
           "title": "Hormuz Closure: Will Brent Crude Exceed $100?",
           "article_slug": "irangahorumuzuhai-xia-woyi-shi-feng-suo-sitagou-zao-shi-jie-noshi-you-no20-woren-zhi-nitorujiao-she-shu",
-          "ghost_url": "https://nowpattern.com/irangahorumuzuhai-xia-woyi-shi-feng-suo-sitagou-zao-shi-jie-noshi-you-no20-woren-zhi-nitorujiao-she-shu/"
+          "ghost_url": "https://nowpattern.com/irangahorumuzuhai-xia-woyi-shi-feng-suo-sitagou-zao-shi-jie-noshi-you-no20-woren-zhi-nitorujiao-she-shu/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0020",
+          "title": "Will the Fed Cut Rates at the March 2026 FOMC?",
+          "article_slug": "fed-fomc-march-2026-rate-decision",
+          "ghost_url": "https://nowpattern.com/fed-fomc-march-2026-rate-decision/",
+          "reason": "cross_lang_only"
         },
         {
           "prediction_id": "NP-2026-0021",
           "title": "Will BTC Recover to $90,000 by March 2026?",
           "article_slug": "btc-90k-march-31-2026",
-          "ghost_url": "https://nowpattern.com/btc-90k-march-31-2026/"
+          "ghost_url": "https://nowpattern.com/btc-90k-march-31-2026/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0022",
           "title": "Will Trump's Section 122 Tariffs Continue After July 2026?",
           "article_slug": "trumpno-section-122-15-guan-shui-ha2026nian-7yue-yi-jiang-mosok-kunoka-zui-gao-cai-gatui-ketaieepanodai-ti-shou-duan-to150ri-noqi-xian",
-          "ghost_url": "https://nowpattern.com/trumpno-section-122-15-guan-shui-ha2026nian-7yue-yi-jiang-mosok-kunoka-zui-gao-cai-gatui-ketaieepanodai-ti-shou-duan-to150ri-noqi-xian/"
+          "ghost_url": "https://nowpattern.com/trumpno-section-122-15-guan-shui-ha2026nian-7yue-yi-jiang-mosok-kunoka-zui-gao-cai-gatui-ketaieepanodai-ti-shou-duan-to150ri-noqi-xian/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0023",
           "title": "Japan Crypto ETF Approval by 2028?",
           "article_slug": "ri-ben-noan-hao-zi-chan-etfjie-jin-2028nian-2-200zhao-yuan-nojia-ji-zi-chan-gadong-kujing-lu-yi-cun-nozhuan-huan-dian",
-          "ghost_url": "https://nowpattern.com/ri-ben-noan-hao-zi-chan-etfjie-jin-2028nian-2-200zhao-yuan-nojia-ji-zi-chan-gadong-kujing-lu-yi-cun-nozhuan-huan-dian/"
+          "ghost_url": "https://nowpattern.com/ri-ben-noan-hao-zi-chan-etfjie-jin-2028nian-2-200zhao-yuan-nojia-ji-zi-chan-gadong-kujing-lu-yi-cun-nozhuan-huan-dian/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0024",
           "title": "Will Bitcoin Exceed $150,000 by 2026?",
           "article_slug": "aishi-ye-domino-heizugamiao-ku-fa-ding-tong-huo-nozi-huai-tobitutokoinzui-gao-zhi-henodao-jin",
-          "ghost_url": "https://nowpattern.com/aishi-ye-domino-heizugamiao-ku-fa-ding-tong-huo-nozi-huai-tobitutokoinzui-gao-zhi-henodao-jin/"
+          "ghost_url": "https://nowpattern.com/aishi-ye-domino-heizugamiao-ku-fa-ding-tong-huo-nozi-huai-tobitutokoinzui-gao-zhi-henodao-jin/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0025",
           "title": "Will Iran Appoint a New Supreme Leader by June 2026?",
           "article_slug": "khamenei-assassination-iran-supreme-leader-succession-2026",
-          "ghost_url": "https://nowpattern.com/khamenei-assassination-iran-supreme-leader-succession-2026/"
+          "ghost_url": "https://nowpattern.com/khamenei-assassination-iran-supreme-leader-succession-2026/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0026",
           "title": "Will Trump's Section 122 Tariffs Be Rolled Back?",
           "article_slug": "trumpnosection-122guan-shui-che-hui-sinariowojie-pou-suru-150ri-noshi-ji-tozhong-jian-xuan-ju-noxia-jian-de",
-          "ghost_url": "https://nowpattern.com/trumpnosection-122guan-shui-che-hui-sinariowojie-pou-suru-150ri-noshi-ji-tozhong-jian-xuan-ju-noxia-jian-de/"
+          "ghost_url": "https://nowpattern.com/trumpnosection-122guan-shui-che-hui-sinariowojie-pou-suru-150ri-noshi-ji-tozhong-jian-xuan-ju-noxia-jian-de/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0027",
           "title": "Will Bitcoin Exceed $70,000 by March 2026?",
           "article_slug": "btc-70k-march-31-2026",
-          "ghost_url": "https://nowpattern.com/btc-70k-march-31-2026/"
+          "ghost_url": "https://nowpattern.com/btc-70k-march-31-2026/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0028",
           "title": "GPT-6 Multimodal Launch — OpenAI's Platform Power Play Reshapes the AI Stack",
           "article_slug": "gpt-6-multimodal-launch-openais-platform-power-play-reshapes-the-ai-stack",
-          "ghost_url": "https://nowpattern.com/en/gpt-6-multimodal-launch-openais-platform-power-play-reshapes-the-ai-stack/"
+          "ghost_url": "https://nowpattern.com/en/gpt-6-multimodal-launch-openais-platform-power-play-reshapes-the-ai-stack/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0030",
           "title": "DeepMind's AGI Prototype — The Race to Define Intelligence Itself",
           "article_slug": "deepminds-agi-prototype-the-race-to-define-intelligence-itself-2",
-          "ghost_url": "https://nowpattern.com/en/deepminds-agi-prototype-the-race-to-define-intelligence-itself-2/"
+          "ghost_url": "https://nowpattern.com/en/deepminds-agi-prototype-the-race-to-define-intelligence-itself-2/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0031",
           "title": "Scarborough Shoal Standoff — The Escalation Spiral That Could Redraw Asia's Map",
           "article_slug": "scarborough-shoal-standoff-the-escalation-spiral-that-could-redraw-asias-map",
-          "ghost_url": "https://nowpattern.com/en/scarborough-shoal-standoff-the-escalation-spiral-that-could-redraw-asias-map/"
+          "ghost_url": "https://nowpattern.com/en/scarborough-shoal-standoff-the-escalation-spiral-that-could-redraw-asias-map/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0032",
           "title": "Russia's Hypersonic Missile Test — Escalation Spiral Meets NATO's Strategic Dilemma",
           "article_slug": "russias-hypersonic-missile-test-escalation-spiral-meets-natos-strategic-dilemma",
-          "ghost_url": "https://nowpattern.com/en/russias-hypersonic-missile-test-escalation-spiral-meets-natos-strategic-dilemma/"
+          "ghost_url": "https://nowpattern.com/en/russias-hypersonic-missile-test-escalation-spiral-meets-natos-strategic-dilemma/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0033",
           "title": "US Stablecoin Regulation — The Architecture of Controlled Innovation",
           "article_slug": "us-stablecoin-regulation-the-architecture-of-controlled-innovation",
-          "ghost_url": "https://nowpattern.com/en/us-stablecoin-regulation-the-architecture-of-controlled-innovation/"
+          "ghost_url": "https://nowpattern.com/en/us-stablecoin-regulation-the-architecture-of-controlled-innovation/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0034",
+          "title": "EU AI Act Enforcement Begins — The Brussels Effect Reshapes Global Tech Governance",
+          "article_slug": "eu-ai-act-enforcement-begins-the-brussels-effect-reshapes-global-tech-governance",
+          "ghost_url": "https://nowpattern.com/en/eu-ai-act-enforcement-begins-the-brussels-effect-reshapes-global-tech-governance/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0035",
           "title": "Bitcoin's $120K Breakthrough — Institutional FOMO Rewrites the Rules of Sound Money",
           "article_slug": "bitcoins-120k-breakthrough-institutional-fomo-rewrites-the-rules-of-sound-money",
-          "ghost_url": "https://nowpattern.com/en/bitcoins-120k-breakthrough-institutional-fomo-rewrites-the-rules-of-sound-money/"
+          "ghost_url": "https://nowpattern.com/en/bitcoins-120k-breakthrough-institutional-fomo-rewrites-the-rules-of-sound-money/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0036",
           "title": "Ethereum Staking Yields Hit 10% — The Gravity Well Reshaping DeFi Capital Flows",
           "article_slug": "ethereum-staking-yields-hit-10-the-gravity-well-reshaping-defi-capital-flows",
-          "ghost_url": "https://nowpattern.com/en/ethereum-staking-yields-hit-10-the-gravity-well-reshaping-defi-capital-flows/"
+          "ghost_url": "https://nowpattern.com/en/ethereum-staking-yields-hit-10-the-gravity-well-reshaping-defi-capital-flows/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0037",
+          "title": "Iran Mission Drift — When Congress Cannot Define What Victory Means",
+          "article_slug": "iran-mission-drift-when-congress-cannot-define-what-victory-means",
+          "ghost_url": "https://nowpattern.com/en/iran-mission-drift-when-congress-cannot-define-what-victory-means/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0038",
+          "title": "US Missile Shield Near Taiwan — The Escalation Spiral That Could Redraw the Pacific",
+          "article_slug": "us-missile-shield-near-taiwan-the-escalation-spiral-that-could-redraw-the-pacific",
+          "ghost_url": "https://nowpattern.com/en/us-missile-shield-near-taiwan-the-escalation-spiral-that-could-redraw-the-pacific/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0041",
           "title": "Bitcoin's $120K Breakout — Institutional Capital Rewrites the Rules of Digital Gold",
           "article_slug": "bitcoins-120k-breakout-institutional-capital-rewrites-the-rules-of-digital-gold",
-          "ghost_url": "https://nowpattern.com/en/bitcoins-120k-breakout-institutional-capital-rewrites-the-rules-of-digital-gold/"
+          "ghost_url": "https://nowpattern.com/en/bitcoins-120k-breakout-institutional-capital-rewrites-the-rules-of-digital-gold/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0042",
           "title": "US Sinks Iranian Warship — The Escalation Spiral Nobody Can Exit",
           "article_slug": "us-sinks-iranian-warship-the-escalation-spiral-nobody-can-exit-2",
-          "ghost_url": "https://nowpattern.com/en/us-sinks-iranian-warship-the-escalation-spiral-nobody-can-exit-2/"
+          "ghost_url": "https://nowpattern.com/en/us-sinks-iranian-warship-the-escalation-spiral-nobody-can-exit-2/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0043",
+          "title": "Spain Defies Trump on Iran — Alliance Strain Meets Imperial Overreach",
+          "article_slug": "spain-defies-trump-on-iran-alliance-strain-meets-imperial-overreach",
+          "ghost_url": "https://nowpattern.com/en/spain-defies-trump-on-iran-alliance-strain-meets-imperial-overreach/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0049",
+          "title": "Trump vs. Banks on Stablecoins — The Regulatory Capture War Reshaping Crypto",
+          "article_slug": "trump-vs-banks-on-stablecoins-the-regulatory-capture-war-reshaping-crypto",
+          "ghost_url": "https://nowpattern.com/en/trump-vs-banks-on-stablecoins-the-regulatory-capture-war-reshaping-crypto/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0051",
+          "title": "Pentagon Strategy Under Fire — Colby's China-First Doctrine Splits the GOP on Global Posture",
+          "article_slug": "pentagon-strategy-under-fire-colbys-china-first-doctrine-splits-the-gop-on-global-posture",
+          "ghost_url": "https://nowpattern.com/en/pentagon-strategy-under-fire-colbys-china-first-doctrine-splits-the-gop-on-global-posture/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0052",
+          "title": "America's Iran Strike — When Alliance Loyalty Overrides Strategic Logic",
+          "article_slug": "americas-iran-strike-when-alliance-loyalty-overrides-strategic-logic",
+          "ghost_url": "https://nowpattern.com/en/americas-iran-strike-when-alliance-loyalty-overrides-strategic-logic/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0053",
+          "title": "Trump's Oil Tanker Shield — The Hidden Architecture of Wartime Energy Control",
+          "article_slug": "trumps-oil-tanker-shield-the-hidden-architecture-of-wartime-energy-control",
+          "ghost_url": "https://nowpattern.com/en/trumps-oil-tanker-shield-the-hidden-architecture-of-wartime-energy-control/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0054",
+          "title": "DHS Funding Standoff — How War Abroad Fuels the Immigration Stalemate at Home",
+          "article_slug": "dhs-funding-standoff-how-war-abroad-fuels-the-immigration-stalemate-at-home",
+          "ghost_url": "https://nowpattern.com/en/dhs-funding-standoff-how-war-abroad-fuels-the-immigration-stalemate-at-home/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0055",
           "title": "South China Sea Near-Collision — The Escalation Spiral Neither Side Can Exit",
           "article_slug": "south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit",
-          "ghost_url": "https://nowpattern.com/en/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit/"
+          "ghost_url": "https://nowpattern.com/en/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0057",
           "title": "Geneva Talks Collapse — Nuclear Brinkmanship Locks the Escalation Spiral",
           "article_slug": "geneva-talks-collapse-nuclear-brinkmanship-locks-the-escalation-spiral",
-          "ghost_url": "https://nowpattern.com/en/geneva-talks-collapse-nuclear-brinkmanship-locks-the-escalation-spiral/"
+          "ghost_url": "https://nowpattern.com/en/geneva-talks-collapse-nuclear-brinkmanship-locks-the-escalation-spiral/",
+          "reason": "no_live_article"
+        },
+        {
+          "prediction_id": "NP-2026-0058",
+          "title": "US Stablecoin Bill — Regulation Crowns the Incumbents",
+          "article_slug": "us-stablecoin-bill-regulation-crowns-the-incumbents",
+          "ghost_url": "https://nowpattern.com/en/us-stablecoin-bill-regulation-crowns-the-incumbents/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0059",
           "title": "GPT-6 and the Reasoning Revolution — AI's Professional-Grade Leap",
           "article_slug": "gpt-6-and-the-reasoning-revolution-ais-professional-grade-leap",
-          "ghost_url": "https://nowpattern.com/en/gpt-6-and-the-reasoning-revolution-ais-professional-grade-leap/"
+          "ghost_url": "https://nowpattern.com/en/gpt-6-and-the-reasoning-revolution-ais-professional-grade-leap/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0060",
           "title": "Bitcoin's $120K Breakout — Institutional FOMO Rewrites the Digital Gold Playbook",
           "article_slug": "bitcoins-120k-breakout-institutional-fomo-rewrites-the-digital-gold-playbook",
-          "ghost_url": "https://nowpattern.com/en/bitcoins-120k-breakout-institutional-fomo-rewrites-the-digital-gold-playbook/"
+          "ghost_url": "https://nowpattern.com/en/bitcoins-120k-breakout-institutional-fomo-rewrites-the-digital-gold-playbook/",
+          "reason": "no_live_article"
         },
         {
           "prediction_id": "NP-2026-0062",
           "title": "DeepMind's AGI Prototype — The Regulatory Reckoning That Nobody Is Ready For",
           "article_slug": "deepminds-agi-prototype-the-regulatory-reckoning-that-nobody-is-ready-for",
-          "ghost_url": "https://nowpattern.com/en/deepminds-agi-prototype-the-regulatory-reckoning-that-nobody-is-ready-for/"
-        },
-        {
-          "prediction_id": "NP-2026-0076",
-          "title": "South China Sea Near-Collision — Escalation Could Sink US-China Trade Talks",
-          "article_slug": "south-china-sea-near-collision-the-escalation-spiral-that-could-sink-us-china-trade-talks",
-          "ghost_url": "https://nowpattern.com/en/south-china-sea-near-collision-the-escalation-spiral-that-could-sink-us-china-trade-talks/"
-        },
-        {
-          "prediction_id": "NP-2026-0079",
-          "title": "Geneva Talks Collapse — The Escalation Spiral NATO Cannot Exit",
-          "article_slug": "geneva-talks-collapse-the-escalation-spiral-nato-cannot-exit",
-          "ghost_url": "https://nowpattern.com/en/geneva-talks-collapse-the-escalation-spiral-nato-cannot-exit/"
-        },
-        {
-          "prediction_id": "NP-2026-0081",
-          "title": "GPT-6 and the Reasoning Revolution — AI's Professional Class Disruption Begins",
-          "article_slug": "gpt-6-and-the-reasoning-revolution-ais-professional-class-disruption-begins",
-          "ghost_url": "https://nowpattern.com/en/gpt-6-and-the-reasoning-revolution-ais-professional-class-disruption-begins/"
-        },
-        {
-          "prediction_id": "NP-2026-0082",
-          "title": "South China Sea Tinderbox — Risk of 'Accidental Collision' From Concurrent US-China Drills",
-          "article_slug": "nan-sinahai-nohuo-yao-ku-mi-zhong-jun-shi-yan-xi-notong-shi-zhan-kai-gasheng-mu-ou-fa-chong-tu-nogou-zao-de-risuku",
-          "ghost_url": "https://nowpattern.com/nan-sinahai-nohuo-yao-ku-mi-zhong-jun-shi-yan-xi-notong-shi-zhan-kai-gasheng-mu-ou-fa-chong-tu-nogou-zao-de-risuku/"
-        },
-        {
-          "prediction_id": "NP-2026-0083",
-          "title": "Ethereum's 10% Staking Yield — The Gravity Well Reshaping DeFi Capital Flows",
-          "article_slug": "ethereums-10-staking-yield-the-gravity-well-reshaping-defi-capital-flows-2",
-          "ghost_url": "https://nowpattern.com/en/ethereums-10-staking-yield-the-gravity-well-reshaping-defi-capital-flows-2/"
-        },
-        {
-          "prediction_id": "NP-2026-0092",
-          "title": "North Korea ICBM Launch Restart — Conflict Spiral After \"Dialogue Window\" Closes",
-          "article_slug": "bei-zhao-xian-icbmfa-she-zai-kai-dui-hua-nochuang-gabi-zitahou-nodui-li-noluo-xuan-gou-zao",
-          "ghost_url": "https://nowpattern.com/bei-zhao-xian-icbmfa-she-zai-kai-dui-hua-nochuang-gabi-zitahou-nodui-li-noluo-xuan-gou-zao/"
-        },
-        {
-          "prediction_id": "NP-2026-0103",
-          "title": "South China Sea Near-Collision — The Escalation Spiral Neither Side Can Exit",
-          "article_slug": "south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-2",
-          "ghost_url": "https://nowpattern.com/en/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-2/"
-        },
-        {
-          "prediction_id": "NP-2026-0105",
-          "title": "Geneva Talks Collapse — Nuclear Brinkmanship Locks the Escalation Spiral",
-          "article_slug": "geneva-talks-collapse-nuclear-brinkmanship-locks-the-escalation-spiral-2",
-          "ghost_url": "https://nowpattern.com/en/geneva-talks-collapse-nuclear-brinkmanship-locks-the-escalation-spiral-2/"
-        },
-        {
-          "prediction_id": "NP-2026-0108",
-          "title": "GPT-6 and the Reasoning Revolution — When AI Outthinks the Professional Class",
-          "article_slug": "gpt-6-and-the-reasoning-revolution-when-ai-outthinks-the-professional-class",
-          "ghost_url": "https://nowpattern.com/en/gpt-6-and-the-reasoning-revolution-when-ai-outthinks-the-professional-class/"
-        },
-        {
-          "prediction_id": "NP-2026-0109",
-          "title": "Ethereum's 10% Staking Yield — The Gravity Well Reshaping DeFi Capital Flows",
-          "article_slug": "ethereums-10-staking-yield-the-gravity-well-reshaping-defi-capital-flows-3",
-          "ghost_url": "https://nowpattern.com/en/ethereums-10-staking-yield-the-gravity-well-reshaping-defi-capital-flows-3/"
-        },
-        {
-          "prediction_id": "NP-2026-0113",
-          "title": "Bitcoin $200,000 Breakthrough — Institutional Gravity Pulls History's Hardest Asset to New Heights",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0114",
-          "title": "AGI Timeline — Will DeepMind or OpenAI Claim AGI by 2028?",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0115",
-          "title": "Trump Term 2 Conclusion — Will He Serve the Full Four Years Without Removal?",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0116",
-          "title": "NATO Ukraine Membership — The Path Through the War's End",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0117",
-          "title": "Ethereum $10,000 — The Deflationary Spiral Meets TradFi",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0118",
-          "title": "Japan Crypto ETF — The 2,200 Trillion Yen Awakening",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0119",
-          "title": "Global AI Governance Treaty — The Race Before the Precipice",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0120",
-          "title": "US Debt Crisis 2027 — When the Bond Market Breaks Before the Fed Does",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0121",
-          "title": "China's Taiwan Blockade — The Gray Zone Before the Red Line",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0122",
-          "title": "OpenAI's Revenue Milestone — $10 Billion ARR and the Profitability Question",
-          "article_slug": "",
-          "ghost_url": ""
-        },
-        {
-          "prediction_id": "NP-2026-0127",
-          "title": "Spratly Standoff — The Escalation Spiral That Neither Side Can Afford to Lose",
-          "article_slug": "spratly-standoff-the-escalation-spiral-that-neither-side-can-afford-to-lose",
-          "ghost_url": "https://nowpattern.com/en/spratly-standoff-the-escalation-spiral-that-neither-side-can-afford-to-lose/"
-        },
-        {
-          "prediction_id": "NP-2026-0129",
-          "title": "Taiwan Strait Drone Intercept — The Escalation Spiral Neither Side Can Afford",
-          "article_slug": "taiwan-strait-drone-intercept-the-escalation-spiral-neither-side-can-afford",
-          "ghost_url": "https://nowpattern.com/en/taiwan-strait-drone-intercept-the-escalation-spiral-neither-side-can-afford/"
-        },
-        {
-          "prediction_id": "NP-2026-0131",
-          "title": "Iran's Nuclear Cyberattack — The Escalation Spiral Nobody Can Claim",
-          "article_slug": "irans-nuclear-cyberattack-the-escalation-spiral-nobody-can-claim",
-          "ghost_url": "https://nowpattern.com/en/irans-nuclear-cyberattack-the-escalation-spiral-nobody-can-claim/"
-        },
-        {
-          "prediction_id": "NP-2026-0133",
-          "title": "Russia's Hypersonic Missile Test — The Escalation Spiral NATO Cannot Ignore",
-          "article_slug": "russias-hypersonic-missile-test-the-escalation-spiral-nato-cannot-ignore",
-          "ghost_url": "https://nowpattern.com/en/russias-hypersonic-missile-test-the-escalation-spiral-nato-cannot-ignore/"
-        },
-        {
-          "prediction_id": "NP-2026-0143",
-          "title": "Taiwan Strait Drone Intercept — The Escalation Spiral Nobody Can Exit",
-          "article_slug": "taiwan-strait-drone-intercept-the-escalation-spiral-nobody-can-exit",
-          "ghost_url": "https://nowpattern.com/en/taiwan-strait-drone-intercept-the-escalation-spiral-nobody-can-exit/"
-        },
-        {
-          "prediction_id": "NP-2026-0144",
-          "title": "Russia's Hypersonic Missile Test — The Escalation Spiral NATO Cannot Ignore",
-          "article_slug": "russias-hypersonic-missile-test-the-escalation-spiral-nato-cannot-ignore-2",
-          "ghost_url": "https://nowpattern.com/en/russias-hypersonic-missile-test-the-escalation-spiral-nato-cannot-ignore-2/"
-        },
-        {
-          "prediction_id": "NP-2026-0145",
-          "title": "Iran's Nuclear Facility Cyberattack — The Shadow War's Escalation Spiral",
-          "article_slug": "irans-nuclear-facility-cyberattack-the-shadow-wars-escalation-spiral",
-          "ghost_url": "https://nowpattern.com/en/irans-nuclear-facility-cyberattack-the-shadow-wars-escalation-spiral/"
+          "ghost_url": "https://nowpattern.com/en/deepminds-agi-prototype-the-regulatory-reckoning-that-nobody-is-ready-for/",
+          "reason": "no_live_article"
         }
       ],
-      "public_rows": 392
+      "public_rows": 197
     }
   }
 }

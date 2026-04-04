@@ -1,0 +1,118 @@
+{
+  "generated_at": "2026-04-04T03:19:26Z",
+  "generated_at_epoch": 1775272766,
+  "base_url": "https://nowpattern.com",
+  "total": 4,
+  "failed": 0,
+  "results": [
+    {
+      "name": "site_link_crawler",
+      "ok": true,
+      "returncode": 0,
+      "command": [
+        "/usr/bin/python3",
+        "/opt/shared/scripts/site_link_crawler.py",
+        "--base-url",
+        "https://nowpattern.com",
+        "--discover-limit",
+        "2000",
+        "--full-scan"
+      ],
+      "output": "{\"total\": 531, \"failed\": 0, \"passed\": 531}\nPASS: site link crawler",
+      "json": null
+    },
+    {
+      "name": "stateful_user_journey",
+      "ok": true,
+      "returncode": 0,
+      "command": [
+        "/usr/bin/python3",
+        "/opt/shared/scripts/stateful_user_journey_audit.py",
+        "--base-url",
+        "https://nowpattern.com"
+      ],
+      "output": "{\n  \"generated_at\": \"2026-04-04T03:17:49Z\",\n  \"generated_at_epoch\": 1775272669,\n  \"base_url\": \"https://nowpattern.com\",\n  \"total\": 8,\n  \"failed\": 0,\n  \"results\": [\n    {\n      \"name\": \"ja_tracker_load\",\n      \"ok\": true,\n      \"detail\": \"status=200\"\n    },\n    {\n      \"name\": \"ja_search_state\",\n      \"ok\": true,\n      \"detail\": \"hidden_after_filter=90\"\n    },\n    {\n      \"name\": \"ja_article_open\",\n      \"ok\": true,\n      \"detail\": \"href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/\"\n    },\n    {\n      \"name\": \"ja_return_to_tracker\",\n      \"ok\": true,\n      \"detail\": \"path=/predictions/\"\n    },\n    {\n      \"name\": \"en_tracker_load\",\n      \"ok\": true,\n      \"detail\": \"status=200\"\n    },\n    {\n      \"name\": \"en_search_state\",\n      \"ok\": true,\n      \"detail\": \"hidden_after_filter=193\"\n    },\n    {\n      \"name\": \"en_article_open\",\n      \"ok\": true,\n      \"detail\": \"href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/\"\n    },\n    {\n      \"name\": \"en_return_to_tracker\",\n      \"ok\": true,\n      \"detail\": \"path=/en/predictions/\"\n    }\n  ]\n}",
+      "json": {
+        "generated_at": "2026-04-04T03:17:49Z",
+        "generated_at_epoch": 1775272669,
+        "base_url": "https://nowpattern.com",
+        "total": 8,
+        "failed": 0,
+        "results": [
+          {
+            "name": "ja_tracker_load",
+            "ok": true,
+            "detail": "status=200"
+          },
+          {
+            "name": "ja_search_state",
+            "ok": true,
+            "detail": "hidden_after_filter=90"
+          },
+          {
+            "name": "ja_article_open",
+            "ok": true,
+            "detail": "href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/"
+          },
+          {
+            "name": "ja_return_to_tracker",
+            "ok": true,
+            "detail": "path=/predictions/"
+          },
+          {
+            "name": "en_tracker_load",
+            "ok": true,
+            "detail": "status=200"
+          },
+          {
+            "name": "en_search_state",
+            "ok": true,
+            "detail": "hidden_after_filter=193"
+          },
+          {
+            "name": "en_article_open",
+            "ok": true,
+            "detail": "href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/"
+          },
+          {
+            "name": "en_return_to_tracker",
+            "ok": true,
+            "detail": "path=/en/predictions/"
+          }
+        ]
+      }
+    },
+    {
+      "name": "article_anchor_integrity",
+      "ok": true,
+      "returncode": 0,
+      "command": [
+        "/usr/bin/python3",
+        "/opt/shared/scripts/article_anchor_integrity_audit.py",
+        "--base-url",
+        "https://nowpattern.com",
+        "--discover-limit",
+        "2000",
+        "--full-scan"
+      ],
+      "output": "{\"total\": 214, \"failed\": 0, \"passed\": 214, \"pruned_stale_paths\": 0}\nPASS: article anchor integrity audit",
+      "json": null
+    },
+    {
+      "name": "site_article_source",
+      "ok": true,
+      "returncode": 0,
+      "command": [
+        "/usr/bin/python3",
+        "/opt/shared/scripts/site_article_source_audit.py",
+        "--base-url",
+        "https://nowpattern.com",
+        "--discover-limit",
+        "2000",
+        "--full-scan"
+      ],
+      "output": "{\"total\": 107, \"failed\": 0, \"passed\": 107, \"pruned_stale_paths\": 0}\nPASS: article source audit",
+      "json": null
+    }
+  ]
+}

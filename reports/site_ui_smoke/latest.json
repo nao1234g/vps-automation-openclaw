@@ -1,4 +1,6 @@
 {
+  "generated_at": "2026-04-04T01:52:02Z",
+  "generated_at_epoch": 1775267522,
   "base_url": "https://nowpattern.com",
   "results": [
     {
@@ -16,23 +18,100 @@
         "article": 12
       },
       "internal_link_sample": [
-        "/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
+        "/hormuz-kaikyo-kiki-beikoku-iran-tairitsu/",
+        "/page/2/",
+        "/bitcoin-65k-crash-digital-gold-myth-shatters-under-iran-war/",
         "/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation/",
-        "/world-war-iii-comparisons-why-threat-inflation-distorts-strategic-clarity/",
+        "/bitcoin-breaks-72k-against-strong-dollar-the-decoupling-signal/",
         "/us-china-paris-trade-talks-rare-earths-as-the-new-leverage-battleground/",
-        "/ethereum-staking-yields-collapse-defis-gravity-well-reshapes-network-security/",
-        "/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/"
+        "/an-hao-zi-chan-nogui-zhi-noshen-pan-ji-guan-tou-zi-jia-nocai-yong-gali-fa-noxian-shi-tojiao-chai-suru-2/",
+        "/us-rolls-back-russia-oil-sanctions-alliance-strain-meets-energy-realpolitik/",
+        "/world-war-iii-comparisons-why-threat-inflation-distorts-strategic-clarity/",
+        "/an-hao-zi-chan-nogui-zhi-noshen-pan-ji-guan-tou-zi-jia-nocai-yong-gali-fa-noxian-shi-tojiao-chai-suru/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\home-ja-desktop.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 7604,
+        "body_text_length": 7609,
         "overflow": {
           "scrollWidth": 1440,
           "innerWidth": 1440,
           "overflow": 0
         },
+        "homepage_card_paths": [
+          "/hormuz-kaikyo-kiki-beikoku-iran-tairitsu/",
+          "/bitcoin-65k-crash-digital-gold-myth-shatters-under-iran-war/",
+          "/bitcoin-breaks-72k-against-strong-dollar-the-decoupling-signal/",
+          "/an-hao-zi-chan-nogui-zhi-noshen-pan-ji-guan-tou-zi-jia-nocai-yong-gali-fa-noxian-shi-tojiao-chai-suru-2/",
+          "/an-hao-zi-chan-nogui-zhi-noshen-pan-ji-guan-tou-zi-jia-nocai-yong-gali-fa-noxian-shi-tojiao-chai-suru/",
+          "/iran-wars-asian-shockwaves-how-a-gulf-conflict-rewires-indo-pacific-power/",
+          "/us-india-oil-waiver-sanctions-flexibility-reveals-empires-energy-dilemma/",
+          "/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/"
+        ],
+        "navigation_timing": {
+          "dom_content_loaded_ms": 1466,
+          "load_ms": 1492,
+          "response_ms": 555
+        },
+        "header_ui": {
+          "html_lang": "ja",
+          "html_classes": "has-dark-text np-ja np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "予測トラッカー",
+            "力学で探す",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "ログイン",
+            "無料で参加"
+          ],
+          "brand_href": "/",
+          "about_href": "/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 154,
+            "height": 42,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "/en/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": "無料で参加",
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/en/"
       }
@@ -52,23 +131,100 @@
         "article": 12
       },
       "internal_link_sample": [
-        "/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
-        "/en/en-eu-stablecoin-crackdown-regulatory-capture-reshapes-digital-dollar-dominance-2/",
-        "/en/en-ethereums-10-staking-yield-the-gravity-well-reshaping-crypto-capital-flows-2-2/",
-        "/en/en-taiwan-strait-standoff-the-escalation-spiral-neither-side-can-exit-4-2/",
-        "/en/en-takaichi-trump-summit-alliance-strain-meets-middle-east-escalation-2-2/",
-        "/en/en-boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit-2-2/"
+        "/en/frbli-xia-gejian-song-rilian-sok-zhong-dong-risukutoinhurezai-ran-gafu-rujin-rong-zheng-ce-nojing-lu-yi-cun/",
+        "/en/uns-first-report-on-gazas-peace/",
+        "/en/takaichis-march-5-marathon-japan-rewires-its-tech-security-alliance-grid/",
+        "/en/hormuz-kaikyo-kiki-beikoku-iran-tairitsu/",
+        "/en/wti-crude-crashes-14-trumps-iran-pause-exposes-oils-geopolitical-fragility/",
+        "/en/bitcoin-65k-crash-digital-gold-myth-shatters-under-iran-war/",
+        "/en/ri-ben-noyu-suan-zheng-zhi-zan-ding-yu-suan-fu-shang-gaying-suyu-ye-dang-xie-diao-noshi-bai-tozhi-du-pi-lao/",
+        "/en/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation-2-2/",
+        "/en/the-deeper-meaning-behind-the-feds-rate-cut-freeze/",
+        "/en/boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit-2-2/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\home-en-desktop.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 6907,
+        "body_text_length": 3190,
         "overflow": {
           "scrollWidth": 1440,
           "innerWidth": 1440,
           "overflow": 0
         },
+        "homepage_card_paths": [
+          "/en/bitcoin-65k-crash-digital-gold-myth-shatters-under-iran-war/",
+          "/en/hormuz-kaikyo-kiki-beikoku-iran-tairitsu/",
+          "/en/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation-2-2/",
+          "/en/boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit-2-2/",
+          "/en/frbli-xia-gejian-song-rilian-sok-zhong-dong-risukutoinhurezai-ran-gafu-rujin-rong-zheng-ce-nojing-lu-yi-cun/",
+          "/en/ri-ben-noyu-suan-zheng-zhi-zan-ding-yu-suan-fu-shang-gaying-suyu-ye-dang-xie-diao-noshi-bai-tozhi-du-pi-lao/",
+          "/en/gaza-peace-council-first-un-report/",
+          "/en/eu-australia-fta-concluded-the-structure-of/"
+        ],
+        "navigation_timing": {
+          "dom_content_loaded_ms": 453,
+          "load_ms": 461,
+          "response_ms": 105
+        },
+        "header_ui": {
+          "html_lang": "en",
+          "html_classes": "has-dark-text np-en np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "Predictions",
+            "Explore Dynamics",
+            "About",
+            "日本語"
+          ],
+          "member_texts": [
+            "Sign in",
+            "Join Free"
+          ],
+          "brand_href": "/en/",
+          "about_href": "/en/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 154,
+            "height": 42,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": "Join Free",
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/"
       }
@@ -88,18 +244,82 @@
       },
       "internal_link_sample": [
         "/predictions/",
-        "/"
+        "/taxonomy-ja/",
+        "/integrity-audit/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\about-ja-desktop.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 831,
+        "body_text_length": 992,
         "overflow": {
           "scrollWidth": 1440,
           "innerWidth": 1440,
           "overflow": 0
         },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 300,
+          "load_ms": 302,
+          "response_ms": 32
+        },
+        "header_ui": {
+          "html_lang": "ja",
+          "html_classes": "has-dark-text np-ja np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "予測トラッカー",
+            "力学で探す",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "ログイン",
+            "無料で参加"
+          ],
+          "brand_href": "/",
+          "about_href": "/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 154,
+            "height": 42,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "/en/about/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": "無料で参加",
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/en/about/"
       }
@@ -118,19 +338,83 @@
         "article": 1
       },
       "internal_link_sample": [
-        "/about/",
-        "/en/predictions/"
+        "/en/predictions/",
+        "/en/taxonomy/",
+        "/en/integrity-audit/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\about-en-desktop.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 1997,
+        "body_text_length": 2103,
         "overflow": {
           "scrollWidth": 1440,
           "innerWidth": 1440,
           "overflow": 0
         },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 281,
+          "load_ms": 285,
+          "response_ms": 21
+        },
+        "header_ui": {
+          "html_lang": "en",
+          "html_classes": "has-dark-text np-en np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "Predictions",
+            "Explore Dynamics",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "Sign in",
+            "Join Free"
+          ],
+          "brand_href": "/en/",
+          "about_href": "/en/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 154,
+            "height": 42,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "/about/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": "Join Free",
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/about/"
       }
@@ -149,19 +433,81 @@
         "article": 1
       },
       "internal_link_sample": [
-        "/taxonomy-en/",
         "/taxonomy-guide-ja/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\taxonomy-ja-desktop.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 2939,
+        "body_text_length": 2929,
         "overflow": {
           "scrollWidth": 1440,
           "innerWidth": 1440,
           "overflow": 0
         },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 354,
+          "load_ms": 355,
+          "response_ms": 28
+        },
+        "header_ui": {
+          "html_lang": "ja",
+          "html_classes": "has-dark-text np-ja np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "予測トラッカー",
+            "力学で探す",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "ログイン",
+            "無料で参加"
+          ],
+          "brand_href": "/",
+          "about_href": "/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 154,
+            "height": 42,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "/en/taxonomy/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": "無料で参加",
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/en/taxonomy/"
       }
@@ -180,19 +526,81 @@
         "article": 1
       },
       "internal_link_sample": [
-        "/taxonomy-ja/",
-        "/taxonomy-guide-en/"
+        "/taxonomy-ja/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\taxonomy-en-desktop.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 6985,
+        "body_text_length": 6997,
         "overflow": {
           "scrollWidth": 1440,
           "innerWidth": 1440,
           "overflow": 0
         },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 296,
+          "load_ms": 298,
+          "response_ms": 23
+        },
+        "header_ui": {
+          "html_lang": "en",
+          "html_classes": "has-dark-text np-en np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "Predictions",
+            "Explore Dynamics",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "Sign in",
+            "Join Free"
+          ],
+          "brand_href": "/en/",
+          "about_href": "/en/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 154,
+            "height": 42,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "/taxonomy/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": "Join Free",
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/taxonomy/"
       }
@@ -207,27 +615,96 @@
       "errors": [],
       "warnings": [],
       "content_hits": {
-        "#np-tracking-list": 1,
-        "#np-tracking-list details": 179
+        "#np-inplay-list": 1,
+        "#np-inplay-list details": 6,
+        "#np-awaiting-list": 1,
+        "#np-resolved-section": 1
       },
       "internal_link_sample": [
-        "/integrity-audit/",
-        "/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/",
-        "/aiezientoga-mai-iwu-woshi-metagou-zao-50dorunoshi-yan-kara15zhao-dorunowei-lai-he/",
-        "/eu-vs-mi-guo-tetukuzhan-zheng-dmagayin-kiqi-kosugui-zhi-nodi-que-bian-dong/",
-        "/du-wa-nodu-tokuremurin-nawarinuian-sha-nohua-xue-de-zheng-ming/",
-        "/ziyunebuno6shi-jian-4nian-mu-nozhan-zheng-ga-jiao-she-woshi-metagou-zao/"
+        "/mi-zhong-parimao-yi-xie-yi-guan-shui-toreaasugaying-suba-quan-jiao-she-nogou-zao-zhuan-huan/",
+        "/ecbjin-li-ju-ezhi-ki6lian-sok-enerugiwei-ji-gapo-ruzheng-ce-zhuan-huan-nofen-shui-ling/",
+        "/ziyunebuno6shi-jian-4nian-mu-nozhan-zheng-ga-jiao-she-woshi-metagou-zao/",
+        "/toranpujia-zu-noan-hao-zi-chan-samituto-gorudomanceokaranitukiminaziyu/",
+        "/aigaxuan-nda-zui-liang-nohuo-bi-habitutokoin-6she-aimoderudiao-cha-gabao-kuwu-yu-noba-quan-zhan-zheng/",
+        "/odashi-shi-ti-zhi-gai-ge-jing-ji-an-bao-shi-dai-noyuan-zhu-wai-jiao-gawen-uri-ben-no-zhan-lue-de-zi-lu/",
+        "/gao-shi-shou-xiang-cun-li-wei-ji-shi-tai-da-bian-mi-qing-bao-ji-guan-gadu-mijie-kuri-ben-an-bao-nogou-zao-zhuan-huan/",
+        "/iranenerugishi-she-gong-ji-zhong-dong-dui-li-noluo-xuan-gashi-jie-gong-gei-wang-woduan-lie-saserugou-zao/",
+        "/suteburukoinshi-jia-zong-e-3000yi-dorutu-po-an-hao-zi-chan-nodai-ji-zi-jin-gashi-sujing-kanadi-que-bian-dong/",
+        "/frbzheng-ce-jin-li-ju-ezhi-ki-iranwei-ji-gali-xia-gejing-lu-wofeng-zirugou-zao-de-zirenma/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\predictions-ja-desktop.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 13221,
+        "body_text_length": 8107,
         "overflow": {
           "scrollWidth": 1440,
           "innerWidth": 1440,
           "overflow": 0
         },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 797,
+          "load_ms": 798,
+          "response_ms": 62
+        },
+        "header_ui": {
+          "html_lang": "ja",
+          "html_classes": "has-dark-text np-ja np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "予測トラッカー",
+            "力学で探す",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "ログイン",
+            "無料で参加"
+          ],
+          "brand_href": "/",
+          "about_href": "/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 154,
+            "height": 42,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "/en/predictions/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": "無料で参加",
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/en/predictions/"
       }
@@ -242,92 +719,324 @@
       "errors": [],
       "warnings": [],
       "content_hits": {
-        "#np-tracking-list": 1,
-        "#np-tracking-list details": 622
+        "#np-inplay-list": 1,
+        "#np-inplay-list details": 0,
+        "#np-awaiting-list": 1,
+        "#np-resolved-section": 1
       },
       "internal_link_sample": [
-        "/en/integrity-audit/",
-        "/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/",
-        "/aiezientoga-mai-iwu-woshi-metagou-zao-50dorunoshi-yan-kara15zhao-dorunowei-lai-he/",
-        "/eu-vs-mi-guo-tetukuzhan-zheng-dmagayin-kiqi-kosugui-zhi-nodi-que-bian-dong/",
-        "/du-wa-nodu-tokuremurin-nawarinuian-sha-nohua-xue-de-zheng-ming/",
-        "/ziyunebuno6shi-jian-4nian-mu-nozhan-zheng-ga-jiao-she-woshi-metagou-zao/"
+        "/en/bitcoins-geopolitical-stress-test-oil-shocks-meet-digital-safe-haven-thesis/",
+        "/en/morgan-stanleys-crypto-custody-play-wall-streets-point-of-no-return/",
+        "/en/trump-advisors-push-exit-plan-imperial-overreach-meets-escalation-spiral-in-iran-war/",
+        "/en/us-sinks-iranian-warship-the-escalation-spiral-nobody-can-stop/",
+        "/en/russia-iran-axis-deepens-zelenskys-bid-to-link-two-fronts/",
+        "/en/chinas-alliance-deficit-the-middle-east-war-reveals-a-superpower-without-partners/",
+        "/en/us-india-russian-oil-waiver-sanctions-bend-when-supply-runs-short/",
+        "/en/chinas-energy-fortress-strategic-reserves-turn-crisis-into-leverage/",
+        "/en/trump-rejects-allied-support-on-iran-imperial-overreach-meets-alliance-fracture/",
+        "/en/russias-border-missile-test-the-escalation-spiral-nato-cannot-ignore/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\predictions-en-desktop.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 33951,
+        "body_text_length": 9372,
         "overflow": {
           "scrollWidth": 1440,
           "innerWidth": 1440,
           "overflow": 0
         },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 454,
+          "load_ms": 459,
+          "response_ms": 54
+        },
+        "header_ui": {
+          "html_lang": "en",
+          "html_classes": "has-dark-text np-en np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "Predictions",
+            "Explore Dynamics",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "Sign in",
+            "Join Free"
+          ],
+          "brand_href": "/en/",
+          "about_href": "/en/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 154,
+            "height": 42,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "/predictions/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": "Join Free",
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/predictions/"
       }
     },
     {
-      "slug": "sample-ja-article",
+      "slug": "integrity-audit-ja",
       "viewport": "desktop",
-      "url": "https://nowpattern.com/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
-      "final_url": "https://nowpattern.com/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
+      "url": "https://nowpattern.com/integrity-audit/",
+      "final_url": "https://nowpattern.com/integrity-audit/",
       "status": 200,
       "ok": true,
       "errors": [],
       "warnings": [],
       "content_hits": {
         "main": 1,
-        "article": 5
+        "article": 1,
+        "h2": 3
       },
       "internal_link_sample": [
         "/predictions/",
-        "/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
-        "/en/en-eu-stablecoin-crackdown-regulatory-capture-reshapes-digital-dollar-dominance-2/",
-        "/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation/",
-        "/world-war-iii-comparisons-why-threat-inflation-distorts-strategic-clarity/"
+        "/scoring-guide/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\sample-ja-article-desktop.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 13103,
+        "body_text_length": 1350,
         "overflow": {
           "scrollWidth": 1440,
           "innerWidth": 1440,
           "overflow": 0
-        }
+        },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 331,
+          "load_ms": 334,
+          "response_ms": 30
+        },
+        "header_ui": {
+          "html_lang": "ja",
+          "html_classes": "has-dark-text np-ja np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "予測トラッカー",
+            "力学で探す",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "ログイン",
+            "無料で参加"
+          ],
+          "brand_href": "/",
+          "about_href": "/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 154,
+            "height": 42,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "/en/integrity-audit/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": "無料で参加",
+        "integrity_tier_cards": 4,
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/en/integrity-audit/"
       }
     },
     {
-      "slug": "sample-en-article",
+      "slug": "integrity-audit-en",
       "viewport": "desktop",
-      "url": "https://nowpattern.com/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
-      "final_url": "https://nowpattern.com/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
+      "url": "https://nowpattern.com/en/integrity-audit/",
+      "final_url": "https://nowpattern.com/en/integrity-audit/",
       "status": 200,
       "ok": true,
       "errors": [],
       "warnings": [],
       "content_hits": {
         "main": 1,
-        "article": 5
+        "article": 1,
+        "h2": 3
       },
       "internal_link_sample": [
-        "/predictions/",
-        "/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
-        "/en/en-eu-stablecoin-crackdown-regulatory-capture-reshapes-digital-dollar-dominance-2/",
-        "/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
-        "/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation/"
+        "/en/predictions/",
+        "/en/scoring-guide/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\sample-en-article-desktop.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 13733,
+        "body_text_length": 2805,
         "overflow": {
           "scrollWidth": 1440,
           "innerWidth": 1440,
           "overflow": 0
+        },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 246,
+          "load_ms": 251,
+          "response_ms": 20
+        },
+        "header_ui": {
+          "html_lang": "en",
+          "html_classes": "has-dark-text np-en np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "Predictions",
+            "Explore Dynamics",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "Sign in",
+            "Join Free"
+          ],
+          "brand_href": "/en/",
+          "about_href": "/en/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 154,
+            "height": 42,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "/integrity-audit/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": "Join Free",
+        "integrity_tier_cards": 4,
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/integrity-audit/"
+      }
+    },
+    {
+      "slug": "predictions-parity",
+      "viewport": "desktop",
+      "url": "https://nowpattern.com/predictions/",
+      "final_url": "https://nowpattern.com/en/predictions/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {},
+      "internal_link_sample": [],
+      "screenshots": [],
+      "extra": {
+        "ja_summary": {
+          "toolbar_all": 99,
+          "toolbar_inplay": 3,
+          "toolbar_awaiting": 84,
+          "toolbar_resolved": 12,
+          "inplay_details": 3,
+          "awaiting_details": 84,
+          "resolved_details": 12,
+          "cross_lang_links": 0
+        },
+        "en_summary": {
+          "toolbar_all": 197,
+          "toolbar_inplay": 0,
+          "toolbar_awaiting": 193,
+          "toolbar_resolved": 4,
+          "inplay_details": 0,
+          "awaiting_details": 193,
+          "resolved_details": 4,
+          "cross_lang_links": 0
         }
       }
     },
@@ -346,23 +1055,100 @@
         "article": 12
       },
       "internal_link_sample": [
-        "/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
+        "/hormuz-kaikyo-kiki-beikoku-iran-tairitsu/",
+        "/page/2/",
+        "/bitcoin-65k-crash-digital-gold-myth-shatters-under-iran-war/",
         "/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation/",
-        "/world-war-iii-comparisons-why-threat-inflation-distorts-strategic-clarity/",
+        "/bitcoin-breaks-72k-against-strong-dollar-the-decoupling-signal/",
         "/us-china-paris-trade-talks-rare-earths-as-the-new-leverage-battleground/",
-        "/ethereum-staking-yields-collapse-defis-gravity-well-reshapes-network-security/",
-        "/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/"
+        "/an-hao-zi-chan-nogui-zhi-noshen-pan-ji-guan-tou-zi-jia-nocai-yong-gali-fa-noxian-shi-tojiao-chai-suru-2/",
+        "/us-rolls-back-russia-oil-sanctions-alliance-strain-meets-energy-realpolitik/",
+        "/world-war-iii-comparisons-why-threat-inflation-distorts-strategic-clarity/",
+        "/an-hao-zi-chan-nogui-zhi-noshen-pan-ji-guan-tou-zi-jia-nocai-yong-gali-fa-noxian-shi-tojiao-chai-suru/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\home-ja-mobile.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 7530,
+        "body_text_length": 7545,
         "overflow": {
           "scrollWidth": 390,
           "innerWidth": 390,
           "overflow": 0
         },
+        "homepage_card_paths": [
+          "/hormuz-kaikyo-kiki-beikoku-iran-tairitsu/",
+          "/bitcoin-65k-crash-digital-gold-myth-shatters-under-iran-war/",
+          "/bitcoin-breaks-72k-against-strong-dollar-the-decoupling-signal/",
+          "/an-hao-zi-chan-nogui-zhi-noshen-pan-ji-guan-tou-zi-jia-nocai-yong-gali-fa-noxian-shi-tojiao-chai-suru-2/",
+          "/an-hao-zi-chan-nogui-zhi-noshen-pan-ji-guan-tou-zi-jia-nocai-yong-gali-fa-noxian-shi-tojiao-chai-suru/",
+          "/iran-wars-asian-shockwaves-how-a-gulf-conflict-rewires-indo-pacific-power/",
+          "/us-india-oil-waiver-sanctions-flexibility-reveals-empires-energy-dilemma/",
+          "/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/"
+        ],
+        "navigation_timing": {
+          "dom_content_loaded_ms": 748,
+          "load_ms": 777,
+          "response_ms": 287
+        },
+        "header_ui": {
+          "html_lang": "ja",
+          "html_classes": "has-dark-text np-ja np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "予測トラッカー",
+            "力学で探す",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "ログイン",
+            "無料で参加"
+          ],
+          "brand_href": "/",
+          "about_href": "/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 150,
+            "height": 40,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "/en/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": null,
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/en/"
       }
@@ -382,23 +1168,100 @@
         "article": 12
       },
       "internal_link_sample": [
-        "/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
-        "/en/en-eu-stablecoin-crackdown-regulatory-capture-reshapes-digital-dollar-dominance-2/",
-        "/en/en-ethereums-10-staking-yield-the-gravity-well-reshaping-crypto-capital-flows-2-2/",
-        "/en/en-taiwan-strait-standoff-the-escalation-spiral-neither-side-can-exit-4-2/",
-        "/en/en-takaichi-trump-summit-alliance-strain-meets-middle-east-escalation-2-2/",
-        "/en/en-boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit-2-2/"
+        "/en/frbli-xia-gejian-song-rilian-sok-zhong-dong-risukutoinhurezai-ran-gafu-rujin-rong-zheng-ce-nojing-lu-yi-cun/",
+        "/en/uns-first-report-on-gazas-peace/",
+        "/en/takaichis-march-5-marathon-japan-rewires-its-tech-security-alliance-grid/",
+        "/en/hormuz-kaikyo-kiki-beikoku-iran-tairitsu/",
+        "/en/wti-crude-crashes-14-trumps-iran-pause-exposes-oils-geopolitical-fragility/",
+        "/en/bitcoin-65k-crash-digital-gold-myth-shatters-under-iran-war/",
+        "/en/ri-ben-noyu-suan-zheng-zhi-zan-ding-yu-suan-fu-shang-gaying-suyu-ye-dang-xie-diao-noshi-bai-tozhi-du-pi-lao/",
+        "/en/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation-2-2/",
+        "/en/the-deeper-meaning-behind-the-feds-rate-cut-freeze/",
+        "/en/boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit-2-2/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\home-en-mobile.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 6827,
+        "body_text_length": 3120,
         "overflow": {
           "scrollWidth": 390,
           "innerWidth": 390,
           "overflow": 0
         },
+        "homepage_card_paths": [
+          "/en/bitcoin-65k-crash-digital-gold-myth-shatters-under-iran-war/",
+          "/en/hormuz-kaikyo-kiki-beikoku-iran-tairitsu/",
+          "/en/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation-2-2/",
+          "/en/boj-holds-rates-amid-hormuz-crisis-path-dependency-traps-japans-exit-2-2/",
+          "/en/frbli-xia-gejian-song-rilian-sok-zhong-dong-risukutoinhurezai-ran-gafu-rujin-rong-zheng-ce-nojing-lu-yi-cun/",
+          "/en/ri-ben-noyu-suan-zheng-zhi-zan-ding-yu-suan-fu-shang-gaying-suyu-ye-dang-xie-diao-noshi-bai-tozhi-du-pi-lao/",
+          "/en/gaza-peace-council-first-un-report/",
+          "/en/eu-australia-fta-concluded-the-structure-of/"
+        ],
+        "navigation_timing": {
+          "dom_content_loaded_ms": 418,
+          "load_ms": 427,
+          "response_ms": 116
+        },
+        "header_ui": {
+          "html_lang": "en",
+          "html_classes": "has-dark-text np-en np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "Predictions",
+            "Explore Dynamics",
+            "About",
+            "日本語"
+          ],
+          "member_texts": [
+            "Sign in",
+            "Join Free"
+          ],
+          "brand_href": "/en/",
+          "about_href": "/en/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 150,
+            "height": 40,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": null,
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/"
       }
@@ -418,18 +1281,82 @@
       },
       "internal_link_sample": [
         "/predictions/",
-        "/"
+        "/taxonomy-ja/",
+        "/integrity-audit/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\about-ja-mobile.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 767,
+        "body_text_length": 938,
         "overflow": {
           "scrollWidth": 390,
           "innerWidth": 390,
           "overflow": 0
         },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 293,
+          "load_ms": 295,
+          "response_ms": 26
+        },
+        "header_ui": {
+          "html_lang": "ja",
+          "html_classes": "has-dark-text np-ja np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "予測トラッカー",
+            "力学で探す",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "ログイン",
+            "無料で参加"
+          ],
+          "brand_href": "/",
+          "about_href": "/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 150,
+            "height": 40,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "/en/about/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": null,
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/en/about/"
       }
@@ -448,19 +1375,83 @@
         "article": 1
       },
       "internal_link_sample": [
-        "/about/",
-        "/en/predictions/"
+        "/en/predictions/",
+        "/en/taxonomy/",
+        "/en/integrity-audit/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\about-en-mobile.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 1933,
+        "body_text_length": 2027,
         "overflow": {
-          "scrollWidth": 465,
-          "innerWidth": 465,
+          "scrollWidth": 390,
+          "innerWidth": 390,
           "overflow": 0
         },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 280,
+          "load_ms": 281,
+          "response_ms": 22
+        },
+        "header_ui": {
+          "html_lang": "en",
+          "html_classes": "has-dark-text np-en np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "Predictions",
+            "Explore Dynamics",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "Sign in",
+            "Join Free"
+          ],
+          "brand_href": "/en/",
+          "about_href": "/en/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 150,
+            "height": 40,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "/about/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": null,
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/about/"
       }
@@ -479,12 +1470,9 @@
         "article": 1
       },
       "internal_link_sample": [
-        "/taxonomy-en/",
         "/taxonomy-guide-ja/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\taxonomy-ja-mobile.png"
-      ],
+      "screenshots": [],
       "extra": {
         "body_text_length": 2875,
         "overflow": {
@@ -492,6 +1480,71 @@
           "innerWidth": 390,
           "overflow": 0
         },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 367,
+          "load_ms": 371,
+          "response_ms": 31
+        },
+        "header_ui": {
+          "html_lang": "ja",
+          "html_classes": "has-dark-text np-ja np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "予測トラッカー",
+            "力学で探す",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "ログイン",
+            "無料で参加"
+          ],
+          "brand_href": "/",
+          "about_href": "/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 150,
+            "height": 40,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "/en/taxonomy/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": null,
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/en/taxonomy/"
       }
@@ -510,12 +1563,9 @@
         "article": 1
       },
       "internal_link_sample": [
-        "/taxonomy-ja/",
-        "/taxonomy-guide-en/"
+        "/taxonomy-ja/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\taxonomy-en-mobile.png"
-      ],
+      "screenshots": [],
       "extra": {
         "body_text_length": 6921,
         "overflow": {
@@ -523,6 +1573,71 @@
           "innerWidth": 390,
           "overflow": 0
         },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 301,
+          "load_ms": 304,
+          "response_ms": 26
+        },
+        "header_ui": {
+          "html_lang": "en",
+          "html_classes": "has-dark-text np-en np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "Predictions",
+            "Explore Dynamics",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "Sign in",
+            "Join Free"
+          ],
+          "brand_href": "/en/",
+          "about_href": "/en/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 150,
+            "height": 40,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "/taxonomy/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": null,
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/taxonomy/"
       }
@@ -537,27 +1652,96 @@
       "errors": [],
       "warnings": [],
       "content_hits": {
-        "#np-tracking-list": 1,
-        "#np-tracking-list details": 179
+        "#np-inplay-list": 1,
+        "#np-inplay-list details": 6,
+        "#np-awaiting-list": 1,
+        "#np-resolved-section": 1
       },
       "internal_link_sample": [
-        "/integrity-audit/",
-        "/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/",
-        "/aiezientoga-mai-iwu-woshi-metagou-zao-50dorunoshi-yan-kara15zhao-dorunowei-lai-he/",
-        "/eu-vs-mi-guo-tetukuzhan-zheng-dmagayin-kiqi-kosugui-zhi-nodi-que-bian-dong/",
-        "/du-wa-nodu-tokuremurin-nawarinuian-sha-nohua-xue-de-zheng-ming/",
-        "/ziyunebuno6shi-jian-4nian-mu-nozhan-zheng-ga-jiao-she-woshi-metagou-zao/"
+        "/mi-zhong-parimao-yi-xie-yi-guan-shui-toreaasugaying-suba-quan-jiao-she-nogou-zao-zhuan-huan/",
+        "/ecbjin-li-ju-ezhi-ki6lian-sok-enerugiwei-ji-gapo-ruzheng-ce-zhuan-huan-nofen-shui-ling/",
+        "/ziyunebuno6shi-jian-4nian-mu-nozhan-zheng-ga-jiao-she-woshi-metagou-zao/",
+        "/toranpujia-zu-noan-hao-zi-chan-samituto-gorudomanceokaranitukiminaziyu/",
+        "/aigaxuan-nda-zui-liang-nohuo-bi-habitutokoin-6she-aimoderudiao-cha-gabao-kuwu-yu-noba-quan-zhan-zheng/",
+        "/odashi-shi-ti-zhi-gai-ge-jing-ji-an-bao-shi-dai-noyuan-zhu-wai-jiao-gawen-uri-ben-no-zhan-lue-de-zi-lu/",
+        "/gao-shi-shou-xiang-cun-li-wei-ji-shi-tai-da-bian-mi-qing-bao-ji-guan-gadu-mijie-kuri-ben-an-bao-nogou-zao-zhuan-huan/",
+        "/iranenerugishi-she-gong-ji-zhong-dong-dui-li-noluo-xuan-gashi-jie-gong-gei-wang-woduan-lie-saserugou-zao/",
+        "/suteburukoinshi-jia-zong-e-3000yi-dorutu-po-an-hao-zi-chan-nodai-ji-zi-jin-gashi-sujing-kanadi-que-bian-dong/",
+        "/frbzheng-ce-jin-li-ju-ezhi-ki-iranwei-ji-gali-xia-gejing-lu-wofeng-zirugou-zao-de-zirenma/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\predictions-ja-mobile.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 13160,
+        "body_text_length": 6953,
         "overflow": {
-          "scrollWidth": 439,
-          "innerWidth": 439,
+          "scrollWidth": 435,
+          "innerWidth": 435,
           "overflow": 0
         },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 585,
+          "load_ms": 615,
+          "response_ms": 65
+        },
+        "header_ui": {
+          "html_lang": "ja",
+          "html_classes": "has-dark-text np-ja np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "予測トラッカー",
+            "力学で探す",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "ログイン",
+            "無料で参加"
+          ],
+          "brand_href": "/",
+          "about_href": "/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 150,
+            "height": 40,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "/en/predictions/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": null,
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/en/predictions/"
       }
@@ -572,99 +1756,331 @@
       "errors": [],
       "warnings": [],
       "content_hits": {
-        "#np-tracking-list": 1,
-        "#np-tracking-list details": 622
+        "#np-inplay-list": 1,
+        "#np-inplay-list details": 0,
+        "#np-awaiting-list": 1,
+        "#np-resolved-section": 1
       },
       "internal_link_sample": [
-        "/en/integrity-audit/",
-        "/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/",
-        "/aiezientoga-mai-iwu-woshi-metagou-zao-50dorunoshi-yan-kara15zhao-dorunowei-lai-he/",
-        "/eu-vs-mi-guo-tetukuzhan-zheng-dmagayin-kiqi-kosugui-zhi-nodi-que-bian-dong/",
-        "/du-wa-nodu-tokuremurin-nawarinuian-sha-nohua-xue-de-zheng-ming/",
-        "/ziyunebuno6shi-jian-4nian-mu-nozhan-zheng-ga-jiao-she-woshi-metagou-zao/"
+        "/en/bitcoins-geopolitical-stress-test-oil-shocks-meet-digital-safe-haven-thesis/",
+        "/en/morgan-stanleys-crypto-custody-play-wall-streets-point-of-no-return/",
+        "/en/trump-advisors-push-exit-plan-imperial-overreach-meets-escalation-spiral-in-iran-war/",
+        "/en/us-sinks-iranian-warship-the-escalation-spiral-nobody-can-stop/",
+        "/en/russia-iran-axis-deepens-zelenskys-bid-to-link-two-fronts/",
+        "/en/chinas-alliance-deficit-the-middle-east-war-reveals-a-superpower-without-partners/",
+        "/en/us-india-russian-oil-waiver-sanctions-bend-when-supply-runs-short/",
+        "/en/chinas-energy-fortress-strategic-reserves-turn-crisis-into-leverage/",
+        "/en/trump-rejects-allied-support-on-iran-imperial-overreach-meets-alliance-fracture/",
+        "/en/russias-border-missile-test-the-escalation-spiral-nato-cannot-ignore/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\predictions-en-mobile.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 33887,
+        "body_text_length": 7087,
         "overflow": {
-          "scrollWidth": 444,
-          "innerWidth": 444,
+          "scrollWidth": 390,
+          "innerWidth": 390,
           "overflow": 0
         },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 495,
+          "load_ms": 508,
+          "response_ms": 42
+        },
+        "header_ui": {
+          "html_lang": "en",
+          "html_classes": "has-dark-text np-en np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "Predictions",
+            "Explore Dynamics",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "Sign in",
+            "Join Free"
+          ],
+          "brand_href": "/en/",
+          "about_href": "/en/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 150,
+            "height": 40,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "/predictions/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": null,
         "lang_toggle_disabled_count": 0,
         "lang_toggle_target": "https://nowpattern.com/predictions/"
       }
     },
     {
-      "slug": "sample-ja-article",
+      "slug": "integrity-audit-ja",
       "viewport": "mobile",
-      "url": "https://nowpattern.com/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
-      "final_url": "https://nowpattern.com/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
+      "url": "https://nowpattern.com/integrity-audit/",
+      "final_url": "https://nowpattern.com/integrity-audit/",
       "status": 200,
       "ok": true,
       "errors": [],
       "warnings": [],
       "content_hits": {
         "main": 1,
-        "article": 5
+        "article": 1,
+        "h2": 3
       },
       "internal_link_sample": [
         "/predictions/",
-        "/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
-        "/en/en-eu-stablecoin-crackdown-regulatory-capture-reshapes-digital-dollar-dominance-2/",
-        "/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation/",
-        "/world-war-iii-comparisons-why-threat-inflation-distorts-strategic-clarity/"
+        "/scoring-guide/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\sample-ja-article-mobile.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 13042,
+        "body_text_length": 1296,
         "overflow": {
           "scrollWidth": 390,
           "innerWidth": 390,
           "overflow": 0
-        }
+        },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 323,
+          "load_ms": 325,
+          "response_ms": 28
+        },
+        "header_ui": {
+          "html_lang": "ja",
+          "html_classes": "has-dark-text np-ja np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "予測トラッカー",
+            "力学で探す",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "ログイン",
+            "無料で参加"
+          ],
+          "brand_href": "/",
+          "about_href": "/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 150,
+            "height": 40,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "/en/integrity-audit/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": null,
+        "integrity_tier_cards": 4,
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/en/integrity-audit/"
       }
     },
     {
-      "slug": "sample-en-article",
+      "slug": "integrity-audit-en",
       "viewport": "mobile",
-      "url": "https://nowpattern.com/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
-      "final_url": "https://nowpattern.com/south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
+      "url": "https://nowpattern.com/en/integrity-audit/",
+      "final_url": "https://nowpattern.com/en/integrity-audit/",
       "status": 200,
       "ok": true,
       "errors": [],
       "warnings": [],
       "content_hits": {
         "main": 1,
-        "article": 5
+        "article": 1,
+        "h2": 3
       },
       "internal_link_sample": [
-        "/predictions/",
-        "/en/en-south-china-sea-near-collision-the-escalation-spiral-neither-side-can-exit-7-2/",
-        "/en/en-eu-stablecoin-crackdown-regulatory-capture-reshapes-digital-dollar-dominance-2/",
-        "/us-rolls-back-russia-oil-sanctions-alliance-strain-fractures-western-unity/",
-        "/takaichi-trump-summit-alliance-strain-meets-middle-east-escalation/"
+        "/en/predictions/",
+        "/en/scoring-guide/"
       ],
-      "screenshots": [
-        "reports\\site_ui_smoke\\screens\\sample-en-article-mobile.png"
-      ],
+      "screenshots": [],
       "extra": {
-        "body_text_length": 13669,
+        "body_text_length": 2729,
         "overflow": {
           "scrollWidth": 390,
           "innerWidth": 390,
           "overflow": 0
+        },
+        "navigation_timing": {
+          "dom_content_loaded_ms": 253,
+          "load_ms": 254,
+          "response_ms": 22
+        },
+        "header_ui": {
+          "html_lang": "en",
+          "html_classes": "has-dark-text np-en np-ui-managed",
+          "nav_texts": [
+            "Nowpattern",
+            "Predictions",
+            "Explore Dynamics",
+            "About",
+            "EN"
+          ],
+          "member_texts": [
+            "Sign in",
+            "Join Free"
+          ],
+          "brand_href": "/en/",
+          "about_href": "/en/about/",
+          "lang_bar": {
+            "text": "JA|EN",
+            "href": "",
+            "color": "rgb(21, 23, 26)",
+            "background": "rgba(15, 23, 42, 0.96)",
+            "parent_background": "rgba(0, 0, 0, 0)",
+            "font_size": "15px",
+            "font_weight": "550",
+            "width": 150,
+            "height": 40,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_ja": {
+            "text": "JA",
+            "href": "/integrity-audit/",
+            "color": "rgb(248, 250, 252)",
+            "background": "rgba(255, 255, 255, 0.04)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": false,
+            "disabled": false
+          },
+          "lang_en": {
+            "text": "EN",
+            "href": "",
+            "color": "rgb(17, 24, 39)",
+            "background": "rgb(242, 201, 76)",
+            "parent_background": "rgba(15, 23, 42, 0.96)",
+            "font_size": "14px",
+            "font_weight": "800",
+            "width": 44,
+            "height": 32,
+            "opacity": "1",
+            "active": true,
+            "disabled": false
+          }
+        },
+        "portal_trigger_label": null,
+        "integrity_tier_cards": 4,
+        "lang_toggle_disabled_count": 0,
+        "lang_toggle_target": "https://nowpattern.com/integrity-audit/"
+      }
+    },
+    {
+      "slug": "predictions-parity",
+      "viewport": "mobile",
+      "url": "https://nowpattern.com/predictions/",
+      "final_url": "https://nowpattern.com/en/predictions/",
+      "status": 200,
+      "ok": true,
+      "errors": [],
+      "warnings": [],
+      "content_hits": {},
+      "internal_link_sample": [],
+      "screenshots": [],
+      "extra": {
+        "ja_summary": {
+          "toolbar_all": 99,
+          "toolbar_inplay": 3,
+          "toolbar_awaiting": 84,
+          "toolbar_resolved": 12,
+          "inplay_details": 3,
+          "awaiting_details": 84,
+          "resolved_details": 12,
+          "cross_lang_links": 0
+        },
+        "en_summary": {
+          "toolbar_all": 197,
+          "toolbar_inplay": 0,
+          "toolbar_awaiting": 193,
+          "toolbar_resolved": 4,
+          "inplay_details": 0,
+          "awaiting_details": 193,
+          "resolved_details": 4,
+          "cross_lang_links": 0
         }
       }
     }
   ],
   "summary": {
-    "total": 20,
-    "passed": 20,
+    "total": 22,
+    "passed": 22,
     "failed": 0
   }
 }

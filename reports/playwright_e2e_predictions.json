@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-04-04T03:23:27Z",
+  "generated_at_epoch": 1775273007,
+  "results": [
+    {
+      "lang": "ja",
+      "device": "desktop",
+      "ok": true,
+      "pass_count": 9,
+      "fail_count": 0,
+      "fail_details": [],
+      "total": 9
+    },
+    {
+      "lang": "ja",
+      "device": "mobile",
+      "ok": true,
+      "pass_count": 9,
+      "fail_count": 0,
+      "fail_details": [],
+      "total": 9
+    },
+    {
+      "lang": "en",
+      "device": "desktop",
+      "ok": true,
+      "pass_count": 9,
+      "fail_count": 0,
+      "fail_details": [],
+      "total": 9
+    },
+    {
+      "lang": "en",
+      "device": "mobile",
+      "ok": true,
+      "pass_count": 9,
+      "fail_count": 0,
+      "fail_details": [],
+      "total": 9
+    }
+  ],
+  "summary": {
+    "total_runs": 4,
+    "failed_runs": 0,
+    "passed_runs": 4
+  },
+  "ok": true
+}

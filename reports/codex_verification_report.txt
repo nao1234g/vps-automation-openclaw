@@ -1,0 +1,219 @@
+============================================================
+ CODEX VERIFICATION REPORT — Independent Audit
+ Date: 2026-04-04
+ Auditor: Claude Code (local, verification-only)
+ Scope: Codex working tree changes (38 files, +8138/-6600)
+============================================================
+
+## 1. TESTS EXECUTED
+
+ Test                                      | Result
+ ------------------------------------------|--------
+ test_release_governor.py                   | PASS
+ test_article_release_guard.py              | PASS
+ test_prediction_tracker_regressions.py     | PASS
+ test_one_pass_completion_gate.py           | PASS
+ release_guard_canary.py (7 checks)         | 7/7 PASS
+
+ Verdict: 5/5 test suites PASS, 0 FAIL.
+
+============================================================
+
+## 2. PY_COMPILE SMOKE (24 modified/new scripts)
+
+ Script                                | py_compile
+ --------------------------------------|----------
+ article_release_guard.py              | OK
+ build_article_release_manifest.py     | OK
+ one_pass_completion_gate.py           | OK
+ synthetic_user_crawler.py             | OK
+ ecosystem_governance_audit.py         | OK
+ release_guard_canary.py               | OK
+ push_prediction_platform_sources.py   | OK
+ deploy_site_ui_guard_stack.py         | OK
+ stateful_user_journey_audit.py        | OK
+ release_governor.py                   | OK
+ site_guard_runner.py                  | OK
+ prediction_deploy_gate.py             | OK
+ prediction_page_builder.py            | OK
+ check_live_repo_drift.py              | OK
+ article_anchor_integrity_audit.py     | OK
+ site_article_source_audit.py          | OK
+ playwright_e2e_predictions.py         | OK
+ canonical_public_lexicon.py           | OK
+ agent_bootstrap_context.py            | OK
+ ecosystem_mission_control.py          | OK
+ install_ecosystem_mission_control.py  | OK
+ install_site_ui_guard.py              | OK
+ site_ui_smoke_audit.py                | OK
+ refresh_prediction_db_meta.py         | OK
+
+ Verdict: 24/24 OK — zero syntax errors.
+
+============================================================
+
+## 3. AUDIT: REGRESSION RISK
+
+### article_release_guard.py (+107 lines)
+ Status: SAFE — No regressions detected.
+ - evaluate_release_blockers() remains a pure evaluation function
+ - No duplicate responsibility with release_governor.py or
+   build_article_release_manifest.py
+ - Clean separation: guard -> governor -> manifest builder
+ - Only side-effect: optional HTTP source-fetchability check
+   (opt-in via check_source_fetchability=False default)
+ - Return type dict[str, Any] with 16 keys is consistent
+
+### release_governor.py (+37 lines)
+ Status: SAFE — Wraps article_release_guard with policy layer.
+ - No duplicate logic with guard — composes it
+ - Added policy versioning (GOVERNOR_POLICY_VERSION)
+ - evaluate_governed_release() delegates to evaluate_release_blockers()
+
+### build_article_release_manifest.py (+32 lines)
+ Status: SAFE — Consumer of governor, no duplicate responsibility.
+ - Imports and calls release_governor.evaluate_governed_release()
+ - Manifest generation layer only
+
+============================================================
+
+## 4. AUDIT: one_pass_completion_gate.py
+
+ evaluate_completion() purity: SAFE
+   - Pure function: no file writes, no network, no state mutation
+   - Idempotent: same inputs -> same outputs
+   - Safe for repeated calls
+
+ main() side-effects: ACCEPTABLE
+   - Runs subprocesses (prediction_deploy_gate, ecosystem_governance_audit)
+   - Atomic file writes for report output
+   - No concurrent execution guard (file locking absent)
+
+ Hardcoded VPS path: KNOWN ISSUE (pre-existing)
+   - root@163.44.124.123 fallback at line ~239
+   - Mitigated by NOWPATTERN_VPS_HOST env var override
+   - Noted in prior release_readiness_matrix.txt
+
+ Duplicate execution risk: LOW
+   - Subprocess calls are audit/read-only scripts
+   - Report write uses atomic tempfile+rename
+
+============================================================
+
+## 5. AUDIT: stateful_user_journey_audit.py
+
+ Syntax: VALID
+ Dependencies: playwright (conditional import, graceful fallback)
+ Dangerous operations: NONE
+   - No file deletes, no DB writes, no system commands
+   - Only writes JSON output when --json-out flag provided
+   - Network: GET requests only (read-only browser automation)
+
+ Verdict: SAFE for deployment.
+
+============================================================
+
+## 6. AUDIT: push_prediction_platform_sources.py (+180 lines)
+
+ Purpose: Pushes local source files to VPS via SSH.
+ Type: WRITE/DEPLOYMENT — NOT read-only.
+
+ Guards present:
+   - --dry-run flag: shows what would be pushed without executing
+   - --target flag: selective deployment of specific files
+   - NOWPATTERN_VPS_HOST env override
+   - Error handling with returncode checks
+
+ Concern: No interactive confirmation prompt on actual push.
+   73 files can be pushed in a single invocation.
+
+ Risk: MEDIUM — proper dry-run guard exists.
+   Recommend: always run --dry-run first on VPS deploy.
+
+============================================================
+
+## 7. AUDIT: ecosystem_governance_audit.py (+108 lines)
+
+ Changes: 5 new audit suites added, enhanced parameters, new CLI flag.
+ New suites: change_freeze, credibility_budget, one_pass_completion,
+   stateful_user_journey, synthetic_user_freshness, plus repairs.
+ New flag: --include-full-crawl (conditional exhaustive crawl)
+
+ Backward compatibility: MAINTAINED
+   - Old invocations without --include-full-crawl work identically
+   - Report adds new fields (generated_at, generated_at_epoch)
+     without removing existing ones
+   - All new audits are read-only
+
+ Side-effects: NONE (all audits are read-only verification)
+ Risk: LOW — expanded scope may increase execution time.
+
+============================================================
+
+## 8. AUDIT: deploy_site_ui_guard_stack.py (+29 lines)
+
+ Changes: 14 new target files + 13 new remote commands added.
+ Type: Additive deployment chain expansion.
+ All additions are test/audit scripts or repair scripts
+   with --audit-only flags.
+
+ Backward compatibility: MAINTAINED
+ --dry-run: still functional
+ Risk: LOW — increases verification coverage.
+
+============================================================
+
+## 9. CANARY DETAIL (release_guard_canary.py)
+
+ Check                                              | OK
+ ---------------------------------------------------|----
+ frontier_claim_without_sources_blocked              | YES
+ frontier_claim_without_vendor_source_blocked         | YES
+ broken_source_section_blocked                       | YES
+ single_risk_source_backed_article_can_be_auto_safe  | YES
+ multi_risk_article_with_two_sources_editorially_ok  | YES
+ high_risk_article_with_human_approval_can_pass      | YES
+ assert_release_ready_raises_on_invalid_frontier     | YES
+
+ Verdict: 7/7 canary checks PASS. Truth-first publication
+ policy is intact. No regression in frontier claim blocking.
+
+============================================================
+
+## 10. OVERALL VERDICT
+
+ Category                          | Status
+ ----------------------------------|------------------
+ Regression tests (4 suites)       | 4/4 PASS
+ Canary checks                     | 7/7 PASS
+ py_compile smoke (24 scripts)     | 24/24 OK
+ Duplicate responsibility          | NONE detected
+ Dangerous side-effects            | NONE new
+ Backward compatibility            | MAINTAINED (all scripts)
+ Blocking bugs                     | 0
+ Pre-existing known issues         | 1 (hardcoded VPS IP fallback)
+
+ +---------------------------------------------------+
+ |  VERDICT: CODEX CHANGES APPROVED                  |
+ |                                                   |
+ |  All tests pass. No regressions. No new           |
+ |  dangerous side-effects. Backward compatible.     |
+ |  Safe to commit.                                  |
+ +---------------------------------------------------+
+
+## 11. HUMAN JUDGMENT NEEDED
+
+ 1. push_prediction_platform_sources.py has no interactive
+    confirmation on actual push (73 files at once).
+    Decision: Is --dry-run sufficient, or add confirmation?
+
+ 2. one_pass_completion_gate.py hardcodes VPS IP
+    163.44.124.123 as fallback. Pre-existing, not new.
+    Decision: Accept or require explicit env var?
+
+ 3. ecosystem_governance_audit.py expanded audit scope
+    significantly (~20+ suites). Execution time on VPS
+    will increase.
+    Decision: Acceptable for cron schedule?
+
+============================================================

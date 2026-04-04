@@ -897,7 +897,13 @@ def main() -> int:
     args = parser.parse_args()
 
     screenshot_dir = Path(args.screenshot_dir) if args.screenshot_dir else None
-    report: dict[str, Any] = {"base_url": args.base_url.rstrip("/"), "results": [], "summary": {}}
+    report: dict[str, Any] = {
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generated_at_epoch": int(datetime.now(timezone.utc).timestamp()),
+        "base_url": args.base_url.rstrip("/"),
+        "results": [],
+        "summary": {},
+    }
     failed = False
 
     try:

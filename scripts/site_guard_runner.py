@@ -61,6 +61,42 @@ JOBS = {
         "load_guard": True,
         "health_guard": True,
     },
+    "theme-en-urls": {
+        "command": ["python3", str(SCRIPT_DIR / "patch_ghost_theme_en_urls.py")],
+        "timeout": 180,
+        "load_guard": True,
+        "health_guard": True,
+    },
+    "ghost-authors": {
+        "command": ["python3", str(SCRIPT_DIR / "repair_ghost_post_authors.py")],
+        "timeout": 180,
+        "load_guard": True,
+        "health_guard": True,
+    },
+    "draft-links": {
+        "command": ["python3", str(SCRIPT_DIR / "repair_internal_draft_links.py")],
+        "timeout": 240,
+        "load_guard": True,
+        "health_guard": True,
+    },
+    "article-sources": {
+        "command": ["python3", str(SCRIPT_DIR / "repair_article_source_urls.py")],
+        "timeout": 240,
+        "load_guard": True,
+        "health_guard": True,
+    },
+    "cross-lang-links": {
+        "command": ["python3", str(SCRIPT_DIR / "repair_cross_language_article_links.py")],
+        "timeout": 300,
+        "load_guard": True,
+        "health_guard": True,
+    },
+    "content-integrity": {
+        "subjobs": ["theme-en-urls", "ghost-authors", "draft-links", "article-sources", "cross-lang-links"],
+        "timeout": 540,
+        "load_guard": True,
+        "health_guard": True,
+    },
     "smoke": {
         "command": [
             "python3",
@@ -82,7 +118,7 @@ JOBS = {
             "--json-out",
             "/opt/shared/reports/site_guard/ecosystem_governance.json",
         ],
-        "timeout": 300,
+        "timeout": 420,
         "load_guard": True,
         "health_guard": False,
     },
@@ -250,30 +286,50 @@ def run_job(job: str) -> int:
             return 0
 
         started = time.time()
-        result = subprocess.run(
-            JOBS[job]["command"],
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=JOBS[job]["timeout"],
-        )
+        if "subjobs" in JOBS[job]:
+            last_returncode = 0
+            for subjob in JOBS[job]["subjobs"]:
+                result = subprocess.run(
+                    JOBS[subjob]["command"],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=JOBS[subjob]["timeout"],
+                )
+                if result.stdout:
+                    print(result.stdout.rstrip())
+                if result.stderr:
+                    print(result.stderr.rstrip(), file=sys.stderr)
+                last_returncode = result.returncode
+                if result.returncode != 0:
+                    break
+            returncode = last_returncode
+        else:
+            result = subprocess.run(
+                JOBS[job]["command"],
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=JOBS[job]["timeout"],
+            )
+            if result.stdout:
+                print(result.stdout.rstrip())
+            if result.stderr:
+                print(result.stderr.rstrip(), file=sys.stderr)
+            returncode = result.returncode
         elapsed = int(time.time() - started)
-        if result.stdout:
-            print(result.stdout.rstrip())
-        if result.stderr:
-            print(result.stderr.rstrip(), file=sys.stderr)
 
         state = load_state(job)
-        state["last_exit_code"] = result.returncode
+        state["last_exit_code"] = returncode
         state["last_elapsed_seconds"] = elapsed
         state["last_ran_epoch"] = int(time.time())
-        if result.returncode == 0:
+        if returncode == 0:
             state["last_ok_epoch"] = int(time.time())
             state["availability_failures"] = 0
             if "pause_until_epoch" not in state:
                 state["pause_until_epoch"] = 0
         save_state(job, state)
-        return result.returncode
+        return returncode
     except subprocess.TimeoutExpired:
         state = load_state(job)
         state["last_exit_code"] = 124

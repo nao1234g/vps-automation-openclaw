@@ -1,0 +1,148 @@
+============================================================
+ CODEX VERIFICATION REPORT v2 — VERIFY-ONLY Audit
+ Date: 2026-04-04
+ Auditor: Claude Code (local, VERIFY-ONLY)
+ Scope: Codex working tree (38 modified, +8138/-6600)
+============================================================
+
+## 1. 検証対象の固定
+
+ Codex所有領域: 理解済み（10ファイル+関連テスト/レポート）
+ 自分の担当: VERIFY-ONLY
+ 触らないファイル: 全ファイル（1行も編集していない）
+ 検証対象: 回帰テスト5種 + py_compile 24本 + 監査観点4件
+
+============================================================
+
+## 2. 実行した検証
+
+### A. テスト実行
+
+ Test                                      | Result
+ ------------------------------------------|--------
+ test_release_governor.py                   | PASS
+ test_article_release_guard.py              | PASS
+ test_prediction_tracker_regressions.py     | PASS
+ test_one_pass_completion_gate.py           | PASS
+ release_guard_canary.py (7 checks)         | 7/7 PASS
+
+ 方式: scripts/ ディレクトリからの直接実行（pytest未インストール）
+
+### B. py_compile smoke (24本)
+
+ article_release_guard.py              | OK
+ build_article_release_manifest.py     | OK
+ one_pass_completion_gate.py           | OK
+ synthetic_user_crawler.py             | OK
+ ecosystem_governance_audit.py         | OK
+ release_guard_canary.py               | OK
+ push_prediction_platform_sources.py   | OK
+ deploy_site_ui_guard_stack.py         | OK
+ stateful_user_journey_audit.py        | OK
+ release_governor.py                   | OK
+ test_article_release_guard.py         | OK
+ test_prediction_tracker_regressions.py| OK
+ test_release_governor.py              | OK
+ site_guard_runner.py                  | OK
+ prediction_deploy_gate.py             | OK
+ check_live_repo_drift.py              | OK
+ article_anchor_integrity_audit.py     | OK
+ site_article_source_audit.py          | OK
+ prediction_page_builder.py            | OK
+ refresh_prediction_db_meta.py         | OK
+ canonical_public_lexicon.py           | OK
+ agent_bootstrap_context.py            | OK
+ ecosystem_mission_control.py          | OK
+ install_site_ui_guard.py              | OK
+
+ 24/24 OK — zero syntax errors.
+
+============================================================
+
+## 3. PASS / FAIL / 検証不能
+
+ 検証項目                              | 結果
+ --------------------------------------|--------
+ 回帰テスト 4本                         | PASS
+ canary 7チェック                       | PASS
+ py_compile 24本                        | PASS
+ stateful_user_journey_audit 構文       | PASS（py_compile OK + import確認済み）
+ stateful_user_journey_audit 整合性     | PASS（playwright conditional import、graceful fallback）
+ one_pass 重複責務                      | PASS（evaluate_completion()は純粋関数、副作用なし）
+ one_pass 危険副作用                    | PASS（main()のsubprocess.runは読み取り系スクリプト呼び出し）
+ build_article_release_manifest 副作用  | HOLD（下記参照）
+ push_prediction_platform_sources リスク| HOLD（下記参照）
+ deploy_site_ui_guard_stack リスク      | PASS（--dry-runあり、追加は検証系のみ）
+
+============================================================
+
+## 4. HOLD が必要な点
+
+### HOLD-1: build_article_release_manifest.py — Ghost DB直接操作+draft降格
+
+ 対象: scripts/build_article_release_manifest.py
+ 事実:
+   - sqlite3.connect("/var/www/nowpattern/content/data/ghost.db") で直接接続
+   - draft_post() 関数がGhost Admin APIで記事をdraft降格する
+   - --apply-draft-truth-failures / --apply-draft-human-review-required フラグで制御
+   - フラグなしでは読み取り専用（マニフェスト生成のみ）
+
+ なぜ右上だけでは最終判断できないか:
+   VPS上のghost.dbへの実行パスが正しいか、draft降格の対象記事が
+   想定通りかは、VPS実環境でしか確認できない。
+   ローカル検証ではフラグなし実行パスの構文整合性のみ確認可能。
+
+ 左上が見るべき理由:
+   --apply-draft-* フラグ付きでVPS実行する際の影響範囲判断が必要。
+
+### HOLD-2: push_prediction_platform_sources.py — 73ファイル一括push
+
+ 対象: scripts/push_prediction_platform_sources.py
+ 事実:
+   - --dry-run フラグあり（構文確認済み）
+   - --target フラグで個別指定可能
+   - 確認プロンプト（interactive confirmation）は存在しない
+   - DEFAULT_HOST = root@163.44.124.123（env var override可能）
+   - 73ファイルが1回のinvocationで対象になりうる
+
+ なぜ右上だけでは最終判断できないか:
+   dry-runで十分か、interactive confirmationが必要かは
+   運用ポリシーの判断。コードの正当性は検証できたが、
+   本番pushの安全性は運用判断。
+
+ 左上が見るべき理由:
+   VPS本番へのpush手順の最終承認。--dry-run先行を標準化するか。
+
+============================================================
+
+## 5. 結論
+
+ VERIFY-WITH-HOLDS
+
+ テスト5種PASS + py_compile 24/24 OK + canary 7/7 PASS。
+ 回帰なし。構文エラーなし。新規の危険副作用なし。
+ 2件のHOLDはコード品質の問題ではなく、VPS実行時の運用判断。
+
+============================================================
+
+## 6. 締め
+
+ 検証で確認できたこと:
+   - 全回帰テストPASS（4テスト + canary 7チェック）
+   - 全24スクリプトの構文健全性（py_compile OK）
+   - stateful_user_journey_audit.pyの構文有効性とplaywright graceful fallback
+   - one_pass_completion_gate.pyのevaluate_completion()が純粋関数であること
+   - deploy_site_ui_guard_stack.pyの追加が検証系スクリプトのみであること
+   - push_prediction_platform_sources.pyに--dry-runガードが存在すること
+
+ 検証だけでは確定できないこと:
+   - build_article_release_manifestのdraft降格がVPS実環境で想定通り動くか
+   - push_prediction_platform_sourcesの73ファイルpushが本番で安全か
+   - ecosystem_governance_auditの拡大された監査スイートのVPS実行時間
+
+ 左上に渡す判断材料:
+   - HOLD-1: build_article_release_manifest --apply-draft-* のVPS実行承認
+   - HOLD-2: push_prediction_platform_sources のpush手順（--dry-run先行の標準化）
+   - 全テストPASS / 全構文OK / 回帰なしの事実
+
+============================================================

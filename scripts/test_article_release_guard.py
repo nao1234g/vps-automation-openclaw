@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from article_release_guard import evaluate_release_blockers
+from article_release_guard import classify_release_lane, evaluate_release_blockers
 
 
 def run() -> None:
@@ -26,7 +26,8 @@ def run() -> None:
     assert "NO_EXTERNAL_SOURCES" in broken["errors"], broken
     assert "BROKEN_SOURCE_SECTION" in broken["errors"], broken
     assert "UNSUPPORTED_FRONTIER_RELEASE_CLAIM" in broken["errors"], broken
-    assert any(err.startswith("HUMAN_APPROVAL_REQUIRED:") for err in broken["errors"]), broken
+    assert broken["release_lane"] == "truth_blocked", broken
+    assert broken["human_approval_required"] is False, broken
 
     html_non_official = """
     <article>
@@ -78,6 +79,161 @@ def run() -> None:
     )
     assert approved["ok"] is True, approved
     assert approved["release_lane"] == "distribution_ready", approved
+
+    auto_safe_war = evaluate_release_blockers(
+        title="Hormuz closure risk rattles energy markets",
+        html="""
+        <article>
+          <p>Oil and shipping markets are repricing after new naval threats in Hormuz.</p>
+          <h2>Sources</h2>
+          <ul>
+            <li><a href="https://www.reuters.com/world/middle-east/example">Reuters</a></li>
+            <li><a href="https://www.ft.com/content/example">FT</a></li>
+          </ul>
+        </article>
+        """,
+        source_urls=[
+            "https://www.reuters.com/world/middle-east/example",
+            "https://www.ft.com/content/example",
+        ],
+        tags=["war", "geopolitics"],
+        status="published",
+        channel="distribution",
+        require_external_sources=True,
+    )
+    assert auto_safe_war["ok"] is True, auto_safe_war
+    assert auto_safe_war["release_lane"] == "auto_safe", auto_safe_war
+
+    auto_safe_single_source_war = evaluate_release_blockers(
+        title="US sanctions escalation raises Hormuz shipping risk",
+        html="""
+        <article>
+          <p>Shipping insurers are repricing Gulf routes after new sanctions and naval warnings.</p>
+          <h2>Sources</h2>
+          <ul>
+            <li><a href="https://www.reuters.com/world/middle-east/example">Reuters</a></li>
+          </ul>
+        </article>
+        """,
+        source_urls=["https://www.reuters.com/world/middle-east/example"],
+        tags=["war", "geopolitics"],
+        status="published",
+        channel="distribution",
+        require_external_sources=True,
+    )
+    assert auto_safe_single_source_war["ok"] is True, auto_safe_single_source_war
+    assert auto_safe_single_source_war["release_lane"] == "auto_safe", auto_safe_single_source_war
+
+    mixed_risk_advised = evaluate_release_blockers(
+        title="Hormuz shock pushes markets toward a banking crisis",
+        html="""
+        <article>
+          <p>War escalation and systemic liquidity fears are colliding.</p>
+          <h2>Sources</h2>
+          <ul>
+            <li><a href="https://www.reuters.com/world/middle-east/example">Reuters</a></li>
+            <li><a href="https://www.ft.com/content/example">FT</a></li>
+          </ul>
+        </article>
+        """,
+        source_urls=[
+            "https://www.reuters.com/world/middle-east/example",
+            "https://www.ft.com/content/example",
+        ],
+        tags=["war", "finance"],
+        status="published",
+        channel="distribution",
+        require_external_sources=True,
+    )
+    assert mixed_risk_advised["ok"] is True, mixed_risk_advised
+    assert mixed_risk_advised["editor_review_required"] is False, mixed_risk_advised
+    assert mixed_risk_advised["release_lane"] == "editorial_review_advised", mixed_risk_advised
+    assert "EDITORIAL_REVIEW_ADVISED:WAR_CONFLICT,FINANCIAL_CRISIS" in mixed_risk_advised["warnings"], mixed_risk_advised
+
+    mixed_risk_single_source_needs_review = evaluate_release_blockers(
+        title="Hormuz shock pushes markets toward a banking crisis",
+        html="""
+        <article>
+          <p>War escalation and systemic liquidity fears are colliding.</p>
+          <h2>Sources</h2>
+          <ul>
+            <li><a href="https://www.reuters.com/world/middle-east/example">Reuters</a></li>
+          </ul>
+        </article>
+        """,
+        source_urls=["https://www.reuters.com/world/middle-east/example"],
+        tags=["war", "finance"],
+        status="published",
+        channel="distribution",
+        require_external_sources=True,
+    )
+    assert mixed_risk_single_source_needs_review["ok"] is True, mixed_risk_single_source_needs_review
+    assert mixed_risk_single_source_needs_review["editor_review_required"] is False, mixed_risk_single_source_needs_review
+    assert mixed_risk_single_source_needs_review["release_lane"] == "editorial_review_advised", mixed_risk_single_source_needs_review
+    assert (
+        "EDITORIAL_REVIEW_ADVISED:WAR_CONFLICT,FINANCIAL_CRISIS"
+        in mixed_risk_single_source_needs_review["warnings"]
+    ), mixed_risk_single_source_needs_review
+
+    single_risk_two_urls_fallback = classify_release_lane(
+        truth_errors=[],
+        risk_flags=["WAR_CONFLICT"],
+        approval_present=False,
+        external_url_count=2,
+        verified_external_source_count=0,
+        oracle_marker_present=False,
+    )
+    assert single_risk_two_urls_fallback == "auto_safe", single_risk_two_urls_fallback
+
+    oracle_non_frontier = evaluate_release_blockers(
+        title="Hormuz closure forecast for shipping insurance",
+        html="""
+        <article>
+          <div id="np-oracle">
+            <strong>Prediction Question</strong>: Will insurers raise Gulf route premiums by 20%?
+          </div>
+          <h2>Sources</h2>
+          <ul>
+            <li><a href="https://www.reuters.com/world/middle-east/example">Reuters</a></li>
+            <li><a href="https://www.ft.com/content/example">FT</a></li>
+          </ul>
+        </article>
+        """,
+        source_urls=[
+            "https://www.reuters.com/world/middle-east/example",
+            "https://www.ft.com/content/example",
+        ],
+        tags=["oracle", "war", "geopolitics"],
+        status="published",
+        channel="distribution",
+        require_external_sources=True,
+    )
+    assert oracle_non_frontier["ok"] is False, oracle_non_frontier
+    assert oracle_non_frontier["human_approval_required"] is False, oracle_non_frontier
+    assert oracle_non_frontier["editor_review_required"] is True, oracle_non_frontier
+    assert oracle_non_frontier["release_lane"] == "review_required", oracle_non_frontier
+
+    jp_war = evaluate_release_blockers(
+        title="停戦崩壊で中東戦争が再拡大",
+        html="<article><p>停戦が崩壊し、軍事衝突が再燃した。</p></article>",
+        source_urls=["https://www.reuters.com/world/middle-east/example"],
+        tags=[],
+        status="published",
+        channel="public",
+        require_external_sources=False,
+    )
+    assert "WAR_CONFLICT" in jp_war["risk_flags"], jp_war
+
+    jp_finance = evaluate_release_blockers(
+        title="銀行危機で市場崩壊リスクが拡大",
+        html="<article><p>銀行危機と債務危機が重なり、不況懸念が強まった。</p></article>",
+        source_urls=["https://www.ft.com/content/example"],
+        tags=[],
+        status="published",
+        channel="public",
+        require_external_sources=False,
+    )
+    assert "FINANCIAL_CRISIS" in jp_finance["risk_flags"], jp_finance
 
     print("PASS: article release guard regression checks")
 
