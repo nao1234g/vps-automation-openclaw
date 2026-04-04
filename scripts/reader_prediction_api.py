@@ -30,6 +30,30 @@ from prediction_state_utils import (
 DB_PATH = "/opt/shared/reader_predictions.db"
 PUBLIC_LEADERBOARD_MIN_RESOLVED = 5
 
+# ── Synthetic / system voter detection ───────────────────────────────────────
+# These UUIDs are AI players, test seeds, or migration artefacts.
+# They must be excluded from *human* reader aggregates and the human
+# forecaster ranking, but kept queryable via /my-stats/{uuid}.
+
+SYNTHETIC_VOTER_EXACT = frozenset({
+    "neo-one-ai-player",
+})
+
+SYNTHETIC_VOTER_PREFIXES = (
+    "test-",       # test harness UUIDs (e.g. test-uuid-12345)
+    "migrated_",   # legacy JSON→SQLite migration artefacts
+)
+
+
+def is_synthetic_voter(voter_uuid: str) -> bool:
+    """Return True if *voter_uuid* belongs to a known synthetic / system account."""
+    if voter_uuid in SYNTHETIC_VOTER_EXACT:
+        return True
+    for prefix in SYNTHETIC_VOTER_PREFIXES:
+        if voter_uuid.startswith(prefix):
+            return True
+    return False
+
 app = FastAPI(
     title="Nowpattern Reader Prediction API",
     version="2.0.0",
@@ -322,28 +346,23 @@ def leaderboard():
     pred_db = load_pred_db()
     ai_summary = _ai_official_score_summary(pred_db)
 
-    # Reader stats
-    reader_total_voters = 0
-    reader_total_votes = 0
-    with db() as con:
-        _r1 = con.execute(
-            "SELECT COUNT(DISTINCT voter_uuid) FROM reader_votes"
-        ).fetchone()
-        reader_total_voters = _r1[0] if _r1 else 0
-        _r2 = con.execute("SELECT COUNT(*) FROM reader_votes").fetchone()
-        reader_total_votes = _r2[0] if _r2 else 0
-
-    # Calculate aggregate reader Brier scores on-the-fly
-    reader_brier_scores = []
-    reader_correct = 0
-    reader_resolved_votes = 0
-
+    # Reader stats — exclude synthetic/system voters from human aggregates
     with db() as con:
         all_votes = con.execute(
             "SELECT voter_uuid, prediction_id, scenario, probability FROM reader_votes"
         ).fetchall()
 
-    for vote in all_votes:
+    human_votes = [v for v in all_votes if not is_synthetic_voter(v["voter_uuid"])]
+    human_uuids = {v["voter_uuid"] for v in human_votes}
+    reader_total_voters = len(human_uuids)
+    reader_total_votes = len(human_votes)
+
+    # Calculate aggregate reader Brier scores on-the-fly (human only)
+    reader_brier_scores = []
+    reader_correct = 0
+    reader_resolved_votes = 0
+
+    for vote in human_votes:
         p = pred_db.get(vote["prediction_id"], {})
         if not _is_prediction_publicly_scorable(p):
             continue
@@ -406,13 +425,15 @@ def top_forecasters():
             "SELECT voter_uuid, prediction_id, scenario, probability, created_at FROM reader_votes"
         ).fetchall()
     
-    # Group by voter
+    # Group by voter — skip all synthetic/system voters
     voter_stats = {}
     ai_vote_total = 0
     for vote in all_votes:
         uid = vote["voter_uuid"]
         if uid == "neo-one-ai-player":
             ai_vote_total += 1
+            continue
+        if is_synthetic_voter(uid):
             continue
         if uid not in voter_stats:
             voter_stats[uid] = {"votes": 0, "resolved": 0, "correct": 0, "brier_scores": [], "first_vote": vote["created_at"]}
@@ -441,11 +462,10 @@ def top_forecasters():
         accuracy = round(s["correct"] / s["resolved"] * 100, 1) if s["resolved"] > 0 else 0
         # Anonymize: first 6 chars of uuid
         anon_id = uid[:6].upper() if len(uid) >= 6 else uid.upper()
-        is_ai = uid == "neo-one-ai-player"
         ranked.append({
             "voter_id": uid,
-            "display_id": "Nowpattern AI" if is_ai else f"Forecaster #{anon_id}",
-            "is_ai": is_ai,
+            "display_id": f"Forecaster #{anon_id}",
+            "is_ai": False,
             "avg_brier_score": avg_brier,
             "avg_brier_index": brier_index(avg_brier),
             "resolved_count": s["resolved"],
@@ -453,7 +473,7 @@ def top_forecasters():
             "accuracy_pct": accuracy,
             "total_votes": s["votes"],
             "score_basis": "reader_vote_brier",
-            "public_leaderboard_eligible": is_ai or s["resolved"] >= PUBLIC_LEADERBOARD_MIN_RESOLVED,
+            "public_leaderboard_eligible": s["resolved"] >= PUBLIC_LEADERBOARD_MIN_RESOLVED,
         })
 
     ai_summary = _ai_official_score_summary(pred_db)
