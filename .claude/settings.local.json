@@ -150,7 +150,14 @@
       "Bash(cp \".claude/rules/NORTH_STAR_v2.md\" \".claude/rules/NORTH_STAR.md\")",
       "Bash(cp \".claude/rules/OPERATING_PRINCIPLES_v2.md\" \".claude/rules/OPERATING_PRINCIPLES.md\")",
       "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''$f'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''OK''\\)\")",
-      "Bash(PYTHONIOENCODING=utf-8 python -c \"import ast; ast.parse\\(open\\(''.claude/hooks/north-star-guard.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''north-star-guard.py syntax OK''\\)\")"
+      "Bash(PYTHONIOENCODING=utf-8 python -c \"import ast; ast.parse\\(open\\(''.claude/hooks/north-star-guard.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''north-star-guard.py syntax OK''\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 python -c \"import ast; ast.parse\\(open\\(''.claude/hooks/north-star-guard.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''SYNTAX OK''\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 python -c \":*)",
+      "Bash(PYTHONIOENCODING=utf-8 python -c \"import scripts.mission_contract; print\\(''IMPORT OK''\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 python -c \"exec\\(open\\(''scripts/mission_contract.py'', encoding=''utf-8-sig''\\).read\\(\\)\\); print\\(''EXEC OK''\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 \"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''scripts/prediction_similarity_search.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''SYNTAX OK''\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 \"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''.claude/hooks/jit-detail-gate.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''jit-detail-gate SYNTAX OK''\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 \"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''scripts/detail_sync_check.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''detail_sync_check SYNTAX OK''\\)\")"
     ],
     "deny": [
       "Read(**/.env)",
@@ -326,6 +333,16 @@
         ]
       },
       {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/jit-detail-gate.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
         "matcher": "Edit|Write|Bash",
         "hooks": [
           {
@@ -423,6 +440,16 @@
           {
             "type": "command",
             "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/north-star-guard.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/jit-detail-gate.py\"",
             "timeout": 5
           }
         ]
