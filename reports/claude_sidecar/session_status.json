@@ -1,39 +1,35 @@
 {
-  "generated_at": "2026-04-05T12:30:00+09:00",
-  "agent": "claude-code-sidecar",
-  "task_id": "sidecar-20260405-prediction-quality-v1",
+  "generated_at": "2026-04-05T22:00:00+09:00",
+  "agent": "claude-code-main",
+  "task_id": "sidecar-20260405-prediction-linkage-v2",
   "status": "completed",
-  "current_phase": "all-phases-done",
+  "current_phase": "all-tracks-complete",
   "scope_completion_pct": 100,
   "overall_completion_estimate_pct": 100,
   "reached_100_pct_for_this_scope": true,
-  "blocking_reason": "",
-  "next_exact_step": "",
+  "blocking_reason": null,
+  "next_exact_step": null,
   "files_written": [
-    "reports/claude_sidecar/session_status.json",
-    "reports/claude_sidecar/heartbeat.json",
-    "reports/claude_sidecar/task_result_v5.json",
-    "reports/claude_sidecar/task_result_v5.md",
-    "reports/claude_sidecar/resume_prompt.txt"
+    "scripts/ghost_post_loader.py",
+    "scripts/prediction_linkage_backfill.py",
+    "scripts/cross_language_only_audit.py",
+    "scripts/prediction_slug_drift_audit.py",
+    "scripts/prediction_slug_normalization_plan.py",
+    "scripts/cross_language_publish_queue_builder.py",
+    "scripts/test_prediction_linkage_backfill.py"
   ],
-  "safe_write_set": [
-    "reports/claude_sidecar/session_status.json",
-    "reports/claude_sidecar/heartbeat.json",
-    "reports/claude_sidecar/task_result_v5.json",
-    "reports/claude_sidecar/task_result_v5.md",
-    "reports/claude_sidecar/resume_prompt.txt"
-  ],
-  "planned_scopes": [
-    "phase-1: genre_tags backfill (44/52 RESOLVED uncategorized)",
-    "phase-2: status normalization + Brier calibration analysis",
-    "phase-3: .coordination/ agent mutual awareness system"
-  ],
-  "completed_tasks": [
-    "phase-1: genre_tags backfill — 44 RESOLVED predictions categorized with slug-format genre_tags on VPS",
-    "phase-1b: status normalization — 6 lowercase 'resolved' → 'RESOLVED'",
-    "phase-1c: genre_tags format normalization — 32 existing Japanese text tags → slug format",
-    "phase-2: Brier calibration analysis — catastrophic underconfidence discovered (0-10% bucket: 70.6% actual HIT), recorded to AGENT_WISDOM",
-    "phase-2b: category_brier_analysis.py fixed for list genre_tags format",
-    "phase-3: .coordination/ system — protocol.json, agent state files, PreToolUse conflict detection, session-sync CLI"
+  "tracks_completed": {
+    "track_c": "Ghost DBローダー共通化 — 4スクリプトからSQL重複排除、ghost_post_loader.py統合完了",
+    "track_a": "EN slug正規化 dry-run — prediction_slug_normalization_plan.py作成、VPS実行待ち",
+    "track_b": "cross_language publish queue — cross_language_publish_queue_builder.py作成、VPS実行待ち",
+    "track_d": "E2E回帰テスト — 13→20テスト全PASS（html=''バグ再発防止、tag正規化、ledger chain整合性）"
+  },
+  "test_results": {
+    "test_prediction_linkage_backfill.py": "20 passed, 0 failed"
+  },
+  "commits": [
+    "78144bd — refactor: Ghost DBローダー共通化",
+    "655b4c4 — feat: prediction linkage infrastructure + coordination OS",
+    "6c7cb24 — feat: Track A/B/D — EN slug正規化plan + cross_language publish queue + E2E回帰テスト7件追加"
   ]
 }

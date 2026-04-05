@@ -1,41 +1,39 @@
-RESUME PROMPT — Claude Code Sidecar / Codex Handoff
+RESUME PROMPT — Claude Code Main Session
 Generated: 2026-04-05
-Last session: sidecar-20260405-prediction-quality-v1
+Last session: sidecar-20260405-prediction-linkage-v2
 Status: COMPLETED (scope 100%)
 
 == WHAT WAS DONE ==
-1. Genre tags backfill: 44/52 RESOLVED predictions categorized on VPS (slug format)
-2. Status normalization: 6 lowercase "resolved" → "RESOLVED"
-3. Genre tag format normalization: 32 Japanese text → slug format
-4. Brier calibration analysis: catastrophic underconfidence found (0-10% bucket: 70.6% actual HIT)
-5. category_brier_analysis.py fixed for list genre_tags
-6. .coordination/ agent mutual awareness system created (protocol, state files, PreToolUse hook)
-7. coordination-session-sync.py CLI tool created
+Track C: Ghost DBローダー共通化
+  - ghost_post_loader.py 作成（共通SQL、tag set正規化、HTML常時取得、oracle判定）
+  - prediction_linkage_backfill.py / cross_language_only_audit.py / prediction_slug_drift_audit.py リファクタリング完了
 
-== COORDINATION SYSTEM STATUS ==
-- .coordination/protocol.json — defines agents, rules, heartbeat intervals
-- .coordination/codex.json — Codex state (idle by default)
-- .coordination/claude-code.json — Claude Code state
-- .coordination/lock-registry.json — lock registry
-- coordination-pretool.py — PreToolUse hook checks .coordination/*.json for conflicts
-- coordination-session-sync.py — CLI: --show, --update-self, --lock, --unlock, --idle
+Track A: EN slug正規化 dry-run
+  - prediction_slug_normalization_plan.py 作成（526件pattern_mismatchの安全分類）
+  - VPS実行待ち（Ghost DB必要）
 
-== REMAINING WORK (next session) ==
-1. Delete redundant .claude/hooks/coordination-precheck.py (logic already in coordination-pretool.py)
-2. Add coordination status display to session-start.sh
-3. Update .codex/instructions.md with coordination protocol usage
-4. Use docs/OPERATIONS_BOARD.md as the single shared board + restructure around it
+Track B: cross_language_only publish queue
+  - cross_language_publish_queue_builder.py 作成（10件のpublish-ready queue生成）
+  - VPS実行待ち（Ghost DB必要）
+
+Track D: E2E回帰テスト
+  - test_prediction_linkage_backfill.py 13→20テスト（全PASS）
+  - html=""バグ再発防止、tag正規化、split_by_status、prediction_id保全、ledger chain整合性
+
+== COMMITS ==
+78144bd — refactor: Ghost DBローダー共通化
+655b4c4 — feat: prediction linkage infrastructure + coordination OS
+6c7cb24 — feat: Track A/B/D — EN slug正規化plan + cross_language publish queue + E2E回帰テスト7件追加
+
+== SUGGESTED NEXT SCOPES ==
+1. VPSでTrack A/B実行（SSHでprediction_slug_normalization_plan.py + cross_language_publish_queue_builder.py）
+2. Track Aの結果を確認し、safe_normalize対象があればprediction_dbを更新
+3. Track Bの結果をnowpattern_publisherに連携してEN記事10件を翻訳・公開
+4. handoff Round 7更新（.agent-mailbox/claude-to-codex.md）
 
 == FILES TO READ ==
-1. reports/claude_sidecar/task_result_v5.json — canonical results
-2. .coordination/protocol.json — coordination system design
-3. .claude/hooks/coordination-pretool.py — conflict detection hook
-4. docs/OPERATIONS_BOARD.md — single shared operations board
-
-== STOP-PROOF CONTRACT ==
-Any future sidecar session MUST maintain these 4 files:
-- reports/claude_sidecar/session_status.json
-- reports/claude_sidecar/heartbeat.json
-- reports/claude_sidecar/task_result_v{N}.json
-- reports/claude_sidecar/task_result_v{N}.md
-- reports/claude_sidecar/resume_prompt.txt
+1. scripts/prediction_slug_normalization_plan.py — Track A
+2. scripts/cross_language_publish_queue_builder.py — Track B
+3. scripts/test_prediction_linkage_backfill.py — Track D (20 tests)
+4. scripts/ghost_post_loader.py — Track C (shared loader)
+5. reports/claude_sidecar/task_result_v7.json — canonical results

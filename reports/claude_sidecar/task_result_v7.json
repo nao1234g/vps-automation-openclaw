@@ -1,0 +1,59 @@
+{
+  "task_id": "sidecar-20260405-prediction-linkage-v2",
+  "generated_at": "2026-04-05T22:00:00+09:00",
+  "status": "completed",
+  "scope_completion_pct": 100,
+  "tracks": {
+    "track_c": {
+      "name": "Ghost DBローダー共通化",
+      "status": "completed",
+      "files_created": ["scripts/ghost_post_loader.py"],
+      "files_modified": [
+        "scripts/prediction_linkage_backfill.py",
+        "scripts/cross_language_only_audit.py",
+        "scripts/prediction_slug_drift_audit.py"
+      ],
+      "changes": "4スクリプトのインライン Ghost SQL を ghost_post_loader.py に統合。タグはset正規化、HTMLは常時取得、oracle判定はロード時実行。html='' バグの根本原因を構造的に排除"
+    },
+    "track_a": {
+      "name": "EN slug正規化 dry-run",
+      "status": "completed_script_vps_pending",
+      "files_created": ["scripts/prediction_slug_normalization_plan.py"],
+      "changes": "526件のlink_slug_pattern_mismatchを safe_normalize / unsafe_ambiguous / ghost_missing / draft_only / db_stale に分類するdry-runスクリプト。VPSでの実行待ち"
+    },
+    "track_b": {
+      "name": "cross_language_only publish queue",
+      "status": "completed_script_vps_pending",
+      "files_created": ["scripts/cross_language_publish_queue_builder.py"],
+      "changes": "10件のcross_language_only記事のpublish-ready queue生成スクリプト。JA原文取得→EN slug・URLマッピング→queue JSON出力"
+    },
+    "track_d": {
+      "name": "E2E回帰テスト",
+      "status": "completed",
+      "files_modified": ["scripts/test_prediction_linkage_backfill.py"],
+      "test_count": "20 (13 existing + 7 new)",
+      "test_result": "20 passed, 0 failed",
+      "new_tests": [
+        "test_ghost_post_loader_always_includes_html",
+        "test_ghost_post_loader_tag_normalization",
+        "test_tag_set_internal_normalization",
+        "test_ghost_post_loader_split_by_status",
+        "test_ghost_post_loader_split_by_status_ignores_other_statuses",
+        "test_slug_normalization_preserves_prediction_id",
+        "test_ledger_dedup_chain_integrity"
+      ]
+    }
+  },
+  "commits": [
+    {"hash": "78144bd", "message": "refactor: Ghost DBローダー共通化 — 4スクリプトのSQL重複を ghost_post_loader.py に統合"},
+    {"hash": "655b4c4", "message": "feat: prediction linkage infrastructure + coordination OS + site guard maturity audit"},
+    {"hash": "6c7cb24", "message": "feat: Track A/B/D — EN slug正規化plan + cross_language publish queue + E2E回帰テスト7件追加"}
+  ],
+  "next_steps": [
+    "VPSでTrack A実行: cd /opt/shared/scripts && python3 prediction_slug_normalization_plan.py",
+    "VPSでTrack B実行: cd /opt/shared/scripts && python3 cross_language_publish_queue_builder.py",
+    "Track A結果のsafe_normalize対象をprediction_dbに適用",
+    "Track Bの10件をnowpattern_publisherで翻訳・EN公開",
+    "handoff Round 7更新"
+  ]
+}
