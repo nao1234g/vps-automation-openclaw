@@ -17,6 +17,7 @@ import os
 import math
 from datetime import datetime
 from contextlib import contextmanager
+from pathlib import Path
 
 from prediction_state_utils import (
     is_prediction_publicly_scorable,
@@ -28,6 +29,13 @@ from prediction_state_utils import (
 )
 
 DB_PATH = "/opt/shared/reader_predictions.db"
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent
+TRACKER_PAYLOAD_OUTPUT_TEMPLATE = (
+    "/opt/shared/reports/tracker_payload_{lang}.json"
+    if os.path.exists("/opt/shared")
+    else str(REPO_ROOT / "reports" / "tracker_payload_{lang}.json")
+)
 PUBLIC_LEADERBOARD_MIN_RESOLVED = 5
 HUMAN_PUBLIC_MIN_VOTERS = 25
 HUMAN_PUBLIC_MIN_TOTAL_VOTES = 200
@@ -362,6 +370,17 @@ def stats_bulk():
     return stats_map
 
 
+@app.get("/reader-predict/tracking-payload/{lang}")
+def tracking_payload(lang: str):
+    normalized_lang = "en" if str(lang).lower() == "en" else "ja"
+    payload = load_tracker_payload(normalized_lang)
+    return {
+        "lang": normalized_lang,
+        "generated_at": payload.get("generated_at"),
+        "items": payload.get("items") or [],
+    }
+
+
 @app.get("/reader-predict/my-votes/{voter_uuid}", response_model=List[TrackerEntry])
 def my_votes(voter_uuid: str):
     """Return all votes cast by a specific reader (identified by UUID)."""
@@ -604,6 +623,8 @@ class MyTrackerEntry(BaseModel):
 
 PRED_DB_CACHE = {}
 PRED_DB_CACHE_TIME = 0
+TRACKER_PAYLOAD_CACHE = {}
+TRACKER_PAYLOAD_CACHE_TIME = {}
 
 
 def load_pred_db() -> dict:
@@ -620,6 +641,29 @@ def load_pred_db() -> dict:
         except Exception:
             pass
     return PRED_DB_CACHE
+
+
+def load_tracker_payload(lang: str) -> dict:
+    """Load tracker payload artifact with a 60s cache."""
+    import time
+
+    normalized_lang = "en" if str(lang).lower() == "en" else "ja"
+    now = time.time()
+    cached = TRACKER_PAYLOAD_CACHE.get(normalized_lang)
+    cached_at = TRACKER_PAYLOAD_CACHE_TIME.get(normalized_lang, 0)
+    if cached is not None and now - cached_at <= 60:
+        return cached
+
+    payload_path = TRACKER_PAYLOAD_OUTPUT_TEMPLATE.format(lang=normalized_lang)
+    try:
+        with open(payload_path, encoding="utf-8") as fh:
+            payload = json.load(fh)
+    except Exception:
+        payload = {"lang": normalized_lang, "items": []}
+
+    TRACKER_PAYLOAD_CACHE[normalized_lang] = payload
+    TRACKER_PAYLOAD_CACHE_TIME[normalized_lang] = now
+    return payload
 
 
 def _prediction_status(prediction: dict) -> str:

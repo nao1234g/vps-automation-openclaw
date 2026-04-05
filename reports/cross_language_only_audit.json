@@ -1,0 +1,124 @@
+{
+  "generated_at": "2026-04-05T03:25:28Z",
+  "total_cross_language_only": 10,
+  "summary": {
+    "by_root_cause": {
+      "unpublished": 10
+    },
+    "by_fix_action": {
+      "create_and_publish": 10
+    }
+  },
+  "audits": [
+    {
+      "slug": "mi-ying-tong-meng-nogui-lie-toranpunoiranzuo-zhan-ganatojie-shu-woshi-sugou-zao-de-zhuan-huan-dian",
+      "prediction_id": "NP-2026-0447",
+      "article_lang": "ja",
+      "target_lang": "en",
+      "db_sibling_slug": "en-mi-ying-tong-meng-nogui-lie-toranpunoiranzuo-zhan-ganatojie-shu-woshi-sugou-zao-de-zhuan-huan-dian",
+      "db_sibling_url": "https://nowpattern.com/en/en-mi-ying-tong-meng-nogui-lie-toranpunoiranzuo-zhan-ganatojie-shu-woshi-sugou-zao-de-zhuan-huan-dian/",
+      "root_cause": "unpublished",
+      "detail": "DB registered slug 'en-mi-ying-tong-meng-nogui-lie-toranpunoiranzuo-zhan-ganatojie-shu-woshi-sugou-zao-de-zhuan-huan-dian' not found in Ghost (never created)",
+      "fix_action": "create_and_publish"
+    },
+    {
+      "slug": "toranpufang-zhong-hou-notai-wan-wu-qi-mai-que-mi-zhong-qu-yin-wai-jiao-gabao-kutong-meng-nocui-ruo-xing",
+      "prediction_id": "NP-2026-0449",
+      "article_lang": "ja",
+      "target_lang": "en",
+      "db_sibling_slug": "en-toranpufang-zhong-hou-notai-wan-wu-qi-mai-que-mi-zhong-qu-yin-wai-jiao-gabao-kutong-meng-nocui-ruo-xing",
+      "db_sibling_url": "https://nowpattern.com/en/en-toranpufang-zhong-hou-notai-wan-wu-qi-mai-que-mi-zhong-qu-yin-wai-jiao-gabao-kutong-meng-nocui-ruo-xing/",
+      "root_cause": "unpublished",
+      "detail": "DB registered slug 'en-toranpufang-zhong-hou-notai-wan-wu-qi-mai-que-mi-zhong-qu-yin-wai-jiao-gabao-kutong-meng-nocui-ruo-xing' not found in Ghost (never created)",
+      "fix_action": "create_and_publish"
+    },
+    {
+      "slug": "ri-mi-shou-noy-hui-tan-toiranwen-ti-tong-meng-no-dui-jia-gawen-warerugou-zao-zhuan-huan-dian",
+      "prediction_id": "NP-2026-0453",
+      "article_lang": "ja",
+      "target_lang": "en",
+      "db_sibling_slug": "en-ri-mi-shou-noy-hui-tan-toiranwen-ti-tong-meng-no-dui-jia-gawen-warerugou-zao-zhuan-huan-dian",
+      "db_sibling_url": "https://nowpattern.com/en/en-ri-mi-shou-noy-hui-tan-toiranwen-ti-tong-meng-no-dui-jia-gawen-warerugou-zao-zhuan-huan-dian/",
+      "root_cause": "unpublished",
+      "detail": "DB registered slug 'en-ri-mi-shou-noy-hui-tan-toiranwen-ti-tong-meng-no-dui-jia-gawen-warerugou-zao-zhuan-huan-dian' not found in Ghost (never created)",
+      "fix_action": "create_and_publish"
+    },
+    {
+      "slug": "mi-zhong-parimao-yi-xie-yi-guan-shui-toreaasugaying-suba-quan-jiao-she-nogou-zao-zhuan-huan",
+      "prediction_id": "NP-2026-0474",
+      "article_lang": "ja",
+      "target_lang": "en",
+      "db_sibling_slug": "en-mi-zhong-parimao-yi-xie-yi-guan-shui-toreaasugaying-suba-quan-jiao-she-nogou-zao-zhuan-huan",
+      "db_sibling_url": "https://nowpattern.com/en/en-mi-zhong-parimao-yi-xie-yi-guan-shui-toreaasugaying-suba-quan-jiao-she-nogou-zao-zhuan-huan/",
+      "root_cause": "unpublished",
+      "detail": "DB registered slug 'en-mi-zhong-parimao-yi-xie-yi-guan-shui-toreaasugaying-suba-quan-jiao-she-nogou-zao-zhuan-huan' not found in Ghost (never created)",
+      "fix_action": "create_and_publish"
+    },
+    {
+      "slug": "horumuzuhai-xia-wei-ji-totoranpuno-fu-dan-gong-you-ya-li-tong-meng-nogui-lie-gazi-yuan-wei-ji-wozeng-fu-surugou-zao",
+      "prediction_id": "NP-2026-0500",
+      "article_lang": "ja",
+      "target_lang": "en",
+      "db_sibling_slug": "en-horumuzuhai-xia-wei-ji-totoranpuno-fu-dan-gong-you-ya-li-tong-meng-nogui-lie-gazi-yuan-wei-ji-wozeng-fu-surugou-zao",
+      "db_sibling_url": "https://nowpattern.com/en/en-horumuzuhai-xia-wei-ji-totoranpuno-fu-dan-gong-you-ya-li-tong-meng-nogui-lie-gazi-yuan-wei-ji-wozeng-fu-surugou-zao/",
+      "root_cause": "unpublished",
+      "detail": "DB registered slug 'en-horumuzuhai-xia-wei-ji-totoranpuno-fu-dan-gong-you-ya-li-tong-meng-nogui-lie-gazi-yuan-wei-ji-wozeng-fu-surugou-zao' not found in Ghost (never created)",
+      "fix_action": "create_and_publish"
+    },
+    {
+      "slug": "ri-mi-shou-noy-hui-tan-2026nian-3yue-guan-shui-ya-li-xia-notong-meng-zai-jiao-she-tojing-lu-yi-cun-nomin",
+      "prediction_id": "NP-2026-0547",
+      "article_lang": "ja",
+      "target_lang": "en",
+      "db_sibling_slug": "en-ri-mi-shou-noy-hui-tan-2026nian-3yue-guan-shui-ya-li-xia-notong-meng-zai-jiao-she-tojing-lu-yi-cun-nomin",
+      "db_sibling_url": "https://nowpattern.com/en/en-ri-mi-shou-noy-hui-tan-2026nian-3yue-guan-shui-ya-li-xia-notong-meng-zai-jiao-she-tojing-lu-yi-cun-nomin/",
+      "root_cause": "unpublished",
+      "detail": "DB registered slug 'en-ri-mi-shou-noy-hui-tan-2026nian-3yue-guan-shui-ya-li-xia-notong-meng-zai-jiao-she-tojing-lu-yi-cun-nomin' not found in Ghost (never created)",
+      "fix_action": "create_and_publish"
+    },
+    {
+      "slug": "ri-mi-fang-wei-dian-hua-hui-tan-horumuzuhai-xia-wei-ji-gazhi-richu-sutong-meng-nogou-zao-de-shi-lian",
+      "prediction_id": "NP-2026-0551",
+      "article_lang": "ja",
+      "target_lang": "en",
+      "db_sibling_slug": "en-ri-mi-fang-wei-dian-hua-hui-tan-horumuzuhai-xia-wei-ji-gazhi-richu-sutong-meng-nogou-zao-de-shi-lian",
+      "db_sibling_url": "https://nowpattern.com/en/en-ri-mi-fang-wei-dian-hua-hui-tan-horumuzuhai-xia-wei-ji-gazhi-richu-sutong-meng-nogou-zao-de-shi-lian/",
+      "root_cause": "unpublished",
+      "detail": "DB registered slug 'en-ri-mi-fang-wei-dian-hua-hui-tan-horumuzuhai-xia-wei-ji-gazhi-richu-sutong-meng-nogou-zao-de-shi-lian' not found in Ghost (never created)",
+      "fix_action": "create_and_publish"
+    },
+    {
+      "slug": "horumuzuhai-xia-jian-chuan-pai-qian-wen-ti-tong-meng-nogui-lie-gabao-kuenerugian-bao-nogou-zao-de-cui-ruo-xing",
+      "prediction_id": "NP-2026-0589",
+      "article_lang": "ja",
+      "target_lang": "en",
+      "db_sibling_slug": "en-horumuzuhai-xia-jian-chuan-pai-qian-wen-ti-tong-meng-nogui-lie-gabao-kuenerugian-bao-nogou-zao-de-cui-ruo-xing",
+      "db_sibling_url": "https://nowpattern.com/en/en-horumuzuhai-xia-jian-chuan-pai-qian-wen-ti-tong-meng-nogui-lie-gabao-kuenerugian-bao-nogou-zao-de-cui-ruo-xing/",
+      "root_cause": "unpublished",
+      "detail": "DB registered slug 'en-horumuzuhai-xia-jian-chuan-pai-qian-wen-ti-tong-meng-nogui-lie-gabao-kuenerugian-bao-nogou-zao-de-cui-ruo-xing' not found in Ghost (never created)",
+      "fix_action": "create_and_publish"
+    },
+    {
+      "slug": "mi-rodian-hua-hui-tan-toiranbao-wei-wang-da-guo-jian-qu-yin-gazhong-dong-zhi-xu-woshu-kihuan-erugou-zao-zhuan-huan",
+      "prediction_id": "NP-2026-0615",
+      "article_lang": "ja",
+      "target_lang": "en",
+      "db_sibling_slug": "en-mi-rodian-hua-hui-tan-toiranbao-wei-wang-da-guo-jian-qu-yin-gazhong-dong-zhi-xu-woshu-kihuan-erugou-zao-zhuan-huan",
+      "db_sibling_url": "https://nowpattern.com/en/en-mi-rodian-hua-hui-tan-toiranbao-wei-wang-da-guo-jian-qu-yin-gazhong-dong-zhi-xu-woshu-kihuan-erugou-zao-zhuan-huan/",
+      "root_cause": "unpublished",
+      "detail": "DB registered slug 'en-mi-rodian-hua-hui-tan-toiranbao-wei-wang-da-guo-jian-qu-yin-gazhong-dong-zhi-xu-woshu-kihuan-erugou-zao-zhuan-huan' not found in Ghost (never created)",
+      "fix_action": "create_and_publish"
+    },
+    {
+      "slug": "gao-shi-shou-xiang-cun-li-wei-ji-shi-tai-da-bian-ri-mi-tong-meng-nogou-zao-zhuan-huan-gashi-matuta",
+      "prediction_id": "NP-2026-0733",
+      "article_lang": "ja",
+      "target_lang": "en",
+      "db_sibling_slug": "en-gao-shi-shou-xiang-cun-li-wei-ji-shi-tai-da-bian-ri-mi-tong-meng-nogou-zao-zhuan-huan-gashi-matuta",
+      "db_sibling_url": "https://nowpattern.com/en/en-gao-shi-shou-xiang-cun-li-wei-ji-shi-tai-da-bian-ri-mi-tong-meng-nogou-zao-zhuan-huan-gashi-matuta/",
+      "root_cause": "unpublished",
+      "detail": "DB registered slug 'en-gao-shi-shou-xiang-cun-li-wei-ji-shi-tai-da-bian-ri-mi-tong-meng-nogou-zao-zhuan-huan-gashi-matuta' not found in Ghost (never created)",
+      "fix_action": "create_and_publish"
+    }
+  ]
+}

@@ -39,6 +39,8 @@ def due_jobs(now: datetime) -> list[str]:
         jobs.append("content-integrity")
     if minute == 52:
         jobs.append("smoke")
+    if minute == 56 and hour % 6 == 0:
+        jobs.append("prediction-maturity")
     if minute == 11 and hour % 2 == 0:
         jobs.append("governance")
     return jobs
@@ -106,4 +108,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

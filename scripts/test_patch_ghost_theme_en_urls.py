@@ -19,6 +19,7 @@ from patch_ghost_theme_en_urls import (
     normalize_en_canonical_urls,
     patch_theme_file,
     patch_routes_for_en_pages,
+    remove_stale_methodology_redirects,
 )
 
 
@@ -65,6 +66,7 @@ def main() -> int:
         post_card = theme_root / "partials" / "post-card.hbs"
         post_hbs = theme_root / "post.hbs"
         routes_yaml = root / "routes.yaml"
+        redirects_txt = root / "nowpattern-redirects.txt"
         page_hbs.write_text(
             "{{!< default}}\n<main><article>{{content}}</article></main>\n",
             encoding="utf-8",
@@ -99,6 +101,21 @@ def main() -> int:
             + "\n",
             encoding="utf-8",
         )
+        redirects_txt.write_text(
+            "\n".join(
+                [
+                    "redir /forecasting-methodology/ /forecast-rules/ permanent",
+                    "redir /en/forecasting-methodology/ /en/forecast-rules/ permanent",
+                    "redir /forecast-scoring-and-resolution/ /scoring-guide/ permanent",
+                    "redir /en/forecast-scoring-and-resolution/ /en/scoring-guide/ permanent",
+                    "redir /forecast-integrity-and-audit/ /integrity-audit/ permanent",
+                    "redir /en/forecast-integrity-and-audit/ /en/integrity-audit/ permanent",
+                    "redir /en-predictions/ /en/predictions/ permanent",
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
 
         db_changes = normalize_en_canonical_urls(db_path, "https://nowpattern.com", dry_run=False)
         assert_equal(db_changes["published_en_posts"], 2, "published EN post count")
@@ -119,11 +136,13 @@ def main() -> int:
         page_en_result = ensure_en_page_template(theme_root, dry_run=False)
         methodology_routes_result = ensure_prediction_methodology_routes(routes_yaml, dry_run=False)
         routes_result = patch_routes_for_en_pages(routes_yaml, dry_run=False)
+        redirects_result = remove_stale_methodology_redirects(redirects_txt, dry_run=False)
         assert_equal(card_result.changed, True, "post-card patched")
         assert_equal(post_result.changed, True, "post.hbs patched")
         assert_equal(page_en_result.changed, True, "page-en created")
         assert_equal(methodology_routes_result.changed, True, "methodology routes inserted")
         assert_equal(routes_result.changed, True, "routes patched for EN pages")
+        assert_equal(redirects_result.changed, True, "stale methodology redirects removed")
         if CARD_NEW not in post_card.read_text(encoding="utf-8"):
             raise AssertionError("post-card missing canonical_url fallback")
         if JSONLD_NEW not in post_hbs.read_text(encoding="utf-8"):
@@ -146,17 +165,28 @@ def main() -> int:
             raise AssertionError("en-forecast-integrity-and-audit route not switched to page-en")
         if "data: page.about\n    template: page-en" in routes_after:
             raise AssertionError("ja page route should not switch to page-en")
+        redirects_after = redirects_txt.read_text(encoding="utf-8")
+        if "/forecasting-methodology/" in redirects_after:
+            raise AssertionError("forecasting-methodology redirect should be removed")
+        if "/forecast-scoring-and-resolution/" in redirects_after:
+            raise AssertionError("forecast-scoring-and-resolution redirect should be removed")
+        if "/forecast-integrity-and-audit/" in redirects_after:
+            raise AssertionError("forecast-integrity-and-audit redirect should be removed")
+        if "redir /en-predictions/ /en/predictions/ permanent" not in redirects_after:
+            raise AssertionError("unrelated redirects should be preserved")
 
         card_result_second = patch_theme_file(post_card, [(CARD_OLD, CARD_NEW)], dry_run=False)
         post_result_second = patch_theme_file(post_hbs, [(JSONLD_OLD, JSONLD_NEW)], dry_run=False)
         page_en_result_second = ensure_en_page_template(theme_root, dry_run=False)
         methodology_routes_result_second = ensure_prediction_methodology_routes(routes_yaml, dry_run=False)
         routes_result_second = patch_routes_for_en_pages(routes_yaml, dry_run=False)
+        redirects_result_second = remove_stale_methodology_redirects(redirects_txt, dry_run=False)
         assert_equal(card_result_second.changed, False, "post-card patch idempotent")
         assert_equal(post_result_second.changed, False, "post.hbs patch idempotent")
         assert_equal(page_en_result_second.changed, False, "page-en patch idempotent")
         assert_equal(methodology_routes_result_second.changed, False, "methodology route patch idempotent")
         assert_equal(routes_result_second.changed, False, "routes patch idempotent")
+        assert_equal(redirects_result_second.changed, False, "redirect cleanup idempotent")
 
     print("PASS: patch_ghost_theme_en_urls")
     return 0

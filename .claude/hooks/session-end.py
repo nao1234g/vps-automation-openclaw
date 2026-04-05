@@ -388,7 +388,7 @@ NOW DOING: {now_doing}
 LAST VERIFIED FACT: Session ended at {date_short} with {search_count} searches, {error_count} errors. Completed: {completed_str}
 BLOCKER: {blocker}
 NEXT EXACT STEP: {next_step}
-NEXT EXACT COMMAND: cat .agent-mailbox/codex-to-claude.md
+NEXT EXACT COMMAND: cat docs/OPERATIONS_BOARD.md && cat .agent-mailbox/codex-to-claude.md
 FILES TO OPEN FIRST: {files_list}
 """
 

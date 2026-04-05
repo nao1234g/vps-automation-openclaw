@@ -1,0 +1,28 @@
+{
+  "version": 4,
+  "documentation": "AGENTS.md § Agent Coordination Protocol",
+  "agent_discovery_glob": ".coordination/*.json",
+  "state_file_pattern": ".coordination/{agent}.json",
+  "operations_board": "docs/OPERATIONS_BOARD.md",
+  "lock_registry": ".coordination/lock-registry.json",
+  "authoritative_machine_source": ".coordination/{agent}.json",
+  "derived_artifacts": [
+    "docs/OPERATIONS_BOARD.md",
+    ".coordination/lock-registry.json"
+  ],
+  "rules": {
+    "read_order": [
+      "docs/OPERATIONS_BOARD.md",
+      ".coordination/*.json"
+    ],
+    "before_edit": "Read all other agents' state files. If target repo-relative path exactly matches another agent's locked_files entry, BLOCK. Basename-only entries are legacy fallback only.",
+    "guard_command": "python3 scripts/coordination_guard.py check <repo-relative-path>",
+    "heartbeat_command": "python3 scripts/coordination_guard.py heartbeat --agent <name> --task <task> --next-step <next> --locked-files <csv>",
+    "keepalive_command": "python3 scripts/coordination_guard.py keepalive --agent <name> --task <task> --next-step <next> --locked-files <csv> --interval 300",
+    "on_session_start": "Write own authoritative state file with status=active, current_task, next_step, locked_files=[]; then sync derived artifacts.",
+    "on_session_end": "Write own authoritative state file with status=idle, current_task='', next_step='', locked_files=[]; then sync derived artifacts.",
+    "lock_path_format": "repo-relative normalized path (e.g. scripts/prediction_page_builder.py)",
+    "heartbeat_interval_seconds": 300,
+    "stale_threshold_seconds": 600
+  }
+}

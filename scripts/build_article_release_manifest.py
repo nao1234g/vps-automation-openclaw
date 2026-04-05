@@ -17,7 +17,18 @@ from urllib.parse import urlparse
 from content_release_scope import SKIP_SLUGS
 from mission_contract import MISSION_CONTRACT_VERSION, mission_contract_hash
 from canonical_public_lexicon import LEXICON_VERSION
-from release_governor import evaluate_governed_release
+from prediction_release_contract import (
+    build_sibling_maps,
+    detect_article_lang,
+    evaluate_prediction_linkage,
+    append_ledger_entry,
+    load_prediction_db,
+    build_slug_to_prediction_index,
+    build_prediction_article_links_index,
+    LEDGER_PATH,
+)
+from article_release_guard import has_oracle_marker
+from release_governor import evaluate_governed_release, GOVERNOR_POLICY_VERSION
 from runtime_boundary import shared_or_local_path
 
 GHOST_DB = "/var/www/nowpattern/content/data/ghost.db"
@@ -144,6 +155,18 @@ def main() -> int:
     ).fetchall()
     con.close()
 
+    # Build cross-language sibling maps for prediction linkage evaluation
+    _all_posts = [
+        {"slug": r["slug"], "tag_slugs": set((r["tag_slugs"] or "").split()), "status": "published"}
+        for r in rows
+    ]
+    ja_by_clean, en_by_clean = build_sibling_maps(_all_posts)
+
+    # Load prediction_db and build slug→prediction_id + prediction_id→article_links indexes
+    pred_db = load_prediction_db()
+    slug_to_pid = build_slug_to_prediction_index(pred_db)
+    pid_to_links = build_prediction_article_links_index(pred_db)
+
     posts: list[dict[str, object]] = []
     counts = {
         "published_total": 0,
@@ -163,11 +186,34 @@ def main() -> int:
     release_warning_counts: Counter[str] = Counter()
     review_queue_samples: list[dict[str, object]] = []
 
+    linkage_counts: Counter[str] = Counter()
+
     for row in rows:
         slug = row["slug"]
         if slug in SKIP_SLUGS:
             continue
         tag_slugs = set((row["tag_slugs"] or "").split())
+
+        # Evaluate prediction linkage for oracle-marked articles
+        prediction_linkage = None
+        is_oracle = has_oracle_marker(
+            title=row["title"] or "",
+            html=row["html"] or "",
+            tags=tag_slugs,
+        )
+        if is_oracle:
+            matched_pid = slug_to_pid.get(slug, "")
+            matched_links = pid_to_links.get(matched_pid, []) if matched_pid else []
+            prediction_linkage = evaluate_prediction_linkage(
+                slug=slug,
+                tag_slugs=tag_slugs,
+                prediction_id=matched_pid,
+                ja_by_clean=ja_by_clean,
+                en_by_clean=en_by_clean,
+                prediction_article_links=matched_links,
+            )
+            linkage_counts[prediction_linkage["linkage_state"]] += 1
+
         release = evaluate_governed_release(
             title=row["title"] or "",
             html=row["html"] or "",
@@ -177,6 +223,7 @@ def main() -> int:
             channel="distribution",
             require_external_sources=True,
             check_source_fetchability=args.check_source_fetchability,
+            prediction_linkage=prediction_linkage,
         )
         truth_only_errors = [
             err
@@ -189,9 +236,10 @@ def main() -> int:
         public_truth_allowed = not truth_only_errors
         distribution_allowed = not release["errors"]
 
-        entry = {
+        public_url = build_public_url(slug, tag_slugs)
+        entry: dict[str, object] = {
             "slug": slug,
-            "url": build_public_url(slug, tag_slugs),
+            "url": public_url,
             "tag_slugs": sorted(tag_slugs),
             "public_truth_allowed": public_truth_allowed,
             "distribution_allowed": distribution_allowed,
@@ -205,6 +253,30 @@ def main() -> int:
             "external_url_count": len(release.get("external_urls", [])),
             "verified_external_source_count": int(release.get("verified_external_source_count") or 0),
         }
+        if prediction_linkage:
+            entry["prediction_linkage"] = {
+                "prediction_id": prediction_linkage.get("prediction_id", ""),
+                "linkage_state": prediction_linkage["linkage_state"],
+                "article_backing_state": prediction_linkage["article_backing_state"],
+                "article_lang": prediction_linkage["article_lang"],
+                "sibling_slug": prediction_linkage.get("same_prediction_sibling_slug"),
+                "sibling_lang": prediction_linkage.get("same_prediction_sibling_lang"),
+            }
+            # Append to release ledger for oracle articles (state-change only)
+            append_ledger_entry(
+                slug=slug,
+                public_url=public_url,
+                prediction_id=prediction_linkage.get("prediction_id", ""),
+                article_lang=prediction_linkage["article_lang"],
+                linkage_state=prediction_linkage["linkage_state"],
+                article_backing_state=prediction_linkage["article_backing_state"],
+                sibling_lang=prediction_linkage.get("same_prediction_sibling_lang"),
+                sibling_slug=prediction_linkage.get("same_prediction_sibling_slug"),
+                release_lane=release["release_lane"],
+                governor_policy_version=GOVERNOR_POLICY_VERSION,
+                mission_contract_hash=mission_contract_hash(),
+                skip_if_unchanged=True,
+            )
         posts.append(entry)
         lane_counts[release["release_lane"]] += 1
         risk_flag_counts.update(release["risk_flags"])
@@ -262,6 +334,7 @@ def main() -> int:
         "risk_flag_counts": dict(sorted(risk_flag_counts.items())),
         "release_error_counts": dict(sorted(release_error_counts.items())),
         "release_warning_counts": dict(sorted(release_warning_counts.items())),
+        "prediction_linkage_counts": dict(sorted(linkage_counts.items())),
         "review_queue": {
             "count": lane_counts.get("human_review_required", 0) + lane_counts.get("review_required", 0),
             "samples": review_queue_samples,

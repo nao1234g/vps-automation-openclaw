@@ -122,6 +122,21 @@ JOBS = {
         "load_guard": True,
         "health_guard": False,
     },
+    "prediction-maturity": {
+        "command": [
+            "python3",
+            str(SCRIPT_DIR / "prediction_maturity_audit.py"),
+            "--base-url",
+            BASE_URL,
+            "--json-out",
+            "/opt/shared/reports/site_guard/prediction_maturity_audit.json",
+            "--md-out",
+            "/opt/shared/reports/site_guard/prediction_maturity_audit.md",
+        ],
+        "timeout": 240,
+        "load_guard": True,
+        "health_guard": True,
+    },
 }
 
 GLOBAL_BREAKER_NAME = "_global"

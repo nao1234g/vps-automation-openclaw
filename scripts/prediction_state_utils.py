@@ -83,10 +83,16 @@ def _coerce_dateish(value: Any) -> date | None:
     token = raw[:10]
     match = _ISO_DATE_RE.match(token)
     if match:
-        return date(int(match.group("year")), int(match.group("month")), int(match.group("day")))
+        try:
+            return date(int(match.group("year")), int(match.group("month")), int(match.group("day")))
+        except ValueError:
+            return None
     match = _ISO_MONTH_RE.match(raw[:7])
     if match:
-        return date(int(match.group("year")), int(match.group("month")), 1)
+        try:
+            return date(int(match.group("year")), int(match.group("month")), 1)
+        except ValueError:
+            return None
     match = _QUARTER_RE.match(raw)
     if match:
         year = int(match.group("year_a") or match.group("year_b"))

@@ -286,6 +286,18 @@ TARGETS = [
         "remote": "/opt/shared/scripts/site_guard_runner.py",
     },
     {
+        "name": "site_guard_scheduler",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "site_guard_scheduler.py",
+        "remote": "/opt/shared/scripts/site_guard_scheduler.py",
+    },
+    {
+        "name": "prediction_maturity_audit",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "prediction_maturity_audit.py",
+        "remote": "/opt/shared/scripts/prediction_maturity_audit.py",
+    },
+    {
         "name": "site_ui_smoke_audit",
         "kind": "text",
         "local": REPO_ROOT / "scripts" / "site_ui_smoke_audit.py",
@@ -410,6 +422,18 @@ TARGETS = [
         "kind": "text",
         "local": REPO_ROOT / "scripts" / "test_public_article_rotation.py",
         "remote": "/opt/shared/scripts/test_public_article_rotation.py",
+    },
+    {
+        "name": "test_site_guard_scheduler",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_site_guard_scheduler.py",
+        "remote": "/opt/shared/scripts/test_site_guard_scheduler.py",
+    },
+    {
+        "name": "test_prediction_maturity_audit",
+        "kind": "text",
+        "local": REPO_ROOT / "scripts" / "test_prediction_maturity_audit.py",
+        "remote": "/opt/shared/scripts/test_prediction_maturity_audit.py",
     },
     {
         "name": "test_site_article_source_audit",

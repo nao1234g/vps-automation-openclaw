@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-04-04T11:48:16Z",
-  "generated_at_epoch": 1775303296,
+  "generated_at": "2026-04-05T00:30:57Z",
+  "generated_at_epoch": 1775349057,
   "total": 20,
-  "failed": 0,
+  "failed": 1,
   "results": [
     {
       "name": "mission_contract",
@@ -301,10 +301,10 @@
       "name": "stateful_user_journey",
       "ok": true,
       "returncode": 0,
-      "output": "{\n  \"generated_at\": \"2026-04-04T11:39:36Z\",\n  \"generated_at_epoch\": 1775302776,\n  \"base_url\": \"https://nowpattern.com\",\n  \"total\": 8,\n  \"failed\": 0,\n  \"results\": [\n    {\n      \"name\": \"ja_tracker_load\",\n      \"ok\": true,\n      \"detail\": \"status=200\"\n    },\n    {\n      \"name\": \"ja_search_state\",\n      \"ok\": true,\n      \"detail\": \"hidden_after_filter=1551\"\n    },\n    {\n      \"name\": \"ja_article_open\",\n      \"ok\": true,\n      \"detail\": \"href=https://nowpattern.com/toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no/ path=/toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no/\"\n    },\n    {\n      \"name\": \"ja_return_to_tracker\",\n      \"ok\": true,\n      \"detail\": \"path=/predictions/\"\n    },\n    {\n      \"name\": \"en_tracker_load\",\n      \"ok\": true,\n      \"detail\": \"status=200\"\n    },\n    {\n      \"name\": \"en_search_state\",\n      \"ok\": true,\n      \"detail\": \"hidden_after_filter=1550\"\n    },\n    {\n      \"name\": \"en_article_open\",\n      \"ok\": true,\n      \"detail\": \"href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/\"\n    },\n    {\n      \"name\": \"en_return_to_tracker\",\n      \"ok\": true,\n      \"detail\": \"path=/en/predictions/\"\n    }\n  ]\n}",
+      "output": "{\n  \"generated_at\": \"2026-04-05T00:18:40Z\",\n  \"generated_at_epoch\": 1775348320,\n  \"base_url\": \"https://nowpattern.com\",\n  \"total\": 8,\n  \"failed\": 0,\n  \"results\": [\n    {\n      \"name\": \"ja_tracker_load\",\n      \"ok\": true,\n      \"detail\": \"status=200\"\n    },\n    {\n      \"name\": \"ja_search_state\",\n      \"ok\": true,\n      \"detail\": \"hidden_after_filter=2039\"\n    },\n    {\n      \"name\": \"ja_article_open\",\n      \"ok\": true,\n      \"detail\": \"href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/\"\n    },\n    {\n      \"name\": \"ja_return_to_tracker\",\n      \"ok\": true,\n      \"detail\": \"path=/predictions/\"\n    },\n    {\n      \"name\": \"en_tracker_load\",\n      \"ok\": true,\n      \"detail\": \"status=200\"\n    },\n    {\n      \"name\": \"en_search_state\",\n      \"ok\": true,\n      \"detail\": \"hidden_after_filter=2039\"\n    },\n    {\n      \"name\": \"en_article_open\",\n      \"ok\": true,\n      \"detail\": \"href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/\"\n    },\n    {\n      \"name\": \"en_return_to_tracker\",\n      \"ok\": true,\n      \"detail\": \"path=/en/predictions/\"\n    }\n  ]\n}",
       "json": {
-        "generated_at": "2026-04-04T11:39:36Z",
-        "generated_at_epoch": 1775302776,
+        "generated_at": "2026-04-05T00:18:40Z",
+        "generated_at_epoch": 1775348320,
         "base_url": "https://nowpattern.com",
         "total": 8,
         "failed": 0,
@@ -317,12 +317,12 @@
           {
             "name": "ja_search_state",
             "ok": true,
-            "detail": "hidden_after_filter=1551"
+            "detail": "hidden_after_filter=2039"
           },
           {
             "name": "ja_article_open",
             "ok": true,
-            "detail": "href=https://nowpattern.com/toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no/ path=/toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no/"
+            "detail": "href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/"
           },
           {
             "name": "ja_return_to_tracker",
@@ -337,7 +337,7 @@
           {
             "name": "en_search_state",
             "ok": true,
-            "detail": "hidden_after_filter=1550"
+            "detail": "hidden_after_filter=2039"
           },
           {
             "name": "en_article_open",
@@ -384,9 +384,9 @@
     },
     {
       "name": "site_article_source",
-      "ok": true,
-      "returncode": 0,
-      "output": "{\"total\": 18, \"failed\": 0, \"passed\": 18, \"pruned_stale_paths\": 0}\nPASS: article source audit",
+      "ok": false,
+      "returncode": 1,
+      "output": "{\"total\": 18, \"failed\": 1, \"passed\": 17, \"pruned_stale_paths\": 0}\nFAIL en/iran-wars-asian-shockwaves-how-a-gulf-conflict-rewires-indo-pacific-power: article_fetch_failed:The read operation timed out",
       "json": null
     },
     {
@@ -431,10 +431,10 @@
       "name": "synthetic_user_crawler",
       "ok": true,
       "returncode": 0,
-      "output": "{\n  \"generated_at\": \"2026-04-04T11:48:14Z\",\n  \"generated_at_epoch\": 1775303294,\n  \"base_url\": \"https://nowpattern.com\",\n  \"total\": 4,\n  \"failed\": 0,\n  \"results\": [\n    {\n      \"name\": \"site_link_crawler\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"command\": [\n        \"/usr/bin/python3\",\n        \"/opt/shared/scripts/site_link_crawler.py\",\n        \"--base-url\",\n        \"https://nowpattern.com\",\n        \"--discover-limit\",\n        \"2000\",\n        \"--full-scan\"\n      ],\n      \"output\": \"{\\\"total\\\": 539, \\\"failed\\\": 0, \\\"passed\\\": 539}\\nPASS: site link crawler\",\n      \"json\": null\n    },\n    {\n      \"name\": \"stateful_user_journey\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"command\": [\n        \"/usr/bin/python3\",\n        \"/opt/shared/scripts/stateful_user_journey_audit.py\",\n        \"--base-url\",\n        \"https://nowpattern.com\"\n      ],\n      \"output\": \"{\\n  \\\"generated_at\\\": \\\"2026-04-04T11:46:27Z\\\",\\n  \\\"generated_at_epoch\\\": 1775303187,\\n  \\\"base_url\\\": \\\"https://nowpattern.com\\\",\\n  \\\"total\\\": 8,\\n  \\\"failed\\\": 0,\\n  \\\"results\\\": [\\n    {\\n      \\\"name\\\": \\\"ja_tracker_load\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"status=200\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"ja_search_state\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"hidden_after_filter=1551\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"ja_article_open\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"href=https://nowpattern.com/toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no/ path=/toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no/\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"ja_return_to_tracker\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"path=/predictions/\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"en_tracker_load\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"status=200\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"en_search_state\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"hidden_after_filter=1550\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"en_article_open\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"en_return_to_tracker\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"path=/en/predictions/\\\"\\n    }\\n  ]\\n}\",\n      \"json\": {\n        \"generated_at\": \"2026-04-04T11:46:27Z\",\n        \"generated_at_epoch\": 1775303187,\n        \"base_url\": \"https://nowpattern.com\",\n        \"total\": 8,\n        \"failed\": 0,\n        \"results\": [\n          {\n            \"name\": \"ja_tracker_load\",\n            \"ok\": true,\n            \"detail\": \"status=200\"\n          },\n          {\n            \"name\": \"ja_search_state\",\n            \"ok\": true,\n            \"detail\": \"hidden_after_filter=1551\"\n          },\n          {\n            \"name\": \"ja_article_open\",\n            \"ok\": true,\n            \"detail\": \"href=https://nowpattern.com/toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no/ path=/toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no/\"\n          },\n          {\n            \"name\": \"ja_return_to_tracker\",\n            \"ok\": true,\n            \"detail\": \"path=/predictions/\"\n          },\n          {\n            \"name\": \"en_tracker_load\",\n            \"ok\": true,\n            \"detail\": \"status=200\"\n          },\n          {\n            \"name\": \"en_search_state\",\n            \"ok\": true,\n            \"detail\": \"hidden_after_filter=1550\"\n          },\n          {\n            \"name\": \"en_article_open\",\n            \"ok\": true,\n            \"detail\": \"href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/\"\n          },\n          {\n            \"name\": \"en_return_to_tracker\",\n            \"ok\": true,\n            \"detail\": \"path=/en/predictions/\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"article_anchor_integrity\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"command\": [\n        \"/usr/bin/python3\",\n        \"/opt/shared/scripts/article_anchor_integrity_audit.py\",\n        \"--base-url\",\n        \"https://nowpattern.com\",\n        \"--discover-limit\",\n        \"2000\",\n        \"--full-scan\"\n      ],\n      \"output\": \"{\\\"total\\\": 214, \\\"failed\\\": 0, \\\"passed\\\": 214, \\\"pruned_stale_paths\\\": 0}\\nPASS: article anchor integrity audit\",\n      \"json\": null\n    },\n    {\n      \"name\": \"site_article_source\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"command\": [\n        \"/usr/bin/python3\",\n        \"/opt/shared/scripts/site_article_source_audit.py\",\n        \"--base-url\",\n        \"https://nowpattern.com\",\n        \"--discover-limit\",\n        \"2000\",\n        \"--full-scan\"\n      ],\n      \"output\": \"{\\\"total\\\": 107, \\\"failed\\\": 0, \\\"passed\\\": 107, \\\"pruned_stale_paths\\\": 0}\\nPASS: article source audit\",\n      \"json\": null\n    }\n  ]\n}",
+      "output": "{\n  \"generated_at\": \"2026-04-05T00:30:56Z\",\n  \"generated_at_epoch\": 1775349056,\n  \"base_url\": \"https://nowpattern.com\",\n  \"total\": 4,\n  \"failed\": 0,\n  \"results\": [\n    {\n      \"name\": \"site_link_crawler\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"command\": [\n        \"/usr/bin/python3\",\n        \"/opt/shared/scripts/site_link_crawler.py\",\n        \"--base-url\",\n        \"https://nowpattern.com\",\n        \"--discover-limit\",\n        \"2000\",\n        \"--full-scan\"\n      ],\n      \"output\": \"{\\\"total\\\": 539, \\\"failed\\\": 0, \\\"passed\\\": 539}\\nPASS: site link crawler\",\n      \"json\": null\n    },\n    {\n      \"name\": \"stateful_user_journey\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"command\": [\n        \"/usr/bin/python3\",\n        \"/opt/shared/scripts/stateful_user_journey_audit.py\",\n        \"--base-url\",\n        \"https://nowpattern.com\"\n      ],\n      \"output\": \"{\\n  \\\"generated_at\\\": \\\"2026-04-05T00:28:50Z\\\",\\n  \\\"generated_at_epoch\\\": 1775348930,\\n  \\\"base_url\\\": \\\"https://nowpattern.com\\\",\\n  \\\"total\\\": 8,\\n  \\\"failed\\\": 0,\\n  \\\"results\\\": [\\n    {\\n      \\\"name\\\": \\\"ja_tracker_load\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"status=200\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"ja_search_state\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"hidden_after_filter=2039\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"ja_article_open\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"ja_return_to_tracker\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"path=/predictions/\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"en_tracker_load\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"status=200\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"en_search_state\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"hidden_after_filter=2039\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"en_article_open\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/\\\"\\n    },\\n    {\\n      \\\"name\\\": \\\"en_return_to_tracker\\\",\\n      \\\"ok\\\": true,\\n      \\\"detail\\\": \\\"path=/en/predictions/\\\"\\n    }\\n  ]\\n}\",\n      \"json\": {\n        \"generated_at\": \"2026-04-05T00:28:50Z\",\n        \"generated_at_epoch\": 1775348930,\n        \"base_url\": \"https://nowpattern.com\",\n        \"total\": 8,\n        \"failed\": 0,\n        \"results\": [\n          {\n            \"name\": \"ja_tracker_load\",\n            \"ok\": true,\n            \"detail\": \"status=200\"\n          },\n          {\n            \"name\": \"ja_search_state\",\n            \"ok\": true,\n            \"detail\": \"hidden_after_filter=2039\"\n          },\n          {\n            \"name\": \"ja_article_open\",\n            \"ok\": true,\n            \"detail\": \"href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/\"\n          },\n          {\n            \"name\": \"ja_return_to_tracker\",\n            \"ok\": true,\n            \"detail\": \"path=/predictions/\"\n          },\n          {\n            \"name\": \"en_tracker_load\",\n            \"ok\": true,\n            \"detail\": \"status=200\"\n          },\n          {\n            \"name\": \"en_search_state\",\n            \"ok\": true,\n            \"detail\": \"hidden_after_filter=2039\"\n          },\n          {\n            \"name\": \"en_article_open\",\n            \"ok\": true,\n            \"detail\": \"href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/\"\n          },\n          {\n            \"name\": \"en_return_to_tracker\",\n            \"ok\": true,\n            \"detail\": \"path=/en/predictions/\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"article_anchor_integrity\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"command\": [\n        \"/usr/bin/python3\",\n        \"/opt/shared/scripts/article_anchor_integrity_audit.py\",\n        \"--base-url\",\n        \"https://nowpattern.com\",\n        \"--discover-limit\",\n        \"2000\",\n        \"--full-scan\"\n      ],\n      \"output\": \"{\\\"total\\\": 214, \\\"failed\\\": 0, \\\"passed\\\": 214, \\\"pruned_stale_paths\\\": 0}\\nPASS: article anchor integrity audit\",\n      \"json\": null\n    },\n    {\n      \"name\": \"site_article_source\",\n      \"ok\": true,\n      \"returncode\": 0,\n      \"command\": [\n        \"/usr/bin/python3\",\n        \"/opt/shared/scripts/site_article_source_audit.py\",\n        \"--base-url\",\n        \"https://nowpattern.com\",\n        \"--discover-limit\",\n        \"2000\",\n        \"--full-scan\"\n      ],\n      \"output\": \"{\\\"total\\\": 107, \\\"failed\\\": 0, \\\"passed\\\": 107, \\\"pruned_stale_paths\\\": 0}\\nPASS: article source audit\",\n      \"json\": null\n    }\n  ]\n}",
       "json": {
-        "generated_at": "2026-04-04T11:48:14Z",
-        "generated_at_epoch": 1775303294,
+        "generated_at": "2026-04-05T00:30:56Z",
+        "generated_at_epoch": 1775349056,
         "base_url": "https://nowpattern.com",
         "total": 4,
         "failed": 0,
@@ -465,10 +465,10 @@
               "--base-url",
               "https://nowpattern.com"
             ],
-            "output": "{\n  \"generated_at\": \"2026-04-04T11:46:27Z\",\n  \"generated_at_epoch\": 1775303187,\n  \"base_url\": \"https://nowpattern.com\",\n  \"total\": 8,\n  \"failed\": 0,\n  \"results\": [\n    {\n      \"name\": \"ja_tracker_load\",\n      \"ok\": true,\n      \"detail\": \"status=200\"\n    },\n    {\n      \"name\": \"ja_search_state\",\n      \"ok\": true,\n      \"detail\": \"hidden_after_filter=1551\"\n    },\n    {\n      \"name\": \"ja_article_open\",\n      \"ok\": true,\n      \"detail\": \"href=https://nowpattern.com/toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no/ path=/toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no/\"\n    },\n    {\n      \"name\": \"ja_return_to_tracker\",\n      \"ok\": true,\n      \"detail\": \"path=/predictions/\"\n    },\n    {\n      \"name\": \"en_tracker_load\",\n      \"ok\": true,\n      \"detail\": \"status=200\"\n    },\n    {\n      \"name\": \"en_search_state\",\n      \"ok\": true,\n      \"detail\": \"hidden_after_filter=1550\"\n    },\n    {\n      \"name\": \"en_article_open\",\n      \"ok\": true,\n      \"detail\": \"href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/\"\n    },\n    {\n      \"name\": \"en_return_to_tracker\",\n      \"ok\": true,\n      \"detail\": \"path=/en/predictions/\"\n    }\n  ]\n}",
+            "output": "{\n  \"generated_at\": \"2026-04-05T00:28:50Z\",\n  \"generated_at_epoch\": 1775348930,\n  \"base_url\": \"https://nowpattern.com\",\n  \"total\": 8,\n  \"failed\": 0,\n  \"results\": [\n    {\n      \"name\": \"ja_tracker_load\",\n      \"ok\": true,\n      \"detail\": \"status=200\"\n    },\n    {\n      \"name\": \"ja_search_state\",\n      \"ok\": true,\n      \"detail\": \"hidden_after_filter=2039\"\n    },\n    {\n      \"name\": \"ja_article_open\",\n      \"ok\": true,\n      \"detail\": \"href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/\"\n    },\n    {\n      \"name\": \"ja_return_to_tracker\",\n      \"ok\": true,\n      \"detail\": \"path=/predictions/\"\n    },\n    {\n      \"name\": \"en_tracker_load\",\n      \"ok\": true,\n      \"detail\": \"status=200\"\n    },\n    {\n      \"name\": \"en_search_state\",\n      \"ok\": true,\n      \"detail\": \"hidden_after_filter=2039\"\n    },\n    {\n      \"name\": \"en_article_open\",\n      \"ok\": true,\n      \"detail\": \"href=https://nowpattern.com/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/ path=/en/us-stablecoin-law-the-regulatory-purge-that-reshapes-digital-dollar-dominance/\"\n    },\n    {\n      \"name\": \"en_return_to_tracker\",\n      \"ok\": true,\n      \"detail\": \"path=/en/predictions/\"\n    }\n  ]\n}",
             "json": {
-              "generated_at": "2026-04-04T11:46:27Z",
-              "generated_at_epoch": 1775303187,
+              "generated_at": "2026-04-05T00:28:50Z",
+              "generated_at_epoch": 1775348930,
               "base_url": "https://nowpattern.com",
               "total": 8,
               "failed": 0,
@@ -481,12 +481,12 @@
                 {
                   "name": "ja_search_state",
                   "ok": true,
-                  "detail": "hidden_after_filter=1551"
+                  "detail": "hidden_after_filter=2039"
                 },
                 {
                   "name": "ja_article_open",
                   "ok": true,
-                  "detail": "href=https://nowpattern.com/toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no/ path=/toranpuguan-shui-zui-gao-cai-bai-bei-demotu-kijin-mu-xuan-yan-150ri-no/"
+                  "detail": "href=https://nowpattern.com/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/ path=/gong-kai-qi-ye-btcbao-you-200mo-mei-tu-po-bu-ke-ni-nozhi-du-hua-gashi-suci-nogemu/"
                 },
                 {
                   "name": "ja_return_to_tracker",
@@ -501,7 +501,7 @@
                 {
                   "name": "en_search_state",
                   "ok": true,
-                  "detail": "hidden_after_filter=1550"
+                  "detail": "hidden_after_filter=2039"
                 },
                 {
                   "name": "en_article_open",

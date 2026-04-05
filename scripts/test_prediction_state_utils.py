@@ -56,10 +56,24 @@ def test_resolved_not_scored_prediction_maps_to_resolved_bucket() -> None:
     assert snap["render_bucket"] == psu.PUBLIC_RENDER_BUCKET_RESOLVED, snap
 
 
+def test_invalid_trigger_date_falls_back_without_crashing() -> None:
+    prediction = {
+        "status": "RESOLVING",
+        "trigger_date": "2026-13",
+        "same_lang_url": "",
+        "fallback_url": "",
+    }
+    snap = psu.public_state_snapshot(prediction, lang="ja", today=date(2026, 4, 4))
+    assert snap["forecast_state"] == psu.FORECAST_STATE_CLOSED, snap
+    assert snap["resolution_state"] == psu.RESOLUTION_STATE_AWAITING, snap
+    assert snap["render_bucket"] == psu.PUBLIC_RENDER_BUCKET_AWAITING, snap
+
+
 def main() -> int:
     test_open_prediction_maps_to_in_play_bucket()
     test_closed_unresolved_prediction_maps_to_awaiting_bucket()
     test_resolved_not_scored_prediction_maps_to_resolved_bucket()
+    test_invalid_trigger_date_falls_back_without_crashing()
     print("PASS: prediction state utils")
     return 0
 

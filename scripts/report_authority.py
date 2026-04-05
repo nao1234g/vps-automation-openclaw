@@ -25,6 +25,7 @@ REMOTE_REPORT_MAP = {
     str(LOCAL_REPORT_DIR / "one_pass_completion_gate.json"): "/opt/shared/reports/one_pass_completion_gate.json",
     str(LOCAL_REPORT_DIR / "article_release_manifest.json"): "/opt/shared/reports/article_release_manifest.json",
     str(LOCAL_REPORT_DIR / "prediction_article_integrity.json"): "/opt/shared/reports/prediction_article_integrity.json",
+    str(LOCAL_REPORT_DIR / "site_guard" / "prediction_maturity_audit.json"): "/opt/shared/reports/site_guard/prediction_maturity_audit.json",
     str(LOCAL_DATA_DIR / "mistake_registry.json"): "/opt/shared/data/mistake_registry.json",
 }
 

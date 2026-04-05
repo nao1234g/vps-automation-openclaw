@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import http.client
+import tempfile
 import sys
 from pathlib import Path
 
@@ -236,6 +238,132 @@ def test_build_page_html_counts_all_formal_rows_even_without_articles() -> None:
     assert 'data-view="resolved">判定済み <span>1</span>' in html, html
 
 
+def test_build_page_html_limits_initial_tracking_dom_and_embeds_tracking_payload() -> None:
+    import json
+    import re
+
+    rows = []
+    for idx in range(40):
+        rows.append(
+            {
+                "source": "prediction_db",
+                "prediction_id": f"NP-2026-{2000 + idx}",
+                "title": f"Open forecast {idx}",
+                "status": "OPEN",
+                "url": "",
+                "same_lang_url": "",
+                "fallback_url": "",
+                "analysis_is_fallback": False,
+                "genres": [],
+                "our_pick": "YES",
+                "our_pick_prob": 60,
+                "question_type": "binary",
+                "hit_condition_ja": f"条件{idx}",
+                "trigger_date": "2026-12-31",
+                "oracle_deadline": "2026-12-31",
+                "resolution_question_ja": f"質問{idx}",
+                "scenarios_labeled": [
+                    {"label": "基本", "prob": 60, "content": f"根拠{idx}"},
+                    {"label": "悲観", "prob": 40, "content": f"反証{idx}"},
+                ],
+            }
+        )
+
+    html = ppb.build_page_html(rows, {}, "ja")
+    assert html.count('class="np-reader-vote"') == ppb.TRACKING_INITIAL_RENDER_LIMIT, html
+
+    config_match = re.search(
+        rf'<script id="{ppb.TRACKING_PAYLOAD_SCRIPT_ID}" type="application/json">(.*?)</script>',
+        html,
+        re.DOTALL,
+    )
+    assert config_match, html
+    config = json.loads(config_match.group(1))
+    assert config["payload_url"] == "/reader-predict/tracking-payload/ja", config
+    assert config["seed_limit"] == ppb.TRACKING_INITIAL_RENDER_LIMIT, config
+    assert config["tracking_total"] == 40, config
+
+    payload = ppb._build_tracking_payload(rows, [], "ja")
+    assert len(payload) == 40, payload
+    assert payload[0]["bucket"] == "inplay", payload[0]
+    assert payload[0]["html_b64"], payload[0]
+    assert "The rest load on demand." not in html, html
+
+
+def test_write_tracker_payload_report_writes_local_artifact() -> None:
+    rows = [
+        {
+            "source": "prediction_db",
+            "prediction_id": "NP-2026-3001",
+            "title": "Open forecast",
+            "status": "OPEN",
+            "render_bucket": "in_play",
+            "same_lang_url": "",
+            "fallback_url": "",
+            "analysis_is_fallback": False,
+            "genres": ["macro"],
+            "our_pick": "YES",
+            "our_pick_prob": 60,
+            "question_type": "binary",
+            "hit_condition_ja": "条件A",
+            "oracle_deadline": "2026-12-31",
+            "resolution_question_ja": "質問A",
+            "scenarios_labeled": [{"label": "基本", "prob": 60, "content": "根拠A"}],
+        },
+        {
+            "source": "prediction_db",
+            "prediction_id": "NP-2026-3002",
+            "title": "Awaiting forecast",
+            "status": "RESOLVING",
+            "render_bucket": "awaiting",
+            "same_lang_url": "",
+            "fallback_url": "",
+            "analysis_is_fallback": False,
+            "genres": ["policy"],
+            "our_pick": "NO",
+            "our_pick_prob": 45,
+            "question_type": "binary",
+            "hit_condition_ja": "条件B",
+            "oracle_deadline": "2026-12-31",
+            "resolution_question_ja": "質問B",
+            "scenarios_labeled": [{"label": "基本", "prob": 45, "content": "根拠B"}],
+        },
+        {
+            "source": "prediction_db",
+            "prediction_id": "NP-2026-3003",
+            "title": "Resolved forecast",
+            "status": "RESOLVED",
+            "render_bucket": "resolved",
+            "same_lang_url": "",
+            "fallback_url": "",
+            "analysis_is_fallback": False,
+            "genres": ["all"],
+            "our_pick": "YES",
+            "our_pick_prob": 75,
+            "question_type": "binary",
+            "hit_condition_ja": "条件C",
+            "oracle_deadline": "2026-12-31",
+            "resolution_question_ja": "質問C",
+            "scenarios_labeled": [{"label": "基本", "prob": 75, "content": "根拠C"}],
+        },
+    ]
+    with tempfile.TemporaryDirectory() as tmpdir:
+        original_template = ppb.TRACKER_PAYLOAD_OUTPUT_TEMPLATE
+        try:
+            ppb.TRACKER_PAYLOAD_OUTPUT_TEMPLATE = str(Path(tmpdir) / "tracker_payload_{lang}.json")
+            ppb._write_tracker_payload_report("ja", rows)
+            payload_path = Path(tmpdir) / "tracker_payload_ja.json"
+            assert payload_path.exists(), payload_path
+            payload = __import__("json").loads(payload_path.read_text(encoding="utf-8"))
+        finally:
+            ppb.TRACKER_PAYLOAD_OUTPUT_TEMPLATE = original_template
+
+    assert payload["lang"] == "ja", payload
+    assert len(payload["items"]) == 2, payload
+    assert {item["bucket"] for item in payload["items"]} == {"inplay", "awaiting"}, payload
+    assert all(item["html_b64"] for item in payload["items"]), payload
+
+
 def test_build_card_renders_reader_vote_widget_for_unresolved_prediction() -> None:
     row = {
         "source": "prediction_db",
@@ -300,6 +428,7 @@ def test_build_reader_vote_widget_foot_localizes_english_copy() -> None:
     assert "Lean YES selected" in foot, foot
     assert "Bullish" in foot, foot
     assert "Bearish" in foot, foot
+    assert "window.npReaderWidgetRefresh" in foot, foot
     assert "楽観" not in foot, foot
 
 
@@ -396,6 +525,8 @@ def test_scoreboard_block_separates_binary_and_brier_metrics() -> None:
     assert "Brier Index / n=54 / avg raw Brier 0.4608" in html, html
     assert "66.7%" in html, html
     assert "32.1%" in html, html
+    assert "54/1121 (4.8%)" in html, html
+    assert "Next milestone: 150 publicly scored cases." in html, html
     assert "/en/forecasting-methodology/" in html, html
     assert "/en/forecast-scoring-and-resolution/" in html, html
     assert "/en/forecast-integrity-and-audit/" in html, html
@@ -433,6 +564,96 @@ def test_build_rows_attaches_state_snapshot_fields() -> None:
     assert row["resolution_state"] == "AWAITING_EVIDENCE", row
     assert row["content_state"] == "CROSS_LANG_FALLBACK", row
     assert row["render_bucket"] == "awaiting", row
+
+
+def test_build_rows_treats_verdict_backed_resolution_as_resolved_without_resolved_at() -> None:
+    pred_db = {
+        "predictions": [
+            {
+                "prediction_id": "NP-2026-8888",
+                "title": "Resolved without timestamp",
+                "title_ja": "解決日時なしの解決予測",
+                "status": "RESOLVED",
+                "verdict": "MISS",
+                "brier_score": 0.8281,
+                "official_score_tier": "PROVISIONAL",
+                "scenarios": [
+                    {"label": "基本", "probability": 0.91, "content": "根拠"}
+                ],
+                "our_pick_prob": 91,
+                "question_type": "binary",
+                "hit_condition_ja": "条件E",
+                "oracle_deadline": "2026-03-01",
+            }
+        ]
+    }
+    rows = ppb.build_rows(pred_db, ghost_posts=[], embed_data=[], lang="ja")
+    assert len(rows) == 1, rows
+    row = rows[0]
+    assert row["verdict"] == "MISS", row
+    assert row["brier_score"] == 0.8281, row
+    assert row["resolution_state"] == "RESOLVED_MISS", row
+    assert row["render_bucket"] == "resolved", row
+
+
+def test_build_rows_uses_canonical_trigger_date_for_state_in_both_languages() -> None:
+    pred_db = {
+        "predictions": [
+            {
+                "prediction_id": "NP-2026-8889",
+                "title": "Cross-language deadline parsing",
+                "title_ja": "多言語期限パース確認",
+                "status": "RESOLVING",
+                "triggers": [{"date": "2026年Q4", "date_en": "Q4 2026"}],
+                "scenarios": [{"label": "基本", "probability": 0.6, "content": "根拠"}],
+                "our_pick_prob": 60,
+                "question_type": "binary",
+                "oracle_deadline": "2026年Q4",
+            }
+        ]
+    }
+    row_ja = ppb.build_rows(pred_db, ghost_posts=[], embed_data=[], lang="ja")[0]
+    row_en = ppb.build_rows(pred_db, ghost_posts=[], embed_data=[], lang="en")[0]
+    assert row_ja["trigger_date"] == "2026年Q4", row_ja
+    assert row_en["trigger_date"] == "2026年Q4", row_en
+    assert row_ja["render_bucket"] == row_en["render_bucket"], (row_ja, row_en)
+
+
+def test_build_rows_accepts_list_genre_tags() -> None:
+    pred_db = {
+        "predictions": [
+            {
+                "prediction_id": "NP-2026-8890",
+                "title": "List genre tags",
+                "title_ja": "genre_tags が配列の予測",
+                "status": "OPEN",
+                "genre_tags": ["Macro", "Policy"],
+                "scenarios": [{"label": "基本", "probability": 0.6, "content": "根拠"}],
+                "our_pick_prob": 60,
+                "question_type": "binary",
+                "oracle_deadline": "2026-12-31",
+            }
+        ]
+    }
+    row = ppb.build_rows(pred_db, ghost_posts=[], embed_data=[], lang="ja")[0]
+    assert row["genres"] == ["macro", "policy"], row
+
+
+def test_tracker_page_metadata_softens_old_transparency_claims() -> None:
+    meta = ppb._tracker_page_metadata(
+        {
+            "total": 1121,
+            "resolved": 58,
+            "scorable": 54,
+            "not_scorable": 4,
+            "accuracy_pct": 66.7,
+            "public_brier_index": 32.1,
+        },
+        "en",
+    )
+    assert "Full Accuracy Transparency" not in meta["title"], meta
+    assert "auto-calculated Brier Scores" not in meta["meta_description"], meta
+    assert "Provisional" in meta["meta_description"], meta
 
 
 def test_build_card_emits_state_attributes() -> None:
@@ -499,10 +720,51 @@ def test_build_card_suppresses_japanese_resolution_evidence_on_en_page() -> None
     }
     html = ppb._build_card(row, "en")
     assert "TRANSLATION MISSING" not in html, html
-    assert "English resolution summary pending." in html, html
-    assert "English evidence summary pending." in html, html
+    assert "English resolution summary pending." not in html, html
+    assert "English evidence summary pending." not in html, html
+    assert "English scenario summary pending." not in html, html
+    assert "This forecast resolved as accurate against its published YES/NO rule." in html, html
+    assert "The supporting evidence bundle for this resolution is recorded and fingerprinted below." in html, html
+    assert "Base case in the published scenario split (72%)." in html, html
+    assert "Bearish case in the published scenario split (28%)." in html, html
     assert "Base" in html, html
     assert "Bearish" in html, html
+
+
+def test_tracker_ui_gate_rejects_legacy_english_pending_copy() -> None:
+    html = "<div>English resolution summary pending.</div>"
+    try:
+        ppb.check_tracker_public_ui_integrity(html)
+    except AssertionError as exc:
+        assert "legacy placeholder copy" in str(exc)
+        return
+    raise AssertionError("tracker UI integrity gate failed to block legacy EN placeholder copy")
+
+
+def test_ghost_request_treats_incomplete_write_body_as_success() -> None:
+    original_urlopen = ppb.urllib.request.urlopen
+    original_jwt = ppb.ghost_jwt
+
+    class _DummyResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def read(self):
+            raise http.client.IncompleteRead(b'{"ok":true}', 32)
+
+    try:
+        ppb.ghost_jwt = lambda api_key: "dummy-token"
+        ppb.urllib.request.urlopen = lambda *args, **kwargs: _DummyResponse()
+        result = ppb.ghost_request("PUT", "/pages/1/", "kid:deadbeef", {"pages": []})
+    finally:
+        ppb.urllib.request.urlopen = original_urlopen
+        ppb.ghost_jwt = original_jwt
+
+    assert result["_warning"] == "incomplete_read_after_write", result
+    assert result["_partial_bytes"] > 0, result
 
 
 def test_claimreview_ld_excludes_not_scored_predictions() -> None:
@@ -571,8 +833,14 @@ def run() -> None:
     test_canonical_public_stats_ignore_stale_stats_block()
     test_scoreboard_block_separates_binary_and_brier_metrics()
     test_build_rows_attaches_state_snapshot_fields()
+    test_build_rows_treats_verdict_backed_resolution_as_resolved_without_resolved_at()
+    test_build_rows_uses_canonical_trigger_date_for_state_in_both_languages()
+    test_build_rows_accepts_list_genre_tags()
+    test_tracker_page_metadata_softens_old_transparency_claims()
     test_build_card_emits_state_attributes()
     test_build_card_suppresses_japanese_resolution_evidence_on_en_page()
+    test_tracker_ui_gate_rejects_legacy_english_pending_copy()
+    test_ghost_request_treats_incomplete_write_body_as_success()
     test_claimreview_ld_excludes_not_scored_predictions()
     test_resolving_near_deadline_promotes_to_in_play()
     test_resolving_far_past_deadline_stays_awaiting()

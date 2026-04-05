@@ -73,11 +73,18 @@ def classify_release_lane(
     external_url_count: int,
     verified_external_source_count: int,
     oracle_marker_present: bool,
+    prediction_linkage_state: str = "",
 ) -> str:
     if truth_errors:
         return "truth_blocked"
     if approval_present:
         return "distribution_ready"
+    # Prediction-linked articles without a cross-language sibling are not ready.
+    if oracle_marker_present and prediction_linkage_state in (
+        "missing_sibling",
+        "tracker_only",
+    ):
+        return "review_required"
     verified_count = verified_external_source_count or external_url_count
     if "FRONTIER_AI" in risk_flags:
         return "human_review_required"
@@ -181,6 +188,7 @@ def evaluate_release_blockers(
     channel: str = "public",
     require_external_sources: bool = True,
     check_source_fetchability: bool = False,
+    prediction_linkage: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     truth_errors, external = evaluate_article_truth(
         title=title,
@@ -212,6 +220,11 @@ def evaluate_release_blockers(
             verified_external_source_count = sum(1 for item in evidence_packets if item.get("ok"))
         else:
             evidence_packets = []
+    linkage_state = ""
+    linkage_info: dict[str, Any] = {}
+    if prediction_linkage:
+        linkage_state = str(prediction_linkage.get("linkage_state", ""))
+        linkage_info = prediction_linkage
     lane = classify_release_lane(
         truth_errors=truth_errors,
         risk_flags=risk_flags,
@@ -219,12 +232,16 @@ def evaluate_release_blockers(
         external_url_count=len(external),
         verified_external_source_count=verified_external_source_count,
         oracle_marker_present=oracle_marker_present,
+        prediction_linkage_state=linkage_state,
     )
     approval_required = (status or "").lower() == "published" and lane == "human_review_required"
     review_required = (status or "").lower() == "published" and lane == "review_required"
     warnings: list[str] = []
 
     errors = list(truth_errors)
+    # Add linkage errors from prediction contract evaluation
+    if linkage_info:
+        errors.extend(linkage_info.get("errors", []))
     if approval_required and not approval_present:
         errors.append("HUMAN_APPROVAL_REQUIRED:" + ",".join(risk_flags))
     if review_required and not approval_present:
@@ -251,6 +268,7 @@ def evaluate_release_blockers(
         "status": status,
         "evidence_packets": evidence_packets,
         "warnings": warnings,
+        "prediction_linkage": linkage_info or None,
     }
 
 

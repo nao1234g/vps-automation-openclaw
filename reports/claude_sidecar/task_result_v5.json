@@ -1,0 +1,69 @@
+{
+  "task_id": "sidecar-20260405-prediction-quality-v1",
+  "generated_at": "2026-04-05T12:30:00+09:00",
+  "agent": "claude-code-sidecar",
+  "status": "completed",
+  "scope_summary": "Prediction quality improvement + agent coordination system",
+  "phases": [
+    {
+      "phase": "phase-1-genre-backfill",
+      "status": "completed",
+      "actions": [
+        "Backfilled genre_tags for 44/52 uncategorized RESOLVED predictions on VPS",
+        "Normalized 6 lowercase 'resolved' statuses to 'RESOLVED'",
+        "Normalized 32 existing Japanese-text genre_tags to slug format (e.g. '暗号資産' → 'genre-crypto')",
+        "Fixed category_brier_analysis.py to handle list genre_tags format"
+      ],
+      "vps_files_modified": [
+        "/opt/shared/scripts/prediction_db.json",
+        "/opt/shared/scripts/category_brier_analysis.py"
+      ],
+      "backups": [
+        "/opt/shared/scripts/prediction_db.json.bak-genre-20260405-103835",
+        "/opt/shared/scripts/category_brier_analysis.py.bak-20260405"
+      ]
+    },
+    {
+      "phase": "phase-2-brier-calibration",
+      "status": "completed",
+      "actions": [
+        "Ran category Brier analysis on VPS with backfilled genre_tags",
+        "Discovered catastrophic underconfidence: 0-10% predicted → 70.6% actual HIT rate (n=17)",
+        "10-20% predicted → 100% actual HIT rate (n=8)",
+        "Recorded findings to /opt/shared/AGENT_WISDOM.md",
+        "Improvement actions: base rate rechecking, probability bounds 5-95%, Polymarket comparison mandatory"
+      ],
+      "key_finding": "Brier score (0.4759) is inflated primarily by systematic underconfidence, not by wrong-direction calls",
+      "vps_files_modified": [
+        "/opt/shared/AGENT_WISDOM.md"
+      ]
+    },
+    {
+      "phase": "phase-3-coordination-system",
+      "status": "completed",
+      "actions": [
+        "Created .coordination/ directory with protocol.json, codex.json, claude-code.json, lock-registry.json",
+        "Updated .claude/hooks/coordination-pretool.py with local .coordination/*.json conflict detection",
+        "Created .claude/hooks/coordination-session-sync.py CLI (--show, --update-self, --lock, --unlock, --idle)",
+        "Created .claude/hooks/coordination-precheck.py (redundant with pretool.py, to be cleaned up)"
+      ],
+      "local_files_created": [
+        ".coordination/protocol.json",
+        ".coordination/codex.json",
+        ".coordination/claude-code.json",
+        ".coordination/lock-registry.json",
+        ".claude/hooks/coordination-session-sync.py",
+        ".claude/hooks/coordination-precheck.py"
+      ],
+      "local_files_modified": [
+        ".claude/hooks/coordination-pretool.py"
+      ]
+    }
+  ],
+  "remaining_work": [
+    "Clean up redundant coordination-precheck.py",
+    "Add coordination status display to session-start.sh",
+    "Update Codex instructions.md with coordination protocol",
+    "Implement OPERATIONS_BOARD.md rename from PREDICTION_EXECUTION_BOARD.md"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "agent": "codex",
+  "status": "active",
+  "updated_at": "2026-04-05T12:47:00+09:00",
+  "current_task": "R2 new-work bilingual linkage enforcement",
+  "next_step": "patch publish path to enforce prediction linkage before Ghost publish",
+  "locked_files": [
+    "docs/OPERATIONS_BOARD.md",
+    "scripts/prediction_release_contract.py",
+    "scripts/nowpattern_publisher.py",
+    "scripts/breaking_pipeline_helper.py",
+    "scripts/test_prediction_release_contract.py",
+    "scripts/test_article_release_guard.py"
+  ],
+  "vps_resources": [],
+  "session_id": ""
+}

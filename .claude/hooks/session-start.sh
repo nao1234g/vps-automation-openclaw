@@ -427,6 +427,49 @@ fi
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
+# ── Local Agent Coordination (.coordination/) ──────────────────────────
+COORD_SYNC="$PROJECT_DIR/.claude/hooks/coordination-session-sync.py"
+COORD_DIR_LOCAL="$PROJECT_DIR/.coordination"
+if [ -d "$COORD_DIR_LOCAL" ]; then
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "🔄 LOCAL AGENT COORDINATION (.coordination/)"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    if [ -f "$COORD_SYNC" ]; then
+        CLAUDE_PROJECT_DIR="$PROJECT_DIR" python "$COORD_SYNC" --show 2>/dev/null
+        CLAUDE_PROJECT_DIR="$PROJECT_DIR" python "$COORD_SYNC" --update-self "session started" 2>/dev/null
+    else
+        for agent_file in "$COORD_DIR_LOCAL"/*.json; do
+            [ ! -f "$agent_file" ] && continue
+            fname=$(basename "$agent_file")
+            [ "$fname" = "protocol.json" ] || [ "$fname" = "lock-registry.json" ] && continue
+            python -c "
+import json, sys
+from datetime import datetime, timezone
+try:
+    s = json.load(open(sys.argv[1], encoding='utf-8'))
+    name = s.get('agent', '?')
+    status = s.get('status', 'unknown')
+    task = s.get('current_task', '')[:50]
+    locked = s.get('locked_files', [])
+    updated = s.get('updated_at', '')
+    stale = ''
+    if updated:
+        ts = datetime.fromisoformat(updated)
+        if ts.tzinfo is None: ts = ts.replace(tzinfo=timezone.utc)
+        age = (datetime.now(timezone.utc) - ts).total_seconds()
+        if age > 600: stale = ' (stale)'
+    icon = '💀' if stale else ('🟢' if status == 'active' else '⚪')
+    print(f'  {icon} {name:<14} {status}{stale}')
+    if task: print(f'      Task: {task}')
+    if locked: print(f'      Locked: {\", \".join(locked)}')
+except: pass
+" "$agent_file" 2>/dev/null
+        done
+    fi
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+fi
+
 echo "--- RULES ---"
 echo "1. RESEARCH FIRST: WebSearch/WebFetch BEFORE any implementation"
 echo "2. CHECK KNOWN_MISTAKES.md BEFORE starting any new task"
@@ -470,8 +513,8 @@ except Exception as e:
     [ -n "$LEDGER_SUMMARY" ] && echo "$LEDGER_SUMMARY"
 fi
 
-# 2. PREDICTION_EXECUTION_BOARD.md（global truth: 全体進捗）
-EXEC_BOARD="$PROJECT_DIR/docs/PREDICTION_EXECUTION_BOARD.md"
+# 2. OPERATIONS_BOARD.md（global truth: 全体進捗・共有運用状態）
+EXEC_BOARD="$PROJECT_DIR/docs/OPERATIONS_BOARD.md"
 if [ -f "$EXEC_BOARD" ]; then
     BOARD_SUMMARY=$(head -30 "$EXEC_BOARD" 2>/dev/null | grep -E "^(##|Progress|Status|Done|Phase|Current)" | head -5)
     if [ -n "$BOARD_SUMMARY" ]; then

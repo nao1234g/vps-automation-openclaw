@@ -1,0 +1,10 @@
+{
+  "agent": "claude-code",
+  "status": "idle",
+  "updated_at": "2026-04-05T12:30:00+09:00",
+  "current_task": "",
+  "next_step": "",
+  "locked_files": [],
+  "vps_resources": [],
+  "session_id": "sidecar-20260405"
+}

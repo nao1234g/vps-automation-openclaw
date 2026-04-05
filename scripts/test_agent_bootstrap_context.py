@@ -23,6 +23,7 @@ def test_bootstrap_payload_contains_contract_and_state() -> None:
     assert payload["north_star"]
     assert "current_state" in payload
     assert "mistake_registry" in payload
+    assert "maturity_m1_progress_pct" in payload["current_state"]
 
 
 def test_bootstrap_summary_is_human_readable() -> None:
@@ -34,6 +35,7 @@ def test_bootstrap_summary_is_human_readable() -> None:
     assert "PVQE: P=判断精度" in summary
     assert "Current State:" in summary
     assert "Mistake Registry:" in summary
+    assert "Prediction Maturity:" in summary
 
 
 def run() -> None:

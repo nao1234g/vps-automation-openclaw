@@ -27,7 +27,32 @@
       "Bash(\"/c/Program Files/Python312/python.exe\" scripts/test_reader_prediction_api.py)",
       "Bash(grep -c '\"\"phase\"\":\"\"commentary\"\"' bkd803722.txt)",
       "Bash(bash -c 'PROJECT_DIR=. && CODEX_MSG=\"\".agent-mailbox/codex-to-claude.md\"\" && head -3 \"\"$CODEX_MSG\"\" 2>/dev/null | grep -oE \"\"[0-9]{4}-[0-9]{2}-[0-9]{2}\"\" | head -1 && head -5 \"\"$CODEX_MSG\"\" 2>/dev/null | grep \"\"^##\"\" | head -1')",
-      "Read(//mnt/c/Users/user/OneDrive/デスクトップ/**)"
+      "Read(//mnt/c/Users/user/OneDrive/デスクトップ/**)",
+      "Bash(PYTHONIOENCODING=utf-8 \"/c/Program Files/Python312/python.exe\" scripts/detail_sync_check.py)",
+      "Bash(PYTHONIOENCODING=utf-8 \"/c/Program Files/Python312/python.exe\" scripts/prediction_similarity_search.py --stats)",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''c:/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/.claude/hooks/jit-detail-gate.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''jit-detail-gate.py: OK''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''c:/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/.claude/hooks/north-star-guard.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''north-star-guard.py: OK''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''c:/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/scripts/prediction_similarity_search.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''prediction_similarity_search.py: OK''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''c:/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/.claude/hooks/fact-checker.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''fact-checker.py: OK''\\)\")",
+      "Bash(bash -c \"cat ''c:/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/.claude/hooks/session-start.sh'' | head -1 && bash -n ''c:/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/.claude/hooks/session-start.sh'' && echo ''session-start.sh: OK''\")",
+      "Bash(find /c/Users/user/OneDrive -name *.md -path *reference*)",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''c:/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/.claude/hooks/jit-detail-gate.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''OK: jit-detail-gate.py''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''c:/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/.claude/hooks/north-star-guard.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''OK: north-star-guard.py''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''c:/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/.claude/hooks/fact-checker.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''OK: fact-checker.py''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''c:/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/scripts/prediction_similarity_search.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''OK: prediction_similarity_search.py''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''c:/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/scripts/test_similarity_search_benchmark.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''OK: test_similarity_search_benchmark.py''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''scripts/prediction_release_contract.py''\\).read\\(\\)\\); print\\(''prediction_release_contract.py: OK''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''scripts/article_release_guard.py''\\).read\\(\\)\\); print\\(''article_release_guard.py: OK''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''scripts/release_governor.py''\\).read\\(\\)\\); print\\(''release_governor.py: OK''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''scripts/build_article_release_manifest.py''\\).read\\(\\)\\); print\\(''build_article_release_manifest.py: OK''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''scripts/prediction_release_contract.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''prediction_release_contract.py: OK''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''scripts/article_release_guard.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''article_release_guard.py: OK''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''scripts/release_governor.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''release_governor.py: OK''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -c \"import ast; ast.parse\\(open\\(''scripts/build_article_release_manifest.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''build_article_release_manifest.py: OK''\\)\")",
+      "Bash(\"/c/Program Files/Python312/python.exe\" -m pytest test_prediction_release_contract.py -v)",
+      "Bash(\"/c/Program Files/Python312/python.exe\" test_prediction_release_contract.py)",
+      "Bash(\"/c/Program Files/Python312/python.exe\" scripts/test_prediction_linkage_backfill.py)",
+      "Bash(\"/c/Program Files/Python312/python.exe\" scripts/test_prediction_release_contract.py)"
     ],
     "deny": [
       "Bash(* rm -rf /*)",
@@ -46,7 +71,9 @@
       "Read(**/*.key)"
     ],
     "additionalDirectories": [
-      "c:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\docs\\seo_audit"
+      "c:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\docs\\seo_audit",
+      "c:\\Users\\user\\OneDrive\\デスクトップ\\vps-automation-openclaw\\.claude\\hooks",
+      "c:\\Users\\user\\OneDrive\\��スクトップ\\vps-automation-openclaw\\.agent-mailbox"
     ]
   },
   "hooks": {

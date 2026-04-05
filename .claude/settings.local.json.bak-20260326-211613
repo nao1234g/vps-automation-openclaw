@@ -1,0 +1,459 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "ANTHROPIC_MODEL": "claude-opus-4-6",
+    "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Task",
+      "WebFetch(domain:docs.bigmodel.cn)",
+      "WebFetch(domain:ai.google.dev)",
+      "WebFetch(domain:open.bigmodel.cn)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:n8n-nodes-substack.readthedocs.io)",
+      "WebFetch(domain:iam.slys.dev)",
+      "WebFetch(domain:support.substack.com)",
+      "WebFetch(domain:developers.beehiiv.com)",
+      "WebFetch(domain:lobachevskystan.substack.com)",
+      "WebFetch(domain:mostlypython.substack.com)",
+      "WebFetch(domain:substack-api.readthedocs.io)",
+      "WebFetch(domain:www.ignorance.ai)",
+      "WebFetch(domain:pypi.org)",
+      "WebFetch(domain:grahammann.net)",
+      "WebFetch(domain:www.tweetarchivist.com)",
+      "WebFetch(domain:buffer.com)",
+      "WebFetch(domain:www.postel.app)",
+      "WebFetch(domain:x.com)",
+      "WebFetch(domain:developer.x.com)",
+      "WebFetch(domain:twitterapi.io)",
+      "WebFetch(domain:docs.x.com)",
+      "WebFetch(domain:socialrails.com)",
+      "WebFetch(domain:help.x.com)",
+      "WebFetch(domain:www.tweetbinder.com)",
+      "WebFetch(domain:devcommunity.x.com)",
+      "WebFetch(domain:owlead.com)",
+      "WebFetch(domain:9meters.com)",
+      "WebFetch(domain:data365.co)",
+      "WebFetch(domain:inspiretothrive.com)",
+      "WebFetch(domain:www.gramfunnels.com)",
+      "WebFetch(domain:elfsight.com)",
+      "WebFetch(domain:themarketingheaven.com)",
+      "WebFetch(domain:tweetdelete.net)",
+      "WebFetch(domain:digitalinspiration.com)",
+      "WebFetch(domain:hackernoon.com)",
+      "WebFetch(domain:www.ayrshare.com)",
+      "WebFetch(domain:developer.twitter.com)",
+      "WebFetch(domain:www.socialmediatoday.com)",
+      "WebFetch(domain:earthweb.com)",
+      "WebFetch(domain:docs.x.ai)",
+      "WebFetch(domain:forum.ghost.org)",
+      "WebFetch(domain:nowpattern.com)",
+      "WebFetch(domain:support.claude.com)",
+      "WebFetch(domain:tomorrowspublisher.today)",
+      "WebFetch(domain:support.google.com)",
+      "WebFetch(domain:note.com)",
+      "WebFetch(domain:coinpost.jp)",
+      "WebFetch(domain:www.coindesk.com)",
+      "WebFetch(domain:about.bnef.com)",
+      "WebFetch(domain:www.metaculus.com)",
+      "WebFetch(domain:docs.manifold.markets)",
+      "WebFetch(domain:metaculus.medium.com)",
+      "WebFetch(domain:help.polymarket.com)",
+      "WebFetch(domain:www.ushijima-law.gr.jp)",
+      "WebFetch(domain:www.shigyo.co.jp)",
+      "WebFetch(domain:lfb.mof.go.jp)",
+      "WebFetch(domain:www.coindeskjapan.com)",
+      "WebFetch(domain:cointelegraph.com)",
+      "WebFetch(domain:www.bloomberg.com)",
+      "WebFetch(domain:www.nikkei.com)",
+      "WebFetch(domain:coinmarketcap.com)",
+      "WebFetch(domain:cryptopotato.com)",
+      "WebFetch(domain:gist.github.com)",
+      "WebFetch(domain:jacobeliason.com)",
+      "WebFetch(domain:innovationlaw.jp)",
+      "WebFetch(domain:it-bengosi.com)",
+      "WebFetch(domain:rocknblock.io)",
+      "WebFetch(domain:projects.fivethirtyeight.com)",
+      "WebFetch(domain:www.okasan.jp)",
+      "WebFetch(domain:www.theblockrunner.com)",
+      "WebFetch(domain:www.gjopen.com)",
+      "WebFetch(domain:goodjudgment.com)",
+      "WebFetch(domain:commoncog.com)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "WebFetch(domain:timvangelder.com)",
+      "WebFetch(domain:opentimestamps.org)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:petertodd.org)",
+      "WebFetch(domain:dgi.io)",
+      "WebFetch(domain:python.useinstructor.com)",
+      "WebFetch(domain:ai.pydantic.dev)",
+      "WebFetch(domain:www.stevanus.design)",
+      "WebFetch(domain:www.benjaminrancourt.ca)",
+      "WebFetch(domain:til.simonwillison.net)",
+      "WebFetch(domain:vizzly.dev)",
+      "Read(//tmp/**)",
+      "Read(//c/tmp/**)",
+      "WebFetch(domain:www.mediawiki.org)",
+      "WebFetch(domain:baymard.com)",
+      "WebFetch(domain:www.uxpin.com)",
+      "WebFetch(domain:ithy.com)",
+      "WebFetch(domain:css-tricks.com)",
+      "WebFetch(domain:get.foundation)",
+      "WebFetch(domain:claudefa.st)",
+      "WebFetch(domain:mem0.ai)",
+      "WebFetch(domain:aslamdoctor.com)",
+      "WebFetch(domain:amitkoth.com)",
+      "WebFetch(domain:richardporter.dev)",
+      "WebFetch(domain:openai.com)",
+      "WebFetch(domain:www.eesel.ai)",
+      "WebFetch(domain:platform.openai.com)",
+      "WebFetch(domain:userjot.com)",
+      "WebFetch(domain:nutstudio.imyfone.com)",
+      "WebFetch(domain:www.interconnects.ai)",
+      "WebFetch(domain:www.noviai.ai)",
+      "WebFetch(domain:slator.com)",
+      "WebFetch(domain:www.crescendo.ai)",
+      "WebFetch(domain:www.sciencedaily.com)",
+      "WebFetch(domain:www.nasa.gov)",
+      "WebFetch(domain:developer.tenten.co)",
+      "WebFetch(domain:seranking.com)",
+      "WebFetch(domain:www.advancedwebranking.com)",
+      "WebFetch(domain:www.weglot.com)",
+      "WebFetch(domain:www.stackmatix.com)",
+      "WebFetch(domain:www.seroundtable.com)",
+      "WebFetch(domain:multilipi.com)",
+      "WebFetch(domain:backlinko.com)",
+      "WebFetch(domain:www.gtechme.com)",
+      "WebFetch(domain:www.ulpa.jp)",
+      "WebFetch(domain:llmstxt.org)",
+      "mcp__claude-peers__set_summary",
+      "mcp__claude-peers__list_peers",
+      "mcp__claude-peers__send_message",
+      "mcp__claude-peers__check_messages",
+      "WebFetch(domain:www.googleapis.com)",
+      "WebFetch(domain:docs.anthropic.com)"
+    ],
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*credentials*)",
+      "Read(**/*secret*)",
+      "Read(**/*private_key*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Write(**/.env)",
+      "Write(**/.env.*)",
+      "Write(**/*credentials*)",
+      "Write(**/*private_key*)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(git push --force *)",
+      "Bash(rm -rf *)",
+      "Bash(docker container rm *)",
+      "Bash(docker rm *)",
+      "Bash(systemctl stop *)",
+      "Bash(systemctl disable *)",
+      "Bash(crontab -r*)",
+      "Bash(DROP TABLE*)",
+      "Bash(DELETE FROM*)"
+    ],
+    "defaultMode": "bypassPermissions",
+    "additionalDirectories": [
+      "\\tmp",
+      "c:\\tmp",
+      "C:\\Users\\user\\AppData\\Roaming\\Code\\User",
+      "c:\\Users\\user\\OneDrive\\デスクトップ\\naoto-os",
+      "C:\\Users\\user\\claude-peers-mcp"
+    ]
+  },
+  "model": "claude-opus-4-6",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/flash-cards-inject.sh\"",
+            "timeout": 3
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/feedback-trap.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/backlog-guard.py\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/fact-checker.py\"",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/pvqe-p-stop.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/guard/pre_edit_task_guard.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/guard/task_state_integrity_check.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|WebSearch|WebFetch|Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/research-gate.sh\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/llm-judge.py\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/north-star-guard.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/north-star-guard.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/ui-layout-guard.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/guard/release_gate.py\" --ssh-only",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/vps-ssh-guard.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/guard/post_edit_task_reconcile.py\"",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/guard/task_close_memory_check.py\"",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/guard/task_state_integrity_check.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "WebSearch|WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/research-reward.sh\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "TodoWrite",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/task-tracker.py\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/vps-health-gate.py\" \"$CLAUDE_PROJECT_DIR\"",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/change-tracker.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/north-star-guard.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/auto-codifier.py\" \"$CLAUDE_PROJECT_DIR\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/rules-sync.py\" \"$CLAUDE_PROJECT_DIR\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/guard/failure_capture.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/error-tracker.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-end.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

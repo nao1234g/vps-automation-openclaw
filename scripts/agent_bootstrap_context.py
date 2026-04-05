@@ -33,6 +33,7 @@ DATA_DIR = shared_or_local_path(
 
 SNAPSHOT_PATH = REPORT_DIR / "content_release_snapshot.json"
 GOVERNANCE_PATH = REPORT_DIR / "ecosystem_governance_audit.json"
+MATURITY_PATH = REPORT_DIR / "site_guard" / "prediction_maturity_audit.json"
 MISTAKE_REGISTRY_PATH = DATA_DIR / "mistake_registry.json"
 
 
@@ -75,14 +76,23 @@ def _summarize_mistake_registry(registry: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _fmt_state_value(value: Any) -> str:
+    return "n/a" if value is None else str(value)
+
+
 def build_bootstrap_payload() -> dict[str, Any]:
     contract = get_mission_contract()
     snapshot = _read_json(SNAPSHOT_PATH)
     governance = _read_json(GOVERNANCE_PATH)
+    maturity = _read_json(MATURITY_PATH)
     registry = _read_json(MISTAKE_REGISTRY_PATH)
     tracker_summary = snapshot.get("tracker_summary", {}) if isinstance(snapshot, dict) else {}
     operational = snapshot.get("operational_metrics", {}) if isinstance(snapshot, dict) else {}
     manifest_counts = snapshot.get("manifest_counts", {}) if isinstance(snapshot, dict) else {}
+    maturity_summary = maturity.get("maturity", {}) if isinstance(maturity, dict) else {}
+    m1 = maturity_summary.get("m1_scored_sample_and_backlog", {}) if isinstance(maturity_summary, dict) else {}
+    m2 = maturity_summary.get("m2_human_baseline", {}) if isinstance(maturity_summary, dict) else {}
+    m3 = maturity_summary.get("m3_en_card_completeness", {}) if isinstance(maturity_summary, dict) else {}
 
     return {
         "mission_contract_version": MISSION_CONTRACT_VERSION,
@@ -112,6 +122,14 @@ def build_bootstrap_payload() -> dict[str, Any]:
             "approval_backlog_ratio_pct": operational.get("approval_backlog_ratio_pct"),
             "governance_failed": governance.get("failed"),
             "governance_total": governance.get("total"),
+            "maturity_generated_at_epoch": maturity.get("generated_at_epoch"),
+            "maturity_m1_progress_pct": m1.get("progress_pct"),
+            "maturity_m2_progress_pct": m2.get("progress_pct"),
+            "maturity_m3_progress_pct": m3.get("progress_pct"),
+            "maturity_publicly_scored": m1.get("current_publicly_scored"),
+            "maturity_publicly_scored_target": m1.get("target_publicly_scored"),
+            "maturity_unique_voters": m2.get("unique_voters"),
+            "maturity_unique_voters_target": (m2.get("thresholds") or {}).get("min_unique_voters"),
         },
         "mistake_registry": _summarize_mistake_registry(registry),
         "required_sources_of_truth": contract.get("source_docs", []),
@@ -152,6 +170,14 @@ def format_bootstrap_summary(payload: dict[str, Any] | None = None) -> str:
             f"critical_active={registry.get('critical_active')} | "
             f"guard_coverage={registry.get('guard_coverage_pct')}% | "
             f"test_coverage={registry.get('test_coverage_pct')}%"
+        ),
+        (
+            "Prediction Maturity: "
+            f"M1={_fmt_state_value(state.get('maturity_m1_progress_pct'))}% | "
+            f"M2={_fmt_state_value(state.get('maturity_m2_progress_pct'))}% | "
+            f"M3={_fmt_state_value(state.get('maturity_m3_progress_pct'))}% | "
+            f"scored={_fmt_state_value(state.get('maturity_publicly_scored'))}/{_fmt_state_value(state.get('maturity_publicly_scored_target'))} | "
+            f"human_voters={_fmt_state_value(state.get('maturity_unique_voters'))}/{_fmt_state_value(state.get('maturity_unique_voters_target'))}"
         ),
         f"Read Order: {' -> '.join(data.get('read_order') or [])}",
         "Contract Summary:",

@@ -16,6 +16,8 @@ def main() -> int:
     assert due_jobs(datetime(2026, 4, 2, 10, 28, tzinfo=timezone.utc)) == ["source-links"]
     assert due_jobs(datetime(2026, 4, 2, 10, 34, tzinfo=timezone.utc)) == ["content-integrity"]
     assert due_jobs(datetime(2026, 4, 2, 10, 52, tzinfo=timezone.utc)) == ["smoke"]
+    assert due_jobs(datetime(2026, 4, 2, 12, 56, tzinfo=timezone.utc)) == ["prediction-maturity"]
+    assert due_jobs(datetime(2026, 4, 2, 13, 56, tzinfo=timezone.utc)) == []
     assert due_jobs(datetime(2026, 4, 2, 10, 11, tzinfo=timezone.utc)) == ["governance"]
     assert due_jobs(datetime(2026, 4, 2, 11, 11, tzinfo=timezone.utc)) == []
     print("PASS: site guard scheduler routing")
@@ -24,4 +26,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

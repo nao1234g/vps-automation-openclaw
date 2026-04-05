@@ -1,0 +1,297 @@
+{
+  "generated_at_epoch": 1775351738,
+  "base_url": "https://nowpattern.com",
+  "canonical_local": {
+    "total": 1121,
+    "resolved": 58,
+    "scorable": 54,
+    "not_scorable": 4,
+    "accuracy_pct": 66.7,
+    "public_brier_index": 32.1
+  },
+  "live": {
+    "leaderboard": {
+      "public_min_resolved": 5,
+      "score_display": "brier_index_public_raw_brier_internal",
+      "human_competition": {
+        "ready": false,
+        "state": "beta_ai_benchmark_only",
+        "display_mode": "ai_benchmark_only",
+        "thresholds": {
+          "min_unique_voters": 25,
+          "min_total_votes": 200,
+          "min_resolved_votes": 20,
+          "min_resolved_per_forecaster": 5
+        },
+        "sample": {
+          "unique_voters": 11,
+          "total_votes": 11,
+          "resolved_votes": 1
+        }
+      },
+      "ai": {
+        "name": "Nowpattern AI",
+        "score_basis": "official_prediction_record",
+        "avg_brier_score": 0.4608,
+        "avg_brier_index": 32.1,
+        "resolved_count": 54,
+        "resolved_ids": [
+          "NP-2026-0002",
+          "NP-2026-0003",
+          "NP-2026-0005",
+          "NP-2026-0008",
+          "NP-2026-0013",
+          "NP-2026-0017",
+          "NP-2026-0019",
+          "NP-2026-0020",
+          "NP-2026-0021",
+          "NP-2026-0022",
+          "NP-2026-0025",
+          "NP-2026-0027",
+          "NP-2026-0029",
+          "NP-2026-0032",
+          "NP-2026-0055",
+          "NP-2026-0056",
+          "NP-2026-0057",
+          "NP-2026-0076",
+          "NP-2026-0079",
+          "NP-2026-0099",
+          "NP-2026-0100",
+          "NP-2026-0103",
+          "NP-2026-0105",
+          "NP-2026-0144",
+          "NP-2026-0145",
+          "NP-2026-0173",
+          "NP-2026-0174",
+          "NP-2026-0191",
+          "NP-2026-0194",
+          "NP-2026-0196",
+          "NP-2026-0212",
+          "NP-2026-0214",
+          "NP-2026-0480",
+          "NP-2026-0509",
+          "NP-2026-0522",
+          "NP-2026-0528",
+          "NP-2026-0547",
+          "NP-2026-0550",
+          "NP-2026-0577",
+          "NP-2026-0591",
+          "NP-2026-0593",
+          "NP-2026-0596",
+          "NP-2026-0602",
+          "NP-2026-0641",
+          "NP-2026-0683",
+          "NP-2026-0686",
+          "NP-2026-0731",
+          "NP-2026-0736",
+          "NP-2026-0807",
+          "NP-2026-0859",
+          "NP-2026-0921",
+          "NP-2026-0988",
+          "NP-2026-1035",
+          "NP-2026-1037"
+        ],
+        "resolved_total": 58,
+        "not_scorable_count": 4,
+        "correct_count": 36,
+        "accuracy_pct": 66.7,
+        "public_leaderboard_eligible": true
+      },
+      "readers": {
+        "total_voters": 11,
+        "total_votes": 11,
+        "resolved_votes": 1,
+        "avg_brier_score": 0.5625,
+        "avg_brier_index": 25.0,
+        "accuracy_pct": 0.0,
+        "correct_count": 0,
+        "data_status": "live",
+        "score_basis": "reader_vote_brier",
+        "public_leaderboard_eligible": false,
+        "human_public_ready": false,
+        "human_competition_state": "beta_ai_benchmark_only",
+        "human_public_thresholds": {
+          "min_unique_voters": 25,
+          "min_total_votes": 200,
+          "min_resolved_votes": 20,
+          "min_resolved_per_forecaster": 5
+        }
+      }
+    },
+    "top_forecasters": {
+      "forecasters": [
+        {
+          "voter_id": "neo-one-ai-player",
+          "display_id": "Nowpattern AI",
+          "is_ai": true,
+          "avg_brier_score": 0.4608,
+          "avg_brier_index": 32.1,
+          "resolved_count": 54,
+          "resolved_total": 58,
+          "not_scorable_count": 4,
+          "correct_count": 36,
+          "accuracy_pct": 66.7,
+          "total_votes": 1121,
+          "score_basis": "official_prediction_record",
+          "public_leaderboard_eligible": true,
+          "rank": 1,
+          "public_rank": 1
+        },
+        {
+          "voter_id": "r-1772864281172-1dpwirl6",
+          "display_id": "Forecaster #R-1772",
+          "is_ai": false,
+          "avg_brier_score": 0.5625,
+          "avg_brier_index": 25.0,
+          "resolved_count": 1,
+          "correct_count": 0,
+          "accuracy_pct": 0.0,
+          "total_votes": 1,
+          "score_basis": "reader_vote_brier",
+          "public_leaderboard_eligible": false,
+          "rank": 2,
+          "public_rank": null
+        }
+      ],
+      "public_forecasters": [
+        {
+          "voter_id": "neo-one-ai-player",
+          "display_id": "Nowpattern AI",
+          "is_ai": true,
+          "avg_brier_score": 0.4608,
+          "avg_brier_index": 32.1,
+          "resolved_count": 54,
+          "resolved_total": 58,
+          "not_scorable_count": 4,
+          "correct_count": 36,
+          "accuracy_pct": 66.7,
+          "total_votes": 1121,
+          "score_basis": "official_prediction_record",
+          "public_leaderboard_eligible": true,
+          "rank": 1,
+          "public_rank": 1
+        }
+      ],
+      "human_public_forecasters": [],
+      "total": 2,
+      "public_total": 1,
+      "public_min_resolved": 5,
+      "human_competition": {
+        "ready": false,
+        "state": "beta_ai_benchmark_only",
+        "display_mode": "ai_benchmark_only",
+        "thresholds": {
+          "min_unique_voters": 25,
+          "min_total_votes": 200,
+          "min_resolved_votes": 20,
+          "min_resolved_per_forecaster": 5
+        },
+        "sample": {
+          "unique_voters": 11,
+          "total_votes": 11,
+          "resolved_votes": 1
+        }
+      },
+      "human_public_ready": false,
+      "human_competition_state": "beta_ai_benchmark_only",
+      "human_public_thresholds": {
+        "min_unique_voters": 25,
+        "min_total_votes": 200,
+        "min_resolved_votes": 20,
+        "min_resolved_per_forecaster": 5
+      },
+      "human_sample": {
+        "unique_voters": 11,
+        "total_votes": 11,
+        "resolved_votes": 1
+      }
+    },
+    "tracker_ja": {
+      "toolbar_counts": {
+        "all": 1121,
+        "in_play": 976,
+        "awaiting": 87,
+        "resolved": 58
+      },
+      "vote_widget_count": 976,
+      "sample_kpi_note_present": true
+    },
+    "tracker_en": {
+      "toolbar_counts": {
+        "all": 1121,
+        "in_play": 976,
+        "awaiting": 87,
+        "resolved": 58
+      },
+      "vote_widget_count": 976,
+      "sample_kpi_note_present": true,
+      "legacy_placeholder_hits": {
+        "English question copy pending.": 0,
+        "English trigger summary pending.": 0,
+        "English criteria summary pending.": 0,
+        "English scenario summary pending.": 0,
+        "English resolution summary pending.": 0,
+        "English evidence summary pending.": 0
+      },
+      "legacy_placeholder_count": 0,
+      "generic_fallback_hits": {
+        "This forecast is judged against the published YES/NO resolution rule shown on this card.": 179,
+        "The key event is defined in the source forecast record and linked evidence trail.": 41,
+        "Resolution follows the published YES/NO condition for this forecast.": 0,
+        "This forecast resolved as accurate against its published YES/NO rule.": 37,
+        "This forecast resolved as missed against its published YES/NO rule.": 19,
+        "This forecast has a recorded resolution against its published YES/NO rule.": 0,
+        "The supporting evidence bundle for this resolution is recorded and fingerprinted below.": 58,
+        "case in the published scenario split": 1022
+      },
+      "generic_fallback_count": 1356
+    },
+    "leaderboard_en": {
+      "baseline_building_copy_present": true,
+      "human_baseline_cta_present": true,
+      "beta_badge_present": true
+    }
+  },
+  "maturity": {
+    "m1_scored_sample_and_backlog": {
+      "progress_pct": 34.9,
+      "sample_progress_pct": 36.0,
+      "backlog_progress_pct": 33.3,
+      "target_publicly_scored": 150,
+      "current_publicly_scored": 54,
+      "awaiting_count": 87,
+      "resolved_count": 58,
+      "awaiting_to_resolved_ratio": 1.5,
+      "status": "blocked"
+    },
+    "m2_human_baseline": {
+      "progress_pct": 18.2,
+      "human_public_ready": false,
+      "unique_voters": 11,
+      "total_votes": 11,
+      "resolved_votes": 1,
+      "unique_voter_progress_pct": 44.0,
+      "total_vote_progress_pct": 5.5,
+      "resolved_vote_progress_pct": 5.0,
+      "thresholds": {
+        "min_unique_voters": 25,
+        "min_total_votes": 200,
+        "min_resolved_votes": 20,
+        "min_resolved_per_forecaster": 5
+      },
+      "status": "blocked"
+    },
+    "m3_en_card_completeness": {
+      "progress_pct": 50.0,
+      "legacy_placeholder_count": 0,
+      "generic_fallback_count": 1356,
+      "status": "watch"
+    }
+  },
+  "recommendations": [
+    "Resolution backlog still dominates: awaiting=87 vs resolved=58. Compress the awaiting queue before marketing the score moat.",
+    "Publicly scored sample is still 54/150 (36.0%). Prioritize more scored cases over more raw total predictions.",
+    "Human baseline is still below unlock thresholds: 11 voters / 11 votes / 1 resolved votes.",
+    "EN tracker still leans on 1356 generic fallback snippets. Replace them with field-specific English substance before claiming content maturity."
+  ]
+}

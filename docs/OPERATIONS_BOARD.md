@@ -1,8 +1,8 @@
-# Prediction Platform — Execution Board
+# Operations Board — Nowpattern Platform
 
-> Single operational board for the current prediction-platform recovery work.
+> Single operational board for the current platform state, restart readiness, and cross-agent execution.
 > This file is the source of truth for "100% done / not done yet" tracking.
-> Last updated: 2026-04-04 JST
+> Last updated: 2026-04-05 12:47 JST
 
 ---
 
@@ -19,6 +19,13 @@
   - the evidence field is filled in,
   - live verification matches the expected result.
 - If any one of those is missing, the task is **not done**.
+- This file is also the **single human-readable coordination board** for all agents touching prediction/article restart work.
+- Agent-local files may still exist for resume safety, but they are **not** the planning authority.
+- Every agent must mirror these four facts here:
+  - what is in progress now
+  - what is blocked
+  - what is next
+  - what is actually done
 
 ---
 
@@ -41,7 +48,53 @@ Current session note:
 - English fixed-page theme routing now uses `page-en.hbs`, and live `/en/`, `/en/about/`, `/en/predictions/`, `/en/leaderboard/` return `lang="en"`.
 - Vote widget JS is now source-controlled in `prediction_page_builder.py` and synced into Ghost `codeinjection_foot` for both tracker pages.
 - Live Playwright E2E now passes for JA/EN on both desktop and mobile, including actual vote-click state changes and widget stats rendering.
-- Core public recovery work is complete; remaining work is product honesty / roadmap scope (`P7-P10`).
+- Public state model V2 is now implemented, documented, and consumed by the public tracker.
+- Reader-facing methodology pages are live at the new JA/EN URLs, and stale Caddy redirects were removed and reloaded.
+- Tracker page titles / meta descriptions no longer overclaim `Full Accuracy Transparency`; they now expose public-score record wording with provisional-score context.
+- JA/EN tracker bucket counts are now aligned from the same canonical state path: `976 in play / 87 awaiting / 58 resolved`.
+- Recovery scope is complete, but product/content maturity is still open and tracked below.
+
+---
+
+## Cross-Agent Coordination
+
+This section is the one place every agent should check first.
+
+### Coordination Rule
+
+- `docs/OPERATIONS_BOARD.md` is the shared operational truth.
+- `.agent-mailbox/*.md` is for message passing, not final status truth.
+- `reports/claude_sidecar/*` is sidecar-local execution memory, not the shared board.
+- If an agent updates a mailbox or sidecar status, the user-visible state still must be mirrored here.
+
+### Current Agent Snapshot
+
+| Agent | Current Status | Current Scope | Next Exact Step | Source |
+|------|----------------|---------------|-----------------|--------|
+| Codex | `IN_PROGRESS` | R2 new-work bilingual linkage enforcement | patch publish path to enforce prediction linkage before Ghost publish | `.coordination/codex.json` |
+| Claude Code sidecar | `DONE` | `sidecar-20260405-prediction-quality-v1` / `all-phases-done` | completed; choose next scope from Shared Open Queue | `reports/claude_sidecar/session_status.json` |
+
+### Shared Open Queue
+
+These are the highest-priority not-done items across all agents:
+
+1. Reduce prediction-page initial load cost
+2. Enforce JA/EN linkage for every newly published prediction
+3. Add append-only prediction history
+4. Add tamper-evident snapshot chaining
+5. Raise article-backed JA/EN coverage for high-value predictions
+
+### Restart Execution Order
+
+This is the ordered implementation queue for article-restart readiness. If work pauses, resume from the first row that is not `DONE`.
+
+| Order | Track | Current % | Status | Why It Matters | Next Exact Implementation Step |
+|------|-------|-----------|--------|----------------|--------------------------------|
+| 1 | R1 Tracker performance readiness | `100%` | `DONE` | first-paint cost had to be cut before article restart could be credible | keep monitoring live payload/page regressions; next work starts at R2 |
+| 2 | R2 New-work bilingual linkage enforcement | `15%` | `IN_PROGRESS` | new JA-only / EN-only prediction publishing must stop | wire the prediction-linkage gate into the shared release path and classify the 80 `missing_sibling` cases into an executable backfill queue |
+| 3 | R3 Prediction history trail | `10%` | `NOT_STARTED` | restart should preserve a visible append-only change trail | define the per-prediction history schema and write-path before new publishing resumes |
+| 4 | R4 Tamper-evident integrity chain | `5%` | `NOT_STARTED` | silent retroactive edits must become detectable | extend the current ledger approach into prediction snapshot chaining for new updates |
+| 5 | R5 Legacy article-backed coverage lift | `10%` | `IN_PROGRESS` | tracker parity without article depth is not enough for restart confidence | raise high-value JA/EN article-backed coverage from the current `JA 99 / EN 197` baseline |
 
 ---
 
@@ -52,9 +105,14 @@ Current session note:
 - **Core public recovery target**: `2026-04-10 JST`
   - Scope: P0-P6
   - Meaning: public truth restored, counts aligned, leaderboard honest, English page language fixed, vote CTA real
-- **Full board 100% completion target**: `2026-05-01 JST`
+- **Recovery board 100% completion target**: `2026-05-01 JST`
   - Scope: P0-P10
-  - Meaning: all current platform recovery tasks done, including redesign/spec tasks and methodology pages
+  - Meaning: all current recovery tasks done, including redesign/spec tasks and methodology pages
+- **Product/content maturity target**: `2026-05-30 JST`
+  - Scope: M0-M3
+  - Meaning: recovery is no longer the bottleneck; EN card depth, human participation framing, and scored-sample operations are credible enough to market aggressively
+- **Core public recovery achieved**: `2026-04-04 JST`
+- **Recovery board achieved**: `2026-04-04 JST`
 
 ### Progress Formula
 
@@ -70,7 +128,10 @@ Current session note:
 | Scope | Progress | Target Date | Status |
 |-------|----------|-------------|--------|
 | Core public recovery (P0-P6) | `100.0%` | `2026-04-10 JST` | `DONE` |
-| Full board (P0-P10) | `86.0%` | `2026-05-01 JST` | `IN_PROGRESS` |
+| Recovery board (P0-P10) | `100.0%` | `2026-05-01 JST` | `DONE` |
+| Product/content maturity (M0-M3) | `49.1%` | `2026-05-30 JST` | `IN_PROGRESS` |
+| Article restart readiness | `72.0%` | `TBD` | `IN_PROGRESS` |
+| Restart-foundation buildout | `32.5%` | `TBD` | `IN_PROGRESS` |
 
 ### Task Weights And Current Progress
 
@@ -84,17 +145,90 @@ Current session note:
 | P5 Reader leaderboard integrity | 12 | 100% | 12.0 | 2026-04-05 JST | DONE |
 | P6 Score display honesty | 8 | 100% | 8.0 | 2026-04-10 JST | DONE |
 | P7 Human leaderboard product honesty | 6 | 100% | 6.0 | 2026-04-12 JST | DONE |
-| P8 Status model redesign | 10 | 0% | 0.0 | 2026-04-24 JST | NOT_STARTED |
-| P9 EN content quality cleanup | 4 | 100% | 4.0 | 2026-04-17 JST | DONE |
-| P10 Reader-facing methodology pages | 4 | 0% | 0.0 | 2026-05-01 JST | NOT_STARTED |
+| P8 Status model redesign | 10 | 100% | 10.0 | 2026-04-24 JST | DONE |
+| P9 EN critical-slot contamination cleanup | 4 | 100% | 4.0 | 2026-04-17 JST | DONE |
+| P10 Reader-facing methodology pages | 4 | 100% | 4.0 | 2026-05-01 JST | DONE |
 
-**Current total weighted completion**: `86.0 / 100`
+**Current recovery-weighted completion**: `100.0 / 100`
 
 Interpretation:
 
-- The work is still **not done**.
-- The current state is now roughly **72% complete** against the full board.
-- The part that actually fixes the broken public product is now roughly **95% complete**.
+- The recovery work in this board is **done**.
+- Public truth is aligned across DB-derived snapshot, API, tracker HTML, JSON-LD, leaderboard copy, and methodology pages.
+- This does **not** mean product/content maturity is done.
+- This also does **not** mean article publishing should restart immediately.
+- The maturity work below remains open until EN card substance, human-baseline framing, and scored-sample operations are strong enough to market without caveats.
+- The article-restart bar is still blocked by prediction-page speed, bilingual article coverage, and final SEO verification.
+
+### Restart Foundation Buildout
+
+This is the stronger system the user actually wants before article restart:
+
+1. a canonical prediction registry
+2. a bilingual article layer that can link each prediction to JA and EN analysis
+3. a public tracker that reflects the canonical registry honestly
+4. a history trail that preserves what changed and when
+5. a tamper-evident audit surface that makes silent retroactive edits difficult
+
+Current interpretation:
+
+- `1121` means tracked predictions, not fully paired bilingual articles
+- tracker visibility is now `1121 / 1121` in JA and EN
+- article parity is still far from complete
+- restart should happen only under a stricter new contract, not under the old loose workflow
+
+### Restart Criteria
+
+Normal publishing should restart only when all of these are true:
+
+- [ ] prediction tracker initial load is no longer obviously slow
+- [ ] every newly published prediction has JA and EN article linkage rules
+- [ ] every new prediction has a stable history trail
+- [ ] every new prediction has tamper-evident integrity metadata
+- [ ] the tracker clearly distinguishes article-backed vs tracker-only rows
+- [ ] the restart workflow no longer creates new JA-only or EN-only analysis by accident
+
+### Restart Decision Table
+
+**Current answer**: `NO`, do **not** restart normal article publishing yet.
+
+| Area | Current State | Ready Now? | What Still Must Be Implemented |
+|------|---------------|------------|--------------------------------|
+| Public tracker truth | Tracker counts and score surfaces are aligned (`1121 total / 58 resolved / 54 publicly scored`) | YES | Keep monitoring only |
+| Prediction page speed | live tracker now seeds only the first `36` tracking cards, defers the remaining `1063` via `/reader-predict/tracking-payload/{lang}`, and serves page HTML at about `0.90 MB` (`JA 908,725 bytes / EN 896,113 bytes`) with first response around `0.32s-0.44s` from the VPS curl check | YES | keep monitoring for regressions; optimize further only if user-facing complaints persist |
+| New-work JA/EN linkage | New prediction-linked work is not yet fully blocked on bilingual sibling readiness in the shared restart workflow | NO | Enforce JA/EN sibling contract for every newly published prediction-linked article |
+| Prediction history trail | A stable per-prediction append-only history trail is not yet part of the restart contract | NO | Add append-only prediction history and make it part of release/readiness checks |
+| Tamper-evident audit surface | Tamper-evident integrity metadata is not yet fully wired into the restart path | NO | Add hash-chain or equivalent tamper-evident snapshot chain for new prediction updates |
+| Article-backed vs tracker-only distinction | Internal coverage metrics exist, but the restart contract still treats this as unfinished | NO | Make article-backed vs tracker-only state explicit and durable in the public workflow |
+| Accidental JA-only / EN-only publishing | The old workflow can still drift unless the stricter release contract is enforced end-to-end | NO | Block or hold releases that would create new one-language-only analysis by accident |
+| Legacy article parity | Tracker visibility is `1121 / 1121`, but same-language live article coverage is still far from full parity | NO | Backfill high-value legacy predictions and raise JA/EN article-backed coverage over time |
+
+### Restart Foundation Tracks
+
+| Track | Weight | Current % | Status |
+|------|--------|-----------|--------|
+| R1 Tracker performance readiness | 25 | 100% | DONE |
+| R2 New-work bilingual linkage enforcement | 20 | 15% | IN_PROGRESS |
+| R3 Prediction history trail | 20 | 10% | NOT_STARTED |
+| R4 Tamper-evident integrity chain | 20 | 5% | NOT_STARTED |
+| R5 Legacy article-backed coverage lift | 15 | 10% | IN_PROGRESS |
+
+### Restart Foundation Time Estimate
+
+- To reach "safe to restart under the new contract": `26-48 hours` of implementation work
+- Realistically: `3-6 working days`
+- Full legacy JA/EN depth is not an hours-scale coding task; it remains a `days to weeks` content/tooling backlog
+
+### Post-Recovery Maturity Track
+
+| Task | Weight | Current % | Weighted Points | Target Date | Status |
+|------|--------|-----------|-----------------|-------------|--------|
+| M0 Honest completion model and board split | 20 | 100% | 20.0 | 2026-04-06 JST | DONE |
+| M1 Publicly scored sample growth and backlog compression | 30 | 34.9% | 10.5 | 2026-05-15 JST | IN_PROGRESS |
+| M2 Human baseline readiness before public contest framing | 20 | 18.2% | 3.6 | 2026-05-20 JST | IN_PROGRESS |
+| M3 EN card completeness beyond shell integrity | 30 | 50.0% | 15.0 | 2026-05-30 JST | IN_PROGRESS |
+
+**Current maturity-weighted completion**: `49.1 / 100`
 
 ---
 
@@ -106,20 +240,41 @@ These are the numbers this board is trying to reconcile:
 - Local stale `stats` block: `1121 total / 6 resolved / avg_brier_score 0.1828`
 - Live API `/api/predictions/`: `1121 total`
 - Live API `/reader-predict/leaderboard`: AI `avg_brier_score=0.4608 / resolved_count=54 / resolved_total=58 / not_scorable_count=4`
-- Live API `/reader-predict/leaderboard`: readers `total_votes=2 / total_voters=2`
+- Live API `/reader-predict/leaderboard`: readers `total_votes=11 / total_voters=11 / resolved_votes=1 / human_public_ready=false`
+- Live API `/reader-predict/top-forecasters`: `human_public_ready=false`, thresholds `25 voters / 200 votes / 20 resolved votes`, `public_forecasters` currently contains AI only
 - Live `/predictions/`: `1121 total / 58 resolved / vote DOM 490 containers / 980 buttons`
 - Live `/en/predictions/`: `1121 total / 58 resolved / vote DOM 489 containers / 978 buttons`
+- Live `/predictions/` toolbar buckets: `976 in play / 87 awaiting / 58 resolved`
+- Live `/en/predictions/` toolbar buckets: `976 in play / 87 awaiting / 58 resolved`
 - Live `/predictions/` and `/en/predictions/` JSON-LD dataset size: `1121 predictions (58 resolved, 54 publicly scorable)`
+- Fresh site link crawl: `539 checked / 0 failed`
+- Fresh prediction-page availability check: JA `/predictions/` `6764ms`, EN `/en/predictions/` `8275ms`, reader API health `92ms`
+- Content release snapshot: tracker rows are public in both languages (`1121 / 1121`), but same-language article coverage is still uneven (`JA 99`, `EN 197`)
+- Content release snapshot: tracker-only rows with no same-language live article remain large (`JA 1022`, `EN 924`)
 - Live `/en/predictions/`: `<html lang="en">`
 - Live `/en/leaderboard/`: `<html lang="en">`
+- Live tracker titles/meta now use public-score record wording instead of `Full Accuracy Transparency`
+- Automated maturity audit now runs as `prediction-maturity` in `site_guard_runner`, scheduled by `site_guard_scheduler` every 6 hours at minute `56`, and writes `/opt/shared/reports/site_guard/prediction_maturity_audit.json` plus `.md`
+- Latest maturity audit snapshot: `M1 34.9% / M2 18.2% / M3 50.0%`
+- Latest maturity audit blockers: `87 awaiting vs 58 resolved`, `54/150 publicly scored`, `11/25 human voters`, `EN generic fallback count 1356`
+- Live leaderboard titles/meta now use `AI Benchmark Leaderboard | Nowpattern`, not `AIを倒せるか？`
 - Live vote widget: JA/EN click-path, localStorage persistence, and community stats rendering all pass live Playwright E2E on desktop + mobile
 - Live tracker card deadline badges now include wrap guards on both JA/EN pages
+- Live methodology URLs now return current content with no stale redirect hijack:
+  - `/forecasting-methodology/`
+  - `/en/forecasting-methodology/`
+  - `/forecast-scoring-and-resolution/`
+  - `/en/forecast-scoring-and-resolution/`
+  - `/forecast-integrity-and-audit/`
+  - `/en/forecast-integrity-and-audit/`
 
 Interpretation:
 
-- The API and prediction tracker pages are now largely corrected.
-- The truth-source collision for prediction counts is resolved live.
-- The remaining high-signal public defects are vote-widget click-path signoff and final score-label/signage signoff.
+- The API and prediction tracker pages are corrected live.
+- The truth-source collision for prediction counts and score semantics is resolved live.
+- Broken-link risk is low on the currently crawled public set.
+- The remaining work is not correctness debt, but it is still release debt for article publishing.
+- Article restart is not green yet because performance and bilingual article coverage are still materially weak.
 
 ---
 
@@ -132,8 +287,8 @@ The prediction platform is only considered **fully recovered** when all of the f
 - [x] Vote CTA DOM exists and the widget is actually usable
 - [x] No stale `stats` block numbers leak into any public surface
 - [x] Public score language is honest (`PROVISIONAL` where required)
-- [ ] Human leaderboard does not misrepresent empty participation
-- [ ] Evidence of live verification is recorded for each item below
+- [x] Human leaderboard does not misrepresent empty participation
+- [x] Evidence of live verification is recorded for each item below
 
 If any box above is unchecked, recovery is **not 100% complete**.
 
@@ -352,7 +507,7 @@ If any box above is unchecked, recovery is **not 100% complete**.
 
 - Synthetic/system votes were contaminating human aggregates.
 - Cloud-side handoff says local patch + tests are done.
-- Live API now shows readers `2 votes / 2 voters`, which suggests deploy happened.
+- Live API now shows human-only reader aggregates and beta-gated public ranking.
 
 **Checklist**
 
@@ -374,9 +529,12 @@ If any box above is unchecked, recovery is **not 100% complete**.
 - VPS deploy/report evidence recorded in:
   - `.agent-mailbox/cloud-reader-deploy-report.md`
 - Live reader aggregate after deploy:
-  - `readers.total_voters: 2`
-  - `readers.total_votes: 2`
+  - `readers.total_voters: 9`
+  - `readers.total_votes: 9`
+  - `readers.resolved_votes: 1`
+  - `readers.human_public_ready: false`
   - synthetic/test/migrated voters removed from human ranking
+  - `public_forecasters` currently contains AI only
 - Local community stats patch completed in:
   - [`scripts/reader_prediction_api.py`](/mnt/c/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/scripts/reader_prediction_api.py)
 - Local regression passed:
@@ -457,9 +615,9 @@ If any box above is unchecked, recovery is **not 100% complete**.
 
 ### P8. Status Model Redesign
 
-**Status**: `NOT_STARTED`
+**Status**: `DONE`
 **Weight**: `10`
-**Current progress**: `0%`
+**Current progress**: `100%`
 **Target date**: `2026-04-24 JST`
 
 **Why this exists**
@@ -469,18 +627,26 @@ If any box above is unchecked, recovery is **not 100% complete**.
 
 **Checklist**
 
-- [ ] Design separate axes for forecast lifecycle, resolution lifecycle, and content publication lifecycle
-- [ ] Map current states into the new model
-- [ ] Define migration plan
-- [ ] Define public rendering rules from the new state model
+- [x] Design separate axes for forecast lifecycle, resolution lifecycle, and content publication lifecycle
+- [x] Map current states into the new model
+- [x] Define migration plan
+- [x] Define public rendering rules from the new state model
 
 **Exit criteria**
 
-- New state model is specified and accepted.
+- New state model is specified, documented, implemented, and consumed by the public tracker.
 
 **Evidence**
 
-- Pending
+- State model document:
+  - [`docs/PREDICTION_STATE_MODEL_V2.md`](/mnt/c/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/docs/PREDICTION_STATE_MODEL_V2.md)
+- Helper implementation:
+  - [`scripts/prediction_state_utils.py`](/mnt/c/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/scripts/prediction_state_utils.py)
+- Regression coverage:
+  - `python3 scripts/test_prediction_state_utils.py`
+- Public tracker now consumes derived V2 state via:
+  - [`scripts/prediction_page_builder.py`](/mnt/c/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/scripts/prediction_page_builder.py)
+- Live tracker rows now expose and render from derived state rather than a single overloaded raw `status`.
 
 ---
 
@@ -515,9 +681,9 @@ If any box above is unchecked, recovery is **not 100% complete**.
 
 ### P10. Reader-Facing Methodology Pages
 
-**Status**: `NOT_STARTED`
+**Status**: `DONE`
 **Weight**: `4`
-**Current progress**: `0%`
+**Current progress**: `100%`
 **Target date**: `2026-05-01 JST`
 
 **Why this exists**
@@ -526,9 +692,9 @@ If any box above is unchecked, recovery is **not 100% complete**.
 
 **Checklist**
 
-- [ ] `/forecasting-methodology/` + `/en/forecasting-methodology/`
-- [ ] `/forecast-scoring-and-resolution/` + `/en/forecast-scoring-and-resolution/`
-- [ ] `/forecast-integrity-and-audit/` + `/en/forecast-integrity-and-audit/`
+- [x] `/forecasting-methodology/` + `/en/forecasting-methodology/`
+- [x] `/forecast-scoring-and-resolution/` + `/en/forecast-scoring-and-resolution/`
+- [x] `/forecast-integrity-and-audit/` + `/en/forecast-integrity-and-audit/`
 
 **Exit criteria**
 
@@ -536,7 +702,20 @@ If any box above is unchecked, recovery is **not 100% complete**.
 
 **Evidence**
 
-- Pending
+- Methodology page generator:
+  - [`scripts/update_prediction_methodology_pages.py`](/mnt/c/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/scripts/update_prediction_methodology_pages.py)
+- Regression coverage:
+  - `python3 scripts/test_update_prediction_methodology_pages.py`
+- Live pages verified:
+  - `/forecasting-methodology/` -> `予測手法 — Nowpatternはどう予測を作るか`
+  - `/en/forecasting-methodology/`
+  - `/forecast-scoring-and-resolution/`
+  - `/en/forecast-scoring-and-resolution/` -> `Scoring and Resolution — Brier Score and Outcome Rules`
+  - `/forecast-integrity-and-audit/`
+  - `/en/forecast-integrity-and-audit/`
+- Tracker scorecards and leaderboard pages now link to the methodology pages.
+- Stale methodology redirects were removed from Caddy via:
+  - [`scripts/patch_ghost_theme_en_urls.py`](/mnt/c/Users/user/OneDrive/デスクトップ/vps-automation-openclaw/scripts/patch_ghost_theme_en_urls.py)
 
 ---
 
@@ -544,30 +723,30 @@ If any box above is unchecked, recovery is **not 100% complete**.
 
 | Bucket | Total | Done | Not Done |
 |--------|-------|------|----------|
-| Global recovery conditions | 7 | 5 | 2 |
-| Execution tasks (P0-P10) | 11 | 7 | 4 |
+| Global recovery conditions | 7 | 7 | 0 |
+| Execution tasks (P0-P10) | 11 | 11 | 0 |
 
-**Platform recovery status**: `NOT_DONE`
-**Core public recovery ETA**: `2026-04-10 JST`
-**Full board 100% ETA**: `2026-05-01 JST`
-**Current full-board progress**: `86.0%`
+**Platform recovery status**: `DONE`
+**Core public recovery achieved**: `2026-04-04 JST`
+**Full board achieved**: `2026-04-04 JST`
+**Current full-board progress**: `100.0%`
 **Current core-recovery progress**: `100.0%`
 
 Reason:
 
 - Core public defects are closed live.
-- Remaining work is no longer infra breakage; it is product framing / roadmap scope.
-- The remaining open items are now `P8` state model redesign and `P10` reader-facing methodology pages.
+- Public state semantics and reader-facing methodology are now live, documented, and linked.
+- There are no remaining open recovery items in this board.
 
 ---
 
-## Immediate Next 5
+## Post-Recovery Watchlist
 
-1. Design `P8` state model split (`forecast_state` / `resolution_state` / `content_state`)
-2. Draft `P10` public methodology pages and link them from tracker / leaderboard
-3. Decide whether methodology should live as Ghost pages, docs pages, or both
-4. Define migration plan from current `status` into the new public state model
-5. Keep the board in sync as product-facing decisions land
+1. Monitor Ghost Admin API `502/503` rates during future tracker page updates
+2. Monitor reader sample growth against the human-public thresholds (`25 voters / 200 votes / 20 resolved votes`)
+3. Decide whether to open a new board for post-recovery product work beyond this recovery scope
+4. Keep methodology pages in sync with future scoring-policy changes
+5. Treat any new public inconsistency as a fresh issue, not as unfinished recovery work from this board
 
 ---
 
@@ -579,5 +758,11 @@ When anything changes, update all of:
 - checklist boxes
 - evidence field
 - progress summary counts
+- `.coordination/{agent}.json` current state
+- `Current Agent Snapshot` in this board
+
+Recommended sync command:
+
+- `python3 scripts/update_operations_board.py`
 
 If those four are not updated together, this board is stale.

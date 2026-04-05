@@ -1,55 +1,41 @@
 RESUME PROMPT — Claude Code Sidecar / Codex Handoff
-Generated: 2026-04-04
-Last session: sidecar-20260404-runtime-layer-v1
+Generated: 2026-04-05
+Last session: sidecar-20260405-prediction-quality-v1
 Status: COMPLETED (scope 100%)
 
 == WHAT WAS DONE ==
-Claude Code runtime layer stability audit and patch:
-1. Full hook inventory: 31 hooks across 2 config files (settings.json + settings.local.json), 7 event types
-2. Root cause diagnosis: 5 factors for "stops after ~10 minutes" — primary cause was no mid-session sidecar state save
-3. Patch P1: Enhanced sidecar_session_start.py — resume detection (reads prior session state, injects context)
-4. Patch P2: Created sidecar_session_end.py — auto-marks in_progress as "interrupted" on unplanned exit
-5. Patch P3: Updated settings.json — registered SessionEnd hook, updated Stop/SubagentStop gate prompts
+1. Genre tags backfill: 44/52 RESOLVED predictions categorized on VPS (slug format)
+2. Status normalization: 6 lowercase "resolved" → "RESOLVED"
+3. Genre tag format normalization: 32 Japanese text → slug format
+4. Brier calibration analysis: catastrophic underconfidence found (0-10% bucket: 70.6% actual HIT)
+5. category_brier_analysis.py fixed for list genre_tags
+6. .coordination/ agent mutual awareness system created (protocol, state files, PreToolUse hook)
+7. coordination-session-sync.py CLI tool created
 
-== SIDECAR LIFECYCLE (NEW) ==
-Normal:    in_progress → completed
-Planned:   in_progress → blocked (with blocking_reason + next_exact_step)
-Unplanned: in_progress → interrupted (SessionEnd hook auto-fires)
-Resume:    Next SessionStart detects interrupted/blocked → injects resume context
+== COORDINATION SYSTEM STATUS ==
+- .coordination/protocol.json — defines agents, rules, heartbeat intervals
+- .coordination/codex.json — Codex state (idle by default)
+- .coordination/claude-code.json — Claude Code state
+- .coordination/lock-registry.json — lock registry
+- coordination-pretool.py — PreToolUse hook checks .coordination/*.json for conflicts
+- coordination-session-sync.py — CLI: --show, --update-self, --lock, --unlock, --idle
 
-== WHAT CODEX SHOULD DO NEXT ==
-Priority order:
-1. TCR-3 from v4: Publish/republish Ghost articles for 20 in-play candidates
-2. TCR-1: Adjust prediction_page_builder.py in-play classification (RESOLVING with Q2 deadlines)
-3. TCR-2: Run prediction_auto_verifier.py in batch mode for past-deadline RESOLVING predictions
-4. Resolve NP-0048, NP-0078, NP-0074 (deadlines already passed)
-5. TCR-4: Backfill linked_articles in prediction_db.json from ghost_url
-
-== NOT ADDRESSED (DEFERRED) ==
-- Hook overhead reduction (13-14 hooks per Edit/Write) — not causing silent stop, optimization deferred
-- session-start.sh SSH heaviness (5-6 calls) — slow startup, not causing silent stop
-- Mid-session heartbeat updates — would need UserPromptSubmit hook, adds overhead
+== REMAINING WORK (next session) ==
+1. Delete redundant .claude/hooks/coordination-precheck.py (logic already in coordination-pretool.py)
+2. Add coordination status display to session-start.sh
+3. Update .codex/instructions.md with coordination protocol usage
+4. Use docs/OPERATIONS_BOARD.md as the single shared board + restructure around it
 
 == FILES TO READ ==
-1. reports/claude_sidecar/task_result_runtime_v1.json — canonical audit + patch details
-2. reports/claude_sidecar/task_result_runtime_v1.md — human-readable version
-3. reports/claude_sidecar/task_result_v4.json — prior session (coverage/in-play audit)
-4. .claude/hooks/sidecar_session_start.py — resume detection code
-5. .claude/hooks/sidecar_session_end.py — auto-interrupt code
-6. .claude/settings.json — hook registration + stop gate prompts
-
-== IF CLAUDE CODE RESUMES ==
-Read session_status.json first. If status=completed, this scope is done.
-Next sidecar scope candidates:
-- Hook overhead optimization (reduce 13-14 hooks per Edit/Write)
-- session-start.sh SSH call reduction
-- Post-implementation verification of Codex TCR work
-- Brier Score deep analysis (calibration by topic)
+1. reports/claude_sidecar/task_result_v5.json — canonical results
+2. .coordination/protocol.json — coordination system design
+3. .claude/hooks/coordination-pretool.py — conflict detection hook
+4. docs/OPERATIONS_BOARD.md — single shared operations board
 
 == STOP-PROOF CONTRACT ==
 Any future sidecar session MUST maintain these 4 files:
-1. reports/claude_sidecar/session_status.json (updated at every phase boundary)
-2. reports/claude_sidecar/heartbeat.json (updated at every phase completion)
-3. reports/claude_sidecar/task_result_v{N}.json (at session completion)
-4. reports/claude_sidecar/resume_prompt.txt (at session end, always)
-Silent stops are prohibited. Always write blocking_reason and next_exact_step before stopping.
+- reports/claude_sidecar/session_status.json
+- reports/claude_sidecar/heartbeat.json
+- reports/claude_sidecar/task_result_v{N}.json
+- reports/claude_sidecar/task_result_v{N}.md
+- reports/claude_sidecar/resume_prompt.txt

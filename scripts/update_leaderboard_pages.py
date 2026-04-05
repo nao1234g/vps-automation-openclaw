@@ -16,12 +16,12 @@ def _copy(lang: str) -> dict[str, str]:
     if lang == "ja":
         return {
             "title": "AI Benchmark Leaderboard",
-            "subtitle": "AIの公開成績を基準に置きつつ、人間ランキングは十分なサンプル到達後に公開します。",
-            "cta_title": "参加する",
+            "subtitle": "AIの公開成績をベンチマークとして開示しつつ、人間側はいまは競争より先にベースラインを作る段階です。",
+            "cta_title": "人間ベースラインを育てる",
             "cta_loading": "参加条件を読み込み中...",
             "cta_beta": (
                 '<a href="https://nowpattern.com/predictions/" style="color:#2563eb;font-weight:700">'
-                "予測一覧ページ</a>から参加できます。人間ランキングは "
+                "予測一覧ページ</a>から参加できます。いまは勝敗より先に人間ベースラインを作る段階で、公開ランキングは "
                 "{voters}人 / {votes}票 / {resolved}解決票 に達するまで beta 表示です。"
             ),
             "cta_live": (
@@ -39,7 +39,7 @@ def _copy(lang: str) -> dict[str, str]:
             "human_heading": "Human Forecasters",
             "beta_title": "AI benchmark only (beta)",
             "beta_body": (
-                "人間ランキングは、十分な参加密度ができるまで公開競争として見せません。"
+                "人間側は、十分な参加密度ができるまで公開競争ではなくベースライン構築として扱います。"
                 "現在のサンプルは {sample_voters}人 / {sample_votes}票 / {sample_resolved}解決票 です。"
             ),
             "beta_thresholds": (
@@ -54,12 +54,12 @@ def _copy(lang: str) -> dict[str, str]:
         }
     return {
         "title": "AI Benchmark Leaderboard",
-        "subtitle": "Nowpattern AI stays public; human rankings only unlock once the sample is genuinely meaningful.",
-        "cta_title": "Join the Challenge",
+        "subtitle": "Nowpattern AI stays public; the human side is still in baseline-building mode until the sample is genuinely meaningful.",
+        "cta_title": "Build the Human Baseline",
         "cta_loading": "Loading participation criteria...",
         "cta_beta": (
             '<a href="https://nowpattern.com/en/predictions/" style="color:#2563eb;font-weight:700">'
-            "Vote from the prediction tracker</a>. Human rankings stay in beta until the sample reaches "
+            "Vote from the prediction tracker</a>. Right now we are building a credible human baseline before framing this as a real public contest. Human rankings stay in beta until the sample reaches "
             "{voters} unique voters / {votes} total votes / {resolved} resolved votes."
         ),
         "cta_live": (
@@ -77,7 +77,7 @@ def _copy(lang: str) -> dict[str, str]:
         "human_heading": "Human Forecasters",
         "beta_title": "AI benchmark only (beta)",
         "beta_body": (
-            "We do not present the human side as a real public contest until the sample is dense enough. "
+            "We do not present the human side as a real public contest until the sample is dense enough; for now it is baseline-building. "
             "Current sample: {sample_voters} unique voters / {sample_votes} votes / {sample_resolved} resolved votes."
         ),
         "beta_thresholds": (
@@ -111,6 +111,22 @@ def _policy_links_html(lang: str) -> str:
         f'color:#E2E8F0;text-decoration:none;font-size:0.8em;font-weight:700">{label} ↗</a>'
         for label, href in links
     )
+
+
+def _page_metadata(lang: str) -> dict[str, str]:
+    if lang == "ja":
+        title = "AI Benchmark Leaderboard | Nowpattern"
+        description = (
+            "Nowpattern AI の公開成績を基準にしたリーダーボード。"
+            "人間側はサンプルが十分に集まるまでベースライン構築の beta 表示で、AI と人間の集計は分離しています。"
+        )
+    else:
+        title = "AI Benchmark Leaderboard | Nowpattern"
+        description = (
+            "Leaderboard anchored on the public Nowpattern AI record. "
+            "The human side stays in baseline-building beta until the sample is genuinely meaningful, and AI/human scoring is kept separate."
+        )
+    return {"title": title, "meta_title": title, "meta_description": description}
 
 
 def _leaderboard_script(lang: str) -> str:
@@ -249,12 +265,21 @@ def main() -> int:
         return 1
 
     targets = [
-        ("leaderboard", "Leaderboard | Nowpattern", "ja"),
-        ("en-leaderboard", "Leaderboard | Nowpattern", "en"),
+        ("leaderboard", "ja"),
+        ("en-leaderboard", "en"),
     ]
-    for slug, title, lang in targets:
+    for slug, lang in targets:
         html = build_leaderboard_page_html(lang)
-        update_ghost_page(api_key, slug, html, title)
+        seo = _page_metadata(lang)
+        update_ghost_page(
+            api_key,
+            slug,
+            html,
+            seo["title"],
+            meta_title=seo["meta_title"],
+            meta_description=seo["meta_description"],
+            custom_excerpt=seo["meta_description"],
+        )
         print(f"Updated /{slug}/ ({lang})")
     return 0
 

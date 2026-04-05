@@ -10,7 +10,7 @@ from change_freeze_guard import assert_change_window, evaluate_change_freeze
 from credibility_budget_guard import assert_credibility_budget_clear, evaluate_credibility_budget
 from mission_contract import assert_mission_handshake
 
-GOVERNOR_POLICY_VERSION = "2026-04-02-governor-v2"
+GOVERNOR_POLICY_VERSION = "2026-04-05-governor-v3"
 MISSION_HANDSHAKE = assert_mission_handshake(
     "release_governor",
     "gate every public release and distribution decision under the founder mission contract",

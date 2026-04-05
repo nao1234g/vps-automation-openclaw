@@ -285,6 +285,11 @@ TARGETS = [
         "remote": "/opt/shared/scripts/site_guard_scheduler.py",
     },
     {
+        "name": "prediction_maturity_audit",
+        "local": REPO_ROOT / "scripts" / "prediction_maturity_audit.py",
+        "remote": "/opt/shared/scripts/prediction_maturity_audit.py",
+    },
+    {
         "name": "site_ui_smoke_audit",
         "local": REPO_ROOT / "scripts" / "site_ui_smoke_audit.py",
         "remote": "/opt/shared/scripts/site_ui_smoke_audit.py",
@@ -488,6 +493,11 @@ TARGETS = [
         "name": "test_site_guard_scheduler",
         "local": REPO_ROOT / "scripts" / "test_site_guard_scheduler.py",
         "remote": "/opt/shared/scripts/test_site_guard_scheduler.py",
+    },
+    {
+        "name": "test_prediction_maturity_audit",
+        "local": REPO_ROOT / "scripts" / "test_prediction_maturity_audit.py",
+        "remote": "/opt/shared/scripts/test_prediction_maturity_audit.py",
     },
     {
         "name": "test_ecosystem_schedule_router",

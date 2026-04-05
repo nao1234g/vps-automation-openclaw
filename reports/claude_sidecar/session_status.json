@@ -1,30 +1,39 @@
 {
-  "generated_at": "2026-04-04T10:25:00Z",
+  "generated_at": "2026-04-05T12:30:00+09:00",
   "agent": "claude-code-sidecar",
-  "task_id": "sidecar-20260404-runtime-layer-v1",
+  "task_id": "sidecar-20260405-prediction-quality-v1",
   "status": "completed",
-  "current_phase": "phase-4-handoff",
+  "current_phase": "all-phases-done",
   "scope_completion_pct": 100,
   "overall_completion_estimate_pct": 100,
   "reached_100_pct_for_this_scope": true,
   "blocking_reason": "",
-  "next_exact_step": "Scope complete. Read resume_prompt.txt for next candidates.",
+  "next_exact_step": "",
   "files_written": [
     "reports/claude_sidecar/session_status.json",
     "reports/claude_sidecar/heartbeat.json",
-    "reports/claude_sidecar/task_result_runtime_v1.json",
-    "reports/claude_sidecar/task_result_runtime_v1.md",
-    "reports/claude_sidecar/resume_prompt.txt",
-    ".claude/hooks/sidecar_session_start.py",
-    ".claude/hooks/sidecar_session_end.py",
-    ".claude/settings.json"
+    "reports/claude_sidecar/task_result_v5.json",
+    "reports/claude_sidecar/task_result_v5.md",
+    "reports/claude_sidecar/resume_prompt.txt"
   ],
   "safe_write_set": [
     "reports/claude_sidecar/session_status.json",
     "reports/claude_sidecar/heartbeat.json",
-    "reports/claude_sidecar/task_result_runtime_v1.json",
-    "reports/claude_sidecar/task_result_runtime_v1.md",
+    "reports/claude_sidecar/task_result_v5.json",
+    "reports/claude_sidecar/task_result_v5.md",
     "reports/claude_sidecar/resume_prompt.txt"
   ],
-  "completed_tasks": ["A-runtime-audit", "B-runtime-patch", "C-sidecar-update", "D-codex-handoff"]
+  "planned_scopes": [
+    "phase-1: genre_tags backfill (44/52 RESOLVED uncategorized)",
+    "phase-2: status normalization + Brier calibration analysis",
+    "phase-3: .coordination/ agent mutual awareness system"
+  ],
+  "completed_tasks": [
+    "phase-1: genre_tags backfill — 44 RESOLVED predictions categorized with slug-format genre_tags on VPS",
+    "phase-1b: status normalization — 6 lowercase 'resolved' → 'RESOLVED'",
+    "phase-1c: genre_tags format normalization — 32 existing Japanese text tags → slug format",
+    "phase-2: Brier calibration analysis — catastrophic underconfidence discovered (0-10% bucket: 70.6% actual HIT), recorded to AGENT_WISDOM",
+    "phase-2b: category_brier_analysis.py fixed for list genre_tags format",
+    "phase-3: .coordination/ system — protocol.json, agent state files, PreToolUse conflict detection, session-sync CLI"
+  ]
 }

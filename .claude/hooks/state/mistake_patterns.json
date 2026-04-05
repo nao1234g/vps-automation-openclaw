@@ -301,5 +301,13 @@
     "added_at": "2026-03-31",
     "source": "gpt6-incident-2026-03-31",
     "example": "GPT-6 released と書いたが source 0本で公式ソースが無いまま公開してよい"
+  },
+  {
+    "name": "CONSOLIDATION_AS_DELETION",
+    "pattern": "(?:統合|consolidat|merg).*(?:完了|done|complet).*(?:削除|delet|remov|圧縮|compress)",
+    "feedback": "⛔ CONSOLIDATION_AS_DELETION: 統合は移動+再構成であり、削除ではない。統合前の全コンテンツが統合後のどこかに1:1で対応しているか確認してください。要約に圧縮したセクションがある場合はオーナーに確認が必要です（T033）。",
+    "added_at": "2026-04-04",
+    "source": "T033-content-loss-incident",
+    "example": "22ファイルを4ファイルに統合完了。重複セクションを削除しました"
   }
 ]

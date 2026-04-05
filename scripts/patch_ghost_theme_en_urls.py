@@ -21,7 +21,9 @@ from pathlib import Path
 DEFAULT_GHOST_DB = Path("/var/www/nowpattern/content/data/ghost.db")
 DEFAULT_THEME_ROOT = Path("/var/www/nowpattern/content/themes/source")
 DEFAULT_ROUTES_PATH = Path("/var/www/nowpattern/content/settings/routes.yaml")
+DEFAULT_CADDY_REDIRECTS_PATH = Path("/etc/caddy/nowpattern-redirects.txt")
 DEFAULT_SERVICE = "ghost-nowpattern.service"
+DEFAULT_CADDY_SERVICE = "caddy"
 DEFAULT_SITE_URL = "https://nowpattern.com"
 
 CARD_TEMPLATE_PATH = Path("partials/post-card.hbs")
@@ -54,6 +56,14 @@ PREDICTION_METHODOLOGY_ROUTES = (
     "  /en/forecast-integrity-and-audit/:\n"
     "    data: page.en-forecast-integrity-and-audit\n"
     "    template: page\n"
+)
+STALE_METHODOLOGY_REDIRECTS = (
+    "redir /forecasting-methodology/ /forecast-rules/ permanent",
+    "redir /en/forecasting-methodology/ /en/forecast-rules/ permanent",
+    "redir /forecast-scoring-and-resolution/ /scoring-guide/ permanent",
+    "redir /en/forecast-scoring-and-resolution/ /en/scoring-guide/ permanent",
+    "redir /forecast-integrity-and-audit/ /integrity-audit/ permanent",
+    "redir /en/forecast-integrity-and-audit/ /en/integrity-audit/ permanent",
 )
 
 
@@ -196,6 +206,22 @@ def ensure_prediction_methodology_routes(routes_path: Path, dry_run: bool) -> Fi
     return FilePatchResult(path=str(routes_path), changed=changed, replacements=len(required_markers) if changed else 0)
 
 
+def remove_stale_methodology_redirects(redirects_path: Path, dry_run: bool) -> FilePatchResult:
+    content = redirects_path.read_text(encoding="utf-8")
+    lines = content.splitlines()
+    stale_lines = set(STALE_METHODOLOGY_REDIRECTS)
+    filtered = [line for line in lines if line.strip() not in stale_lines]
+    removed = len(lines) - len(filtered)
+    updated = "\n".join(filtered)
+    if content.endswith("\n"):
+        updated += "\n"
+    changed = updated != content
+    if changed and not dry_run:
+        backup_file(redirects_path)
+        redirects_path.write_text(updated, encoding="utf-8")
+    return FilePatchResult(path=str(redirects_path), changed=changed, replacements=removed)
+
+
 def target_public_en_url(site_url: str, slug: str) -> str | None:
     if not slug.startswith("en-") or len(slug) <= 3:
         return None
@@ -240,10 +266,10 @@ def normalize_en_canonical_urls(db_path: Path, site_url: str, dry_run: bool) -> 
     }
 
 
-def restart_service(service_name: str, dry_run: bool) -> None:
+def run_systemctl(service_name: str, action: str, dry_run: bool) -> None:
     if dry_run:
         return
-    subprocess.run(["systemctl", "restart", service_name], check=True)
+    subprocess.run(["systemctl", action, service_name], check=True)
 
 
 def main() -> int:
@@ -254,12 +280,15 @@ def main() -> int:
     parser.add_argument("--db", default=str(DEFAULT_GHOST_DB), help="Path to ghost.db")
     parser.add_argument("--theme-root", default=str(DEFAULT_THEME_ROOT), help="Path to active Ghost theme root")
     parser.add_argument("--routes", default=str(DEFAULT_ROUTES_PATH), help="Path to Ghost routes.yaml")
+    parser.add_argument("--redirects", default=str(DEFAULT_CADDY_REDIRECTS_PATH), help="Path to Caddy redirects file")
     parser.add_argument("--site-url", default=DEFAULT_SITE_URL, help="Canonical public site URL")
     parser.add_argument("--service", default=DEFAULT_SERVICE, help="Ghost systemd service to restart")
+    parser.add_argument("--caddy-service", default=DEFAULT_CADDY_SERVICE, help="Caddy systemd service to reload")
     parser.add_argument("--dry-run", action="store_true", help="Report planned changes without writing")
     parser.add_argument("--skip-db", action="store_true", help="Skip canonical_url normalization")
     parser.add_argument("--skip-theme", action="store_true", help="Skip theme template patching")
     parser.add_argument("--skip-page-lang", action="store_true", help="Skip English page template and routes patching")
+    parser.add_argument("--skip-caddy", action="store_true", help="Skip stale Caddy redirect cleanup")
     parser.add_argument("--no-restart", action="store_true", help="Do not restart Ghost after patching")
     parser.add_argument("--json-out", help="Optional JSON report path")
     args = parser.parse_args()
@@ -267,30 +296,37 @@ def main() -> int:
     db_path = Path(args.db)
     theme_root = Path(args.theme_root)
     routes_path = Path(args.routes)
+    redirects_path = Path(args.redirects)
     if not db_path.exists() and not args.skip_db:
         raise FileNotFoundError(f"ghost db not found: {db_path}")
     if not theme_root.exists() and not args.skip_theme:
         raise FileNotFoundError(f"theme root not found: {theme_root}")
     if not routes_path.exists() and not args.skip_page_lang:
         raise FileNotFoundError(f"routes file not found: {routes_path}")
+    if not redirects_path.exists() and not args.skip_caddy:
+        raise FileNotFoundError(f"redirects file not found: {redirects_path}")
 
     report: dict[str, object] = {
         "site_url": normalize_site_url(args.site_url),
         "db": str(db_path),
         "theme_root": str(theme_root),
         "routes": str(routes_path),
+        "redirects": str(redirects_path),
         "dry_run": args.dry_run,
         "db_changes": {},
         "theme_changes": [],
         "page_lang_changes": [],
+        "caddy_changes": {},
         "restarted": False,
+        "caddy_reloaded": False,
     }
 
-    any_change = False
+    ghost_change = False
+    caddy_change = False
     if not args.skip_db:
         db_changes = normalize_en_canonical_urls(db_path, args.site_url, args.dry_run)
         report["db_changes"] = db_changes
-        any_change = any_change or bool(db_changes.get("canonical_urls_changed"))
+        ghost_change = ghost_change or bool(db_changes.get("canonical_urls_changed"))
 
     if not args.skip_theme:
         card_result = patch_theme_file(
@@ -305,7 +341,7 @@ def main() -> int:
         )
         theme_changes = [asdict(card_result), asdict(post_result)]
         report["theme_changes"] = theme_changes
-        any_change = any_change or any(item["changed"] for item in theme_changes)
+        ghost_change = ghost_change or any(item["changed"] for item in theme_changes)
 
     if not args.skip_page_lang:
         page_en_result = ensure_en_page_template(theme_root, args.dry_run)
@@ -313,11 +349,19 @@ def main() -> int:
         routes_result = patch_routes_for_en_pages(routes_path, args.dry_run)
         page_lang_changes = [asdict(page_en_result), asdict(methodology_routes_result), asdict(routes_result)]
         report["page_lang_changes"] = page_lang_changes
-        any_change = any_change or any(item["changed"] for item in page_lang_changes)
+        ghost_change = ghost_change or any(item["changed"] for item in page_lang_changes)
 
-    if any_change and not args.no_restart:
-        restart_service(args.service, args.dry_run)
+    if not args.skip_caddy:
+        caddy_result = remove_stale_methodology_redirects(redirects_path, args.dry_run)
+        report["caddy_changes"] = asdict(caddy_result)
+        caddy_change = caddy_result.changed
+
+    if ghost_change and not args.no_restart:
+        run_systemctl(args.service, "restart", args.dry_run)
         report["restarted"] = not args.dry_run
+    if caddy_change and not args.no_restart:
+        run_systemctl(args.caddy_service, "reload", args.dry_run)
+        report["caddy_reloaded"] = not args.dry_run
 
     payload = json.dumps(report, ensure_ascii=False, indent=2)
     print(payload)
