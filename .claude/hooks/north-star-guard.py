@@ -354,11 +354,16 @@ if tool_name == "Edit" and hook_event == "PostToolUse":
         )
         sys.exit(2)
 
-    # ── NORTH_STAR.md 編集後: DETAIL同期チェック（非ブロック、警告のみ）───
-    if normalized.lower().endswith("north_star.md"):
+    # ── C'' 双方向sync: NORTH_STAR.md OR DETAIL 編集後 → 同期チェック ───
+    # 設計: 片方向(NORTH_STAR→DETAIL)から双方向に拡張。
+    # 警告をpending_sync.jsonに永続化。session-startで未対応警告を表示。
+    is_ns = normalized.lower().endswith("north_star.md")
+    is_detail = "north_star_detail.md" in normalized.lower()
+    if is_ns or is_detail:
         sync_script = PROJECT_DIR / "scripts" / "detail_sync_check.py"
         if sync_script.exists():
             import subprocess
+            _sync_err_log = PROJECT_DIR / ".claude" / "hooks" / "state" / "errors.log"
             try:
                 result = subprocess.run(
                     [sys.executable, str(sync_script), "--json"],
@@ -369,22 +374,50 @@ if tool_name == "Edit" and hook_event == "PostToolUse":
                     sync_data = json.loads(result.stdout)
                     warnings = sync_data.get("warnings", [])
                     if warnings:
+                        edited = "NORTH_STAR.md" if is_ns else "DETAIL"
                         print(
                             "\n"
                             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                            "ℹ️  [SYNC CHECK] NORTH_STAR ↔ DETAIL 同期警告\n"
+                            f"ℹ️  [SYNC CHECK] {edited} 編集 → 同期警告\n"
                             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
                         )
                         for w in warnings:
                             print(f"  ⚠️  {w}")
                         print(
                             "\n"
-                            "  DETAIL も更新が必要かもしれません。\n"
+                            "  もう片方のファイルも更新が必要かもしれません。\n"
                             "  確認: python scripts/detail_sync_check.py --fix\n"
                             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
                         )
-                        # 警告のみ、ブロックしない（exit 0）
-            except Exception:
-                pass  # sync check失敗でもブロックしない
+                        # C'' pending_sync.json に警告を永続化
+                        _pending_file = PROJECT_DIR / ".claude" / "hooks" / "state" / "pending_sync.json"
+                        try:
+                            from datetime import datetime as _dt
+                            _pending = {
+                                "warnings": warnings,
+                                "source": "NORTH_STAR.md" if is_ns else "NORTH_STAR_DETAIL.md",
+                                "at": _dt.now().isoformat(),
+                            }
+                            _pending_file.parent.mkdir(parents=True, exist_ok=True)
+                            _pending_file.write_text(
+                                json.dumps(_pending, indent=2, ensure_ascii=False),
+                                encoding="utf-8",
+                            )
+                        except Exception:
+                            pass
+                    else:
+                        # 警告なし → pending_syncをクリア
+                        _pending_file = PROJECT_DIR / ".claude" / "hooks" / "state" / "pending_sync.json"
+                        if _pending_file.exists():
+                            _pending_file.unlink(missing_ok=True)
+            except Exception as _sync_exc:
+                # C'' エラーログ: サイレント故障防止（ECC§5準拠）
+                try:
+                    from datetime import datetime as _dt
+                    _sync_err_log.parent.mkdir(parents=True, exist_ok=True)
+                    with open(_sync_err_log, "a", encoding="utf-8") as _ef:
+                        _ef.write(f"{_dt.now().isoformat()} sync_check_error: {_sync_exc}\n")
+                except Exception:
+                    pass
 
 sys.exit(0)

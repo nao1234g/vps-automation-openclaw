@@ -496,8 +496,8 @@ def main():
         sys.exit(1)
 
     # 検索エンジン選択
-    # B' ハイブリッドデフォルト: GEMINI_API_KEY が存在すれば自動で
-    # 0.7*TF-IDF + 0.3*embedding のハイブリッドスコアリングを使用。
+    # B'' ハイブリッドデフォルト: GEMINI_API_KEY が存在すれば自動で
+    # Reciprocal Rank Fusion (RRF) によるハイブリッドスコアリングを使用。
     # --embed フラグで embedding 100% に切り替え可能。
     gemini_available = _init_genai()
     use_hybrid = gemini_available and not args.embed  # --embed時は純embedding
@@ -514,48 +514,48 @@ def main():
             min_score = args.min_score or 0.3
             mode = "Gemini Embedding"
     elif use_hybrid:
-        print("Using hybrid search (0.7*TF-IDF + 0.3*Embedding)...", file=sys.stderr)
+        print("Using hybrid search (RRF: TF-IDF + Embedding)...", file=sys.stderr)
         tfidf_engine = TFIDFEngine(predictions)
         embed_engine = EmbeddingEngine(predictions)
         min_score = args.min_score or 0.01
-        mode = "Hybrid (TF-IDF + Embedding)"
+        mode = "Hybrid RRF (TF-IDF + Embedding)"
     else:
         engine = TFIDFEngine(predictions)
         min_score = args.min_score or 0.01
         mode = "TF-IDF"
 
-    # ハイブリッド検索: TF-IDFとEmbeddingの結果を結合
+    # ハイブリッド検索: Reciprocal Rank Fusion (RRF)
+    # B'' 改善: max-normalization → RRF。スコア分布に依存しない安定した結合。
+    # RRF: score(d) = Σ 1/(k + rank_i(d))  (Cormack et al. 2009, k=60が標準)
+    RRF_K = 60
     if use_hybrid:
         tfidf_results = tfidf_engine.search(
-            query=args.query, top_n=args.top * 3,
+            query=args.query, top_n=args.top * 5,
             category=args.category, resolved_only=args.resolved_only,
             min_score=0.001,
         )
         embed_results = embed_engine.search(
-            query=args.query, top_n=args.top * 3,
+            query=args.query, top_n=args.top * 5,
             category=args.category, resolved_only=args.resolved_only,
             min_score=0.1,
         )
 
-        # スコア正規化 + 加重結合
-        tfidf_max = max((s for _, s in tfidf_results), default=1.0) or 1.0
-        embed_max = max((s for _, s in embed_results), default=1.0) or 1.0
-
+        # RRF: 各リストのランクから逆数スコアを計算
         combined: dict[str, tuple[dict, float]] = {}
-        for pred, score in tfidf_results:
+        for rank, (pred, _score) in enumerate(tfidf_results):
             pid = pred.get("id", id(pred))
-            norm_score = score / tfidf_max
-            combined[pid] = (pred, 0.7 * norm_score)
-        for pred, score in embed_results:
+            rrf_score = 1.0 / (RRF_K + rank + 1)
+            combined[pid] = (pred, rrf_score)
+        for rank, (pred, _score) in enumerate(embed_results):
             pid = pred.get("id", id(pred))
-            norm_score = score / embed_max
+            rrf_score = 1.0 / (RRF_K + rank + 1)
             if pid in combined:
-                combined[pid] = (combined[pid][0], combined[pid][1] + 0.3 * norm_score)
+                combined[pid] = (combined[pid][0], combined[pid][1] + rrf_score)
             else:
-                combined[pid] = (pred, 0.3 * norm_score)
+                combined[pid] = (pred, rrf_score)
 
         results = sorted(combined.values(), key=lambda x: x[1], reverse=True)
-        results = [(p, s) for p, s in results if s >= min_score][:args.top]
+        results = results[:args.top]
     else:
         results = engine.search(
             query=args.query,

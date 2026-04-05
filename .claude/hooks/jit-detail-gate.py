@@ -14,6 +14,7 @@ v2 改善（致命的欠陥修正）:
   - offset/limit 追跡: どの範囲を���んだかを記録し、十分な量を読んだかを判定
 """
 import json
+import re
 import sys
 import os
 from pathlib import Path
@@ -26,8 +27,33 @@ STATE_FILE = STATE_DIR / "detail_loaded.json"
 # DETAIL ファイルの実体パス（行数計算用）
 DETAIL_FILE = PROJECT_DIR / ".claude" / "reference" / "NORTH_STAR_DETAIL.md"
 
-# 十分な読み込みと判定する最低行数（DETAILは約780行。100行 ≈ 13%以上を要求）
+# 十分な読み込みと判定する最低行数
 MIN_LINES_READ = 100
+
+# ── A'' セクション単位追跡: DETAIL内の§見出し行番号マップ ──────────────
+# DETAIL のセクション配置（§番号 → 開始行）。build_section_map() で動的取得。
+def build_section_map() -> dict[str, tuple[int, int]]:
+    """DETAIL ファイルの §N 見出しの行範囲を返す。{§番号: (start_line, end_line)}"""
+    if not DETAIL_FILE.exists():
+        return {}
+    section_starts = []
+    try:
+        with open(DETAIL_FILE, "r", encoding="utf-8") as f:
+            for i, line in enumerate(f, 1):
+                m = re.match(r'^##\s+§(\d+)', line)
+                if m:
+                    section_starts.append((f"§{m.group(1)}", i))
+    except Exception:
+        return {}
+    # 各セクションの終了行 = 次のセクション開始行-1（最後は9999）
+    result = {}
+    for idx, (section, start) in enumerate(section_starts):
+        if idx + 1 < len(section_starts):
+            end = section_starts[idx + 1][1] - 1
+        else:
+            end = 9999
+        result[section] = (start, end)
+    return result
 
 # ── 予測クリティカルファイル → 必要なDETAILセクション ──────────────────
 # パターン: (ファイルパスの部分一致, 必要な§番号, 理由)
@@ -104,24 +130,35 @@ def get_required_section(file_path: str):
     return None
 
 
-def estimate_lines_read(tool_input: dict) -> int:
-    """Read toolのinputから読み込み行数を推定する"""
+def estimate_lines_read(tool_input: dict) -> tuple[int, int, int]:
+    """Read toolのinputから読み込み行数と範囲を推定する。(lines, start_line, end_line)"""
     limit = tool_input.get("limit")
-    offset = tool_input.get("offset", 0)
+    offset = int(tool_input.get("offset", 0) or 0)
+    start_line = offset + 1  # Read toolはoffset行目から開始
 
     if limit is not None:
-        # 明示的なlimit指定あり
-        return int(limit)
+        lines = int(limit)
+        return (lines, start_line, start_line + lines - 1)
 
     # limitなし = デフォルト2000行（Read toolのデフォルト）
-    # ただし実ファイル行数を超えない
     if DETAIL_FILE.exists():
         try:
             total = sum(1 for _ in open(DETAIL_FILE, encoding="utf-8"))
-            return max(0, total - int(offset or 0))
+            lines = max(0, total - offset)
+            return (lines, start_line, start_line + lines - 1)
         except Exception:
             pass
-    return 2000  # フォールバック
+    return (2000, start_line, start_line + 1999)
+
+
+def sections_covered(start_line: int, end_line: int, section_map: dict) -> list[str]:
+    """Read範囲がカバーするセクション番号のリストを返す"""
+    covered = []
+    for section, (s_start, s_end) in section_map.items():
+        # 読み込み範囲とセクション範囲が重なるか
+        if start_line <= s_end and end_line >= s_start:
+            covered.append(section)
+    return covered
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -130,18 +167,26 @@ def estimate_lines_read(tool_input: dict) -> int:
 if hook_event == "PostToolUse" and tool_name == "Read":
     file_path = tool_input.get("file_path", "")
     if is_detail_path(file_path):
-        lines_this_read = estimate_lines_read(tool_input)
+        lines_this_read, start_line, end_line = estimate_lines_read(tool_input)
         state = load_state()
         state["total_lines_read"] = state.get("total_lines_read", 0) + lines_this_read
         state["read_count"] = state.get("read_count", 0) + 1
         state["last_read"] = datetime.now().isoformat()
         state["loaded"] = state["total_lines_read"] >= MIN_LINES_READ
+        # A'' セクション追跡: どの§がカバーされたかを記録
+        section_map = build_section_map()
+        covered = sections_covered(start_line, end_line, section_map)
+        existing_sections = set(state.get("sections_read", []))
+        existing_sections.update(covered)
+        state["sections_read"] = sorted(existing_sections)
         # 読み込み履歴（デバッグ用）
         reads = state.get("reads", [])
         reads.append({
             "offset": tool_input.get("offset", 0),
             "limit": tool_input.get("limit"),
             "lines": lines_this_read,
+            "range": f"L{start_line}-L{end_line}",
+            "sections": covered,
             "at": datetime.now().isoformat(),
         })
         state["reads"] = reads[-20:]  # 最新20件まで保持
@@ -173,26 +218,48 @@ if hook_event == "PreToolUse" and tool_name in ("Edit", "Write"):
     # DETAIL が十分に読み込まれているかチェック
     state = load_state()
     total_lines = state.get("total_lines_read", 0)
+    sections_read = set(state.get("sections_read", []))
 
-    if state.get("loaded") and total_lines >= MIN_LINES_READ:
-        sys.exit(0)  # ���分な量を読み込み済み → 許可
+    # A'' セクション単位チェック: 量 + 必要セクション両方を要求
+    lines_ok = total_lines >= MIN_LINES_READ
+    section_ok = section in sections_read
 
-    # ブロック: DETAIL未読 or 読み込み不足
+    if lines_ok and section_ok:
+        sys.exit(0)  # 十分な量 + 必要セクション読み込み済み → 許可
+
+    # ブロック理由の特定
     basename = file_path.split("/")[-1].split("\\")[-1]
-    if total_lines > 0:
-        # 読んだが不十分
+    if total_lines == 0:
+        status_msg = "  現在の読み込み: 0行（未読）"
+        action_msg = (
+            "  編集する前に NORTH_STAR_DETAIL.md を Read してください:\n"
+            "  Read .claude/reference/NORTH_STAR_DETAIL.md"
+        )
+    elif not lines_ok:
         status_msg = f"  現在の読み込み: {total_lines}行 / 必要: {MIN_LINES_READ}行以上"
         action_msg = (
             "  DETAILをもっと読んでください（offset/limitを変えて追加Read）:\n"
             "  例: Read .claude/reference/NORTH_STAR_DETAIL.md offset=200 limit=200"
         )
     else:
-        # 全く読んでいない
-        status_msg = "  現在の読み込み: 0行（未読）"
-        action_msg = (
-            "  編集する前に NORTH_STAR_DETAIL.md を Read してください:\n"
-            "  Read .claude/reference/NORTH_STAR_DETAIL.md"
+        # 量は十分だが必要セクション未読
+        read_list = ", ".join(sorted(sections_read)) if sections_read else "なし"
+        status_msg = (
+            f"  読み込み済み: {total_lines}行（セクション: {read_list}）\n"
+            f"  ⚠️  必要セクション {section} が未読です！"
         )
+        section_map = build_section_map()
+        if section in section_map:
+            s_start, s_end = section_map[section]
+            action_msg = (
+                f"  {section} を含む範囲を Read してください:\n"
+                f"  Read .claude/reference/NORTH_STAR_DETAIL.md offset={s_start - 1} limit={min(s_end - s_start + 1, 200)}"
+            )
+        else:
+            action_msg = (
+                f"  {section} を含む部分を Read してください:\n"
+                "  Read .claude/reference/NORTH_STAR_DETAIL.md"
+            )
 
     print(
         "\n"
@@ -207,8 +274,7 @@ if hook_event == "PreToolUse" and tool_name in ("Edit", "Write"):
         "\n"
         f"{action_msg}\n"
         "\n"
-        "  JIT参照設計: セッション内でDETAILを100行以上読むと解除されます。\n"
-        "  ヘッダーだけ読んでも通過できません（v2: Read量チェック）。\n"
+        "  v3: セクション単位チェック — 必要な§を実際に読まないと通過できません。\n"
         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
     )
     sys.exit(2)

@@ -205,16 +205,6 @@ KNOWN_ERRORS = [
         "feedback": "⛔ FACT ERROR: @aisaintelは廃止されたXアカウントです。現在は存在しません。",
         "name": "AISAINTEL_GHOST"
     },
-    {
-        "pattern": r"(AI推論|AI\s*reasoning|AI\s*inference).{0,120}(根拠|evidence|エビデンス|判断の?基盤|sole\s*basis|唯一の?根拠)",
-        "feedback": "⛔ L5 VIOLATION: (AI推論)マーク付きデータを予測の唯一の根拠にしてはいけません。L1-L3（実測値・一次文献・実践者証言）と組み合わせてください。NORTH_STAR §7 知恵階層を参照。",
-        "name": "L5_SOLE_EVIDENCE"
-    },
-    {
-        "pattern": r"(推測(で|に)生成|AIが推測|AI\s*specul).{0,80}(予測(確率|の根拠)|probability|確率.{0,20}(設定|決定))",
-        "feedback": "⛔ L5 VIOLATION: AIが推測で生成した情報（L5）を予測確率の根拠にしてはいけません。必ずL1-L3の検証可能な事実と照合してください。",
-        "name": "L5_SPECULATIVE_PROBABILITY"
-    },
 ]
 
 # ── ECC Pipeline: mistake_patterns.json から動的ロード ────────────────────────
@@ -383,6 +373,46 @@ UI_VERIFICATION_REQUEST_PATTERN = re.compile(
     r"(ブラウザで確認|目視確認|実際に確認|確認してください"
     r"|ページを開いて|以下のURLで確認|アクセスして確認"
     r"|見てみてください|開いて確認)",
+    re.IGNORECASE
+)
+
+# ──────────────────────────────────────────────────────────────────────────────
+# D'' L5行動ベース検出: 予測確率の設定/提案時に検証可能なソースがない場合にブロック
+# 設計根拠: L5=AIが推測で生成した情報。L5違反者は「AI推論を根拠に」とは書かない。
+#   実際には「総合的に判断して70%」と書く。検出すべきは「ラベル」ではなく「行動」。
+#   行動=「確率を設定/提案する」。証拠=「URL/データソース/市場価格/基準率の引用」。
+# ──────────────────────────────────────────────────────────────────────────────
+PREDICTION_PROB_CLAIM_PATTERN = re.compile(
+    r"("
+    # 確率を設定/判断/決定する行為
+    r"確率.{0,30}(を|は)\s*\d{1,3}\s*%\s*(に|と)\s*(設定|判断|決定|予測|推定)|"
+    r"(確率|probability).{0,20}(設定|決定|判断|推定)(し|しま)|"
+    r"\d{1,3}\s*%\s*(と|に)(予測|設定|判断)(する|した|します)|"
+    # our_pick_probを変更する行為
+    r"our_pick_prob.{0,30}(を|=)\s*\d{1,3}|"
+    # 「総合的に判断して」系の確率断言
+    r"総合的に.{0,40}\d{1,3}\s*%|"
+    r"(諸|複数の|様々な|各種)(要因|要素|情報).{0,40}(判断|勘案).{0,30}\d{1,3}\s*%"
+    r")",
+    re.IGNORECASE | re.DOTALL
+)
+
+# 検証可能な証拠（L1-L3）
+PREDICTION_EVIDENCE_PROOF_PATTERN = re.compile(
+    r"("
+    # URL引用（L1-L3のソース）
+    r"https?://[^\s]{10,}|"
+    # 市場データ引用
+    r"(Polymarket|Metaculus|Manifold|PredictIt|Kalshi).{0,40}\d{1,3}\s*%|"
+    # 具体的データソース引用
+    r"(Bloomberg|Reuters|WSJ|Financial Times|日経|NHK|AP|BBC).{0,60}(によると|reported|said|according)|"
+    # 基準率/統計引用
+    r"(基準率|base\s*rate|historically|過去\d+年|過去\d+回).{0,40}\d{1,3}\s*%|"
+    # 世論調査/統計データ
+    r"(世論調査|poll|survey|統計|GDP|CPI|失業率|成長率).{0,30}\d|"
+    # prediction_db/prediction_similarity_search への参照（過去予測参照=L1）
+    r"prediction_(db|similarity)|過去の(類似|同様の)予測"
+    r")",
     re.IGNORECASE
 )
 
@@ -592,6 +622,32 @@ def main():
                 "\n"
                 "  原則: 数字を主張するなら、その数字を生成したコマンド出力を必ず貼ること。\n"
                 "        「データソースを見た」は証拠にならない。「システムに聞いた」が証拠。"
+            )
+            sys.exit(2)
+
+    # ── D'' L5行動ベース検出: 予測確率をソースなしで断言 ──────────────────
+    # 「確率を70%に設定」「総合的に判断して65%」等の確率断言に
+    # 検証可能なL1-L3ソース（URL/市場データ/基準率/データソース）がない場合にブロック
+    if PREDICTION_PROB_CLAIM_PATTERN.search(last_message):
+        if not PREDICTION_EVIDENCE_PROOF_PATTERN.search(last_message):
+            log_prevention("L5_PREDICTION_NO_EVIDENCE", last_message[:120])
+            print(
+                "⛔ L5予測根拠エラー: 予測確率を設定/提案する際に、\n"
+                "  検証可能なソース（L1-L3）が回答に含まれていません。\n"
+                "\n"
+                "  ❌ 禁止（L5 = AIの推測のみで確率を断言）:\n"
+                "    「総合的に判断して70%」\n"
+                "    「複数の要因を勘案して65%と設定」\n"
+                "\n"
+                "  ✅ 必須（L1-L3の検証可能なソースを引用）:\n"
+                "    URL:    https://... からの引用\n"
+                "    市場:   Polymarket 72% / Metaculus 68% 等の市場価格\n"
+                "    基準率: 過去N年でN回中N回発生（基準率X%）\n"
+                "    統計:   GDP成長率X%, CPI X% 等の具体的数値\n"
+                "    過去予測: prediction_similarity_search で類似予測を参照\n"
+                "\n"
+                "  原則: NORTH_STAR §7 — L4以下は単体で判断の根拠にしない。\n"
+                "        確率にはL1(実測値)かL2(一次文献)かL3(実践者証言)が必須。"
             )
             sys.exit(2)
 
